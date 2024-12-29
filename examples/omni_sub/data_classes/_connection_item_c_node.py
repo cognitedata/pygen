@@ -238,6 +238,11 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
         connection_item_b: The connection item b field.
     """
 
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("connection_item_a", dm.DirectRelationReference("sp_pygen_models", "unidirectional")),
+        ("connection_item_b", dm.DirectRelationReference("sp_pygen_models", "unidirectional")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
 
     space: str

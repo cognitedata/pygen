@@ -197,6 +197,13 @@ class CogniteSchedulableWrite(DomainModelWrite):
         start_time: The actual start time of an activity (or similar that extends this)
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "end_time",
+        "scheduled_end_time",
+        "scheduled_start_time",
+        "start_time",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSchedulable", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE

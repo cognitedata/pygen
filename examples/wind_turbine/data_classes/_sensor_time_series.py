@@ -236,6 +236,17 @@ class SensorTimeSeriesWrite(DomainModelWrite):
         type_: Specifies the data type of the data points.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "concept_id",
+        "description",
+        "is_step",
+        "name",
+        "source_unit",
+        "standard_name",
+        "type_",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "SensorTimeSeries", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

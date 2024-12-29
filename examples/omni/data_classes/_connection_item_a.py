@@ -241,6 +241,19 @@ class ConnectionItemAWrite(DomainModelWrite):
         self_direct: The self direct field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "name",
+        "other_direct",
+        "self_direct",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("outwards", dm.DirectRelationReference("sp_pygen_models", "bidirectional")),
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "other_direct",
+        "self_direct",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

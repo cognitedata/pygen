@@ -296,6 +296,24 @@ class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
             map from CogniteCADNode to tree index
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "cad_node_reference",
+        "description",
+        "model_3d",
+        "name",
+        "object_3d",
+        "revisions",
+        "sub_tree_sizes",
+        "tags",
+        "tree_indexes",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "object_3d",
+        "revisions",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCADNode", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

@@ -252,6 +252,21 @@ class MainShaftWrite(DomainModelWrite):
         torque: The torque field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "bending_x",
+        "bending_y",
+        "calculated_tilt_moment",
+        "calculated_yaw_moment",
+        "torque",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "bending_x",
+        "bending_y",
+        "calculated_tilt_moment",
+        "calculated_yaw_moment",
+        "torque",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "MainShaft", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

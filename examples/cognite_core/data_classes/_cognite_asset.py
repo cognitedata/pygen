@@ -449,6 +449,33 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "asset_class",
+        "description",
+        "name",
+        "object_3d",
+        "parent",
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_updated_time",
+        "source_updated_user",
+        "tags",
+        "type_",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "asset_class",
+        "object_3d",
+        "parent",
+        "path",
+        "root",
+        "source",
+        "type_",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

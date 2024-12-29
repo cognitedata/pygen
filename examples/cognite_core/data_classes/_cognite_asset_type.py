@@ -238,6 +238,17 @@ class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "asset_class",
+        "code",
+        "description",
+        "name",
+        "standard",
+        "tags",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("asset_class",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAssetType", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

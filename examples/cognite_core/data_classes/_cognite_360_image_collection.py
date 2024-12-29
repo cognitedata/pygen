@@ -247,6 +247,18 @@ class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevis
         type_: The type field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "model_3d",
+        "name",
+        "published",
+        "status",
+        "tags",
+        "type_",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("model_3d",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

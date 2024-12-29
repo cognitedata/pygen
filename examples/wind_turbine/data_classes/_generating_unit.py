@@ -185,6 +185,12 @@ class GeneratingUnitWrite(DomainModelWrite):
         name: Name of the instance
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "capacity",
+        "description",
+        "name",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "GeneratingUnit", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

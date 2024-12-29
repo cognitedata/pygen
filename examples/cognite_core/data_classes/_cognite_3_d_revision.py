@@ -215,6 +215,14 @@ class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
         type_: The type field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "published",
+        "status",
+        "type_",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("model_3d",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE

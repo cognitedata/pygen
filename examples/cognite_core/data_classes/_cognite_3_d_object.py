@@ -334,6 +334,22 @@ class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
         z_min: Lowest Z value in bounding box
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+        "x_max",
+        "x_min",
+        "y_max",
+        "y_min",
+        "z_max",
+        "z_min",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("images_360", dm.DirectRelationReference("cdf_cdm", "image-360-annotation")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DObject", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

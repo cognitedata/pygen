@@ -226,6 +226,23 @@ class CogniteCubeMapWrite(DomainModelWrite):
         top: Direct relation to a file holding the top projection of the cube map
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "front",
+        "left",
+        "right",
+        "top",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "front",
+        "left",
+        "right",
+        "top",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCubeMap", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE

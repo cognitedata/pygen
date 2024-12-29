@@ -310,6 +310,10 @@ class DataRecordWriteList(_DataRecordListCore[DataRecordWrite]):
 
 
 class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
+    _container_fields: ClassVar[tuple[str, ...]] = tuple()
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = tuple()
+    _direct_relations: ClassVar[tuple[str, ...]] = tuple()
     external_id_factory: ClassVar[Optional[Callable[[type[DomainModelWrite], dict], str]]] = None
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

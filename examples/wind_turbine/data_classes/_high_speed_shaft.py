@@ -232,6 +232,17 @@ class HighSpeedShaftWrite(DomainModelWrite):
         torque: The torque field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "bending_moment_y",
+        "bending_monent_x",
+        "torque",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "bending_moment_y",
+        "bending_monent_x",
+        "torque",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "HighSpeedShaft", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

@@ -193,6 +193,13 @@ class CogniteDescribableNodeWrite(DomainModelWrite):
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE

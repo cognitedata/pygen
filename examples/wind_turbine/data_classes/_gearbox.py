@@ -226,6 +226,17 @@ class GearboxWrite(DomainModelWrite):
         displacement_z: The displacement z field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "displacement_x",
+        "displacement_y",
+        "displacement_z",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "displacement_x",
+        "displacement_y",
+        "displacement_z",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Gearbox", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

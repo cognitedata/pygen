@@ -413,6 +413,31 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "asset",
+        "description",
+        "equipment_type",
+        "files",
+        "manufacturer",
+        "name",
+        "serial_number",
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_updated_time",
+        "source_updated_user",
+        "tags",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "asset",
+        "equipment_type",
+        "files",
+        "source",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteEquipment", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

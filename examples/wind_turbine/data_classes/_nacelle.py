@@ -375,6 +375,30 @@ class NacelleWrite(DomainModelWrite):
         yaw_error: The yaw error field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "acc_from_back_side_x",
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "yaw_direction",
+        "yaw_error",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "yaw_direction",
+        "yaw_error",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Nacelle", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

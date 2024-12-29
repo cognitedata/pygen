@@ -166,6 +166,8 @@ class MainInterfaceWrite(DomainModelWrite):
         main_value: The main value field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = ("main_value",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
 
     space: str

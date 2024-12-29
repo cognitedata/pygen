@@ -186,6 +186,9 @@ class CogniteVisualizableWrite(DomainModelWrite):
         object_3d: Direct relation to an Object3D instance representing the 3D resource
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = ("object_3d",)
+    _direct_relations: ClassVar[tuple[str, ...]] = ("object_3d",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteVisualizable", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE

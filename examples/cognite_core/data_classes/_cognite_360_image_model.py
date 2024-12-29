@@ -248,6 +248,16 @@ class Cognite360ImageModelWrite(Cognite3DModelWrite):
         type_: CAD, PointCloud or Image360
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+        "thumbnail",
+        "type_",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("thumbnail",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageModel", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

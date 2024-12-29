@@ -221,6 +221,18 @@ class SolarPanelWrite(GeneratingUnitWrite):
         orientation: The orientation field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "capacity",
+        "description",
+        "efficiency",
+        "name",
+        "orientation",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "efficiency",
+        "orientation",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "SolarPanel", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

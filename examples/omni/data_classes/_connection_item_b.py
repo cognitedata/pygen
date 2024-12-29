@@ -222,6 +222,14 @@ class ConnectionItemBWrite(DomainModelWrite):
         self_edge: The self edge field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = ("name",)
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("self_edge", dm.DirectRelationReference("sp_pygen_models", "reflexive")),
+    )
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("inwards", dm.DirectRelationReference("sp_pygen_models", "bidirectional")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemB", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

@@ -364,6 +364,37 @@ class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite
         translation_z: The displacement of the object along the Z-axis in the 3D coordinate system
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "collection_360",
+        "euler_rotation_x",
+        "euler_rotation_y",
+        "euler_rotation_z",
+        "front",
+        "left",
+        "right",
+        "scale_x",
+        "scale_y",
+        "scale_z",
+        "station_360",
+        "taken_at",
+        "top",
+        "translation_x",
+        "translation_y",
+        "translation_z",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "collection_360",
+        "front",
+        "left",
+        "right",
+        "station_360",
+        "top",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360Image", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

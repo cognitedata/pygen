@@ -182,6 +182,12 @@ class Implementation1v2Write(SubInterfaceWrite):
         value_2: The value 2 field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "main_value",
+        "sub_value",
+        "value_2",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "Implementation1", "2")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(

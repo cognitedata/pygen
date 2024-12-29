@@ -388,6 +388,30 @@ class SensorPositionWrite(DomainModelWrite):
         position: The position field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "blade",
+        "edgewise_bend_mom_crosstalk_corrected",
+        "edgewise_bend_mom_offset",
+        "edgewise_bend_mom_offset_crosstalk_corrected",
+        "edgewisewise_bend_mom",
+        "flapwise_bend_mom",
+        "flapwise_bend_mom_crosstalk_corrected",
+        "flapwise_bend_mom_offset",
+        "flapwise_bend_mom_offset_crosstalk_corrected",
+        "position",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "blade",
+        "edgewise_bend_mom_crosstalk_corrected",
+        "edgewise_bend_mom_offset",
+        "edgewise_bend_mom_offset_crosstalk_corrected",
+        "edgewisewise_bend_mom",
+        "flapwise_bend_mom",
+        "flapwise_bend_mom_crosstalk_corrected",
+        "flapwise_bend_mom_offset",
+        "flapwise_bend_mom_offset_crosstalk_corrected",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "SensorPosition", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

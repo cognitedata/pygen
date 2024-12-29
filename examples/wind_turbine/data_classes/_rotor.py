@@ -232,6 +232,15 @@ class RotorWrite(DomainModelWrite):
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "rotor_speed_controller",
+        "rpm_low_speed_shaft",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "rotor_speed_controller",
+        "rpm_low_speed_shaft",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Rotor", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

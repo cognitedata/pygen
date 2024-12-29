@@ -208,6 +208,14 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
         default_string: The default string field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "auto_increment_int_32",
+        "default_boolean",
+        "default_float_32",
+        "default_object",
+        "default_string",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

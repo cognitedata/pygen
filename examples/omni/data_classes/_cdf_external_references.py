@@ -204,6 +204,12 @@ class CDFExternalReferencesWrite(DomainModelWrite):
         timeseries: The timesery field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "file",
+        "sequence",
+        "timeseries",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferences", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

@@ -244,6 +244,17 @@ class PowerInverterWrite(DomainModelWrite):
         reactive_power_total: The reactive power total field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "active_power_total",
+        "apparent_power_total",
+        "reactive_power_total",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "active_power_total",
+        "apparent_power_total",
+        "reactive_power_total",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "PowerInverter", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

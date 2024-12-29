@@ -226,6 +226,15 @@ class GeneratorWrite(DomainModelWrite):
         generator_speed_controller_reference: The generator speed controller reference field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "generator_speed_controller",
+        "generator_speed_controller_reference",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "generator_speed_controller",
+        "generator_speed_controller_reference",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Generator", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

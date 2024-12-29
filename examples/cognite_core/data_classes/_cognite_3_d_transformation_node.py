@@ -250,6 +250,18 @@ class Cognite3DTransformationNodeWrite(DomainModelWrite):
         translation_z: The displacement of the object along the Z-axis in the 3D coordinate system
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "euler_rotation_x",
+        "euler_rotation_y",
+        "euler_rotation_z",
+        "scale_x",
+        "scale_y",
+        "scale_z",
+        "translation_x",
+        "translation_y",
+        "translation_z",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
 
     space: str = DEFAULT_INSTANCE_SPACE

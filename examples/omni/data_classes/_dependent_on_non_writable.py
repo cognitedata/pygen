@@ -218,6 +218,11 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         to_non_writable: The to non writable field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = ("a_value",)
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("to_non_writable", dm.DirectRelationReference("sp_pygen_models", "toNonWritable")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

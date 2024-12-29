@@ -256,6 +256,16 @@ class MetmastWrite(DomainModelWrite):
         wind_turbines: The wind turbine field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "position",
+        "temperature",
+        "tilt_angle",
+        "wind_speed",
+    )
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("wind_turbines", dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Metmast", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

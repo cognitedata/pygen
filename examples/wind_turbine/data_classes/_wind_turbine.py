@@ -303,6 +303,27 @@ class WindTurbineWrite(GeneratingUnitWrite):
         windfarm: The windfarm field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "blades",
+        "capacity",
+        "datasheets",
+        "description",
+        "nacelle",
+        "name",
+        "power_curve",
+        "rotor",
+        "windfarm",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("metmast", dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance")),
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "blades",
+        "datasheets",
+        "nacelle",
+        "rotor",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "WindTurbine", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

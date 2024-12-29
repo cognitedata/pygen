@@ -174,6 +174,11 @@ class SubInterfaceWrite(MainInterfaceWrite):
         sub_value: The sub value field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "main_value",
+        "sub_value",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "SubInterface", "1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

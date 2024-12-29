@@ -215,6 +215,13 @@ class DataSheetWrite(DomainModelWrite):
         name: Name of the instance
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "description",
+        "directory",
+        "mime_type",
+        "name",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "DataSheet", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

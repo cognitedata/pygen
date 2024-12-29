@@ -210,6 +210,15 @@ class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
         version_: Version identifier for the source system
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "manufacturer",
+        "name",
+        "tags",
+        "version_",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

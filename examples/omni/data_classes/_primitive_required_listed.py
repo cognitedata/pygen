@@ -242,6 +242,18 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
         timestamp: The timestamp field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "boolean",
+        "date",
+        "float_32",
+        "float_64",
+        "int_32",
+        "int_64",
+        "json_",
+        "text",
+        "timestamp",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

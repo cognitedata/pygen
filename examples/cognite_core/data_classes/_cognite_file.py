@@ -398,6 +398,29 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
         tags: Text based labels for generic use, limited to 1000
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "assets",
+        "category",
+        "description",
+        "directory",
+        "mime_type",
+        "name",
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_updated_time",
+        "source_updated_user",
+        "tags",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "assets",
+        "category",
+        "source",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteFile", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

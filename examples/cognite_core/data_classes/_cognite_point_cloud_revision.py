@@ -221,6 +221,15 @@ class CognitePointCloudRevisionWrite(Cognite3DRevisionWrite, protected_namespace
         type_: The type field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "published",
+        "revision_id",
+        "status",
+        "type_",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("model_3d",)
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudRevision", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

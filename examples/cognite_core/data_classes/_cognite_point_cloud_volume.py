@@ -312,6 +312,25 @@ class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namesp
         volume_type: Type of volume (Cylinder or Box)
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "format_version",
+        "model_3d",
+        "name",
+        "object_3d",
+        "revisions",
+        "tags",
+        "volume",
+        "volume_references",
+        "volume_type",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "object_3d",
+        "revisions",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None

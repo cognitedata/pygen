@@ -303,6 +303,16 @@ class ConnectionItemEWrite(DomainModelWrite):
         name: The name field.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "direct_list_no_source",
+        "direct_no_source",
+        "name",
+    )
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("inwards_single", dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle")),
+        ("inwards_single_property", dm.DirectRelationReference("sp_pygen_models", "multiProperty")),
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE

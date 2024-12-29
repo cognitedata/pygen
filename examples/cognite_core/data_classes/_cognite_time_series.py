@@ -409,6 +409,32 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
         unit: The unit of the time series.
     """
 
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "assets",
+        "description",
+        "equipment",
+        "is_step",
+        "name",
+        "source",
+        "source_context",
+        "source_created_time",
+        "source_created_user",
+        "source_id",
+        "source_unit",
+        "source_updated_time",
+        "source_updated_user",
+        "tags",
+        "type_",
+        "unit",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "assets",
+        "equipment",
+        "source",
+        "unit",
+    )
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteTimeSeries", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
