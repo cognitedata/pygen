@@ -790,10 +790,10 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
 def serialize_property(value: Any) -> Any:
     if isinstance(value, Sequence) and not isinstance(value, str):
         return [serialize_property(item) for item in value]
-    elif isinstance(value, datetime.date):
-        return value.isoformat()
     elif isinstance(value, datetime.datetime):
         return value.isoformat(timespec="milliseconds")
+    elif isinstance(value, datetime.date):
+        return value.isoformat()
     elif isinstance(value, TimeSeriesWrite | FileMetadataWrite | SequenceWrite):
         return value.external_id
     return value
