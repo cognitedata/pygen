@@ -559,7 +559,7 @@ class DomainModelWriteList(CoreList[T_DomainModelWrite]):
         cache: set[tuple[str, str]] = set()
         domains = ResourcesWrite()
         for node in self:
-            result = node._to_instances_write(cache, write_none, allow_version_increase)
+            result = node._to_resources_write(cache, allow_version_increase)
             domains.extend(result)
         return domains
 
@@ -718,16 +718,14 @@ class DomainRelationWrite(Core, extra="forbid", populate_by_name=True):
         cache.add((edge.space, edge.external_id))
 
         if isinstance(end_node, DomainModelWrite):
-            other_resources = end_node._to_instances_write(
+            other_resources = end_node._to_resources_write(
                 cache,
-                write_none,
                 allow_version_increase,
             )
             resources.extend(other_resources)
         if isinstance(start_node, DomainModelWrite):
-            other_resources = start_node._to_instances_write(
+            other_resources = start_node._to_resources_write(
                 cache,
-                write_none,
                 allow_version_increase,
             )
             resources.extend(other_resources)
