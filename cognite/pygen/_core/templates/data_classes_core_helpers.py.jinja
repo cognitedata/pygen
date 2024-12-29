@@ -65,7 +65,7 @@ def as_instance_dict_id(value:{% if has_default_instance_space %} str |{% endif 
     elif isinstance(value, dict) and "space" in value and "externalId" in value:
         return {"space": value["space"], "externalId": value["externalId"]}
     elif value is not None and hasattr(value, "space") and hasattr(value, "external_id"):
-        return {"space": value.space, "externalId": value.external_id} # type: ignore[union-attr]
+        return {"space": value.space, "externalId": value.external_id}  # type: ignore[union-attr]
     raise TypeError(f"Expected str, NodeId, tuple or DirectRelationReference, got {type(value)}")
 
 
