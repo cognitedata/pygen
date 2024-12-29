@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -156,53 +157,13 @@ class CognitePointCloudVolumeGraphQL(GraphQLCore, protected_namespaces=()):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CognitePointCloudVolume:
         """Convert this GraphQL format of Cognite point cloud volume to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CognitePointCloudVolume(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            description=self.description,
-            format_version=self.format_version,
-            model_3d=self.model_3d.as_read() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
-            name=self.name,
-            object_3d=self.object_3d.as_read() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            revisions=[revision.as_read() for revision in self.revisions] if self.revisions is not None else None,
-            tags=self.tags,
-            volume=self.volume,
-            volume_references=self.volume_references,
-            volume_type=self.volume_type,
-        )
+        return CognitePointCloudVolume.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CognitePointCloudVolumeWrite:
         """Convert this GraphQL format of Cognite point cloud volume to the writing format."""
-        return CognitePointCloudVolumeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            description=self.description,
-            format_version=self.format_version,
-            model_3d=self.model_3d.as_write() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
-            name=self.name,
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            revisions=[revision.as_write() for revision in self.revisions] if self.revisions is not None else None,
-            tags=self.tags,
-            volume=self.volume,
-            volume_references=self.volume_references,
-            volume_type=self.volume_type,
-        )
+        return CognitePointCloudVolumeWrite.model_validate(as_write_args(self))
 
 
 class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):

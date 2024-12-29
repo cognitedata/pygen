@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -25,6 +25,7 @@ from wind_turbine.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -111,47 +112,13 @@ class SensorTimeSeriesGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> SensorTimeSeries:
         """Convert this GraphQL format of sensor time series to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return SensorTimeSeries(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            concept_id=self.concept_id,
-            description=self.description,
-            is_step=self.is_step,
-            name=self.name,
-            source_unit=self.source_unit,
-            standard_name=self.standard_name,
-            type_=self.type_,
-        )
+        return SensorTimeSeries.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SensorTimeSeriesWrite:
         """Convert this GraphQL format of sensor time series to the writing format."""
-        return SensorTimeSeriesWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            concept_id=self.concept_id,
-            description=self.description,
-            is_step=self.is_step,
-            name=self.name,
-            source_unit=self.source_unit,
-            standard_name=self.standard_name,
-            type_=self.type_,
-        )
+        return SensorTimeSeriesWrite.model_validate(as_write_args(self))
 
 
 class SensorTimeSeries(DomainModel):

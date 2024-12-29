@@ -872,11 +872,14 @@ def as_read_args(model: GraphQLCore) -> dict[str, Any]:
         value = getattr(model, field_name)
         if field_name == "data_record":
             # Dict to postpone validation
-            output[field_name] = dict(
-                version=0,
-                last_updated_time=model.data_record.last_updated_time,
-                created_time=model.data_record.created_time
-            )
+            if model.data_record is None:
+                output[field_name] = None
+            else:
+                output[field_name] = dict(
+                    version=0,
+                    last_updated_time=model.data_record.last_updated_time,
+                    created_time=model.data_record.created_time,
+                )
         else:
             output[field_name] = as_read_value(value)
     return output

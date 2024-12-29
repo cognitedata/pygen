@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -26,6 +26,7 @@ from wind_turbine.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -106,41 +107,13 @@ class DataSheetGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> DataSheet:
         """Convert this GraphQL format of data sheet to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return DataSheet(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            description=self.description,
-            directory=self.directory,
-            is_uploaded=self.is_uploaded,
-            mime_type=self.mime_type,
-            name=self.name,
-            uploaded_time=self.uploaded_time,
-        )
+        return DataSheet.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> DataSheetWrite:
         """Convert this GraphQL format of data sheet to the writing format."""
-        return DataSheetWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            description=self.description,
-            directory=self.directory,
-            mime_type=self.mime_type,
-            name=self.name,
-        )
+        return DataSheetWrite.model_validate(as_write_args(self))
 
 
 class DataSheet(DomainModel):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -125,46 +126,13 @@ class Cognite360ImageModelGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Cognite360ImageModel:
         """Convert this GraphQL format of Cognite 360 image model to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Cognite360ImageModel(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            collections=(
-                [collection.as_read() for collection in self.collections] if self.collections is not None else None
-            ),
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-            thumbnail=self.thumbnail.as_read() if isinstance(self.thumbnail, GraphQLCore) else self.thumbnail,
-            type_=self.type_,
-        )
+        return Cognite360ImageModel.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite360ImageModelWrite:
         """Convert this GraphQL format of Cognite 360 image model to the writing format."""
-        return Cognite360ImageModelWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            description=self.description,
-            name=self.name,
-            tags=self.tags,
-            thumbnail=self.thumbnail.as_write() if isinstance(self.thumbnail, GraphQLCore) else self.thumbnail,
-            type_=self.type_,
-        )
+        return Cognite360ImageModelWrite.model_validate(as_write_args(self))
 
 
 class Cognite360ImageModel(Cognite3DModel):

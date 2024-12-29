@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from omni.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -94,39 +95,13 @@ class Implementation1GraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Implementation1:
         """Convert this GraphQL format of implementation 1 to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Implementation1(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-            value_1=self.value_1,
-            value_2=self.value_2,
-        )
+        return Implementation1.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Implementation1Write:
         """Convert this GraphQL format of implementation 1 to the writing format."""
-        return Implementation1Write(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            main_value=self.main_value,
-            sub_value=self.sub_value,
-            value_1=self.value_1,
-            value_2=self.value_2,
-        )
+        return Implementation1Write.model_validate(as_write_args(self))
 
 
 class Implementation1(SubInterface):

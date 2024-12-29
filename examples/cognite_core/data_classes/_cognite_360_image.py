@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -25,6 +25,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -178,71 +179,13 @@ class Cognite360ImageGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Cognite360Image:
         """Convert this GraphQL format of Cognite 360 image to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Cognite360Image(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            back=self.back.as_read() if isinstance(self.back, GraphQLCore) else self.back,
-            bottom=self.bottom.as_read() if isinstance(self.bottom, GraphQLCore) else self.bottom,
-            collection_360=(
-                self.collection_360.as_read() if isinstance(self.collection_360, GraphQLCore) else self.collection_360
-            ),
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            front=self.front.as_read() if isinstance(self.front, GraphQLCore) else self.front,
-            left=self.left.as_read() if isinstance(self.left, GraphQLCore) else self.left,
-            right=self.right.as_read() if isinstance(self.right, GraphQLCore) else self.right,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            station_360=self.station_360.as_read() if isinstance(self.station_360, GraphQLCore) else self.station_360,
-            taken_at=self.taken_at,
-            top=self.top.as_read() if isinstance(self.top, GraphQLCore) else self.top,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite360Image.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite360ImageWrite:
         """Convert this GraphQL format of Cognite 360 image to the writing format."""
-        return Cognite360ImageWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            back=self.back.as_write() if isinstance(self.back, GraphQLCore) else self.back,
-            bottom=self.bottom.as_write() if isinstance(self.bottom, GraphQLCore) else self.bottom,
-            collection_360=(
-                self.collection_360.as_write() if isinstance(self.collection_360, GraphQLCore) else self.collection_360
-            ),
-            euler_rotation_x=self.euler_rotation_x,
-            euler_rotation_y=self.euler_rotation_y,
-            euler_rotation_z=self.euler_rotation_z,
-            front=self.front.as_write() if isinstance(self.front, GraphQLCore) else self.front,
-            left=self.left.as_write() if isinstance(self.left, GraphQLCore) else self.left,
-            right=self.right.as_write() if isinstance(self.right, GraphQLCore) else self.right,
-            scale_x=self.scale_x,
-            scale_y=self.scale_y,
-            scale_z=self.scale_z,
-            station_360=self.station_360.as_write() if isinstance(self.station_360, GraphQLCore) else self.station_360,
-            taken_at=self.taken_at,
-            top=self.top.as_write() if isinstance(self.top, GraphQLCore) else self.top,
-            translation_x=self.translation_x,
-            translation_y=self.translation_y,
-            translation_z=self.translation_z,
-        )
+        return Cognite360ImageWrite.model_validate(as_write_args(self))
 
 
 class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):

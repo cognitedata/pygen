@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -144,51 +145,13 @@ class CogniteCADNodeGraphQL(GraphQLCore, protected_namespaces=()):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteCADNode:
         """Convert this GraphQL format of Cognite cad node to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteCADNode(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            cad_node_reference=self.cad_node_reference,
-            description=self.description,
-            model_3d=self.model_3d.as_read() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
-            name=self.name,
-            object_3d=self.object_3d.as_read() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            revisions=[revision.as_read() for revision in self.revisions] if self.revisions is not None else None,
-            sub_tree_sizes=self.sub_tree_sizes,
-            tags=self.tags,
-            tree_indexes=self.tree_indexes,
-        )
+        return CogniteCADNode.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteCADNodeWrite:
         """Convert this GraphQL format of Cognite cad node to the writing format."""
-        return CogniteCADNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            cad_node_reference=self.cad_node_reference,
-            description=self.description,
-            model_3d=self.model_3d.as_write() if isinstance(self.model_3d, GraphQLCore) else self.model_3d,
-            name=self.name,
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            revisions=[revision.as_write() for revision in self.revisions] if self.revisions is not None else None,
-            sub_tree_sizes=self.sub_tree_sizes,
-            tags=self.tags,
-            tree_indexes=self.tree_indexes,
-        )
+        return CogniteCADNodeWrite.model_validate(as_write_args(self))
 
 
 class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):

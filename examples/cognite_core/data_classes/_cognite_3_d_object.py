@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -163,64 +164,13 @@ class Cognite3DObjectGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Cognite3DObject:
         """Convert this GraphQL format of Cognite 3D object to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Cognite3DObject(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            asset=self.asset.as_read() if isinstance(self.asset, GraphQLCore) else self.asset,
-            cad_nodes=[cad_node.as_read() for cad_node in self.cad_nodes] if self.cad_nodes is not None else None,
-            description=self.description,
-            images_360=(
-                [images_360.as_read() for images_360 in self.images_360] if self.images_360 is not None else None
-            ),
-            name=self.name,
-            point_cloud_volumes=(
-                [point_cloud_volume.as_read() for point_cloud_volume in self.point_cloud_volumes]
-                if self.point_cloud_volumes is not None
-                else None
-            ),
-            tags=self.tags,
-            x_max=self.x_max,
-            x_min=self.x_min,
-            y_max=self.y_max,
-            y_min=self.y_min,
-            z_max=self.z_max,
-            z_min=self.z_min,
-        )
+        return Cognite3DObject.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> Cognite3DObjectWrite:
         """Convert this GraphQL format of Cognite 3D object to the writing format."""
-        return Cognite3DObjectWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            description=self.description,
-            images_360=(
-                [images_360.as_write() for images_360 in self.images_360] if self.images_360 is not None else None
-            ),
-            name=self.name,
-            tags=self.tags,
-            x_max=self.x_max,
-            x_min=self.x_min,
-            y_max=self.y_max,
-            y_min=self.y_min,
-            z_max=self.z_max,
-            z_min=self.z_min,
-        )
+        return Cognite3DObjectWrite.model_validate(as_write_args(self))
 
 
 class Cognite3DObject(CogniteDescribableNode):

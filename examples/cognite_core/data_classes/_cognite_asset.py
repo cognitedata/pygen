@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -25,6 +25,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -250,71 +251,13 @@ class CogniteAssetGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteAsset:
         """Convert this GraphQL format of Cognite asset to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteAsset(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            activities=[activity.as_read() for activity in self.activities] if self.activities is not None else None,
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_read() if isinstance(self.asset_class, GraphQLCore) else self.asset_class,
-            children=[child.as_read() for child in self.children] if self.children is not None else None,
-            description=self.description,
-            equipment=[equipment.as_read() for equipment in self.equipment] if self.equipment is not None else None,
-            files=[file.as_read() for file in self.files] if self.files is not None else None,
-            name=self.name,
-            object_3d=self.object_3d.as_read() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            parent=self.parent.as_read() if isinstance(self.parent, GraphQLCore) else self.parent,
-            path=[path.as_read() for path in self.path] if self.path is not None else None,
-            path_last_updated_time=self.path_last_updated_time,
-            root=self.root.as_read() if isinstance(self.root, GraphQLCore) else self.root,
-            source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-            time_series=(
-                [time_series.as_read() for time_series in self.time_series] if self.time_series is not None else None
-            ),
-            type_=self.type_.as_read() if isinstance(self.type_, GraphQLCore) else self.type_,
-        )
+        return CogniteAsset.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteAssetWrite:
         """Convert this GraphQL format of Cognite asset to the writing format."""
-        return CogniteAssetWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            asset_class=self.asset_class.as_write() if isinstance(self.asset_class, GraphQLCore) else self.asset_class,
-            description=self.description,
-            name=self.name,
-            object_3d=self.object_3d.as_write() if isinstance(self.object_3d, GraphQLCore) else self.object_3d,
-            parent=self.parent.as_write() if isinstance(self.parent, GraphQLCore) else self.parent,
-            source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-            type_=self.type_.as_write() if isinstance(self.type_, GraphQLCore) else self.type_,
-        )
+        return CogniteAssetWrite.model_validate(as_write_args(self))
 
 
 class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceableNode):

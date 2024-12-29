@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -26,6 +26,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -210,66 +211,13 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteTimeSeries:
         """Convert this GraphQL format of Cognite time series to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteTimeSeries(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            activities=[activity.as_read() for activity in self.activities] if self.activities is not None else None,
-            aliases=self.aliases,
-            assets=[asset.as_read() for asset in self.assets] if self.assets is not None else None,
-            description=self.description,
-            equipment=[equipment.as_read() for equipment in self.equipment] if self.equipment is not None else None,
-            is_step=self.is_step,
-            name=self.name,
-            source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_unit=self.source_unit,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-            type_=self.type_,
-            unit=self.unit.as_read() if isinstance(self.unit, GraphQLCore) else self.unit,
-        )
+        return CogniteTimeSeries.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteTimeSeriesWrite:
         """Convert this GraphQL format of Cognite time series to the writing format."""
-        return CogniteTimeSeriesWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            assets=[asset.as_write() for asset in self.assets] if self.assets is not None else None,
-            description=self.description,
-            equipment=[equipment.as_write() for equipment in self.equipment] if self.equipment is not None else None,
-            is_step=self.is_step,
-            name=self.name,
-            source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_unit=self.source_unit,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            tags=self.tags,
-            type_=self.type_,
-            unit=self.unit.as_write() if isinstance(self.unit, GraphQLCore) else self.unit,
-        )
+        return CogniteTimeSeriesWrite.model_validate(as_write_args(self))
 
 
 class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):

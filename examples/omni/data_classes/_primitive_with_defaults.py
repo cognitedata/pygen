@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from omni.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -101,41 +102,13 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> PrimitiveWithDefaults:
         """Convert this GraphQL format of primitive with default to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return PrimitiveWithDefaults(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            auto_increment_int_32=self.auto_increment_int_32,
-            default_boolean=self.default_boolean,
-            default_float_32=self.default_float_32,
-            default_object=self.default_object,
-            default_string=self.default_string,
-        )
+        return PrimitiveWithDefaults.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> PrimitiveWithDefaultsWrite:
         """Convert this GraphQL format of primitive with default to the writing format."""
-        return PrimitiveWithDefaultsWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            auto_increment_int_32=self.auto_increment_int_32,
-            default_boolean=self.default_boolean,
-            default_float_32=self.default_float_32,
-            default_object=self.default_object,
-            default_string=self.default_string,
-        )
+        return PrimitiveWithDefaultsWrite.model_validate(as_write_args(self))
 
 
 class PrimitiveWithDefaults(DomainModel):

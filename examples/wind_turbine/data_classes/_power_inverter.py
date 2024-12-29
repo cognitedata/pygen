@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from wind_turbine.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -105,62 +106,13 @@ class PowerInverterGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> PowerInverter:
         """Convert this GraphQL format of power inverter to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return PowerInverter(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            active_power_total=(
-                self.active_power_total.as_read()
-                if isinstance(self.active_power_total, GraphQLCore)
-                else self.active_power_total
-            ),
-            apparent_power_total=(
-                self.apparent_power_total.as_read()
-                if isinstance(self.apparent_power_total, GraphQLCore)
-                else self.apparent_power_total
-            ),
-            nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
-            reactive_power_total=(
-                self.reactive_power_total.as_read()
-                if isinstance(self.reactive_power_total, GraphQLCore)
-                else self.reactive_power_total
-            ),
-        )
+        return PowerInverter.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> PowerInverterWrite:
         """Convert this GraphQL format of power inverter to the writing format."""
-        return PowerInverterWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            active_power_total=(
-                self.active_power_total.as_write()
-                if isinstance(self.active_power_total, GraphQLCore)
-                else self.active_power_total
-            ),
-            apparent_power_total=(
-                self.apparent_power_total.as_write()
-                if isinstance(self.apparent_power_total, GraphQLCore)
-                else self.apparent_power_total
-            ),
-            reactive_power_total=(
-                self.reactive_power_total.as_write()
-                if isinstance(self.reactive_power_total, GraphQLCore)
-                else self.reactive_power_total
-            ),
-        )
+        return PowerInverterWrite.model_validate(as_write_args(self))
 
 
 class PowerInverter(DomainModel):

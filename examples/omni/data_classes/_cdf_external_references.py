@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
@@ -41,6 +41,7 @@ from omni.data_classes._core import (
     SequenceGraphQL,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -107,37 +108,13 @@ class CDFExternalReferencesGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CDFExternalReferences:
         """Convert this GraphQL format of cdf external reference to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CDFExternalReferences(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            file=self.file.as_read() if self.file else None,
-            sequence=self.sequence.as_read() if self.sequence else None,
-            timeseries=self.timeseries.as_read() if self.timeseries else None,
-        )
+        return CDFExternalReferences.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CDFExternalReferencesWrite:
         """Convert this GraphQL format of cdf external reference to the writing format."""
-        return CDFExternalReferencesWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            file=self.file.as_write() if self.file else None,
-            sequence=self.sequence.as_write() if self.sequence else None,
-            timeseries=self.timeseries.as_write() if self.timeseries else None,
-        )
+        return CDFExternalReferencesWrite.model_validate(as_write_args(self))
 
 
 class CDFExternalReferences(DomainModel):

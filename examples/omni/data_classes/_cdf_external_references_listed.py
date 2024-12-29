@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
@@ -41,6 +41,7 @@ from omni.data_classes._core import (
     SequenceGraphQL,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -113,43 +114,13 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             return [v for v in value if v is not None] or None
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CDFExternalReferencesListed:
         """Convert this GraphQL format of cdf external references listed to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CDFExternalReferencesListed(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            files=[file.as_read() for file in self.files or []] if self.files is not None else None,
-            sequences=[sequence.as_read() for sequence in self.sequences or []] if self.sequences is not None else None,
-            timeseries=(
-                [timesery.as_read() for timesery in self.timeseries or []] if self.timeseries is not None else None
-            ),
-        )
+        return CDFExternalReferencesListed.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CDFExternalReferencesListedWrite:
         """Convert this GraphQL format of cdf external references listed to the writing format."""
-        return CDFExternalReferencesListedWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            files=[file.as_write() for file in self.files or []] if self.files is not None else None,
-            sequences=(
-                [sequence.as_write() for sequence in self.sequences or []] if self.sequences is not None else None
-            ),
-            timeseries=(
-                [timesery.as_write() for timesery in self.timeseries or []] if self.timeseries is not None else None
-            ),
-        )
+        return CDFExternalReferencesListedWrite.model_validate(as_write_args(self))
 
 
 class CDFExternalReferencesListed(DomainModel):

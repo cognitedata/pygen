@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -25,6 +25,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -203,71 +204,13 @@ class CogniteActivityGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteActivity:
         """Convert this GraphQL format of Cognite activity to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteActivity(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            aliases=self.aliases,
-            assets=[asset.as_read() for asset in self.assets] if self.assets is not None else None,
-            description=self.description,
-            end_time=self.end_time,
-            equipment=[equipment.as_read() for equipment in self.equipment] if self.equipment is not None else None,
-            name=self.name,
-            scheduled_end_time=self.scheduled_end_time,
-            scheduled_start_time=self.scheduled_start_time,
-            source=self.source.as_read() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            start_time=self.start_time,
-            tags=self.tags,
-            time_series=(
-                [time_series.as_read() for time_series in self.time_series] if self.time_series is not None else None
-            ),
-        )
+        return CogniteActivity.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteActivityWrite:
         """Convert this GraphQL format of Cognite activity to the writing format."""
-        return CogniteActivityWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            aliases=self.aliases,
-            assets=[asset.as_write() for asset in self.assets] if self.assets is not None else None,
-            description=self.description,
-            end_time=self.end_time,
-            equipment=[equipment.as_write() for equipment in self.equipment] if self.equipment is not None else None,
-            name=self.name,
-            scheduled_end_time=self.scheduled_end_time,
-            scheduled_start_time=self.scheduled_start_time,
-            source=self.source.as_write() if isinstance(self.source, GraphQLCore) else self.source,
-            source_context=self.source_context,
-            source_created_time=self.source_created_time,
-            source_created_user=self.source_created_user,
-            source_id=self.source_id,
-            source_updated_time=self.source_updated_time,
-            source_updated_user=self.source_updated_user,
-            start_time=self.start_time,
-            tags=self.tags,
-            time_series=(
-                [time_series.as_write() for time_series in self.time_series] if self.time_series is not None else None
-            ),
-        )
+        return CogniteActivityWrite.model_validate(as_write_args(self))
 
 
 class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSchedulable):

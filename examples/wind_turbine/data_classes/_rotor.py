@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from wind_turbine.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -109,54 +110,13 @@ class RotorGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Rotor:
         """Convert this GraphQL format of rotor to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Rotor(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            rotor_speed_controller=(
-                self.rotor_speed_controller.as_read()
-                if isinstance(self.rotor_speed_controller, GraphQLCore)
-                else self.rotor_speed_controller
-            ),
-            rpm_low_speed_shaft=(
-                self.rpm_low_speed_shaft.as_read()
-                if isinstance(self.rpm_low_speed_shaft, GraphQLCore)
-                else self.rpm_low_speed_shaft
-            ),
-            wind_turbine=(
-                self.wind_turbine.as_read() if isinstance(self.wind_turbine, GraphQLCore) else self.wind_turbine
-            ),
-        )
+        return Rotor.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> RotorWrite:
         """Convert this GraphQL format of rotor to the writing format."""
-        return RotorWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            rotor_speed_controller=(
-                self.rotor_speed_controller.as_write()
-                if isinstance(self.rotor_speed_controller, GraphQLCore)
-                else self.rotor_speed_controller
-            ),
-            rpm_low_speed_shaft=(
-                self.rpm_low_speed_shaft.as_write()
-                if isinstance(self.rpm_low_speed_shaft, GraphQLCore)
-                else self.rpm_low_speed_shaft
-            ),
-        )
+        return RotorWrite.model_validate(as_write_args(self))
 
 
 class Rotor(DomainModel):

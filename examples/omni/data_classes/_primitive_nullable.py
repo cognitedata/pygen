@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -25,6 +25,7 @@ from omni.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -116,49 +117,13 @@ class PrimitiveNullableGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> PrimitiveNullable:
         """Convert this GraphQL format of primitive nullable to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return PrimitiveNullable(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            boolean=self.boolean,
-            date=self.date,
-            float_32=self.float_32,
-            float_64=self.float_64,
-            int_32=self.int_32,
-            int_64=self.int_64,
-            json_=self.json_,
-            text=self.text,
-            timestamp=self.timestamp,
-        )
+        return PrimitiveNullable.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> PrimitiveNullableWrite:
         """Convert this GraphQL format of primitive nullable to the writing format."""
-        return PrimitiveNullableWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            boolean=self.boolean,
-            date=self.date,
-            float_32=self.float_32,
-            float_64=self.float_64,
-            int_32=self.int_32,
-            int_64=self.int_64,
-            json_=self.json_,
-            text=self.text,
-            timestamp=self.timestamp,
-        )
+        return PrimitiveNullableWrite.model_validate(as_write_args(self))
 
 
 class PrimitiveNullable(DomainModel):

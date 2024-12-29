@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from wind_turbine.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -113,41 +114,13 @@ class SolarPanelGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> SolarPanel:
         """Convert this GraphQL format of solar panel to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return SolarPanel(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            capacity=self.capacity,
-            description=self.description,
-            efficiency=self.efficiency.as_read() if isinstance(self.efficiency, GraphQLCore) else self.efficiency,
-            name=self.name,
-            orientation=self.orientation.as_read() if isinstance(self.orientation, GraphQLCore) else self.orientation,
-        )
+        return SolarPanel.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SolarPanelWrite:
         """Convert this GraphQL format of solar panel to the writing format."""
-        return SolarPanelWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            capacity=self.capacity,
-            description=self.description,
-            efficiency=self.efficiency.as_write() if isinstance(self.efficiency, GraphQLCore) else self.efficiency,
-            name=self.name,
-            orientation=self.orientation.as_write() if isinstance(self.orientation, GraphQLCore) else self.orientation,
-        )
+        return SolarPanelWrite.model_validate(as_write_args(self))
 
 
 class SolarPanel(GeneratingUnit):

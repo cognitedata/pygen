@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -25,6 +25,7 @@ from cognite_core.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -96,39 +97,13 @@ class CogniteSchedulableGraphQL(GraphQLCore):
             )
         return values
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> CogniteSchedulable:
         """Convert this GraphQL format of Cognite schedulable to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return CogniteSchedulable(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            end_time=self.end_time,
-            scheduled_end_time=self.scheduled_end_time,
-            scheduled_start_time=self.scheduled_start_time,
-            start_time=self.start_time,
-        )
+        return CogniteSchedulable.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> CogniteSchedulableWrite:
         """Convert this GraphQL format of Cognite schedulable to the writing format."""
-        return CogniteSchedulableWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            end_time=self.end_time,
-            scheduled_end_time=self.scheduled_end_time,
-            scheduled_start_time=self.scheduled_start_time,
-            start_time=self.start_time,
-        )
+        return CogniteSchedulableWrite.model_validate(as_write_args(self))
 
 
 class CogniteSchedulable(DomainModel):

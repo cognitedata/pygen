@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from wind_turbine.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -167,86 +168,13 @@ class NacelleGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Nacelle:
         """Convert this GraphQL format of nacelle to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Nacelle(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=(
-                self.acc_from_back_side_y.as_read()
-                if isinstance(self.acc_from_back_side_y, GraphQLCore)
-                else self.acc_from_back_side_y
-            ),
-            acc_from_back_side_z=(
-                self.acc_from_back_side_z.as_read()
-                if isinstance(self.acc_from_back_side_z, GraphQLCore)
-                else self.acc_from_back_side_z
-            ),
-            gearbox=self.gearbox.as_read() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
-            generator=self.generator.as_read() if isinstance(self.generator, GraphQLCore) else self.generator,
-            high_speed_shaft=(
-                self.high_speed_shaft.as_read()
-                if isinstance(self.high_speed_shaft, GraphQLCore)
-                else self.high_speed_shaft
-            ),
-            main_shaft=self.main_shaft.as_read() if isinstance(self.main_shaft, GraphQLCore) else self.main_shaft,
-            power_inverter=(
-                self.power_inverter.as_read() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
-            ),
-            wind_turbine=(
-                self.wind_turbine.as_read() if isinstance(self.wind_turbine, GraphQLCore) else self.wind_turbine
-            ),
-            yaw_direction=(
-                self.yaw_direction.as_read() if isinstance(self.yaw_direction, GraphQLCore) else self.yaw_direction
-            ),
-            yaw_error=self.yaw_error.as_read() if isinstance(self.yaw_error, GraphQLCore) else self.yaw_error,
-        )
+        return Nacelle.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> NacelleWrite:
         """Convert this GraphQL format of nacelle to the writing format."""
-        return NacelleWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            acc_from_back_side_x=self.acc_from_back_side_x,
-            acc_from_back_side_y=(
-                self.acc_from_back_side_y.as_write()
-                if isinstance(self.acc_from_back_side_y, GraphQLCore)
-                else self.acc_from_back_side_y
-            ),
-            acc_from_back_side_z=(
-                self.acc_from_back_side_z.as_write()
-                if isinstance(self.acc_from_back_side_z, GraphQLCore)
-                else self.acc_from_back_side_z
-            ),
-            gearbox=self.gearbox.as_write() if isinstance(self.gearbox, GraphQLCore) else self.gearbox,
-            generator=self.generator.as_write() if isinstance(self.generator, GraphQLCore) else self.generator,
-            high_speed_shaft=(
-                self.high_speed_shaft.as_write()
-                if isinstance(self.high_speed_shaft, GraphQLCore)
-                else self.high_speed_shaft
-            ),
-            main_shaft=self.main_shaft.as_write() if isinstance(self.main_shaft, GraphQLCore) else self.main_shaft,
-            power_inverter=(
-                self.power_inverter.as_write() if isinstance(self.power_inverter, GraphQLCore) else self.power_inverter
-            ),
-            yaw_direction=(
-                self.yaw_direction.as_write() if isinstance(self.yaw_direction, GraphQLCore) else self.yaw_direction
-            ),
-            yaw_error=self.yaw_error.as_write() if isinstance(self.yaw_error, GraphQLCore) else self.yaw_error,
-        )
+        return NacelleWrite.model_validate(as_write_args(self))
 
 
 class Nacelle(DomainModel):

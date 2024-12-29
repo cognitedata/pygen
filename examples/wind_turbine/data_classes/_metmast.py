@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
@@ -35,6 +35,7 @@ from wind_turbine.data_classes._core import (
     TimeSeriesReferenceAPI,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -124,49 +125,13 @@ class MetmastGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> Metmast:
         """Convert this GraphQL format of metmast to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return Metmast(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            position=self.position,
-            temperature=self.temperature.as_read() if self.temperature else None,
-            tilt_angle=self.tilt_angle.as_read() if self.tilt_angle else None,
-            wind_speed=self.wind_speed.as_read() if self.wind_speed else None,
-            wind_turbines=(
-                [wind_turbine.as_read() for wind_turbine in self.wind_turbines]
-                if self.wind_turbines is not None
-                else None
-            ),
-        )
+        return Metmast.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> MetmastWrite:
         """Convert this GraphQL format of metmast to the writing format."""
-        return MetmastWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            position=self.position,
-            temperature=self.temperature.as_write() if self.temperature else None,
-            tilt_angle=self.tilt_angle.as_write() if self.tilt_angle else None,
-            wind_speed=self.wind_speed.as_write() if self.wind_speed else None,
-            wind_turbines=(
-                [wind_turbine.as_write() for wind_turbine in self.wind_turbines]
-                if self.wind_turbines is not None
-                else None
-            ),
-        )
+        return MetmastWrite.model_validate(as_write_args(self))
 
 
 class Metmast(DomainModel):

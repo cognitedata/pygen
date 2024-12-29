@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from wind_turbine.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -131,115 +132,13 @@ class SensorPositionGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> SensorPosition:
         """Convert this GraphQL format of sensor position to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return SensorPosition(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            blade=self.blade.as_read() if isinstance(self.blade, GraphQLCore) else self.blade,
-            edgewise_bend_mom_crosstalk_corrected=(
-                self.edgewise_bend_mom_crosstalk_corrected.as_read()
-                if isinstance(self.edgewise_bend_mom_crosstalk_corrected, GraphQLCore)
-                else self.edgewise_bend_mom_crosstalk_corrected
-            ),
-            edgewise_bend_mom_offset=(
-                self.edgewise_bend_mom_offset.as_read()
-                if isinstance(self.edgewise_bend_mom_offset, GraphQLCore)
-                else self.edgewise_bend_mom_offset
-            ),
-            edgewise_bend_mom_offset_crosstalk_corrected=(
-                self.edgewise_bend_mom_offset_crosstalk_corrected.as_read()
-                if isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, GraphQLCore)
-                else self.edgewise_bend_mom_offset_crosstalk_corrected
-            ),
-            edgewisewise_bend_mom=(
-                self.edgewisewise_bend_mom.as_read()
-                if isinstance(self.edgewisewise_bend_mom, GraphQLCore)
-                else self.edgewisewise_bend_mom
-            ),
-            flapwise_bend_mom=(
-                self.flapwise_bend_mom.as_read()
-                if isinstance(self.flapwise_bend_mom, GraphQLCore)
-                else self.flapwise_bend_mom
-            ),
-            flapwise_bend_mom_crosstalk_corrected=(
-                self.flapwise_bend_mom_crosstalk_corrected.as_read()
-                if isinstance(self.flapwise_bend_mom_crosstalk_corrected, GraphQLCore)
-                else self.flapwise_bend_mom_crosstalk_corrected
-            ),
-            flapwise_bend_mom_offset=(
-                self.flapwise_bend_mom_offset.as_read()
-                if isinstance(self.flapwise_bend_mom_offset, GraphQLCore)
-                else self.flapwise_bend_mom_offset
-            ),
-            flapwise_bend_mom_offset_crosstalk_corrected=(
-                self.flapwise_bend_mom_offset_crosstalk_corrected.as_read()
-                if isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, GraphQLCore)
-                else self.flapwise_bend_mom_offset_crosstalk_corrected
-            ),
-            position=self.position,
-        )
+        return SensorPosition.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> SensorPositionWrite:
         """Convert this GraphQL format of sensor position to the writing format."""
-        return SensorPositionWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            blade=self.blade.as_write() if isinstance(self.blade, GraphQLCore) else self.blade,
-            edgewise_bend_mom_crosstalk_corrected=(
-                self.edgewise_bend_mom_crosstalk_corrected.as_write()
-                if isinstance(self.edgewise_bend_mom_crosstalk_corrected, GraphQLCore)
-                else self.edgewise_bend_mom_crosstalk_corrected
-            ),
-            edgewise_bend_mom_offset=(
-                self.edgewise_bend_mom_offset.as_write()
-                if isinstance(self.edgewise_bend_mom_offset, GraphQLCore)
-                else self.edgewise_bend_mom_offset
-            ),
-            edgewise_bend_mom_offset_crosstalk_corrected=(
-                self.edgewise_bend_mom_offset_crosstalk_corrected.as_write()
-                if isinstance(self.edgewise_bend_mom_offset_crosstalk_corrected, GraphQLCore)
-                else self.edgewise_bend_mom_offset_crosstalk_corrected
-            ),
-            edgewisewise_bend_mom=(
-                self.edgewisewise_bend_mom.as_write()
-                if isinstance(self.edgewisewise_bend_mom, GraphQLCore)
-                else self.edgewisewise_bend_mom
-            ),
-            flapwise_bend_mom=(
-                self.flapwise_bend_mom.as_write()
-                if isinstance(self.flapwise_bend_mom, GraphQLCore)
-                else self.flapwise_bend_mom
-            ),
-            flapwise_bend_mom_crosstalk_corrected=(
-                self.flapwise_bend_mom_crosstalk_corrected.as_write()
-                if isinstance(self.flapwise_bend_mom_crosstalk_corrected, GraphQLCore)
-                else self.flapwise_bend_mom_crosstalk_corrected
-            ),
-            flapwise_bend_mom_offset=(
-                self.flapwise_bend_mom_offset.as_write()
-                if isinstance(self.flapwise_bend_mom_offset, GraphQLCore)
-                else self.flapwise_bend_mom_offset
-            ),
-            flapwise_bend_mom_offset_crosstalk_corrected=(
-                self.flapwise_bend_mom_offset_crosstalk_corrected.as_write()
-                if isinstance(self.flapwise_bend_mom_offset_crosstalk_corrected, GraphQLCore)
-                else self.flapwise_bend_mom_offset_crosstalk_corrected
-            ),
-            position=self.position,
-        )
+        return SensorPositionWrite.model_validate(as_write_args(self))
 
 
 class SensorPosition(DomainModel):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from omni.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -107,51 +108,13 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionItemCNode:
         """Convert this GraphQL format of connection item c node to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemCNode(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            connection_item_a=(
-                [connection_item_a.as_read() for connection_item_a in self.connection_item_a]
-                if self.connection_item_a is not None
-                else None
-            ),
-            connection_item_b=(
-                [connection_item_b.as_read() for connection_item_b in self.connection_item_b]
-                if self.connection_item_b is not None
-                else None
-            ),
-        )
+        return ConnectionItemCNode.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemCNodeWrite:
         """Convert this GraphQL format of connection item c node to the writing format."""
-        return ConnectionItemCNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            connection_item_a=(
-                [connection_item_a.as_write() for connection_item_a in self.connection_item_a]
-                if self.connection_item_a is not None
-                else None
-            ),
-            connection_item_b=(
-                [connection_item_b.as_write() for connection_item_b in self.connection_item_b]
-                if self.connection_item_b is not None
-                else None
-            ),
-        )
+        return ConnectionItemCNodeWrite.model_validate(as_write_args(self))
 
 
 class ConnectionItemCNode(DomainModel):

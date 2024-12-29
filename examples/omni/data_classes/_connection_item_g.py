@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -24,6 +24,7 @@ from omni.data_classes._core import (
     ResourcesWrite,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -105,43 +106,13 @@ class ConnectionItemGGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> ConnectionItemG:
         """Convert this GraphQL format of connection item g to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return ConnectionItemG(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            inwards_multi_property=(
-                [inwards_multi_property.as_read() for inwards_multi_property in self.inwards_multi_property]
-                if self.inwards_multi_property is not None
-                else None
-            ),
-            name=self.name,
-        )
+        return ConnectionItemG.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> ConnectionItemGWrite:
         """Convert this GraphQL format of connection item g to the writing format."""
-        return ConnectionItemGWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            inwards_multi_property=(
-                [inwards_multi_property.as_write() for inwards_multi_property in self.inwards_multi_property]
-                if self.inwards_multi_property is not None
-                else None
-            ),
-            name=self.name,
-        )
+        return ConnectionItemGWrite.model_validate(as_write_args(self))
 
 
 class ConnectionItemG(DomainModel):

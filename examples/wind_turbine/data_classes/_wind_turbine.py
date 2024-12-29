@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, no_type_check, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from cognite.client.data_classes import (
@@ -34,6 +34,7 @@ from wind_turbine.data_classes._core import (
     SequenceGraphQL,
     T_DomainModelList,
     as_node_id,
+    as_read_args,
     as_write_args,
     is_tuple_id,
     as_instance_dict_id,
@@ -145,51 +146,13 @@ class WindTurbineGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_read(self) -> WindTurbine:
         """Convert this GraphQL format of wind turbine to the reading format."""
-        if self.data_record is None:
-            raise ValueError("This object cannot be converted to a read format because it lacks a data record.")
-        return WindTurbine(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecord(
-                version=0,
-                last_updated_time=self.data_record.last_updated_time,
-                created_time=self.data_record.created_time,
-            ),
-            blades=[blade.as_read() for blade in self.blades] if self.blades is not None else None,
-            capacity=self.capacity,
-            datasheets=[datasheet.as_read() for datasheet in self.datasheets] if self.datasheets is not None else None,
-            description=self.description,
-            metmast=[metmast.as_read() for metmast in self.metmast] if self.metmast is not None else None,
-            nacelle=self.nacelle.as_read() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
-            name=self.name,
-            power_curve=self.power_curve.as_read() if self.power_curve else None,
-            rotor=self.rotor.as_read() if isinstance(self.rotor, GraphQLCore) else self.rotor,
-            windfarm=self.windfarm,
-        )
+        return WindTurbine.model_validate(as_read_args(self))
 
-    # We do the ignore argument type as we let pydantic handle the type checking
-    @no_type_check
     def as_write(self) -> WindTurbineWrite:
         """Convert this GraphQL format of wind turbine to the writing format."""
-        return WindTurbineWrite(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=0),
-            blades=[blade.as_write() for blade in self.blades] if self.blades is not None else None,
-            capacity=self.capacity,
-            datasheets=[datasheet.as_write() for datasheet in self.datasheets] if self.datasheets is not None else None,
-            description=self.description,
-            metmast=[metmast.as_write() for metmast in self.metmast] if self.metmast is not None else None,
-            nacelle=self.nacelle.as_write() if isinstance(self.nacelle, GraphQLCore) else self.nacelle,
-            name=self.name,
-            power_curve=self.power_curve.as_write() if self.power_curve else None,
-            rotor=self.rotor.as_write() if isinstance(self.rotor, GraphQLCore) else self.rotor,
-            windfarm=self.windfarm,
-        )
+        return WindTurbineWrite.model_validate(as_write_args(self))
 
 
 class WindTurbine(GeneratingUnit):
