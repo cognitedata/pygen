@@ -834,13 +834,13 @@ def connection_resources(
         for item in values:
             if isinstance(item, DomainRelationWrite):
                 other_resources = item._to_resources_write(
-                    cache, model, edge_type, "outwards", allow_version_increase # type: ignore[arg-type]
+                    cache, model, edge_type, "outwards", allow_version_increase  # type: ignore[arg-type]
                 )
             else:
                 other_resources = DomainRelationWrite.from_edge_to_resources(
                     cache,
-                    start_node=model, # type: ignore[arg-type]
-                    end_node=item, # type: ignore[arg-type]
+                    start_node=model,  # type: ignore[arg-type]
+                    end_node=item,  # type: ignore[arg-type]
                     edge_type=edge_type,
                     write_none=False,
                     allow_version_increase=allow_version_increase,
@@ -855,13 +855,13 @@ def connection_resources(
         for item in values:
             if isinstance(item, DomainRelationWrite):
                 other_resources = item._to_resources_write(
-                    cache, model, edge_type, "inwards", allow_version_increase # type: ignore[arg-type]
+                    cache, model, edge_type, "inwards", allow_version_increase  # type: ignore[arg-type]
                 )
             else:
                 other_resources = DomainRelationWrite.from_edge_to_resources(
                     cache,
-                    start_node=item, # type: ignore[arg-type]
-                    end_node=model, # type: ignore[arg-type]
+                    start_node=item,  # type: ignore[arg-type]
+                    end_node=model,  # type: ignore[arg-type]
                     edge_type=edge_type,
                     write_none=False,
                     allow_version_increase=allow_version_increase,
