@@ -93,8 +93,8 @@ def field_type_hints_test_cases():
     )
     yield pytest.param(
         field,
-        "Union[Site, str, dm.NodeId]",
-        "Union[SiteApply, str, dm.NodeId]",
+        'Union[Site, str, dm.NodeId] = Field(alias="endNode")',
+        'Union[SiteApply, str, dm.NodeId] = Field(alias="endNode")',
         id="EdgeOneToEndNode",
     )
 
