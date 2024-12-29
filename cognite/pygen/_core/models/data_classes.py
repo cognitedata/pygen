@@ -917,7 +917,7 @@ class EdgeDataClass(DataClass):
         self._end_node_field = EndNodeField(
             name="end_node",
             doc_name="end node",
-            prop_name="end_node",
+            prop_name="endNode",
             description="The end node of this edge.",
             pydantic_field="Field",
             edge_classes=list(edge_classes.values()),

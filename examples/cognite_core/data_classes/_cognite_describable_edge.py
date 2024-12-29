@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
+from pydantic import Field
 
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -77,7 +78,7 @@ class CogniteDescribableEdgeGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
-    end_node: Union[dm.NodeId, None] = None
+    end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     aliases: Optional[list[str]] = None
     description: Optional[str] = None
     name: Optional[str] = None
@@ -110,7 +111,7 @@ class CogniteDescribableEdge(DomainRelation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[str, dm.NodeId]
+    end_node: Union[str, dm.NodeId] = Field(alias="endNode")
     aliases: Optional[list[str]] = None
     description: Optional[str] = None
     name: Optional[str] = None
@@ -174,7 +175,7 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
-    end_node: Union[str, dm.NodeId]
+    end_node: Union[str, dm.NodeId] = Field(alias="endNode")
     aliases: Optional[list[str]] = None
     description: Optional[str] = None
     name: Optional[str] = None

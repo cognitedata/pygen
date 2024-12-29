@@ -99,7 +99,7 @@ class Cognite3DTransformationEdgeGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
-    end_node: Union[dm.NodeId, None] = None
+    end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     euler_rotation_x: Optional[float] = Field(None, alias="eulerRotationX")
     euler_rotation_y: Optional[float] = Field(None, alias="eulerRotationY")
     euler_rotation_z: Optional[float] = Field(None, alias="eulerRotationZ")
@@ -142,7 +142,7 @@ class Cognite3DTransformationEdge(DomainRelation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[str, dm.NodeId]
+    end_node: Union[str, dm.NodeId] = Field(alias="endNode")
     euler_rotation_x: Optional[float] = Field(None, alias="eulerRotationX")
     euler_rotation_y: Optional[float] = Field(None, alias="eulerRotationY")
     euler_rotation_z: Optional[float] = Field(None, alias="eulerRotationZ")
@@ -221,7 +221,7 @@ class Cognite3DTransformationEdgeWrite(DomainRelationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
-    end_node: Union[str, dm.NodeId]
+    end_node: Union[str, dm.NodeId] = Field(alias="endNode")
     euler_rotation_x: Optional[float] = Field(None, alias="eulerRotationX")
     euler_rotation_y: Optional[float] = Field(None, alias="eulerRotationY")
     euler_rotation_z: Optional[float] = Field(None, alias="eulerRotationZ")

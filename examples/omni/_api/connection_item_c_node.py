@@ -176,24 +176,34 @@ class ConnectionItemCNodeAPI(
 
     @overload
     def retrieve(
-        self, external_id: str | dm.NodeId | tuple[str, str], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: str | dm.NodeId | tuple[str, str],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemCNode | None: ...
 
     @overload
     def retrieve(
-        self, external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]], space: str = DEFAULT_INSTANCE_SPACE
+        self,
+        external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
+        space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemCNodeList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> ConnectionItemCNode | ConnectionItemCNodeList | None:
         """Retrieve one or more connection item c nodes by id(s).
 
         Args:
             external_id: External id or list of external ids of the connection item c nodes.
             space: The space where all the connection item c nodes are located.
+            retrieve_connections: Whether to retrieve `connection_item_a` and `connection_item_b` for the connection
+            item c nodes. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve
+            the identifier of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             The requested connection item c nodes.
@@ -212,23 +222,7 @@ class ConnectionItemCNodeAPI(
         return self._retrieve(
             external_id,
             space,
-            retrieve_edges=True,
-            edge_api_name_type_direction_view_id_penta=[
-                (
-                    self.connection_item_a_edge,
-                    "connection_item_a",
-                    dm.DirectRelationReference("sp_pygen_models", "unidirectional"),
-                    "outwards",
-                    dm.ViewId("sp_pygen_models", "ConnectionItemA", "1"),
-                ),
-                (
-                    self.connection_item_b_edge,
-                    "connection_item_b",
-                    dm.DirectRelationReference("sp_pygen_models", "unidirectional"),
-                    "outwards",
-                    dm.ViewId("sp_pygen_models", "ConnectionItemB", "1"),
-                ),
-            ],
+            retrieve_connections=retrieve_connections,
         )
 
     def search(
@@ -442,6 +436,45 @@ class ConnectionItemCNodeAPI(
         )
         return ConnectionItemCNodeQuery(self._client)
 
+    def _query(
+        self,
+        filter_: dm.Filter | None,
+        limit: int,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> ConnectionItemCNodeList:
+        builder = QueryBuilder()
+        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
+        builder.append(
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                has_container_fields=False,
+            )
+        )
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemA._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "connectionItemA"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
+            )
+        )
+        builder.extend(
+            factory.from_edge(
+                ConnectionItemB._view_id,
+                "outwards",
+                ViewPropertyId(self._view_id, "connectionItemB"),
+                include_end_node=retrieve_connections == "full",
+                has_container_fields=True,
+            )
+        )
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
+        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
+        return ConnectionItemCNodeList([ConnectionItemCNode.model_validate(item) for item in unpacked])
+
     def list(
         self,
         external_id_prefix: str | None = None,
@@ -482,39 +515,5 @@ class ConnectionItemCNodeAPI(
             filter,
         )
         if retrieve_connections == "skip":
-            return self._list(
-                limit=limit,
-                filter=filter_,
-            )
-
-        builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                limit=limit,
-                has_container_fields=False,
-            )
-        )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemA._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "connectionItemA"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
-            )
-        )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemB._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "connectionItemB"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
-            )
-        )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        return ConnectionItemCNodeList([ConnectionItemCNode.model_validate(item) for item in unpacked])
+            return self._list(limit=limit, filter=filter_)
+        return self._query(filter_, limit, retrieve_connections)

@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
+from pydantic import Field
 
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
@@ -77,7 +78,7 @@ class DistanceGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Distance", "1")
-    end_node: Union[MetmastGraphQL, WindTurbineGraphQL, None] = None
+    end_node: Union[MetmastGraphQL, WindTurbineGraphQL, None] = Field(None, alias="endNode")
     distance: Optional[float] = None
 
     def as_read(self) -> Distance:
@@ -104,7 +105,7 @@ class Distance(DomainRelation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Distance", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[Metmast, WindTurbine, str, dm.NodeId]
+    end_node: Union[Metmast, WindTurbine, str, dm.NodeId] = Field(alias="endNode")
     distance: Optional[float] = None
 
     def as_write(self) -> DistanceWrite:
@@ -161,7 +162,7 @@ class DistanceWrite(DomainRelationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Distance", "1")
-    end_node: Union[MetmastWrite, WindTurbineWrite, str, dm.NodeId]
+    end_node: Union[MetmastWrite, WindTurbineWrite, str, dm.NodeId] = Field(alias="endNode")
     distance: Optional[float] = None
 
 

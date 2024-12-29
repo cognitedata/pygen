@@ -148,7 +148,7 @@ class Cognite360ImageAnnotationGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageAnnotation", "v1")
-    end_node: Union[Cognite360ImageGraphQL, None] = None
+    end_node: Union[Cognite360ImageGraphQL, None] = Field(None, alias="endNode")
     aliases: Optional[list[str]] = None
     confidence: Optional[float] = None
     description: Optional[str] = None

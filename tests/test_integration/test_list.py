@@ -10,6 +10,7 @@ from omni import OmniClient
 from omni import data_classes as dc
 from omni.data_classes._core import DEFAULT_INSTANCE_SPACE
 from omni_sub import OmniSubClient
+from wind_turbine import WindTurbineClient
 
 
 @pytest.fixture(scope="session")
@@ -168,6 +169,14 @@ def test_list_with_identifier_connections(omni_client: OmniClient) -> None:
     assert len(edges) > 0
     full_edges = [edge for edge in edges if not isinstance(edge, str | dm.NodeId)]
     assert not full_edges, f"Expect only identifier. Found full outwards edges: {full_edges}"
+
+
+def test_list_with_identifier_connections_edge_with_properties(turbine_client: WindTurbineClient) -> None:
+    items = turbine_client.wind_turbine.list(retrieve_connections="identifier", limit=2)
+
+    assert len(items) > 0
+    distances = [edge.distance for item in items for edge in item.metmast or []]
+    assert distances, f"Missing distances: {distances}"
 
 
 def test_list_without_default_space(omnisub_client: OmniSubClient) -> None:

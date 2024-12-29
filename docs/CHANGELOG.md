@@ -16,6 +16,7 @@ Changes are grouped as follows
 ## TBD
 ### Added
 - Support for filtering on direct relations in the `.select()` method.
+- Parameter `retrieve_connections` in the `.retrieve()` method to retrieve all connections for a node.
 
 ### Improved
 - When calling the `.upsert(...)` the `write_none` argument is now deprecated. Instead, `pygen` detects which

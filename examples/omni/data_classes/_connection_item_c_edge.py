@@ -70,7 +70,7 @@ class ConnectionItemCEdgeGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
-    end_node: Union[dm.NodeId, None] = None
+    end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
     connection_item_b: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False, alias="connectionItemB")
 
@@ -95,7 +95,7 @@ class ConnectionItemCEdge(DomainRelation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[str, dm.NodeId]
+    end_node: Union[str, dm.NodeId] = Field(alias="endNode")
     connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
         default=None, repr=False, alias="connectionItemA"
     )
