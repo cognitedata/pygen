@@ -79,6 +79,7 @@ from {{ top_level_package }}.data_classes._core import (
     as_node_id,
     as_pygen_node_id,
     are_nodes_equal,
+    as_write_args,
     is_tuple_id,
     select_best_node,
     parse_single_connection,
@@ -267,16 +268,7 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
     @no_type_check
     def as_write(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
-        return {{ data_class.write_name }}(
-            space=self.space,
-            external_id=self.external_id,
-            data_record=DataRecordWrite(existing_version=self.data_record.version),
-            {% for field in data_class %}
-            {% if field.is_write_field %}
-            {{ field.name }}={{ field.as_write() }},
-            {% endif %}
-            {% endfor %}
-        )
+        return {{ data_class.write_name }}.model_validator(as_write_args(self))
 
     def as_apply(self) -> {{ data_class.write_name }}:
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
