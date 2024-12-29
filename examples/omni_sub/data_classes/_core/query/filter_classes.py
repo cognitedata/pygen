@@ -150,14 +150,12 @@ class DateFilter(Filtering[T_QueryCore]):
 
 
 class DirectRelationFilter(Filtering[T_QueryCore]):
-    def equals(self, value: str | dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> T_QueryCore:
+    def equals(self, value: dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any) -> T_QueryCore:
         self._raise_if_filter_set()
         self._filter = dm.filters.Equals(self._prop_path, as_instance_dict_id(value))
         return self._query
 
-    def in_(
-        self, values: Sequence[str | dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any]
-    ) -> T_QueryCore:
+    def in_(self, values: Sequence[dm.NodeId | tuple[str, str] | dm.DirectRelationReference | Any]) -> T_QueryCore:
         self._raise_if_filter_set()
         self._filter = dm.filters.In(self._prop_path, [as_instance_dict_id(value) for value in values])
         return self._query
