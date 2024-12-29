@@ -77,7 +77,7 @@ def test_select_list_full_inwards_edge(omni_client: OmniClient) -> None:
     assert items.dump()
 
 
-def test_query_list_full_across_direct_relation(omni_client: OmniClient) -> None:
+def test_select_list_full_across_direct_relation(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_d.select().direct_single.name.prefix("E").list_full(limit=5)
     items_reversed = (
         omni_client.connection_item_e.select().name.prefix("E").direct_reverse_single.list_connection_item_d(limit=5)
@@ -91,7 +91,7 @@ def test_query_list_full_across_direct_relation(omni_client: OmniClient) -> None
     assert items.dump()
 
 
-def test_query_list_full_across_reverse_direct_relation(omni_client: OmniClient) -> None:
+def test_select_list_full_across_reverse_direct_relation(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_e.select().direct_reverse_single.name.prefix("M").list_full(limit=5)
     items_reversed = (
         omni_client.connection_item_d.select().name.prefix("M").direct_single.list_connection_item_e(limit=5)
@@ -105,7 +105,7 @@ def test_query_list_full_across_reverse_direct_relation(omni_client: OmniClient)
     assert items.dump()
 
 
-def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
+def test_select_across_edge_without_properties(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_a.select().outwards.list_full(limit=5)
 
     assert len(items) > 0
@@ -116,7 +116,7 @@ def test_query_across_edge_without_properties(omni_client: OmniClient) -> None:
 
 
 @pytest.mark.skip("Missing test data")
-def test_query_across_edge_properties(omni_client: OmniClient) -> None:
+def test_select_across_edge_properties(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_f.select().outwards_multi.end_node.list_full(limit=5)
 
     assert len(items) > 0
@@ -126,26 +126,26 @@ def test_query_across_edge_properties(omni_client: OmniClient) -> None:
     assert items.dump()
 
 
-def test_query_circular_raises_value_error(omni_client: OmniClient) -> None:
+def test_select_circular_raises_value_error(omni_client: OmniClient) -> None:
     with pytest.raises(ValueError) as e:
         omni_client.connection_item_a.select().outwards.inwards.outwards.list_full(limit=5)
 
     assert "Circular" in str(e.value)
 
 
-def test_query_past_reverse_list_value_error(omni_client: OmniClient) -> None:
+def test_select_past_reverse_list_value_error(omni_client: OmniClient) -> None:
     with pytest.raises(ValueError) as e:
         omni_client.connection_item_e.select().direct_reverse_multi.direct_single.list_full(limit=5)
 
     assert "Cannot traverse past reverse direct relation of list." in str(e.value)
 
 
-def test_query_across_reversed_list(omni_client: OmniClient) -> None:
+def test_select_across_reversed_list(omni_client: OmniClient) -> None:
     result = omni_client.connection_item_e.select().direct_reverse_multi.list_full(limit=5)
     assert result
 
 
-def test_query_end_on_reverse_direct_relation_to_list(omni_client: OmniClient) -> None:
+def test_select_end_on_reverse_direct_relation_to_list(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_e.select().direct_reverse_multi.list_connection_item_d(limit=5)
 
     assert len(items) > 0
@@ -160,14 +160,14 @@ def test_select_list_across_edge_with_limit(turbine_client: WindTurbineClient) -
     assert items.dump()
 
 
-def test_query_across_reverse_direct_relation_to_list_full(omni_client: OmniClient) -> None:
+def test_select_across_reverse_direct_relation_to_list_full(omni_client: OmniClient) -> None:
     items = omni_client.connection_item_e.select().direct_reverse_multi.list_full(limit=5)
 
     assert len(items) > 0
     assert items.dump()
 
 
-def test_query_return_other_side_reverse_list(core_client: CogniteCoreClient) -> None:
+def test_select_return_other_side_reverse_list(core_client: CogniteCoreClient) -> None:
     assert CORE_SDK.instance_space is not None
     result = (
         core_client.cognite_asset.select()
@@ -179,7 +179,7 @@ def test_query_return_other_side_reverse_list(core_client: CogniteCoreClient) ->
     assert len(result) == 2
 
 
-def test_query_on_direct_relation_then_traverse(core_client: CogniteCoreClient) -> None:
+def test_select_on_direct_relation_then_traverse(core_client: CogniteCoreClient) -> None:
     assert CORE_SDK.instance_space is not None
     result = (
         core_client.cognite_asset.select()
