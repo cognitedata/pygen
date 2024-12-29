@@ -146,10 +146,14 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._view_id)
             items.extend([self._class_type.from_instance(node) for node in instances.nodes])
         else:
-            for space_key, external_ids in groupby(sorted((node_id.as_tuple() for node_id in node_ids)), key=lambda x: x[0]):
+            for space_key, external_ids in groupby(
+                sorted((node_id.as_tuple() for node_id in node_ids)), key=lambda x: x[0]
+            ):
                 external_id_list = [ext_id[1] for ext_id in external_ids]
                 for ext_id_chunk in chunker(external_id_list, IN_FILTER_CHUNK_SIZE):
-                    filter_ = dm.filters.Equals(["node", "space"], space_key) & dm.filters.In(["node", "externalId"], ext_id_chunk)
+                    filter_ = dm.filters.Equals(["node", "space"], space_key) & dm.filters.In(
+                        ["node", "externalId"], ext_id_chunk
+                    )
                     items.extend(self._query(filter_, len(ext_id_chunk), retrieve_connections))
 
         nodes = self._class_list(items)
