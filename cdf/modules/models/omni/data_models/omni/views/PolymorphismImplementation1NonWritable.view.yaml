@@ -14,6 +14,18 @@ properties:
       type: container
     containerPropertyIdentifier: implementation1Value
     name: Value1
+  connectionValue:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: Implementation1
+      type: container
+    containerPropertyIdentifier: connectionValue
+    name: ConnectionValue
+    source:
+      space: {{ pygen_models_space }}
+      externalId: Implementation1
+      version: '1'
+      type: view
 filter:
   equals:
     property:

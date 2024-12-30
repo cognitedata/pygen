@@ -21,3 +21,11 @@ properties:
     autoIncrement: false
     immutable: false
     name: requiredChild1Value
+  connectionValue:
+    type:
+      type: direct
+      list: false
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: connectionValue

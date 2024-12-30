@@ -1045,6 +1045,24 @@ views:
   usedFor: node
   isGlobal: false
   properties:
+    connectionValue:
+      container:
+        space: sp_pygen_models
+        externalId: Implementation1
+      containerPropertyIdentifier: connectionValue
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_models
+          externalId: Implementation1
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: ConnectionValue
+      description: null
     mainValue:
       container:
         space: sp_pygen_models
@@ -1093,7 +1111,7 @@ views:
       defaultValue: null
       name: Value1
       description: null
-  lastUpdatedTime: 1729345477397
+  lastUpdatedTime: 1735597907476
   createdTime: 1729345477397
 - space: sp_pygen_models
   externalId: Implementation2
@@ -1911,5 +1929,5 @@ views:
   lastUpdatedTime: 1729345477397
   createdTime: 1729345477397
 isGlobal: false
-lastUpdatedTime: 1729345479132
-createdTime: 1729345479132
+lastUpdatedTime: 1735598007708
+createdTime: 1735598007708
