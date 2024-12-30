@@ -60,6 +60,14 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList])
 
     def to_non_writable(
         self,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -76,6 +84,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList])
         """Query along the to non writable edges of the dependent on non writable.
 
         Args:
+            connection_value:
             main_value:
             main_value_prefix:
             sub_value:
@@ -120,6 +129,7 @@ class DependentOnNonWritableQueryAPI(QueryAPI[T_DomainModel, T_DomainModelList])
         has_data = dm.filters.HasData(views=[view_id])
         node_filter = _create_implementation_1_non_writeable_filter(
             view_id,
+            connection_value,
             main_value,
             main_value_prefix,
             sub_value,

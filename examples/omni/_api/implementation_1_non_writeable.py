@@ -37,6 +37,7 @@ from omni.data_classes import (
     Implementation1NonWriteableFields,
     Implementation1NonWriteableList,
     Implementation1NonWriteableTextFields,
+    Implementation1,
 )
 from omni._api.implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
 
@@ -52,6 +53,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
     def __call__(
         self,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -66,6 +75,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         """Query starting at implementation 1 non writeables.
 
         Args:
+            connection_value: The connection value to filter on.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
             sub_value: The sub value to filter on.
@@ -91,6 +101,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         has_data = dm.filters.HasData(views=[self._view_id])
         filter_ = _create_implementation_1_non_writeable_filter(
             self._view_id,
+            connection_value,
             main_value,
             main_value_prefix,
             sub_value,
@@ -141,6 +152,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         self,
         external_id: str | dm.NodeId | tuple[str, str],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Implementation1NonWriteable | None: ...
 
     @overload
@@ -148,18 +160,23 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         self,
         external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Implementation1NonWriteableList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Implementation1NonWriteable | Implementation1NonWriteableList | None:
         """Retrieve one or more implementation 1 non writeables by id(s).
 
         Args:
             external_id: External id or list of external ids of the implementation 1 non writeables.
             space: The space where all the implementation 1 non writeables are located.
+            retrieve_connections: Whether to retrieve `connection_value` for the implementation 1 non writeables.
+            Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier
+            of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             The requested implementation 1 non writeables.
@@ -178,6 +195,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         return self._retrieve(
             external_id,
             space,
+            retrieve_connections=retrieve_connections,
         )
 
     def search(
@@ -185,6 +203,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         query: str,
         properties: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
         ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
@@ -205,6 +231,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
+            connection_value: The connection value to filter on.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
             sub_value: The sub value to filter on.
@@ -239,6 +266,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         """
         filter_ = _create_implementation_1_non_writeable_filter(
             self._view_id,
+            connection_value,
             main_value,
             main_value_prefix,
             sub_value,
@@ -269,6 +297,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         search_property: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -290,6 +326,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         query: str | None = None,
         search_property: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
+        ) = None,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
         ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
@@ -317,6 +361,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         search_property: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -342,6 +394,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         search_property: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -365,6 +425,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            connection_value: The connection value to filter on.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
             sub_value: The sub value to filter on.
@@ -393,6 +454,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
         filter_ = _create_implementation_1_non_writeable_filter(
             self._view_id,
+            connection_value,
             main_value,
             main_value_prefix,
             sub_value,
@@ -421,6 +483,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         search_property: (
             Implementation1NonWriteableTextFields | SequenceNotStr[Implementation1NonWriteableTextFields] | None
         ) = None,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -439,6 +509,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
+            connection_value: The connection value to filter on.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
             sub_value: The sub value to filter on.
@@ -458,6 +529,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         """
         filter_ = _create_implementation_1_non_writeable_filter(
             self._view_id,
+            connection_value,
             main_value,
             main_value_prefix,
             sub_value,
@@ -498,6 +570,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
                 has_container_fields=True,
             )
         )
+        if retrieve_connections == "full":
+            builder.extend(
+                factory.from_direct_relation(
+                    Implementation1._view_id,
+                    ViewPropertyId(self._view_id, "connectionValue"),
+                    has_container_fields=True,
+                )
+            )
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
         unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
@@ -509,6 +589,14 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
     def list(
         self,
+        connection_value: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
         sub_value: str | list[str] | None = None,
@@ -522,10 +610,12 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         sort_by: Implementation1NonWriteableFields | Sequence[Implementation1NonWriteableFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Implementation1NonWriteableList:
         """List/filter implementation 1 non writeables
 
         Args:
+            connection_value: The connection value to filter on.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
             sub_value: The sub value to filter on.
@@ -543,6 +633,9 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
+            retrieve_connections: Whether to retrieve `connection_value` for the implementation 1 non writeables.
+            Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier
+            of the connected items, and 'full' will retrieve the full connected items.
 
         Returns:
             List of requested implementation 1 non writeables
@@ -558,6 +651,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
         """
         filter_ = _create_implementation_1_non_writeable_filter(
             self._view_id,
+            connection_value,
             main_value,
             main_value_prefix,
             sub_value,
@@ -569,4 +663,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit, filter=filter_, sort=sort_input)
+        if retrieve_connections == "skip":
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
+        return self._query(filter_, limit, retrieve_connections, sort_input)

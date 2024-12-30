@@ -132,7 +132,7 @@ if _has_typer:
         default_settings = PygenSettings()
 
         @app.command(help=help_text)
-        def generate(
+        def generate(  # type: ignore[misc]
             space: Annotated[str, typer.Option(..., help=default_settings.space.help)],
             external_id: Annotated[str, typer.Option(..., help=default_settings.external_id.help)],
             version: Annotated[str, typer.Option(..., help=default_settings.version.help)],

@@ -9,6 +9,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from omni.data_classes import (
     DomainModelCore,
     Implementation1NonWriteable,
+    Implementation1,
 )
 from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
@@ -54,11 +55,35 @@ class Implementation1NonWriteableQueryAPI(QueryAPI[T_DomainModel, T_DomainModelL
 
     def query(
         self,
+        retrieve_connection_value: bool = False,
     ) -> T_DomainModelList:
         """Execute query and return the result.
+
+        Args:
+            retrieve_connection_value: Whether to retrieve the
+                connection value for each
+                implementation 1 non writeable or not.
 
         Returns:
             The list of the source nodes of the query.
 
         """
+        from_ = self._builder[-1].name
+        if retrieve_connection_value:
+            self._query_append_connection_value(from_)
         return self._query()
+
+    def _query_append_connection_value(self, from_: str) -> None:
+        self._builder.append(
+            QueryStep(
+                name=self._builder.create_name(from_),
+                expression=dm.query.NodeResultSetExpression(
+                    from_=from_,
+                    through=self._view_id.as_property_ref("connectionValue"),
+                    direction="outwards",
+                    filter=dm.filters.HasData(views=[Implementation1._view_id]),
+                ),
+                view_id=Implementation1._view_id,
+                connection_property=ViewPropertyId(self._view_id, "connectionValue"),
+            ),
+        )
