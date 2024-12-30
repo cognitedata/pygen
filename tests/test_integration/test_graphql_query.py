@@ -216,8 +216,6 @@ def test_query_latest_datapoint(turbine_client: WindTurbineClient) -> None:
     item = result[0]
     assert isinstance(item, wdc.MetmastGraphQL)
     assert item.temperature is not None
-    assert item.temperature.data is not None
-    assert item.temperature.data.timestamp is not None
-    assert item.temperature.data.value is not None
-    assert len(item.temperature.data.timestamp) == 1
-    assert len(item.temperature.data.value) == 1
+    assert item.temperature.latest is not None
+    assert item.temperature.latest.timestamp is not None
+    assert item.temperature.latest.value is not None
