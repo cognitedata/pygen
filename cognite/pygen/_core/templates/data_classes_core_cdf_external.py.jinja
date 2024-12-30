@@ -9,7 +9,7 @@ from typing import (
 )
 
 from cognite.client import data_modeling as dm
-from cognite.client.data_classes import Datapoints, SequenceColumnWrite, SequenceColumn
+from cognite.client.data_classes import Datapoint, Datapoints, SequenceColumnWrite, SequenceColumn
 from cognite.client.data_classes import (
     TimeSeries as CogniteTimeSeries,
     Sequence as CogniteSequence,
@@ -110,6 +110,7 @@ class TimeSeriesGraphQL(GraphQLExternal):
     created_time: Optional[int] = None
     last_updated_time: Optional[int] = None
     data: Optional[Datapoints] = None
+    latest: Optional[Datapoint] = None
 
     @model_validator(mode="before")
     def parse_datapoints(cls, data: Any) -> Any:
@@ -123,6 +124,13 @@ class TimeSeriesGraphQL(GraphQLExternal):
                     )
                 data["datapoints"] = datapoints["items"]
                 data["data"] = Datapoints.load(data)
+        if isinstance(data, dict) and "getLatestDataPoint" in data:
+            latest = data.pop("getLatestDataPoint")
+            if "items" in latest:
+                latest["items"][0]["timestamp"] = datetime_to_ms(
+                    datetime.datetime.fromisoformat(latest["items"][0]["timestamp"].replace("Z", "+00:00"))
+                )
+                data["latest"] = Datapoint.load(latest["items"][0])
         return data
 
     def as_write(self) -> CogniteTimeSeriesWrite:

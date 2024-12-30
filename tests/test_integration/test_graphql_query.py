@@ -168,7 +168,7 @@ def test_query_with_datapoints(turbine_client: WindTurbineClient) -> None:
       temperature{
         externalId
         name
-        getDataPoints(granularity: "1d", aggregates: SUM){
+        getDataPoints(granularity: "1d", aggregates: SUM, first: 100){
           items{
             timestamp
             sum
@@ -182,5 +182,40 @@ def test_query_with_datapoints(turbine_client: WindTurbineClient) -> None:
     )
     assert len(result) == 1
     item = result[0]
-    # Currently (16/11/2024 - there is now datapoints in the timeseries)
     assert isinstance(item, wdc.MetmastGraphQL)
+    assert item.temperature is not None
+    assert item.temperature.data is not None
+    assert item.temperature.data.sum is not None
+    assert len(item.temperature.data.sum) > 0
+    assert item.temperature.data.timestamp is not None
+    assert len(item.temperature.data.timestamp) > 0
+
+
+def test_query_latest_datapoint(turbine_client: WindTurbineClient) -> None:
+    result = turbine_client.graphql_query(
+        """{
+  listMetmast(first: 1){
+    items{
+      __typename
+      temperature{
+        externalId
+        name
+        getLatestDataPoint{
+          items{
+            timestamp
+            value
+          }
+        }
+      }
+    }
+  }
+}
+"""
+    )
+    assert len(result) == 1
+    item = result[0]
+    assert isinstance(item, wdc.MetmastGraphQL)
+    assert item.temperature is not None
+    assert item.temperature.latest is not None
+    assert item.temperature.latest.timestamp is not None
+    assert item.temperature.latest.value is not None
