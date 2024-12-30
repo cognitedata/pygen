@@ -8,3 +8,6 @@ mkdocs-gitbook==0.0.1
 mkdocs-glightbox==0.4.*
 pymdown-extensions==10.13.*
 mkdocstrings[python]==0.27.*
+# dependencies for mkdocstrings
+# 3.1.0 breaks nbconvert
+mistune==3.0.2
