@@ -49,6 +49,7 @@ nav:
         - WindTurbine Data Classes: example_docs/wind_data_classes.md
     - Developer Docs:
         - Querying: docs-dev/docs_query.ipynb
+        - Filters: docs-dev/query_filters.ipynb
     - Reference - Code API:
         - Pygen: api/api.md
         - Demo: api/demo.md
