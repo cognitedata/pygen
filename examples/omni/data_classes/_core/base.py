@@ -247,10 +247,7 @@ class DomainModel(DomainModelCore, ABC):
             node_type=node_type,
             **unpack_properties(instance.properties),
         )
-        if global_config.validate_retrieve:
-            return cls.model_validate(args)
-        else:
-            return cls.model_construct(**args)  # type: ignore[return-value]
+        return parse_pydantic(cls, args)
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
@@ -402,10 +399,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         args = dict(
             space=space, external_id=external_id, node_type=node_type, data_record=DataRecordWrite(**data), **properties
         )
-        if global_config.validate_retrieve:
-            return cls.model_validate(args)
-        else:
-            return cls.model_construct(**args)  # type: ignore[return-value]
+        return parse_pydantic(cls, args)
 
 
 T_DomainModelWrite = TypeVar("T_DomainModelWrite", bound=DomainModelWrite)
@@ -556,11 +550,7 @@ class DomainRelation(DomainModelCore):
             end_node=end_node,
             **unpack_properties(instance.properties),
         )
-        if global_config.validate_retrieve:
-            return cls.model_validate(args)
-        else:
-            return cls.model_construct(**args)  # type: ignore[return-value]
-
+        return parse_pydantic(cls, args)
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
@@ -928,3 +918,10 @@ def as_write_value(value: Any) -> Any:
     elif isinstance(value, Sequence) and not isinstance(value, str):
         return [as_write_value(item) for item in value]
     return value
+
+
+def parse_pydantic(cls: type[T_Core], data: dict[str, Any]) -> T_Core:
+    if global_config.validate_retrieve:
+        return cls.model_validate(data)
+    else:
+        return cls.model_construct(**data)  # type: ignore[return-value]
