@@ -184,3 +184,30 @@ def test_query_with_datapoints(turbine_client: WindTurbineClient) -> None:
     item = result[0]
     # Currently (16/11/2024 - there is now datapoints in the timeseries)
     assert isinstance(item, wdc.MetmastGraphQL)
+
+
+def test_query_latest_datapoint(turbine_client: WindTurbineClient) -> None:
+    result = turbine_client.graphql_query(
+        """{
+  listMetmast(first: 1){
+    items{
+      __typename
+      temperature{
+        externalId
+        name
+        getLatestDataPoint{
+          items{
+            timestamp
+            value
+          }
+        }
+      }
+    }
+  }
+}
+"""
+    )
+    assert len(result) == 1
+    item = result[0]
+    # Currently (16/11/2024 - there is now datapoints in the timeseries)
+    assert isinstance(item, wdc.MetmastGraphQL)
