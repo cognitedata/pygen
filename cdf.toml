@@ -14,3 +14,4 @@ dump = false
 
 [alpha_flags]
 graphql = true
+purge = true
