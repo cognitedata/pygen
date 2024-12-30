@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.59] - 24-12-30
 ### Added
 - Support for filtering on direct relations in the `.select()` method.
 - Parameter `retrieve_connections` in the `.retrieve()` method to retrieve all connections for a node.
