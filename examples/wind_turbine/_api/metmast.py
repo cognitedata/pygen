@@ -459,16 +459,8 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
             filter_,
         )
 
-    def query(self) -> MetmastQuery:
-        """Start a query for metmasts."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return MetmastQuery(self._client)
-
     def select(self) -> MetmastQuery:
         """Start selecting from metmasts."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return MetmastQuery(self._client)
 
     def _query(

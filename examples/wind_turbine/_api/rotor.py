@@ -544,16 +544,8 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             filter_,
         )
 
-    def query(self) -> RotorQuery:
-        """Start a query for rotors."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return RotorQuery(self._client)
-
     def select(self) -> RotorQuery:
         """Start selecting from rotors."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return RotorQuery(self._client)
 
     def _query(

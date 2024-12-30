@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.59] - 24-12-30
 ### Added
 - Support for filtering on direct relations in the `.select()` method.
 - Parameter `retrieve_connections` in the `.retrieve()` method to retrieve all connections for a node.
@@ -25,6 +25,12 @@ Changes are grouped as follows
 - When calling the `.upsert(...)` the `write_none` argument is now deprecated. Instead, `pygen` detects which
   properties that are explicitly set to `None` and only sends those properties to the CDF. This way you can
   now set properties to `None` and they will be updated in the CDF.
+
+### Removed
+- The `.query()` method (was in `alpha`) has been removed. Instead, use the `.select()` method.
+
+### Changed
+- The `.select()` method is no longer in `alpha` and is now the recommended way to query the CDF.
 
 ### Fixed
 - Calling `.upsert` with an edge with properties in inwards direction, now creates the edge in the correct direction.

@@ -973,16 +973,8 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
             filter_,
         )
 
-    def query(self) -> CogniteFileQuery:
-        """Start a query for Cognite files."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return CogniteFileQuery(self._client)
-
     def select(self) -> CogniteFileQuery:
         """Start selecting from Cognite files."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return CogniteFileQuery(self._client)
 
     def _query(

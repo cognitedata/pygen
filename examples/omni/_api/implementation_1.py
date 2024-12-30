@@ -544,16 +544,8 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
             filter_,
         )
 
-    def query(self) -> Implementation1Query:
-        """Start a query for implementation 1."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return Implementation1Query(self._client)
-
     def select(self) -> Implementation1Query:
         """Start selecting from implementation 1."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return Implementation1Query(self._client)
 
     def _query(

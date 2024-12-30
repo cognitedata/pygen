@@ -13,7 +13,7 @@ adding `cognite-pygen` to the installed packages under `settings`.
 pyodide-http==0.2.1
 cognite-sdk==7.66.0
 pydantic==2.7.0
-cognite-pygen==0.99.58
+cognite-pygen==0.99.59
 ```
 
 Note that we also set `pydantic` to a specific version. This is because `pygen` supports both `pydantic` `v1` and `v2`, but

@@ -1052,16 +1052,8 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
             filter_,
         )
 
-    def query(self) -> CogniteActivityQuery:
-        """Start a query for Cognite activities."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return CogniteActivityQuery(self._client)
-
     def select(self) -> CogniteActivityQuery:
         """Start selecting from Cognite activities."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return CogniteActivityQuery(self._client)
 
     def _query(

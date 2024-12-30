@@ -594,16 +594,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             filter_,
         )
 
-    def query(self) -> ConnectionItemAQuery:
-        """Start a query for connection item as."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return ConnectionItemAQuery(self._client)
-
     def select(self) -> ConnectionItemAQuery:
         """Start selecting from connection item as."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return ConnectionItemAQuery(self._client)
 
     def _query(

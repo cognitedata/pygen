@@ -520,16 +520,8 @@ class Cognite3DRevisionAPI(
             filter_,
         )
 
-    def query(self) -> Cognite3DRevisionQuery:
-        """Start a query for Cognite 3D revisions."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return Cognite3DRevisionQuery(self._client)
-
     def select(self) -> Cognite3DRevisionQuery:
         """Start selecting from Cognite 3D revisions."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return Cognite3DRevisionQuery(self._client)
 
     def _query(

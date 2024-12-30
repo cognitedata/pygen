@@ -488,16 +488,8 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             filter_,
         )
 
-    def query(self) -> SubInterfaceQuery:
-        """Start a query for sub interfaces."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return SubInterfaceQuery(self._client)
-
     def select(self) -> SubInterfaceQuery:
         """Start selecting from sub interfaces."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return SubInterfaceQuery(self._client)
 
     def _query(

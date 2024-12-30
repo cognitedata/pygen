@@ -1028,16 +1028,8 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             filter_,
         )
 
-    def query(self) -> SensorPositionQuery:
-        """Start a query for sensor positions."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return SensorPositionQuery(self._client)
-
     def select(self) -> SensorPositionQuery:
         """Start selecting from sensor positions."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return SensorPositionQuery(self._client)
 
     def _query(

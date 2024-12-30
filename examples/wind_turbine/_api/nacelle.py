@@ -1062,16 +1062,8 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
             filter_,
         )
 
-    def query(self) -> NacelleQuery:
-        """Start a query for nacelles."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return NacelleQuery(self._client)
-
     def select(self) -> NacelleQuery:
         """Start selecting from nacelles."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return NacelleQuery(self._client)
 
     def _query(

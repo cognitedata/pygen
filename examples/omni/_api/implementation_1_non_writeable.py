@@ -477,16 +477,8 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
             filter_,
         )
 
-    def query(self) -> Implementation1NonWriteableQuery:
-        """Start a query for implementation 1 non writeables."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return Implementation1NonWriteableQuery(self._client)
-
     def select(self) -> Implementation1NonWriteableQuery:
         """Start selecting from implementation 1 non writeables."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return Implementation1NonWriteableQuery(self._client)
 
     def _query(

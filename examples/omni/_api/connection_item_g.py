@@ -469,16 +469,8 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
             filter_,
         )
 
-    def query(self) -> ConnectionItemGQuery:
-        """Start a query for connection item gs."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return ConnectionItemGQuery(self._client)
-
     def select(self) -> ConnectionItemGQuery:
         """Start selecting from connection item gs."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return ConnectionItemGQuery(self._client)
 
     def _query(

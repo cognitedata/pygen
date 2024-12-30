@@ -650,16 +650,8 @@ class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPa
             filter_,
         )
 
-    def query(self) -> SolarPanelQuery:
-        """Start a query for solar panels."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return SolarPanelQuery(self._client)
-
     def select(self) -> SolarPanelQuery:
         """Start selecting from solar panels."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return SolarPanelQuery(self._client)
 
     def _query(

@@ -574,16 +574,8 @@ class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DMo
             filter_,
         )
 
-    def query(self) -> Cognite3DModelQuery:
-        """Start a query for Cognite 3D models."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return Cognite3DModelQuery(self._client)
-
     def select(self) -> Cognite3DModelQuery:
         """Start selecting from Cognite 3D models."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return Cognite3DModelQuery(self._client)
 
     def _query(
