@@ -26,6 +26,12 @@ Changes are grouped as follows
   properties that are explicitly set to `None` and only sends those properties to the CDF. This way you can
   now set properties to `None` and they will be updated in the CDF.
 
+### Removed
+- The `.query()` method (was in `alpha`) has been removed. Instead, use the `.select()` method.
+
+### Changed
+- The `.select()` method is no longer in `alpha` and is now the recommended way to query the CDF.
+
 ### Fixed
 - Calling `.upsert` with an edge with properties in inwards direction, now creates the edge in the correct direction.
 

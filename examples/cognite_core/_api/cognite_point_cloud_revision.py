@@ -536,16 +536,8 @@ class CognitePointCloudRevisionAPI(
             filter_,
         )
 
-    def query(self) -> CognitePointCloudRevisionQuery:
-        """Start a query for Cognite point cloud revisions."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return CognitePointCloudRevisionQuery(self._client)
-
     def select(self) -> CognitePointCloudRevisionQuery:
         """Start selecting from Cognite point cloud revisions."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return CognitePointCloudRevisionQuery(self._client)
 
     def _query(

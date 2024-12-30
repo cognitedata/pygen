@@ -523,16 +523,8 @@ class GeneratingUnitAPI(NodeAPI[GeneratingUnit, GeneratingUnitWrite, GeneratingU
             filter_,
         )
 
-    def query(self) -> GeneratingUnitQuery:
-        """Start a query for generating units."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return GeneratingUnitQuery(self._client)
-
     def select(self) -> GeneratingUnitQuery:
         """Start selecting from generating units."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return GeneratingUnitQuery(self._client)
 
     def _query(

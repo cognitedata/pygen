@@ -545,16 +545,8 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
             filter_,
         )
 
-    def query(self) -> GeneratorQuery:
-        """Start a query for generators."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return GeneratorQuery(self._client)
-
     def select(self) -> GeneratorQuery:
         """Start selecting from generators."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return GeneratorQuery(self._client)
 
     def _query(

@@ -608,16 +608,8 @@ class GearboxAPI(NodeAPI[Gearbox, GearboxWrite, GearboxList, GearboxWriteList]):
             filter_,
         )
 
-    def query(self) -> GearboxQuery:
-        """Start a query for gearboxes."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return GearboxQuery(self._client)
-
     def select(self) -> GearboxQuery:
         """Start selecting from gearboxes."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return GearboxQuery(self._client)
 
     def _query(

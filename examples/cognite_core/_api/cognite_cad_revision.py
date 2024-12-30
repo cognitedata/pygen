@@ -529,16 +529,8 @@ class CogniteCADRevisionAPI(
             filter_,
         )
 
-    def query(self) -> CogniteCADRevisionQuery:
-        """Start a query for Cognite cad revisions."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return CogniteCADRevisionQuery(self._client)
-
     def select(self) -> CogniteCADRevisionQuery:
         """Start selecting from Cognite cad revisions."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return CogniteCADRevisionQuery(self._client)
 
     def _query(

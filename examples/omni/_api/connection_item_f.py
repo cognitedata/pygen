@@ -537,16 +537,8 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
             filter_,
         )
 
-    def query(self) -> ConnectionItemFQuery:
-        """Start a query for connection item fs."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return ConnectionItemFQuery(self._client)
-
     def select(self) -> ConnectionItemFQuery:
         """Start selecting from connection item fs."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return ConnectionItemFQuery(self._client)
 
     def _query(

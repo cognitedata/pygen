@@ -513,16 +513,8 @@ class Implementation1v2API(
             filter_,
         )
 
-    def query(self) -> Implementation1v2Query:
-        """Start a query for implementation 1 v 2."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return Implementation1v2Query(self._client)
-
     def select(self) -> Implementation1v2Query:
         """Start selecting from implementation 1 v 2."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return Implementation1v2Query(self._client)
 
     def _query(

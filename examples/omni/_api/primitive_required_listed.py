@@ -442,16 +442,8 @@ class PrimitiveRequiredListedAPI(
             filter_,
         )
 
-    def query(self) -> PrimitiveRequiredListedQuery:
-        """Start a query for primitive required listeds."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return PrimitiveRequiredListedQuery(self._client)
-
     def select(self) -> PrimitiveRequiredListedQuery:
         """Start selecting from primitive required listeds."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return PrimitiveRequiredListedQuery(self._client)
 
     def _query(

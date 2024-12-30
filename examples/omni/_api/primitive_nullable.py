@@ -652,16 +652,8 @@ class PrimitiveNullableAPI(
             filter_,
         )
 
-    def query(self) -> PrimitiveNullableQuery:
-        """Start a query for primitive nullables."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return PrimitiveNullableQuery(self._client)
-
     def select(self) -> PrimitiveNullableQuery:
         """Start selecting from primitive nullables."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return PrimitiveNullableQuery(self._client)
 
     def _query(

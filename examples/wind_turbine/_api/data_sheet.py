@@ -588,16 +588,8 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
             filter_,
         )
 
-    def query(self) -> DataSheetQuery:
-        """Start a query for data sheets."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return DataSheetQuery(self._client)
-
     def select(self) -> DataSheetQuery:
         """Start selecting from data sheets."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return DataSheetQuery(self._client)
 
     def _query(

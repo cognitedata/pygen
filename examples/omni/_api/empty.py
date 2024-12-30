@@ -648,16 +648,8 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             filter_,
         )
 
-    def query(self) -> EmptyQuery:
-        """Start a query for empties."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return EmptyQuery(self._client)
-
     def select(self) -> EmptyQuery:
         """Start selecting from empties."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return EmptyQuery(self._client)
 
     def _query(

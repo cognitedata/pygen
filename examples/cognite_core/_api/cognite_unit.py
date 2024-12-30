@@ -604,16 +604,8 @@ class CogniteUnitAPI(NodeAPI[CogniteUnit, CogniteUnitWrite, CogniteUnitList, Cog
             filter_,
         )
 
-    def query(self) -> CogniteUnitQuery:
-        """Start a query for Cognite units."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return CogniteUnitQuery(self._client)
-
     def select(self) -> CogniteUnitQuery:
         """Start selecting from Cognite units."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return CogniteUnitQuery(self._client)
 
     def _query(

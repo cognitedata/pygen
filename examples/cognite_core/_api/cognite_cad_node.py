@@ -716,16 +716,8 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
             filter_,
         )
 
-    def query(self) -> CogniteCADNodeQuery:
-        """Start a query for Cognite cad nodes."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return CogniteCADNodeQuery(self._client)
-
     def select(self) -> CogniteCADNodeQuery:
         """Start selecting from Cognite cad nodes."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return CogniteCADNodeQuery(self._client)
 
     def _query(

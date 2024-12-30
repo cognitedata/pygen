@@ -591,16 +591,8 @@ class SensorTimeSeriesAPI(
             filter_,
         )
 
-    def query(self) -> SensorTimeSeriesQuery:
-        """Start a query for sensor time series."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return SensorTimeSeriesQuery(self._client)
-
     def select(self) -> SensorTimeSeriesQuery:
         """Start selecting from sensor time series."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return SensorTimeSeriesQuery(self._client)
 
     def _query(

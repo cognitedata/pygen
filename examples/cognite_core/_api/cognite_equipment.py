@@ -997,16 +997,8 @@ class CogniteEquipmentAPI(
             filter_,
         )
 
-    def query(self) -> CogniteEquipmentQuery:
-        """Start a query for Cognite equipments."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return CogniteEquipmentQuery(self._client)
-
     def select(self) -> CogniteEquipmentQuery:
         """Start selecting from Cognite equipments."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return CogniteEquipmentQuery(self._client)
 
     def _query(

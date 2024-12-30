@@ -464,16 +464,8 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
             filter_,
         )
 
-    def query(self) -> ConnectionItemBQuery:
-        """Start a query for connection item bs."""
-        warnings.warn("This method is renamed to .select", UserWarning, stacklevel=2)
-        return ConnectionItemBQuery(self._client)
-
     def select(self) -> ConnectionItemBQuery:
         """Start selecting from connection item bs."""
-        warnings.warn(
-            "The .select is in alpha and is subject to breaking changes without notice.", UserWarning, stacklevel=2
-        )
         return ConnectionItemBQuery(self._client)
 
     def _query(
