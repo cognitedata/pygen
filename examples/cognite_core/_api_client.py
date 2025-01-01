@@ -52,7 +52,7 @@ class CogniteCoreClient:
     CogniteCoreClient
 
     Generated with:
-        pygen = 0.99.59
+        pygen = 0.99.60
         cognite-sdk = 7.70.7
         pydantic = 2.10.4
 
@@ -70,7 +70,7 @@ class CogniteCoreClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:0.99.59"
+        client.config.client_name = "CognitePygen:0.99.60"
 
         self._client = client
 

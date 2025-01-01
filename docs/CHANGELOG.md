@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.60] - 25-01-01
 ### Improved
 - Error message on validation error in any retrieve type method (e.g. `.retrieve`, `.list`, `.select`). It now
   includes an overview of the total instances that failed validation.
