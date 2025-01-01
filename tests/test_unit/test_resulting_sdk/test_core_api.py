@@ -8,7 +8,6 @@ from omni import OmniClient
 from omni import data_classes as dc
 from omni._api._core import instantiate_classes
 from omni.config import global_config
-from pydantic import ValidationError
 from wind_turbine import data_classes as wdc
 from wind_turbine._api._core import GraphQLQueryResponse
 
@@ -196,7 +195,7 @@ class TestAPIClass:
                 ]
             )
             pygen = OmniClient(mock_client)
-            with pytest.raises(ValidationError):
+            with pytest.raises(ValueError):
                 _ = pygen.primitive_required.list()
             try:
                 global_config.validate_retrieve = False
@@ -249,4 +248,4 @@ class TestInstantiateClasses:
 
         with pytest.raises(ValueError) as exc_info:
             instantiate_classes(dc.PrimitiveRequired, raw, "retrieve")
-        assert exc_info.match("Failed to retrieve 'PrimitiveRequired'. 2 out of 3 instances failed validation.")
+        assert exc_info.match("Failed to retrieve 'PrimitiveRequired', 2 out of 3 instances failed validation.")

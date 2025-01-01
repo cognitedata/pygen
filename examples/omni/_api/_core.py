@@ -572,11 +572,18 @@ def instantiate_classes(cls_: type[T_BaseModel], data: list[dict[str, Any]], con
         return cls_list.validate_python(data)
     except ValidationError as e:
         failed_count = len({item["loc"][0] for item in e.errors()})
-        msg = f"Failed to {context} {cls_.__name__!r}. {failed_count} out of {len(data)} instances failed validation."
-        raise PygenValidationError(msg, e)
+        msg = f"Failed to {context} {cls_.__name__!r}, {failed_count} out of {len(data)} instances failed validation."
+        raise PygenValidationError(msg, e) from e
 
 
 class PygenValidationError(ValueError):
     def __init__(self, message, pydantic_error: ValidationError) -> None:
         super().__init__(message)
         self.errors = pydantic_error.errors()
+
+    def __str__(self):
+        return (
+            f"{super().__str__()}\nFor details see the ValidationError above."
+            f"\nHint: You can turn off validation by setting `global_config.validate_retrieve = False` by"
+            f" importing `from omni.config import global_config`."
+        )
