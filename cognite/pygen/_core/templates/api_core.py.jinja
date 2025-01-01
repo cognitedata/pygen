@@ -141,12 +141,18 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                 if child_cls is None:
                     raise ValueError(f"Could not find child class with external_id {child_class_external_id}")
                 instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=child_cls._view_id)
-                items.extend(instantiate_classes(child_cls, [child_cls._to_dict(node) for node in instances.nodes], "retrieve"))
+                items.extend(
+                    instantiate_classes(child_cls, [child_cls._to_dict(node) for node in instances.nodes], "retrieve")
+                )
         elif as_child_class:
             raise ValueError("Cannot retrieve as child classes and include connections")
         elif retrieve_connections == "skip":
             instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._view_id)
-            items.extend(instantiate_classes(self._class_type, [self._class_type._to_dict(node) for node in instances.nodes], "retrieve"))
+            items.extend(
+                instantiate_classes(
+                    self._class_type, [self._class_type._to_dict(node) for node in instances.nodes], "retrieve"
+                )
+            )
         else:
             for space_key, external_ids in groupby(
                 sorted((node_id.as_tuple() for node_id in node_ids)), key=lambda x: x[0]
@@ -156,7 +162,11 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                     filter_ = dm.filters.Equals(["node", "space"], space_key) & dm.filters.In(
                         ["node", "externalId"], ext_id_chunk
                     )
-                    items.extend(instantiate_classes(self._class_type, self._query(filter_, len(ext_id_chunk), retrieve_connections), "retrieve"))
+                    items.extend(
+                        instantiate_classes(
+                            self._class_type, self._query(filter_, len(ext_id_chunk), retrieve_connections), "retrieve"
+                        )
+                    )
 
         nodes = self._class_list(items)
 
@@ -198,7 +208,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             limit=limit,
             sort=sort_input,
         )
-        return self._class_list(instantiate_classes(self._class_type, [self._class_type._to_dict(node) for node in nodes], "search"))
+        return self._class_list(
+            instantiate_classes(self._class_type, [self._class_type._to_dict(node) for node in nodes], "search")
+        )
 
     def _to_input_properties(self, properties: str | SequenceNotStr[str] | None) -> list[str] | None:
         properties_input: list[str] | None = None
@@ -310,7 +322,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             filter=filter,
             sort=sort,
         )
-        return self._class_list(instantiate_classes(self._class_type, [self._class_type._to_dict(node) for node in nodes], "list"))
+        return self._class_list(
+            instantiate_classes(self._class_type, [self._class_type._to_dict(node) for node in nodes], "list")
+        )
 
     def _create_sort(
         self,
@@ -395,7 +409,9 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, 
         filter_: dm.Filter | None = None,
     ) -> T_DomainRelationList:
         edges = self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_, sources=[self._view_id])
-        return self._class_list(instantiate_classes(self._class_type, [self._class_type._to_dict(edge) for edge in edges], "list"))
+        return self._class_list(
+            instantiate_classes(self._class_type, [self._class_type._to_dict(edge) for edge in edges], "list")
+        )
 
 
 class QueryAPI(Generic[T_DomainModel, T_DomainModelList]):
