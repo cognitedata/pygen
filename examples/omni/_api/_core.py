@@ -567,7 +567,7 @@ def instantiate_classes(cls_: type[T_BaseModel], data: list[dict[str, Any]], con
     if global_config.validate_retrieve is False:
         return [cls_.model_construct(**item) for item in data]
 
-    cls_list = TypeAdapter(list[cls_]) # type: ignore[valid-type]
+    cls_list = TypeAdapter(list[cls_])  # type: ignore[valid-type]
     try:
         return cls_list.validate_python(data)
     except ValidationError as e:

@@ -20,7 +20,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from cognite_core.config import global_config
 from cognite_core import data_classes
@@ -575,7 +575,26 @@ T_BaseModel = TypeVar("T_BaseModel", bound=BaseModel)
 
 
 def instantiate_classes(cls_: type[T_BaseModel], data: list[dict[str, Any]], context: str) -> list[T_BaseModel]:
-    if global_config.validate_retrieve is True:
-        return [cls_.model_validate(item) for item in data]
-    else:
+    if global_config.validate_retrieve is False:
         return [cls_.model_construct(**item) for item in data]
+
+    cls_list = TypeAdapter(list[cls_])  # type: ignore[valid-type]
+    try:
+        return cls_list.validate_python(data)
+    except ValidationError as e:
+        failed_count = len({item["loc"][0] for item in e.errors()})
+        msg = f"Failed to {context} {cls_.__name__!r}, {failed_count} out of {len(data)} instances failed validation."
+        raise PygenValidationError(msg, e) from e
+
+
+class PygenValidationError(ValueError):
+    def __init__(self, message, pydantic_error: ValidationError) -> None:
+        super().__init__(message)
+        self.errors = pydantic_error.errors()
+
+    def __str__(self):
+        return (
+            f"{super().__str__()}\nFor details see the ValidationError above."
+            "\nHint: You can turn off validation by setting `global_config.validate_retrieve = False` by"
+            f" importing `from cognite_core.config import global_config`."
+        )
