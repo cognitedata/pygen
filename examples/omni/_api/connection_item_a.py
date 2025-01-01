@@ -8,7 +8,6 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.config import global_config
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
     instantiate_classes,
