@@ -546,6 +546,6 @@ T_Class = TypeVar("T_Class", bound=type[BaseModel])
 
 def instantiate_classes(cls_: T_Class, data: list[dict[str, Any]], context: str) -> list[T_Class]:
     if global_config.validate_retrieve is True:
-        return [cls_.model_validate(item) for item in data]
+        return [cls_.model_validate(item) for item in data]  # type: ignore[misc]
     else:
         return [cls_.model_construct(**item) for item in data]  # type: ignore[misc]

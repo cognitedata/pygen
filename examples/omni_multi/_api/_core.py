@@ -20,6 +20,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
+from pydantic import BaseModel
 
 from omni_multi.config import global_config
 from omni_multi import data_classes
@@ -509,3 +510,13 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[G
         "Implementation1": data_classes.Implementation1v1GraphQL,
     },
 }
+
+
+T_Class = TypeVar("T_Class", bound=type[BaseModel])
+
+
+def instantiate_classes(cls_: T_Class, data: list[dict[str, Any]], context: str) -> list[T_Class]:
+    if global_config.validate_retrieve is True:
+        return [cls_.model_validate(item) for item in data]  # type: ignore[misc]
+    else:
+        return [cls_.model_construct(**item) for item in data]  # type: ignore[misc]

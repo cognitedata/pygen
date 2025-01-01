@@ -20,6 +20,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
+from pydantic import BaseModel
 
 from wind_turbine.config import global_config
 from wind_turbine import data_classes
@@ -538,3 +539,13 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[G
         "WindTurbine": data_classes.WindTurbineGraphQL,
     },
 }
+
+
+T_Class = TypeVar("T_Class", bound=type[BaseModel])
+
+
+def instantiate_classes(cls_: T_Class, data: list[dict[str, Any]], context: str) -> list[T_Class]:
+    if global_config.validate_retrieve is True:
+        return [cls_.model_validate(item) for item in data]  # type: ignore[misc]
+    else:
+        return [cls_.model_construct(**item) for item in data]  # type: ignore[misc]
