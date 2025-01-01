@@ -5,6 +5,8 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 from cognite.client.testing import monkeypatch_cognite_client
 from omni import OmniClient
+from omni import data_classes as dc
+from omni._api._core import instantiate_classes
 from omni.config import global_config
 from pydantic import ValidationError
 from wind_turbine import data_classes as wdc
@@ -209,3 +211,24 @@ class TestAPIClass:
                 "int_64": "invalid_value",
                 "space": "my_space",
             }
+
+
+class TestInstantiateClasses:
+    def test_raise_multiple(self) -> None:
+        raw = [
+            {
+                "space": "my_space",
+                "externalId": "first",
+                "float32": 1.0,
+            },
+            {
+                "space": "my_space",
+                "externalId": "second",
+                "float32": 2.0,
+                "float64": "not_valid_float",
+            },
+        ]
+
+        with pytest.raises(ValueError) as exc_info:
+            instantiate_classes(dc.PrimitiveRequired, raw, "retrieve")
+        assert exc_info.match("Validation failed in retrieve operation for PrimitiveRequired")
