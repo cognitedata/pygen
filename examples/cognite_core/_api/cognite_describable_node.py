@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import ClassVar, Literal, overload
+from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.config import global_config
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
+    instantiate_classes,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
@@ -631,7 +631,7 @@ class CogniteDescribableNodeAPI(
         limit: int,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> CogniteDescribableNodeList:
+    ) -> list[dict[str, Any]]:
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -644,12 +644,7 @@ class CogniteDescribableNodeAPI(
         )
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        if global_config.validate_retrieve:
-            retrieved = [CogniteDescribableNode.model_validate(item) for item in unpacked]
-        else:
-            retrieved = [CogniteDescribableNode.model_construct(**item) for item in unpacked]
-        return CogniteDescribableNodeList(retrieved)
+        return QueryUnpacker(builder, edges=unpack_edges).unpack()
 
     def list(
         self,

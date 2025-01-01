@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import ClassVar, Literal, overload
+from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from omni.config import global_config
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
+    instantiate_classes,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
@@ -511,7 +511,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         limit: int,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> SubInterfaceList:
+    ) -> list[dict[str, Any]]:
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -524,12 +524,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         )
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        if global_config.validate_retrieve:
-            retrieved = [SubInterface.model_validate(item) for item in unpacked]
-        else:
-            retrieved = [SubInterface.model_construct(**item) for item in unpacked]
-        return SubInterfaceList(retrieved)
+        return QueryUnpacker(builder, edges=unpack_edges).unpack()
 
     def list(
         self,
