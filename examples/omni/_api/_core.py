@@ -20,7 +20,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import TimeSeriesList
 from cognite.client.data_classes.data_modeling.instances import InstanceSort, InstanceAggregationResultList
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from omni.config import global_config
 from omni import data_classes
@@ -564,7 +564,18 @@ T_BaseModel = TypeVar("T_BaseModel", bound=BaseModel)
 
 
 def instantiate_classes(cls_: type[T_BaseModel], data: list[dict[str, Any]], context: str) -> list[T_BaseModel]:
-    if global_config.validate_retrieve is True:
-        return [cls_.model_validate(item) for item in data]
-    else:
+    if global_config.validate_retrieve is False:
         return [cls_.model_construct(**item) for item in data]
+
+    cls_list = TypeAdapter(list[cls_]) # type: ignore[valid-type]
+    try:
+        return cls_list.validate_python(data)
+    except ValidationError as e:
+        raise PygenValidationError(f"Failed to validate ", e)
+
+
+class PygenValidationError(ValueError):
+    def __init__(self, message, pydantic_error: ValidationError) -> None:
+        super().__init__(message)
+        self.pydantic_error = pydantic_error
+
