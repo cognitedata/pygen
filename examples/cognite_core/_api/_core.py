@@ -139,12 +139,18 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                 if child_cls is None:
                     raise ValueError(f"Could not find child class with external_id {child_class_external_id}")
                 instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=child_cls._view_id)
-                items.extend([child_cls.from_instance(node) for node in instances.nodes])
+                items.extend(
+                    instantiate_classes(child_cls, [child_cls._to_dict(node) for node in instances.nodes], "retrieve")
+                )
         elif as_child_class:
             raise ValueError("Cannot retrieve as child classes and include connections")
         elif retrieve_connections == "skip":
             instances = self._client.data_modeling.instances.retrieve(nodes=node_ids, sources=self._view_id)
-            items.extend([self._class_type.from_instance(node) for node in instances.nodes])
+            items.extend(
+                instantiate_classes(
+                    self._class_type, [self._class_type._to_dict(node) for node in instances.nodes], "retrieve"
+                )
+            )
         else:
             for space_key, external_ids in groupby(
                 sorted((node_id.as_tuple() for node_id in node_ids)), key=lambda x: x[0]
@@ -154,7 +160,11 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                     filter_ = dm.filters.Equals(["node", "space"], space_key) & dm.filters.In(
                         ["node", "externalId"], ext_id_chunk
                     )
-                    items.extend(self._query(filter_, len(ext_id_chunk), retrieve_connections))
+                    items.extend(
+                        instantiate_classes(
+                            self._class_type, self._query(filter_, len(ext_id_chunk), retrieve_connections), "retrieve"
+                        )
+                    )
 
         nodes = self._class_list(items)
 
@@ -171,7 +181,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         limit: int,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> T_DomainModelList:
+    ) -> list[dict[str, Any]]:
         raise NotImplementedError
 
     def _search(
@@ -196,7 +206,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             limit=limit,
             sort=sort_input,
         )
-        return self._class_list([self._class_type.from_instance(node) for node in nodes])
+        return self._class_list(
+            instantiate_classes(self._class_type, [self._class_type._to_dict(node) for node in nodes], "search")
+        )
 
     def _to_input_properties(self, properties: str | SequenceNotStr[str] | None) -> list[str] | None:
         properties_input: list[str] | None = None
@@ -308,7 +320,9 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             filter=filter,
             sort=sort,
         )
-        return self._class_list([self._class_type.from_instance(node) for node in nodes])
+        return self._class_list(
+            instantiate_classes(self._class_type, [self._class_type._to_dict(node) for node in nodes], "list")
+        )
 
     def _create_sort(
         self,
@@ -393,7 +407,9 @@ class EdgePropertyAPI(EdgeAPI, Generic[T_DomainRelation, T_DomainRelationWrite, 
         filter_: dm.Filter | None = None,
     ) -> T_DomainRelationList:
         edges = self._client.data_modeling.instances.list("edge", limit=limit, filter=filter_, sources=[self._view_id])
-        return self._class_list([self._class_type.from_instance(edge) for edge in edges])  # type: ignore[misc]
+        return self._class_list(
+            instantiate_classes(self._class_type, [self._class_type._to_dict(edge) for edge in edges], "list")
+        )
 
 
 class QueryAPI(Generic[T_DomainModel, T_DomainModelList]):
@@ -412,11 +428,8 @@ class QueryAPI(Generic[T_DomainModel, T_DomainModelList]):
     def _query(self) -> T_DomainModelList:
         self._builder.execute_query(self._client, remove_not_connected=True)
         unpacked = QueryUnpacker(self._builder).unpack()
-        if global_config.validate_retrieve:
-            retrieved = [self._result_cls.model_validate(item) for item in unpacked]
-        else:
-            retrieved = [self._result_cls.model_construct(**item) for item in unpacked]  # type: ignore[misc]
-        return self._result_list_cls(retrieved)
+        item_list = instantiate_classes(self._result_cls, unpacked, "query")
+        return self._result_list_cls(item_list)
 
 
 def _create_edge_filter(
@@ -558,11 +571,11 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[G
 }
 
 
-T_Class = TypeVar("T_Class", bound=type[BaseModel])
+T_BaseModel = TypeVar("T_BaseModel", bound=BaseModel)
 
 
-def instantiate_classes(cls_: T_Class, data: list[dict[str, Any]], context: str) -> list[T_Class]:
+def instantiate_classes(cls_: type[T_BaseModel], data: list[dict[str, Any]], context: str) -> list[T_BaseModel]:
     if global_config.validate_retrieve is True:
-        return [cls_.model_validate(item) for item in data]  # type: ignore[misc]
+        return [cls_.model_validate(item) for item in data]
     else:
-        return [cls_.model_construct(**item) for item in data]  # type: ignore[misc]
+        return [cls_.model_construct(**item) for item in data]
