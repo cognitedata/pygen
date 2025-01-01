@@ -13,6 +13,15 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Improved
+- Error message on validation error in any retrieve type method (e.g. `.retrieve`, `.list`, `.select`). It now
+  includes an overview of the total instances that failed validation.
+
+### Added
+- Support for turning off validation for the `.search`/edge `.list` methods using the configuration:
+  `my_sdk.config import global_config; global_config.validate_retrieve = False`.
+
 ## [0.99.59] - 24-12-30
 ### Added
 - Support for filtering on direct relations in the `.select()` method.
