@@ -571,11 +571,12 @@ def instantiate_classes(cls_: type[T_BaseModel], data: list[dict[str, Any]], con
     try:
         return cls_list.validate_python(data)
     except ValidationError as e:
-        raise PygenValidationError(f"Failed to validate ", e)
+        failed_count = len({item["loc"][0] for item in e.errors()})
+        msg = f"Failed to {context} {cls_.__name__!r}. {failed_count} out of {len(data)} instances failed validation."
+        raise PygenValidationError(msg, e)
 
 
 class PygenValidationError(ValueError):
     def __init__(self, message, pydantic_error: ValidationError) -> None:
         super().__init__(message)
-        self.pydantic_error = pydantic_error
-
+        self.errors = pydantic_error.errors()

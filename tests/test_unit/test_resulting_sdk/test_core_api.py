@@ -218,17 +218,35 @@ class TestInstantiateClasses:
         raw = [
             {
                 "space": "my_space",
-                "externalId": "first",
+                "externalId": "first-invalid",
                 "float32": 1.0,
             },
             {
                 "space": "my_space",
-                "externalId": "second",
+                "externalId": "second-invalid",
                 "float32": 2.0,
                 "float64": "not_valid_float",
+            },
+            {
+                "space": "my_space",
+                "externalId": "third-valid",
+                "data_record": {
+                    "version": 3,
+                    "lastUpdatedTime": 3,
+                    "createdTime": 3,
+                },
+                "float32": 3.0,
+                "float64": 3.0,
+                "int32": 3,
+                "int64": 3,
+                "text": "text",
+                "boolean": True,
+                "date": "2025-01-01",
+                "timestamp": "2025-01-01T00:00:00Z",
+                "json": {"key": "value"},
             },
         ]
 
         with pytest.raises(ValueError) as exc_info:
             instantiate_classes(dc.PrimitiveRequired, raw, "retrieve")
-        assert exc_info.match("Validation failed in retrieve operation for PrimitiveRequired")
+        assert exc_info.match("Failed to retrieve 'PrimitiveRequired'. 2 out of 3 instances failed validation.")
