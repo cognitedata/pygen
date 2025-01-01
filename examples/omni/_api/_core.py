@@ -584,6 +584,6 @@ class PygenValidationError(ValueError):
     def __str__(self):
         return (
             f"{super().__str__()}\nFor details see the ValidationError above."
-            f"\nHint: You can turn off validation by setting `global_config.validate_retrieve = False` by"
+            "\nHint: You can turn off validation by setting `global_config.validate_retrieve = False` by"
             f" importing `from omni.config import global_config`."
         )
