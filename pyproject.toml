@@ -95,7 +95,7 @@ pytest-rerunfailures = "^14.0"
 toml = "*"
 pandas = "*"
 pyyaml = "*"
-# MyPy 1.14.1 crashes on every other run, waiting for a fix.g
+# MyPy 1.14.1 crashes on every other run, waiting for a fix.
 mypy = ">=1.5, <1.14.1"
 mkdocs =  {version="^1.6.0", optional=true}
 mkdocs-material = {version="^9.5.26", optional=true}
