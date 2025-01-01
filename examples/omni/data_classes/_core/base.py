@@ -235,19 +235,22 @@ class DomainModel(DomainModelCore, ABC):
         return dm.NodeId(space=self.space, external_id=self.external_id)
 
     @classmethod
-    def from_instance(cls, instance: Instance) -> Self:
+    def _to_dict(cls, instance: Instance) -> dict[str, Any]:
         data = instance.dump(camel_case=False)
         node_type = data.pop("type", None)
         space = data.pop("space")
         external_id = data.pop("external_id")
-        args = dict(
+        return dict(
             space=space,
             external_id=external_id,
             data_record=DataRecord(**data),
             node_type=node_type,
             **unpack_properties(instance.properties),
         )
-        return parse_pydantic(cls, args)
+
+    @classmethod
+    def from_instance(cls, instance: Instance) -> Self:
+        return parse_pydantic(cls, cls._to_dict(instance))
 
 
 T_DomainModel = TypeVar("T_DomainModel", bound=DomainModel)
@@ -377,7 +380,7 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
         return data
 
     @classmethod
-    def from_instance(cls: type[T_DomainModelWrite], instance: InstanceApply) -> T_DomainModelWrite:
+    def _to_dict(cls, instance: InstanceApply) -> dict[str, Any]:
         data = instance.dump(camel_case=False)
         data.pop("instance_type", None)
         node_type = data.pop("type", None)
@@ -396,10 +399,13 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
                         )
                 else:
                     properties[prop_name] = prop_value
-        args = dict(
+        return dict(
             space=space, external_id=external_id, node_type=node_type, data_record=DataRecordWrite(**data), **properties
         )
-        return parse_pydantic(cls, args)
+
+    @classmethod
+    def from_instance(cls: type[T_DomainModelWrite], instance: InstanceApply) -> T_DomainModelWrite:
+        return parse_pydantic(cls, cls._to_dict(instance))
 
 
 T_DomainModelWrite = TypeVar("T_DomainModelWrite", bound=DomainModelWrite)
@@ -533,7 +539,7 @@ class DomainRelation(DomainModelCore):
         return dm.EdgeId(space=self.space, external_id=self.external_id)
 
     @classmethod
-    def from_instance(cls, instance: Instance) -> Self:
+    def _to_dict(cls, instance: Instance) -> dict[str, Any]:
         data = instance.dump(camel_case=False)
         data.pop("instance_type", None)
         edge_type = data.pop("type", None)
@@ -541,7 +547,7 @@ class DomainRelation(DomainModelCore):
         end_node = data.pop("end_node")
         space = data.pop("space")
         external_id = data.pop("external_id")
-        args = dict(
+        return dict(
             space=space,
             external_id=external_id,
             data_record=DataRecord(**data),
@@ -550,7 +556,11 @@ class DomainRelation(DomainModelCore):
             end_node=end_node,
             **unpack_properties(instance.properties),
         )
-        return parse_pydantic(cls, args)
+
+    @classmethod
+    def from_instance(cls, instance: Instance) -> Self:
+        return parse_pydantic(cls, cls._to_dict(instance))
+
 
 T_DomainRelation = TypeVar("T_DomainRelation", bound=DomainRelation)
 
