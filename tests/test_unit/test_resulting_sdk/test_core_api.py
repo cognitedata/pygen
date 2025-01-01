@@ -5,8 +5,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 from cognite.client.testing import monkeypatch_cognite_client
 from omni import OmniClient
+from omni import data_classes as dc
+from omni._api._core import instantiate_classes
 from omni.config import global_config
-from pydantic import ValidationError
 from wind_turbine import data_classes as wdc
 from wind_turbine._api._core import GraphQLQueryResponse
 
@@ -194,7 +195,7 @@ class TestAPIClass:
                 ]
             )
             pygen = OmniClient(mock_client)
-            with pytest.raises(ValidationError):
+            with pytest.raises(ValueError):
                 _ = pygen.primitive_required.list()
             try:
                 global_config.validate_retrieve = False
@@ -209,3 +210,42 @@ class TestAPIClass:
                 "int_64": "invalid_value",
                 "space": "my_space",
             }
+
+
+class TestInstantiateClasses:
+    def test_raise_multiple(self) -> None:
+        raw = [
+            {
+                "space": "my_space",
+                "externalId": "first-invalid",
+                "float32": 1.0,
+            },
+            {
+                "space": "my_space",
+                "externalId": "second-invalid",
+                "float32": 2.0,
+                "float64": "not_valid_float",
+            },
+            {
+                "space": "my_space",
+                "externalId": "third-valid",
+                "data_record": {
+                    "version": 3,
+                    "lastUpdatedTime": 3,
+                    "createdTime": 3,
+                },
+                "float32": 3.0,
+                "float64": 3.0,
+                "int32": 3,
+                "int64": 3,
+                "text": "text",
+                "boolean": True,
+                "date": "2025-01-01",
+                "timestamp": "2025-01-01T00:00:00Z",
+                "json": {"key": "value"},
+            },
+        ]
+
+        with pytest.raises(ValueError) as exc_info:
+            instantiate_classes(dc.PrimitiveRequired, raw, "retrieve")
+        assert exc_info.match("Failed to retrieve 'PrimitiveRequired', 2 out of 3 instances failed validation.")

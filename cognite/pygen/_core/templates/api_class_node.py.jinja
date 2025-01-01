@@ -5,15 +5,15 @@ import datetime
 {% endif %}
 import warnings
 from collections.abc import Sequence
-from typing import ClassVar, Literal, overload
+from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from {{ top_level_package }}.config import global_config
 from {{ top_level_package }}._api._core import (
     DEFAULT_LIMIT_READ,
+    instantiate_classes,
     Aggregations,
     {% if data_class.is_writable %}
     NodeAPI,
@@ -556,7 +556,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         limit: int,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> {{ data_class.read_list_name }}:
+    ) -> list[dict[str, Any]]:
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(factory.root(
@@ -632,12 +632,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 {% endif %}
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        if global_config.validate_retrieve:
-            retrieved = [{{ data_class.read_name }}.model_validate(item) for item in unpacked]
-        else:
-            retrieved = [{{ data_class.read_name }}.model_construct(**item) for item in unpacked]
-        return {{ data_class.read_list_name }}(retrieved)
+        return QueryUnpacker(builder, edges=unpack_edges).unpack()
+
 
     def list(
         self,
@@ -701,7 +697,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 {% if data_class.has_connection_with_target %}
         if retrieve_connections == "skip":
             return self._list(limit=limit,  filter=filter_{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort=sort_input{% endif %})
-        return self._query(filter_, limit, retrieve_connections{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort_input{% endif %})
+        values = self._query(filter_, limit, retrieve_connections{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort_input{% endif %})
+        return self._class_list(instantiate_classes(self._class_type, values, "list"))
         {% else %}
         return self._list(limit=limit,  filter=filter_{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort=sort_input{% endif %})
         {% endif %}

@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Sequence
-from typing import ClassVar, Literal, overload
+from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from wind_turbine.config import global_config
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
+    instantiate_classes,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
@@ -554,7 +554,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
         limit: int,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> RotorList:
+    ) -> list[dict[str, Any]]:
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -590,12 +590,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             )
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        if global_config.validate_retrieve:
-            retrieved = [Rotor.model_validate(item) for item in unpacked]
-        else:
-            retrieved = [Rotor.model_construct(**item) for item in unpacked]
-        return RotorList(retrieved)
+        return QueryUnpacker(builder, edges=unpack_edges).unpack()
 
     def list(
         self,
@@ -658,4 +653,5 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
         )
         if retrieve_connections == "skip":
             return self._list(limit=limit, filter=filter_)
-        return self._query(filter_, limit, retrieve_connections)
+        values = self._query(filter_, limit, retrieve_connections)
+        return self._class_list(instantiate_classes(self._class_type, values, "list"))

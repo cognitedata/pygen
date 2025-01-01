@@ -3,15 +3,15 @@ from __future__ import annotations
 import datetime
 import warnings
 from collections.abc import Sequence
-from typing import ClassVar, Literal, overload
+from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList, InstanceSort
 
-from cognite_core.config import global_config
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
+    instantiate_classes,
     Aggregations,
     NodeAPI,
     SequenceNotStr,
@@ -983,7 +983,7 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         limit: int,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> CogniteFileList:
+    ) -> list[dict[str, Any]]:
         builder = QueryBuilder()
         factory = QueryStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -1027,12 +1027,7 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
             )
         unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
         builder.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        unpacked = QueryUnpacker(builder, edges=unpack_edges).unpack()
-        if global_config.validate_retrieve:
-            retrieved = [CogniteFile.model_validate(item) for item in unpacked]
-        else:
-            retrieved = [CogniteFile.model_construct(**item) for item in unpacked]
-        return CogniteFileList(retrieved)
+        return QueryUnpacker(builder, edges=unpack_edges).unpack()
 
     def list(
         self,
@@ -1183,4 +1178,5 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
             return self._list(limit=limit, filter=filter_, sort=sort_input)
-        return self._query(filter_, limit, retrieve_connections, sort_input)
+        values = self._query(filter_, limit, retrieve_connections, sort_input)
+        return self._class_list(instantiate_classes(self._class_type, values, "list"))
