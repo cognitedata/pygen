@@ -225,3 +225,12 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                 connection_name="connection_item_b",
                 connection_property=ViewPropertyId(self._view_id, "connectionItemB"),
             )
+
+        self.space = StringFilter(self, ["node", "space"])
+        self.external_id = StringFilter(self, ["node", "externalId"])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
