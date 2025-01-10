@@ -6,7 +6,7 @@ mkdocs-git-revision-date-localized-plugin==1.3.*
 mkdocs-git-authors-plugin==0.9.*
 mkdocs-gitbook==0.0.1
 mkdocs-glightbox==0.4.*
-pymdown-extensions==10.13.*
+pymdown-extensions==10.14.*
 mkdocstrings[python]==0.27.*
 # dependencies for mkdocstrings
 # 3.1.0 breaks nbconvert
