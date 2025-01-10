@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [0.99.61] - 24-11-14
+### Fixed
+- Add ability to filter on node external ID and space even when no other filterable properties are present. Version 0.99.49 only partially fixed this.
+
 ## [0.99.60] - 25-01-01
 ### Improved
 - Error message on validation error in any retrieve type method (e.g. `.retrieve`, `.list`, `.select`). It now

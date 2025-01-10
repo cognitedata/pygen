@@ -456,7 +456,6 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
         {% endfor %}
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        {% if data_class.has_filtering_fields %}
         {% for field in data_class.filtering_fields %}
         self.{{ field.filter_attribute }} = {{ field.filtering_cls }}(self, self._view_id.as_property_ref("{{ field.prop_name }}"))
         {% endfor %}
@@ -467,7 +466,6 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
             self.{{ field.filter_attribute }},
             {% endfor %}
         ])
-        {% endif %}
         {% if data_class.is_cognite_timeseries %}
         self.data = DataPointsAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
         {% endif %}

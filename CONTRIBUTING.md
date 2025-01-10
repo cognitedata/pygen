@@ -106,7 +106,7 @@ git checkout -b my-new-feature
 ### Generating Example SDKs
 When you are developing `pygen` you will likely need to generate the example SDKs. To do this run the following command from the root directory:
 ```bash
-python scripts/dev.py generate-sdks
+python dev.py generate
 ```
 This command must be run with both Python environments, `pydantic` `v1` and `v2`.
 
