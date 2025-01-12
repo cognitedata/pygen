@@ -13,7 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.99.61] - 24-11-14
+## [0.99.62] - 25-01-12
+### Fixed
+- If a view had a property with a direct relation to another view with name "Field", the generated SDK would contain an invalid Python file making the SDK client fail on import.
+
+## [0.99.61] - 25-01-10
 ### Fixed
 - Add ability to filter on node external ID and space even when no other filterable properties are present. Version 0.99.49 only partially fixed this.
 

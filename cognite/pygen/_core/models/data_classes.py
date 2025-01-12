@@ -194,7 +194,7 @@ class DataClass:
         if any(dependency.pydantic_field == "pydantic.Field" for dependency in self.dependencies):
             for field_ in self.fields:
                 # All fields are frozen, so we need to set the attribute directly
-                object.__setattr__(field_, "pydantic_field", "pydantic.Field")
+                object.__setattr__(field_, "pydantic_field", self.pydantic_field)
         self.initialization.add("fields")
 
     def update_implements_interface_and_writable(self, parents: "list[DataClass]", is_interface: bool):

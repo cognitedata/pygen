@@ -67,6 +67,14 @@ class ExampleSDK:
         return dm.NodeList.load(self.read_node_path(data_model_id).read_text())
 
 
+FIELD_SDK = ExampleSDK(
+    data_model_ids=[DataModelId("fields-space", "Fields", "4")],
+    _top_level_package="field.client",
+    client_name="FieldClient",
+    generate_sdk=True,
+    instance_space=None,
+)
+
 OMNI_SDK = ExampleSDK(
     data_model_ids=[DataModelId("sp_pygen_models", "Omni", "1")],
     _top_level_package="omni",
