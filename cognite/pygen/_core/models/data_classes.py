@@ -194,7 +194,7 @@ class DataClass:
         if any(dependency.pydantic_field == "pydantic.Field" for dependency in self.dependencies):
             for field_ in self.fields:
                 # All fields are frozen, so we need to set the attribute directly
-                object.__setattr__(field_, "pydantic_field", self.pydantic_field)
+                object.__setattr__(field_, "pydantic_field", "pydantic.Field")
         self.initialization.add("fields")
 
     def update_implements_interface_and_writable(self, parents: "list[DataClass]", is_interface: bool):
@@ -325,15 +325,6 @@ class DataClass:
         """
         if any(
             name == "Field" for name in [self.read_name, self.write_name, self.read_list_name, self.write_list_name]
-        ) or any(
-            name == "Field"
-            for dependency in self.dependencies
-            for name in [
-                dependency.read_name,
-                dependency.write_name,
-                dependency.read_list_name,
-                dependency.write_list_name,
-            ]
         ):
             return "pydantic.Field"
         else:
@@ -815,7 +806,7 @@ class DataClass:
     @property
     def import_pydantic_field(self) -> str:
         """Import the pydantic field used in the data class."""
-        if self.pydantic_field == "Field":
+        if self.pydantic_field == "Field" and all(dep.pydantic_field == "Field" for dep in self.dependencies):
             return "from pydantic import Field"
         else:
             return "import pydantic"

@@ -35,7 +35,8 @@ class TestDataClasses:
         # Assert
         country_data_class = node_class_by_view_id[dm.ViewId("ReportedBugs", "Country", "c93d79472dd1cb")]
 
-        assert country_data_class.pydantic_field == "pydantic.Field"
+        assert country_data_class.pydantic_field == "Field"
+        assert country_data_class.import_pydantic_field == "import pydantic"
         wrong_field = [field.name for field in country_data_class if field.pydantic_field != "pydantic.Field"]
         assert not wrong_field, f"Wrong pydantic field for the following field(s): {wrong_field}"
 
