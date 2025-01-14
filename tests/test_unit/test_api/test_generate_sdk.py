@@ -36,6 +36,23 @@ class TestGenerateSDK:
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 
+    def test_generate_sdk_from_view_with_direct_relation_to_view_with_property_of_type_Field(self, tmp_path):
+        client_name = "FieldsClient"
+        top_level_package = "fields_model"
+
+        generate_sdk(
+            DATA_MODEL_WITH_VIEW_PROPERTY_OF_TYPE_FIELD,
+            top_level_package=top_level_package,
+            output_dir=tmp_path / top_level_package,
+            overwrite=True,
+            client_name=client_name,
+            default_instance_space="fields-space",
+        )
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+
     def test_generate_sdk_with_view_without_properties(self, tmp_path):
         client_name = "NoPropertiesClient"
         top_level_package = "no_properties_model"
@@ -139,6 +156,106 @@ class TestGenerateSDK:
         with append_to_sys_path(str(tmp_path)):
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
+
+
+DATA_MODEL_WITH_VIEW_PROPERTY_OF_TYPE_FIELD: dm.DataModel = dm.DataModel.load(
+    {
+        "space": "fields-space",
+        "externalId": "Fields",
+        "name": "Fields",
+        "description": "",
+        "version": "1",
+        "views": [
+            {
+                "space": "fields-space",
+                "externalId": "Field",
+                "name": "Field",
+                "implements": [],
+                "version": "1",
+                "writable": True,
+                "usedFor": "node",
+                "isGlobal": False,
+                "properties": {
+                    "name": {
+                        "container": {"space": "fields-space", "externalId": "Field"},
+                        "containerPropertyIdentifier": "name",
+                        "type": {"list": False, "collation": "ucs_basic", "type": "text"},
+                        "nullable": True,
+                        "immutable": False,
+                        "autoIncrement": False,
+                        "source": None,
+                        "defaultValue": None,
+                        "name": "name",
+                        "description": None,
+                    }
+                },
+                "lastUpdatedTime": 0,
+                "createdTime": 0,
+            },
+            {
+                "space": "fields-space",
+                "externalId": "Area",
+                "name": "Area",
+                "implements": [],
+                "version": "1",
+                "writable": True,
+                "usedFor": "node",
+                "isGlobal": False,
+                "properties": {
+                    "field": {
+                        "container": {"space": "fields-space", "externalId": "Area"},
+                        "containerPropertyIdentifier": "field",
+                        "type": {
+                            "list": False,
+                            "type": "direct",
+                            "source": {"space": "fields-space", "externalId": "Field", "version": "1"},
+                        },
+                        "nullable": True,
+                        "immutable": False,
+                        "autoIncrement": False,
+                        "defaultValue": None,
+                        "name": "field",
+                        "description": None,
+                    }
+                },
+                "lastUpdatedTime": 0,
+                "createdTime": 0,
+            },
+            {
+                "space": "fields-space",
+                "externalId": "Region",
+                "name": "Region",
+                "implements": [],
+                "version": "1",
+                "writable": True,
+                "usedFor": "node",
+                "isGlobal": False,
+                "properties": {
+                    "area": {
+                        "container": {"space": "fields-space", "externalId": "Region"},
+                        "containerPropertyIdentifier": "area",
+                        "type": {
+                            "list": False,
+                            "type": "direct",
+                            "source": {"space": "fields-space", "externalId": "Area", "version": "1"},
+                        },
+                        "nullable": True,
+                        "immutable": False,
+                        "autoIncrement": False,
+                        "defaultValue": None,
+                        "name": "area",
+                        "description": None,
+                    }
+                },
+                "lastUpdatedTime": 0,
+                "createdTime": 0,
+            },
+        ],
+        "isGlobal": False,
+        "lastUpdatedTime": 0,
+        "createdTime": 0,
+    }
+)
 
 
 DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
