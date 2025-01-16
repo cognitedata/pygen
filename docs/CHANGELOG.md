@@ -13,7 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [0.99.61] - 24-11-14
+## [0.99.62] - 24-11-16
+### Fixed
+- A view with a relation to a view with a property of type Field would generate a SDK with a corrupted file making the SDK unsuable.
+
+## [0.99.61] - 25-01-10
 ### Fixed
 - Add ability to filter on node external ID and space even when no other filterable properties are present. Version 0.99.49 only partially fixed this.
 
