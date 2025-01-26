@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Changed
+- In the `generate_sdk`, the `format_code` parameter is now default to `False`. In addition, in the
+  `pygen generate` the flag `skip-formating` is now renamed to `format-code` and is default to `False`. The reason
+  is that the formatting slows down the generation process, and most users will format their code after generation
+  with a tool like `ruff`.
+
 ## [0.99.62] - 24-11-16
 ### Fixed
 - A view with a relation to a view with a property of type Field would generate a SDK with a corrupted file making the SDK unsuable.

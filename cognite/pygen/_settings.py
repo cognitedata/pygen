@@ -35,7 +35,7 @@ class PygenSettings(BaseModel):
     overwrite: Argument = Argument(
         default=False, help="Whether to overwrite existing files in output directory with the new SDK."
     )
-    skip_formatting: Argument = Argument(default=False, help="Whether to skip formatting the generated SDK with black.")
+    format_code: Argument = Argument(default=False, help="Whether to format the generated SDK code with black.")
     data_models: list[tuple[str, str, str]] = Field(
         default_factory=list,
         json_schema_extra={"help": "Data models to generate SDK for."},

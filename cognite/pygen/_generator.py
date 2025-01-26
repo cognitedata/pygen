@@ -40,7 +40,7 @@ def generate_sdk(  # type: ignore[overload-overlap, misc]
     output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
     overwrite: bool = False,
-    format_code: bool = True,
+    format_code: bool = False,
     config: Optional[PygenConfig] = None,
     return_sdk_files: Literal[False] = False,
 ) -> None: ...
@@ -56,7 +56,7 @@ def generate_sdk(
     output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
     overwrite: bool = False,
-    format_code: bool = True,
+    format_code: bool = False,
     config: Optional[PygenConfig] = None,
     return_sdk_files: Literal[True] = False,  # type: ignore[assignment]
 ) -> dict[Path, str]: ...
@@ -71,7 +71,7 @@ def generate_sdk(
     output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
     overwrite: bool = False,
-    format_code: bool = True,
+    format_code: bool = False,
     config: Optional[PygenConfig] = None,
     return_sdk_files: bool = False,
 ) -> None | dict[Path, str]:
@@ -96,7 +96,7 @@ def generate_sdk(
             Defaults: Path.cwd() / Path(top_level_package.replace(".", "/")).
         logger: A logger function to log progress. Defaults to print.
         overwrite: Whether to overwrite the output directory if it already exists. Defaults to False.
-        format_code: Whether to format the generated code using black. Defaults to True.
+        format_code: Whether to format the generated code using black. Defaults to False.
         config: The configuration used to control how to generate the SDK.
         return_sdk_files: Whether to return the generated SDK files as a dictionary. Defaults to False.
             This is useful for granular control of how to write the SDK to disk.
@@ -125,7 +125,7 @@ def _generate_sdk(
     output_dir: Optional[Path] = None,
     logger: Optional[Callable[[str], None]] = None,
     overwrite: bool = False,
-    format_code: bool = True,
+    format_code: bool = False,
     config: Optional[PygenConfig] = None,
     return_sdk_files: bool = False,
     context: Literal["notebook", "cli"] = "cli",
