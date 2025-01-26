@@ -78,8 +78,8 @@ if _has_typer:
                 loaded_settings.instance_space.default, help=loaded_settings.instance_space.help
             ),
             overwrite: bool = typer.Option(loaded_settings.overwrite.default, help=loaded_settings.overwrite.help),
-            skip_formatting: bool = typer.Option(
-                loaded_settings.skip_formatting.default, help=loaded_settings.skip_formatting.help
+            format_code: bool = typer.Option(
+                loaded_settings.format_code.default, help=loaded_settings.format_code.help
             ),
         ):
             if token_url:
@@ -123,7 +123,7 @@ if _has_typer:
                     output_dir=output_dir,
                     logger=typer.echo,
                     overwrite=overwrite,
-                    format_code=not skip_formatting,
+                    format_code=format_code,
                 )
             except (CogniteAPIError, IndexError) as e:
                 raise typer.Exit(code=1) from e
@@ -155,8 +155,8 @@ if _has_typer:
                 default_settings.instance_space.default, help=default_settings.instance_space.help
             ),
             overwrite: bool = typer.Option(default_settings.overwrite.default, help=default_settings.overwrite.help),
-            skip_formatting: bool = typer.Option(
-                default_settings.skip_formatting.default, help=default_settings.skip_formatting.help
+            format_code: bool = typer.Option(
+                default_settings.format_code.default, help=default_settings.format_code.help
             ),
         ):
             if token_url:
@@ -191,7 +191,7 @@ if _has_typer:
                     output_dir=output_dir,
                     logger=typer.echo,
                     overwrite=overwrite,
-                    format_code=not skip_formatting,
+                    format_code=format_code,
                 )
             except (CogniteAPIError, IndexError) as e:
                 raise typer.Exit(code=1) from e
