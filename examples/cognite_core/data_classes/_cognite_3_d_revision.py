@@ -141,8 +141,8 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
     node_type: Union[dm.DirectRelationReference, None] = None
     model_3d: Union[Cognite3DModel, str, dm.NodeId, None] = Field(default=None, repr=False, alias="model3D")
     published: Optional[bool] = None
-    status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] = None
-    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
+    status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] | str = None
+    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] | str = Field(None, alias="type")
 
     @field_validator("model_3d", mode="before")
     @classmethod

@@ -199,7 +199,7 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
     revisions: Optional[list[Union[CogniteCADRevision, str, dm.NodeId]]] = Field(default=None, repr=False)
     volume: Optional[list[float]] = None
     volume_references: Optional[list[str]] = Field(None, alias="volumeReferences")
-    volume_type: Optional[Literal["Box", "Cylinder"]] = Field(None, alias="volumeType")
+    volume_type: Optional[Literal["Box", "Cylinder"]] | str = Field(None, alias="volumeType")
 
     @field_validator("model_3d", "object_3d", mode="before")
     @classmethod

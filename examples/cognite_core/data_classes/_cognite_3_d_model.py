@@ -148,7 +148,7 @@ class Cognite3DModel(CogniteDescribableNode):
 
     node_type: Union[dm.DirectRelationReference, None] = None
     thumbnail: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
-    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] = Field(None, alias="type")
+    type_: Optional[Literal["CAD", "Image360", "PointCloud"]] | str = Field(None, alias="type")
 
     @field_validator("thumbnail", mode="before")
     @classmethod

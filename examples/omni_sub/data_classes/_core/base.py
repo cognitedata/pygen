@@ -220,7 +220,7 @@ class DataRecord(BaseModel, populate_by_name=True):
         return v
 
 
-class DomainModel(DomainModelCore, ABC):
+class DomainModel(DomainModelCore, ABC, extra="allow"):
     data_record: DataRecord
     node_type: Optional[dm.DirectRelationReference] = None
 
@@ -512,7 +512,7 @@ class DomainModelWriteList(CoreList[T_DomainModelWrite]):
 T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWriteList, covariant=True)
 
 
-class DomainRelation(DomainModelCore):
+class DomainRelation(DomainModelCore, extra="allow"):
     edge_type: dm.DirectRelationReference
     start_node: dm.DirectRelationReference = Field(alias="startNode")
     end_node: Any = Field(alias="endNode")

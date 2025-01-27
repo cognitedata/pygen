@@ -137,14 +137,16 @@ class PrimitiveField(BasePrimitiveField):
             return f"{self.default}"
 
     def as_read_type_hint(self) -> str:
+        # We allow string for enum responses. This is in case a new value is added to the enum
+        str_ = " | str" if isinstance(self.type_, Enum) else ""
         if self.need_alias and self.is_nullable:
-            return f"Optional[{self.type_as_string}] = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
+            return f"Optional[{self.type_as_string}]{str_} = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
         elif self.need_alias:
-            return f'{self.type_as_string} = {self.pydantic_field}(alias="{self.prop_name}")'
+            return f'{self.type_as_string}{str_} = {self.pydantic_field}(alias="{self.prop_name}")'
         elif self.is_nullable:
-            return f"Optional[{self.type_as_string}] = None"
+            return f"Optional[{self.type_as_string}]{str_} = None"
         else:
-            return f"{self.type_as_string}"
+            return f"{self.type_as_string}{str_}"
 
     def as_graphql_type_hint(self) -> str:
         if self.need_alias:
@@ -178,7 +180,8 @@ class PrimitiveListField(BasePrimitiveField):
     variable: str
 
     def as_read_type_hint(self) -> str:
-        return self.as_write_type_hint()
+        str_ = " | str" if isinstance(self.type_, Enum) else ""
+        return self.as_write_type_hint(str_)
 
     def as_graphql_type_hint(self) -> str:
         if self.need_alias:
@@ -186,16 +189,16 @@ class PrimitiveListField(BasePrimitiveField):
         else:
             return f"Optional[list[{self.type_as_string}]] = None"
 
-    def as_write_type_hint(self) -> str:
+    def as_write_type_hint(self, str_: str = "") -> str:
         type_ = self.type_as_string
         if self.is_nullable and self.need_alias:
-            return f'Optional[list[{type_}]] = {self.pydantic_field}(None, alias="{self.prop_name}")'
+            return f'Optional[list[{type_}]{str_}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         elif self.need_alias:
-            return f'list[{type_}] = {self.pydantic_field}(alias="{self.prop_name}")'
+            return f'list[{type_}{str_}] = {self.pydantic_field}(alias="{self.prop_name}")'
         elif self.is_nullable:
-            return f"Optional[list[{type_}]] = None"
+            return f"Optional[list[{type_}{str_}]] = None"
         else:  # not self.is_nullable and not self.need_alias
-            return f"list[{type_}]"
+            return f"list[{type_}{str_}]"
 
     @property
     def is_list(self) -> bool:

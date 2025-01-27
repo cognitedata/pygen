@@ -190,7 +190,7 @@ class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAnnotation", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     confidence: Optional[float] = None
-    status: Optional[Literal["Approved", "Rejected", "Suggested"]] = None
+    status: Optional[Literal["Approved", "Rejected", "Suggested"]] | str = None
 
     def as_write(self) -> CogniteAnnotationWrite:
         """Convert this read version of Cognite annotation to the writing version."""

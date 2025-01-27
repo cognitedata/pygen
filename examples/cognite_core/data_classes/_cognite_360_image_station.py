@@ -126,7 +126,7 @@ class Cognite360ImageStation(CogniteDescribableNode):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageStation", "v1")
 
     node_type: Union[dm.DirectRelationReference, None] = None
-    group_type: Optional[Literal["Station360"]] = Field(None, alias="groupType")
+    group_type: Optional[Literal["Station360"]] | str = Field(None, alias="groupType")
 
     def as_write(self) -> Cognite360ImageStationWrite:
         """Convert this read version of Cognite 360 image station to the writing version."""
