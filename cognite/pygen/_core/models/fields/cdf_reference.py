@@ -145,7 +145,7 @@ class CDFExternalListField(PrimitiveListField, CDFExternalField):
         else:
             return f"Optional[list[Union[{type_}, str]]] = None"
 
-    def as_write_type_hint(self) -> str:
+    def as_write_type_hint(self, str_: str = "") -> str:
         type_ = f"{self.type_name}Write"
         return self._create_type_hint(type_)
 
