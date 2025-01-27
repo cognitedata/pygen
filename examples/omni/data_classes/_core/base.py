@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import sys
 import warnings
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import UserList
 from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass, field

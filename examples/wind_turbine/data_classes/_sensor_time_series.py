@@ -151,7 +151,7 @@ class SensorTimeSeries(DomainModel):
     name: Optional[str] = None
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
     standard_name: Optional[str] = Field(None, alias="standardName")
-    type_: Literal["numeric", "string"] = Field(alias="type")
+    type_: Literal["numeric", "string"] | str = Field(alias="type")
 
     def as_write(self) -> SensorTimeSeriesWrite:
         """Convert this read version of sensor time series to the writing version."""
