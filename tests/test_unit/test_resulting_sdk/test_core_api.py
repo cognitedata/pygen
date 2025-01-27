@@ -276,10 +276,10 @@ class TestAPIClass:
             listed = pygen.cognite_time_series.list()
             assert len(listed) == 1
             node = listed[0]
-            assert node.model_dump(exclude={"data_record", "node_type"}, exclude_unset=True) == {
-                "external_id": "my_node",
+            assert node.model_dump(exclude={"data_record", "node_type"}, exclude_unset=True, by_alias=True) == {
+                "externalId": "my_node",
                 "name": "my_ts",
-                "is_step": False,
+                "isStep": False,
                 "type": "new-status",
                 "space": "my_space",
             }

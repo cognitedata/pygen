@@ -261,7 +261,7 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
     equipment: Optional[list[Union[CogniteEquipment, str, dm.NodeId]]] = Field(default=None, repr=False)
     is_step: bool = Field(alias="isStep")
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
-    type_: Literal["numeric", "string"] = Field(alias="type")
+    type_: Literal["numeric", "string"] | str = Field(alias="type")
     unit: Union[CogniteUnit, str, dm.NodeId, None] = Field(default=None, repr=False)
 
     @field_validator("source", "unit", mode="before")
