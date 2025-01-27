@@ -211,6 +211,42 @@ class TestAPIClass:
                 "space": "my_space",
             }
 
+    def test_retrieve_extra_arguments(self) -> None:
+        with monkeypatch_cognite_client() as mock_client:
+            mock_client.data_modeling.instances.list.return_value = dm.NodeList[dm.Node](
+                [
+                    dm.Node(
+                        space="my_space",
+                        external_id="my_node",
+                        version=1,
+                        last_updated_time=1,
+                        created_time=1,
+                        deleted_time=None,
+                        type=None,
+                        properties=Properties(
+                            {
+                                dm.ViewId("sp_pygen_models", "PrimitiveNullable", "1"): {
+                                    "boolean": True,
+                                    "int32": 10,
+                                    "new_field": "extra_field",
+                                }
+                            }
+                        ),
+                    )
+                ]
+            )
+            pygen = OmniClient(mock_client)
+            listed = pygen.primitive_nullable.list()
+            assert len(listed) == 1
+            node = listed[0]
+            assert node.model_dump(exclude={"data_record", "node_type"}, exclude_unset=True) == {
+                "boolean": True,
+                "external_id": "my_node",
+                "int_32": 10,
+                "space": "my_space",
+                "new_field": "extra_field",
+            }
+
 
 class TestInstantiateClasses:
     def test_raise_multiple(self) -> None:
