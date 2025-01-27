@@ -19,6 +19,8 @@ Changes are grouped as follows
   `pygen generate` the flag `skip-formating` is now renamed to `format-code` and is default to `False`. The reason
   is that the formatting slows down the generation process, and most users will format their code after generation
   with a tool like `ruff`.
+- The generated SDK now longer raises a `ValidationError` if there are new properties added to the data model,
+  or new values are added to an enum property.
 
 ## [0.99.62] - 24-11-16
 ### Fixed
