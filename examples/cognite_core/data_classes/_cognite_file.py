@@ -280,15 +280,6 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
         """Convert this read version of Cognite file to the writing version."""
         return CogniteFileWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteFileWrite:
-        """Convert this read version of Cognite file to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
     """This represents the writing version of Cognite file.
@@ -363,19 +354,6 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
         return value
 
 
-class CogniteFileApply(CogniteFileWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteFileApply:
-        warnings.warn(
-            "CogniteFileApply is deprecated and will be removed in v1.0. "
-            "Use CogniteFileWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteFile.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteFileList(DomainModelList[CogniteFile]):
     """List of Cognite files in the read version."""
 
@@ -384,15 +362,6 @@ class CogniteFileList(DomainModelList[CogniteFile]):
     def as_write(self) -> CogniteFileWriteList:
         """Convert these read versions of Cognite file to the writing versions."""
         return CogniteFileWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CogniteFileWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def assets(self) -> CogniteAssetList:
@@ -455,9 +424,6 @@ class CogniteFileWriteList(DomainModelWriteList[CogniteFileWrite]):
         return CogniteSourceSystemWriteList(
             [item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)]
         )
-
-
-class CogniteFileApplyList(CogniteFileWriteList): ...
 
 
 def _create_cognite_file_filter(

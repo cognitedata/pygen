@@ -149,15 +149,6 @@ class PowerInverter(DomainModel):
         """Convert this read version of power inverter to the writing version."""
         return PowerInverterWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> PowerInverterWrite:
-        """Convert this read version of power inverter to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class PowerInverterWrite(DomainModelWrite):
     """This represents the writing version of power inverter.
@@ -203,19 +194,6 @@ class PowerInverterWrite(DomainModelWrite):
         return value
 
 
-class PowerInverterApply(PowerInverterWrite):
-    def __new__(cls, *args, **kwargs) -> PowerInverterApply:
-        warnings.warn(
-            "PowerInverterApply is deprecated and will be removed in v1.0. "
-            "Use PowerInverterWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "PowerInverter.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class PowerInverterList(DomainModelList[PowerInverter]):
     """List of power inverters in the read version."""
 
@@ -224,15 +202,6 @@ class PowerInverterList(DomainModelList[PowerInverter]):
     def as_write(self) -> PowerInverterWriteList:
         """Convert these read versions of power inverter to the writing versions."""
         return PowerInverterWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> PowerInverterWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def active_power_total(self) -> SensorTimeSeriesList:
@@ -305,9 +274,6 @@ class PowerInverterWriteList(DomainModelWriteList[PowerInverterWrite]):
                 if isinstance(item.reactive_power_total, SensorTimeSeriesWrite)
             ]
         )
-
-
-class PowerInverterApplyList(PowerInverterWriteList): ...
 
 
 def _create_power_inverter_filter(

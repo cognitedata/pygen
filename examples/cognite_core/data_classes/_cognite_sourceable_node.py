@@ -186,15 +186,6 @@ class CogniteSourceableNode(DomainModel):
         """Convert this read version of Cognite sourceable node to the writing version."""
         return CogniteSourceableNodeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteSourceableNodeWrite:
-        """Convert this read version of Cognite sourceable node to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteSourceableNodeWrite(DomainModelWrite):
     """This represents the writing version of Cognite sourceable node.
@@ -251,19 +242,6 @@ class CogniteSourceableNodeWrite(DomainModelWrite):
         return value
 
 
-class CogniteSourceableNodeApply(CogniteSourceableNodeWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteSourceableNodeApply:
-        warnings.warn(
-            "CogniteSourceableNodeApply is deprecated and will be removed in v1.0. "
-            "Use CogniteSourceableNodeWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteSourceableNode.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteSourceableNodeList(DomainModelList[CogniteSourceableNode]):
     """List of Cognite sourceable nodes in the read version."""
 
@@ -272,15 +250,6 @@ class CogniteSourceableNodeList(DomainModelList[CogniteSourceableNode]):
     def as_write(self) -> CogniteSourceableNodeWriteList:
         """Convert these read versions of Cognite sourceable node to the writing versions."""
         return CogniteSourceableNodeWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CogniteSourceableNodeWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def source(self) -> CogniteSourceSystemList:
@@ -303,9 +272,6 @@ class CogniteSourceableNodeWriteList(DomainModelWriteList[CogniteSourceableNodeW
         return CogniteSourceSystemWriteList(
             [item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)]
         )
-
-
-class CogniteSourceableNodeApplyList(CogniteSourceableNodeWriteList): ...
 
 
 def _create_cognite_sourceable_node_filter(

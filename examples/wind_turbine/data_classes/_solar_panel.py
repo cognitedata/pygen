@@ -155,15 +155,6 @@ class SolarPanel(GeneratingUnit):
         """Convert this read version of solar panel to the writing version."""
         return SolarPanelWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> SolarPanelWrite:
-        """Convert this read version of solar panel to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class SolarPanelWrite(GeneratingUnitWrite):
     """This represents the writing version of solar panel.
@@ -210,19 +201,6 @@ class SolarPanelWrite(GeneratingUnitWrite):
         return value
 
 
-class SolarPanelApply(SolarPanelWrite):
-    def __new__(cls, *args, **kwargs) -> SolarPanelApply:
-        warnings.warn(
-            "SolarPanelApply is deprecated and will be removed in v1.0. "
-            "Use SolarPanelWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "SolarPanel.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class SolarPanelList(DomainModelList[SolarPanel]):
     """List of solar panels in the read version."""
 
@@ -231,15 +209,6 @@ class SolarPanelList(DomainModelList[SolarPanel]):
     def as_write(self) -> SolarPanelWriteList:
         """Convert these read versions of solar panel to the writing versions."""
         return SolarPanelWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> SolarPanelWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def efficiency(self) -> SensorTimeSeriesList:
@@ -278,9 +247,6 @@ class SolarPanelWriteList(DomainModelWriteList[SolarPanelWrite]):
         return SensorTimeSeriesWriteList(
             [item.orientation for item in self.data if isinstance(item.orientation, SensorTimeSeriesWrite)]
         )
-
-
-class SolarPanelApplyList(SolarPanelWriteList): ...
 
 
 def _create_solar_panel_filter(

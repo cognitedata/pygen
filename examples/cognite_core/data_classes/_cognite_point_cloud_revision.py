@@ -155,15 +155,6 @@ class CognitePointCloudRevision(Cognite3DRevision, protected_namespaces=()):
         """Convert this read version of Cognite point cloud revision to the writing version."""
         return CognitePointCloudRevisionWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CognitePointCloudRevisionWrite:
-        """Convert this read version of Cognite point cloud revision to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CognitePointCloudRevisionWrite(Cognite3DRevisionWrite, protected_namespaces=()):
     """This represents the writing version of Cognite point cloud revision.
@@ -196,19 +187,6 @@ class CognitePointCloudRevisionWrite(Cognite3DRevisionWrite, protected_namespace
     revision_id: Optional[int] = Field(None, alias="revisionId")
 
 
-class CognitePointCloudRevisionApply(CognitePointCloudRevisionWrite):
-    def __new__(cls, *args, **kwargs) -> CognitePointCloudRevisionApply:
-        warnings.warn(
-            "CognitePointCloudRevisionApply is deprecated and will be removed in v1.0. "
-            "Use CognitePointCloudRevisionWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CognitePointCloudRevision.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CognitePointCloudRevisionList(DomainModelList[CognitePointCloudRevision]):
     """List of Cognite point cloud revisions in the read version."""
 
@@ -217,15 +195,6 @@ class CognitePointCloudRevisionList(DomainModelList[CognitePointCloudRevision]):
     def as_write(self) -> CognitePointCloudRevisionWriteList:
         """Convert these read versions of Cognite point cloud revision to the writing versions."""
         return CognitePointCloudRevisionWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CognitePointCloudRevisionWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def model_3d(self) -> CognitePointCloudModelList:
@@ -248,9 +217,6 @@ class CognitePointCloudRevisionWriteList(DomainModelWriteList[CognitePointCloudR
         return CognitePointCloudModelWriteList(
             [item.model_3d for item in self.data if isinstance(item.model_3d, CognitePointCloudModelWrite)]
         )
-
-
-class CognitePointCloudRevisionApplyList(CognitePointCloudRevisionWriteList): ...
 
 
 def _create_cognite_point_cloud_revision_filter(

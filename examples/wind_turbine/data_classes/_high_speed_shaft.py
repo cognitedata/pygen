@@ -149,15 +149,6 @@ class HighSpeedShaft(DomainModel):
         """Convert this read version of high speed shaft to the writing version."""
         return HighSpeedShaftWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> HighSpeedShaftWrite:
-        """Convert this read version of high speed shaft to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class HighSpeedShaftWrite(DomainModelWrite):
     """This represents the writing version of high speed shaft.
@@ -203,19 +194,6 @@ class HighSpeedShaftWrite(DomainModelWrite):
         return value
 
 
-class HighSpeedShaftApply(HighSpeedShaftWrite):
-    def __new__(cls, *args, **kwargs) -> HighSpeedShaftApply:
-        warnings.warn(
-            "HighSpeedShaftApply is deprecated and will be removed in v1.0. "
-            "Use HighSpeedShaftWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "HighSpeedShaft.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class HighSpeedShaftList(DomainModelList[HighSpeedShaft]):
     """List of high speed shafts in the read version."""
 
@@ -224,15 +202,6 @@ class HighSpeedShaftList(DomainModelList[HighSpeedShaft]):
     def as_write(self) -> HighSpeedShaftWriteList:
         """Convert these read versions of high speed shaft to the writing versions."""
         return HighSpeedShaftWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> HighSpeedShaftWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def bending_moment_y(self) -> SensorTimeSeriesList:
@@ -291,9 +260,6 @@ class HighSpeedShaftWriteList(DomainModelWriteList[HighSpeedShaftWrite]):
         return SensorTimeSeriesWriteList(
             [item.torque for item in self.data if isinstance(item.torque, SensorTimeSeriesWrite)]
         )
-
-
-class HighSpeedShaftApplyList(HighSpeedShaftWriteList): ...
 
 
 def _create_high_speed_shaft_filter(

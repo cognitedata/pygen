@@ -136,15 +136,6 @@ class CogniteVisualizable(DomainModel):
         """Convert this read version of Cognite visualizable to the writing version."""
         return CogniteVisualizableWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteVisualizableWrite:
-        """Convert this read version of Cognite visualizable to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteVisualizableWrite(DomainModelWrite):
     """This represents the writing version of Cognite visualizable.
@@ -178,19 +169,6 @@ class CogniteVisualizableWrite(DomainModelWrite):
         return value
 
 
-class CogniteVisualizableApply(CogniteVisualizableWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteVisualizableApply:
-        warnings.warn(
-            "CogniteVisualizableApply is deprecated and will be removed in v1.0. "
-            "Use CogniteVisualizableWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteVisualizable.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteVisualizableList(DomainModelList[CogniteVisualizable]):
     """List of Cognite visualizables in the read version."""
 
@@ -199,15 +177,6 @@ class CogniteVisualizableList(DomainModelList[CogniteVisualizable]):
     def as_write(self) -> CogniteVisualizableWriteList:
         """Convert these read versions of Cognite visualizable to the writing versions."""
         return CogniteVisualizableWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CogniteVisualizableWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def object_3d(self) -> Cognite3DObjectList:
@@ -230,9 +199,6 @@ class CogniteVisualizableWriteList(DomainModelWriteList[CogniteVisualizableWrite
         return Cognite3DObjectWriteList(
             [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)]
         )
-
-
-class CogniteVisualizableApplyList(CogniteVisualizableWriteList): ...
 
 
 def _create_cognite_visualizable_filter(

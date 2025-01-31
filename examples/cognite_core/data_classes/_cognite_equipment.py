@@ -286,15 +286,6 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
         """Convert this read version of Cognite equipment to the writing version."""
         return CogniteEquipmentWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteEquipmentWrite:
-        """Convert this read version of Cognite equipment to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
     """This represents the writing version of Cognite equipment.
@@ -373,19 +364,6 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
         return value
 
 
-class CogniteEquipmentApply(CogniteEquipmentWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteEquipmentApply:
-        warnings.warn(
-            "CogniteEquipmentApply is deprecated and will be removed in v1.0. "
-            "Use CogniteEquipmentWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteEquipment.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteEquipmentList(DomainModelList[CogniteEquipment]):
     """List of Cognite equipments in the read version."""
 
@@ -394,15 +372,6 @@ class CogniteEquipmentList(DomainModelList[CogniteEquipment]):
     def as_write(self) -> CogniteEquipmentWriteList:
         """Convert these read versions of Cognite equipment to the writing versions."""
         return CogniteEquipmentWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CogniteEquipmentWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def activities(self) -> CogniteActivityList:
@@ -485,9 +454,6 @@ class CogniteEquipmentWriteList(DomainModelWriteList[CogniteEquipmentWrite]):
         return CogniteSourceSystemWriteList(
             [item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)]
         )
-
-
-class CogniteEquipmentApplyList(CogniteEquipmentWriteList): ...
 
 
 def _create_cognite_equipment_filter(

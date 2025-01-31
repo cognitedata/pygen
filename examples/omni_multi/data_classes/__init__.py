@@ -19,8 +19,6 @@ from omni_multi.data_classes._core import (
 )
 from ._implementation_1_v_1 import (
     Implementation1v1,
-    Implementation1v1Apply,
-    Implementation1v1ApplyList,
     Implementation1v1Fields,
     Implementation1v1GraphQL,
     Implementation1v1List,
@@ -30,8 +28,6 @@ from ._implementation_1_v_1 import (
 )
 from ._implementation_1_v_2 import (
     Implementation1v2,
-    Implementation1v2Apply,
-    Implementation1v2ApplyList,
     Implementation1v2Fields,
     Implementation1v2GraphQL,
     Implementation1v2List,
@@ -41,8 +37,6 @@ from ._implementation_1_v_2 import (
 )
 from ._main_interface import (
     MainInterface,
-    MainInterfaceApply,
-    MainInterfaceApplyList,
     MainInterfaceFields,
     MainInterfaceGraphQL,
     MainInterfaceList,
@@ -52,8 +46,6 @@ from ._main_interface import (
 )
 from ._sub_interface import (
     SubInterface,
-    SubInterfaceApply,
-    SubInterfaceApplyList,
     SubInterfaceFields,
     SubInterfaceGraphQL,
     SubInterfaceList,
@@ -84,37 +76,29 @@ __all__ = [
     "Implementation1v1",
     "Implementation1v1GraphQL",
     "Implementation1v1Write",
-    "Implementation1v1Apply",
     "Implementation1v1List",
     "Implementation1v1WriteList",
-    "Implementation1v1ApplyList",
     "Implementation1v1Fields",
     "Implementation1v1TextFields",
     "Implementation1v2",
     "Implementation1v2GraphQL",
     "Implementation1v2Write",
-    "Implementation1v2Apply",
     "Implementation1v2List",
     "Implementation1v2WriteList",
-    "Implementation1v2ApplyList",
     "Implementation1v2Fields",
     "Implementation1v2TextFields",
     "MainInterface",
     "MainInterfaceGraphQL",
     "MainInterfaceWrite",
-    "MainInterfaceApply",
     "MainInterfaceList",
     "MainInterfaceWriteList",
-    "MainInterfaceApplyList",
     "MainInterfaceFields",
     "MainInterfaceTextFields",
     "SubInterface",
     "SubInterfaceGraphQL",
     "SubInterfaceWrite",
-    "SubInterfaceApply",
     "SubInterfaceList",
     "SubInterfaceWriteList",
-    "SubInterfaceApplyList",
     "SubInterfaceFields",
     "SubInterfaceTextFields",
 ]

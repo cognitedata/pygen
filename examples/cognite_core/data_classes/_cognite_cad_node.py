@@ -204,15 +204,6 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
         """Convert this read version of Cognite cad node to the writing version."""
         return CogniteCADNodeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteCADNodeWrite:
-        """Convert this read version of Cognite cad node to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
     """This represents the writing version of Cognite cad node.
@@ -276,19 +267,6 @@ class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
         return value
 
 
-class CogniteCADNodeApply(CogniteCADNodeWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteCADNodeApply:
-        warnings.warn(
-            "CogniteCADNodeApply is deprecated and will be removed in v1.0. "
-            "Use CogniteCADNodeWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteCADNode.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteCADNodeList(DomainModelList[CogniteCADNode]):
     """List of Cognite cad nodes in the read version."""
 
@@ -297,15 +275,6 @@ class CogniteCADNodeList(DomainModelList[CogniteCADNode]):
     def as_write(self) -> CogniteCADNodeWriteList:
         """Convert these read versions of Cognite cad node to the writing versions."""
         return CogniteCADNodeWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CogniteCADNodeWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def model_3d(self) -> CogniteCADModelList:
@@ -358,9 +327,6 @@ class CogniteCADNodeWriteList(DomainModelWriteList[CogniteCADNodeWrite]):
         return CogniteCADRevisionWriteList(
             [item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevisionWrite)]
         )
-
-
-class CogniteCADNodeApplyList(CogniteCADNodeWriteList): ...
 
 
 def _create_cognite_cad_node_filter(

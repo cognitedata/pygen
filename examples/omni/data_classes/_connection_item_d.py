@@ -164,15 +164,6 @@ class ConnectionItemD(DomainModel):
         """Convert this read version of connection item d to the writing version."""
         return ConnectionItemDWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> ConnectionItemDWrite:
-        """Convert this read version of connection item d to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class ConnectionItemDWrite(DomainModelWrite):
     """This represents the writing version of connection item d.
@@ -230,19 +221,6 @@ class ConnectionItemDWrite(DomainModelWrite):
         return value
 
 
-class ConnectionItemDApply(ConnectionItemDWrite):
-    def __new__(cls, *args, **kwargs) -> ConnectionItemDApply:
-        warnings.warn(
-            "ConnectionItemDApply is deprecated and will be removed in v1.0. "
-            "Use ConnectionItemDWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "ConnectionItemD.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class ConnectionItemDList(DomainModelList[ConnectionItemD]):
     """List of connection item ds in the read version."""
 
@@ -251,15 +229,6 @@ class ConnectionItemDList(DomainModelList[ConnectionItemD]):
     def as_write(self) -> ConnectionItemDWriteList:
         """Convert these read versions of connection item d to the writing versions."""
         return ConnectionItemDWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> ConnectionItemDWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def direct_multi(self) -> ConnectionItemEList:
@@ -314,9 +283,6 @@ class ConnectionItemDWriteList(DomainModelWriteList[ConnectionItemDWrite]):
         return ConnectionItemEWriteList(
             [item.outwards_single for item in self.data if isinstance(item.outwards_single, ConnectionItemEWrite)]
         )
-
-
-class ConnectionItemDApplyList(ConnectionItemDWriteList): ...
 
 
 def _create_connection_item_d_filter(

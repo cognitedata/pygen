@@ -132,15 +132,6 @@ class Cognite360ImageStation(CogniteDescribableNode):
         """Convert this read version of Cognite 360 image station to the writing version."""
         return Cognite360ImageStationWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Cognite360ImageStationWrite:
-        """Convert this read version of Cognite 360 image station to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite360ImageStationWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite 360 image station.
@@ -172,19 +163,6 @@ class Cognite360ImageStationWrite(CogniteDescribableNodeWrite):
     group_type: Optional[Literal["Station360"]] = Field(None, alias="groupType")
 
 
-class Cognite360ImageStationApply(Cognite360ImageStationWrite):
-    def __new__(cls, *args, **kwargs) -> Cognite360ImageStationApply:
-        warnings.warn(
-            "Cognite360ImageStationApply is deprecated and will be removed in v1.0. "
-            "Use Cognite360ImageStationWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Cognite360ImageStation.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Cognite360ImageStationList(DomainModelList[Cognite360ImageStation]):
     """List of Cognite 360 image stations in the read version."""
 
@@ -194,23 +172,11 @@ class Cognite360ImageStationList(DomainModelList[Cognite360ImageStation]):
         """Convert these read versions of Cognite 360 image station to the writing versions."""
         return Cognite360ImageStationWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> Cognite360ImageStationWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite360ImageStationWriteList(DomainModelWriteList[Cognite360ImageStationWrite]):
     """List of Cognite 360 image stations in the writing version."""
 
     _INSTANCE = Cognite360ImageStationWrite
-
-
-class Cognite360ImageStationApplyList(Cognite360ImageStationWriteList): ...
 
 
 def _create_cognite_360_image_station_filter(

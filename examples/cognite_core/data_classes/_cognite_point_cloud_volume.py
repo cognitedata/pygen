@@ -217,15 +217,6 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
         """Convert this read version of Cognite point cloud volume to the writing version."""
         return CognitePointCloudVolumeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CognitePointCloudVolumeWrite:
-        """Convert this read version of Cognite point cloud volume to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
     """This represents the writing version of Cognite point cloud volume.
@@ -291,19 +282,6 @@ class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namesp
         return value
 
 
-class CognitePointCloudVolumeApply(CognitePointCloudVolumeWrite):
-    def __new__(cls, *args, **kwargs) -> CognitePointCloudVolumeApply:
-        warnings.warn(
-            "CognitePointCloudVolumeApply is deprecated and will be removed in v1.0. "
-            "Use CognitePointCloudVolumeWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CognitePointCloudVolume.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CognitePointCloudVolumeList(DomainModelList[CognitePointCloudVolume]):
     """List of Cognite point cloud volumes in the read version."""
 
@@ -312,15 +290,6 @@ class CognitePointCloudVolumeList(DomainModelList[CognitePointCloudVolume]):
     def as_write(self) -> CognitePointCloudVolumeWriteList:
         """Convert these read versions of Cognite point cloud volume to the writing versions."""
         return CognitePointCloudVolumeWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CognitePointCloudVolumeWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def model_3d(self) -> CogniteCADModelList:
@@ -373,9 +342,6 @@ class CognitePointCloudVolumeWriteList(DomainModelWriteList[CognitePointCloudVol
         return CogniteCADRevisionWriteList(
             [item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevisionWrite)]
         )
-
-
-class CognitePointCloudVolumeApplyList(CognitePointCloudVolumeWriteList): ...
 
 
 def _create_cognite_point_cloud_volume_filter(

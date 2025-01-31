@@ -239,15 +239,6 @@ class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):
         """Convert this read version of Cognite 360 image to the writing version."""
         return Cognite360ImageWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Cognite360ImageWrite:
-        """Convert this read version of Cognite 360 image to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite):
     """This represents the writing version of Cognite 360 image.
@@ -332,19 +323,6 @@ class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite
         return value
 
 
-class Cognite360ImageApply(Cognite360ImageWrite):
-    def __new__(cls, *args, **kwargs) -> Cognite360ImageApply:
-        warnings.warn(
-            "Cognite360ImageApply is deprecated and will be removed in v1.0. "
-            "Use Cognite360ImageWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Cognite360Image.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Cognite360ImageList(DomainModelList[Cognite360Image]):
     """List of Cognite 360 images in the read version."""
 
@@ -353,15 +331,6 @@ class Cognite360ImageList(DomainModelList[Cognite360Image]):
     def as_write(self) -> Cognite360ImageWriteList:
         """Convert these read versions of Cognite 360 image to the writing versions."""
         return Cognite360ImageWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> Cognite360ImageWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def back(self) -> CogniteFileList:
@@ -476,9 +445,6 @@ class Cognite360ImageWriteList(DomainModelWriteList[Cognite360ImageWrite]):
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
 
         return CogniteFileWriteList([item.top for item in self.data if isinstance(item.top, CogniteFileWrite)])
-
-
-class Cognite360ImageApplyList(Cognite360ImageWriteList): ...
 
 
 def _create_cognite_360_image_filter(

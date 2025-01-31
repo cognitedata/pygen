@@ -171,15 +171,6 @@ class Metmast(DomainModel):
         """Convert this read version of metmast to the writing version."""
         return MetmastWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> MetmastWrite:
-        """Convert this read version of metmast to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class MetmastWrite(DomainModelWrite):
     """This represents the writing version of metmast.
@@ -228,19 +219,6 @@ class MetmastWrite(DomainModelWrite):
         return value
 
 
-class MetmastApply(MetmastWrite):
-    def __new__(cls, *args, **kwargs) -> MetmastApply:
-        warnings.warn(
-            "MetmastApply is deprecated and will be removed in v1.0. "
-            "Use MetmastWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Metmast.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class MetmastList(DomainModelList[Metmast]):
     """List of metmasts in the read version."""
 
@@ -249,15 +227,6 @@ class MetmastList(DomainModelList[Metmast]):
     def as_write(self) -> MetmastWriteList:
         """Convert these read versions of metmast to the writing versions."""
         return MetmastWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> MetmastWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def wind_turbines(self) -> DistanceList:
@@ -280,9 +249,6 @@ class MetmastWriteList(DomainModelWriteList[MetmastWrite]):
         return DistanceWriteList(
             [item for items in self.data for item in items.wind_turbines or [] if isinstance(item, DistanceWrite)]
         )
-
-
-class MetmastApplyList(MetmastWriteList): ...
 
 
 def _create_metmast_filter(

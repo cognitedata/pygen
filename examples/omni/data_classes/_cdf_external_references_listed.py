@@ -149,15 +149,6 @@ class CDFExternalReferencesListed(DomainModel):
         """Convert this read version of cdf external references listed to the writing version."""
         return CDFExternalReferencesListedWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CDFExternalReferencesListedWrite:
-        """Convert this read version of cdf external references listed to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CDFExternalReferencesListedWrite(DomainModelWrite):
     """This represents the writing version of cdf external references listed.
@@ -188,19 +179,6 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
     timeseries: Optional[list[Union[TimeSeriesWrite, str]]] = None
 
 
-class CDFExternalReferencesListedApply(CDFExternalReferencesListedWrite):
-    def __new__(cls, *args, **kwargs) -> CDFExternalReferencesListedApply:
-        warnings.warn(
-            "CDFExternalReferencesListedApply is deprecated and will be removed in v1.0. "
-            "Use CDFExternalReferencesListedWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CDFExternalReferencesListed.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CDFExternalReferencesListedList(DomainModelList[CDFExternalReferencesListed]):
     """List of cdf external references listeds in the read version."""
 
@@ -210,23 +188,11 @@ class CDFExternalReferencesListedList(DomainModelList[CDFExternalReferencesListe
         """Convert these read versions of cdf external references listed to the writing versions."""
         return CDFExternalReferencesListedWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> CDFExternalReferencesListedWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CDFExternalReferencesListedWriteList(DomainModelWriteList[CDFExternalReferencesListedWrite]):
     """List of cdf external references listeds in the writing version."""
 
     _INSTANCE = CDFExternalReferencesListedWrite
-
-
-class CDFExternalReferencesListedApplyList(CDFExternalReferencesListedWriteList): ...
 
 
 def _create_cdf_external_references_listed_filter(

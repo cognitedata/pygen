@@ -153,15 +153,6 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
         """Convert this read version of Cognite 3D revision to the writing version."""
         return Cognite3DRevisionWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Cognite3DRevisionWrite:
-        """Convert this read version of Cognite 3D revision to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
     """This represents the writing version of Cognite 3D revision.
@@ -206,19 +197,6 @@ class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
         return value
 
 
-class Cognite3DRevisionApply(Cognite3DRevisionWrite):
-    def __new__(cls, *args, **kwargs) -> Cognite3DRevisionApply:
-        warnings.warn(
-            "Cognite3DRevisionApply is deprecated and will be removed in v1.0. "
-            "Use Cognite3DRevisionWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Cognite3DRevision.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Cognite3DRevisionList(DomainModelList[Cognite3DRevision]):
     """List of Cognite 3D revisions in the read version."""
 
@@ -227,15 +205,6 @@ class Cognite3DRevisionList(DomainModelList[Cognite3DRevision]):
     def as_write(self) -> Cognite3DRevisionWriteList:
         """Convert these read versions of Cognite 3D revision to the writing versions."""
         return Cognite3DRevisionWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> Cognite3DRevisionWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def model_3d(self) -> Cognite3DModelList:
@@ -256,9 +225,6 @@ class Cognite3DRevisionWriteList(DomainModelWriteList[Cognite3DRevisionWrite]):
         return Cognite3DModelWriteList(
             [item.model_3d for item in self.data if isinstance(item.model_3d, Cognite3DModelWrite)]
         )
-
-
-class Cognite3DRevisionApplyList(Cognite3DRevisionWriteList): ...
 
 
 def _create_cognite_3_d_revision_filter(

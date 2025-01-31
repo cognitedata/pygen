@@ -149,15 +149,6 @@ class Gearbox(DomainModel):
         """Convert this read version of gearbox to the writing version."""
         return GearboxWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> GearboxWrite:
-        """Convert this read version of gearbox to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class GearboxWrite(DomainModelWrite):
     """This represents the writing version of gearbox.
@@ -203,19 +194,6 @@ class GearboxWrite(DomainModelWrite):
         return value
 
 
-class GearboxApply(GearboxWrite):
-    def __new__(cls, *args, **kwargs) -> GearboxApply:
-        warnings.warn(
-            "GearboxApply is deprecated and will be removed in v1.0. "
-            "Use GearboxWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Gearbox.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class GearboxList(DomainModelList[Gearbox]):
     """List of gearboxes in the read version."""
 
@@ -224,15 +202,6 @@ class GearboxList(DomainModelList[Gearbox]):
     def as_write(self) -> GearboxWriteList:
         """Convert these read versions of gearbox to the writing versions."""
         return GearboxWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> GearboxWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def displacement_x(self) -> SensorTimeSeriesList:
@@ -293,9 +262,6 @@ class GearboxWriteList(DomainModelWriteList[GearboxWrite]):
         return SensorTimeSeriesWriteList(
             [item.displacement_z for item in self.data if isinstance(item.displacement_z, SensorTimeSeriesWrite)]
         )
-
-
-class GearboxApplyList(GearboxWriteList): ...
 
 
 def _create_gearbox_filter(

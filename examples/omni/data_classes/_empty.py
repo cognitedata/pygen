@@ -164,15 +164,6 @@ class Empty(DomainModel):
         """Convert this read version of empty to the writing version."""
         return EmptyWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> EmptyWrite:
-        """Convert this read version of empty to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class EmptyWrite(DomainModelWrite):
     """This represents the writing version of empty.
@@ -223,19 +214,6 @@ class EmptyWrite(DomainModelWrite):
     timestamp: Optional[datetime.datetime] = None
 
 
-class EmptyApply(EmptyWrite):
-    def __new__(cls, *args, **kwargs) -> EmptyApply:
-        warnings.warn(
-            "EmptyApply is deprecated and will be removed in v1.0. "
-            "Use EmptyWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Empty.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class EmptyList(DomainModelList[Empty]):
     """List of empties in the read version."""
 
@@ -245,23 +223,11 @@ class EmptyList(DomainModelList[Empty]):
         """Convert these read versions of empty to the writing versions."""
         return EmptyWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> EmptyWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class EmptyWriteList(DomainModelWriteList[EmptyWrite]):
     """List of empties in the writing version."""
 
     _INSTANCE = EmptyWrite
-
-
-class EmptyApplyList(EmptyWriteList): ...
 
 
 def _create_empty_filter(

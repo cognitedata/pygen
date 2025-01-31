@@ -154,8 +154,8 @@ def test_upsert_recursive(omni_client: OmniClient, cognite_client: CogniteClient
 @pytest.fixture(scope="module")
 def primitive_nullable_node(
     omni_client: OmniClient, cognite_client: CogniteClient
-) -> Iterable[dc.PrimitiveNullableApply]:
-    node = dc.PrimitiveNullableApply(
+) -> Iterable[dc.PrimitiveNullableWrite]:
+    node = dc.PrimitiveNullableWrite(
         external_id="integration_test:PrimitiveNullable",
         text="string",
         int_32=1,
@@ -168,14 +168,14 @@ def primitive_nullable_node(
         json_={"a": 1, "b": 2},
     )
     try:
-        omni_client.primitive_nullable.apply(node)
+        omni_client.upsert(node)
         yield node
     finally:
         cognite_client.data_modeling.instances.delete(nodes=node.as_tuple_id())
 
 
 def test_set_empty_string(
-    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
+    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableWrite
 ) -> None:
     update = primitive_nullable_node.model_copy()
 
@@ -187,12 +187,12 @@ def test_set_empty_string(
 
 
 def test_upsert_multiple_list(
-    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
+    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableWrite
 ) -> None:
     # Arrange
     test_name = "integration_test:ApplyMultipleList"
     new_items = [
-        dc.PrimitiveNullableApply(
+        dc.PrimitiveNullableWrite(
             external_id=f"{test_name}:PrimitiveNullable:{i}",
             text="string",
             int_32=i,

@@ -169,15 +169,6 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
         """Convert this read version of Cognite 360 image collection to the writing version."""
         return Cognite360ImageCollectionWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Cognite360ImageCollectionWrite:
-        """Convert this read version of Cognite 360 image collection to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevisionWrite, protected_namespaces=()):
     """This represents the writing version of Cognite 360 image collection.
@@ -215,19 +206,6 @@ class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevis
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
 
 
-class Cognite360ImageCollectionApply(Cognite360ImageCollectionWrite):
-    def __new__(cls, *args, **kwargs) -> Cognite360ImageCollectionApply:
-        warnings.warn(
-            "Cognite360ImageCollectionApply is deprecated and will be removed in v1.0. "
-            "Use Cognite360ImageCollectionWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Cognite360ImageCollection.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Cognite360ImageCollectionList(DomainModelList[Cognite360ImageCollection]):
     """List of Cognite 360 image collections in the read version."""
 
@@ -236,15 +214,6 @@ class Cognite360ImageCollectionList(DomainModelList[Cognite360ImageCollection]):
     def as_write(self) -> Cognite360ImageCollectionWriteList:
         """Convert these read versions of Cognite 360 image collection to the writing versions."""
         return Cognite360ImageCollectionWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> Cognite360ImageCollectionWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def model_3d(self) -> Cognite360ImageModelList:
@@ -267,9 +236,6 @@ class Cognite360ImageCollectionWriteList(DomainModelWriteList[Cognite360ImageCol
         return Cognite360ImageModelWriteList(
             [item.model_3d for item in self.data if isinstance(item.model_3d, Cognite360ImageModelWrite)]
         )
-
-
-class Cognite360ImageCollectionApplyList(Cognite360ImageCollectionWriteList): ...
 
 
 def _create_cognite_360_image_collection_filter(
