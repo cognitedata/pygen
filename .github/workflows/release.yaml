@@ -3,7 +3,8 @@ name: release
 
 on:
   push:
-    branches: [main]
+    branches:
+      - release-* # This will trigger the workflow on any branch that starts with "release-"
 
 env:
   PYTHON_VERSION: '3.10'
