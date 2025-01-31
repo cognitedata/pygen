@@ -50,37 +50,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
-        """Delete one or more implementation 1 non writeable.
-
-        Args:
-            external_id: External id of the implementation 1 non writeable to delete.
-            space: The space where all the implementation 1 non writeable are located.
-
-        Returns:
-            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
-
-        Examples:
-
-            Delete implementation_1_non_writeable by id:
-
-                >>> from omni import OmniClient
-                >>> client = OmniClient()
-                >>> client.implementation_1_non_writeable.delete("my_implementation_1_non_writeable")
-        """
-        warnings.warn(
-            "The .delete method is deprecated and will be removed in v1.0. "
-            "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.implementation_1_non_writeable.delete(my_ids)` please use `my_client.delete(my_ids)`."
-            "The motivation is that all delete methods are the same, and having one delete method per API "
-            " class encourages users to delete items in small batches, which is inefficient.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._delete(external_id, space)
-
     @overload
     def retrieve(
         self,
