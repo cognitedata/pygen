@@ -14,11 +14,6 @@ Cognite Python SDK Generator
 This is the Cognite Python SDK Generator, `pygen`. The purpose of this package is to help developers to
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 
-**Beta Note** This package, `pygen`, is currently in beta, which is reflected in the version number `0.99.x`. Beta
-indicates that a product or functionality is in a mature testing phase, but is still subject to change or retirement.
-We will provide a deprecation notice a minimum of two months before retiring the product or functionality. We recommend
-not using the product or functionality in production systems.
-
 The core functionality is to provide a Python client that matches a data model. This enables the developer for the following
 benefits
 
