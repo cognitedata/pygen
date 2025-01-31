@@ -157,15 +157,6 @@ class Cognite3DTransformationEdge(DomainRelation):
         """Convert this read version of Cognite 3D transformation edge to the writing version."""
         return Cognite3DTransformationEdgeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Cognite3DTransformationEdgeWrite:
-        """Convert this read version of Cognite 3D transformation edge to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
@@ -233,19 +224,6 @@ class Cognite3DTransformationEdgeWrite(DomainRelationWrite):
     translation_z: Optional[float] = Field(None, alias="translationZ")
 
 
-class Cognite3DTransformationEdgeApply(Cognite3DTransformationEdgeWrite):
-    def __new__(cls, *args, **kwargs) -> Cognite3DTransformationEdgeApply:
-        warnings.warn(
-            "Cognite3DTransformationEdgeApply is deprecated and will be removed in v1.0. "
-            "Use Cognite3DTransformationEdgeWrite instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Cognite3DTransformationEdge.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Cognite3DTransformationEdgeList(DomainRelationList[Cognite3DTransformationEdge]):
     """List of Cognite 3D transformation edges in the reading version."""
 
@@ -255,23 +233,11 @@ class Cognite3DTransformationEdgeList(DomainRelationList[Cognite3DTransformation
         """Convert this read version of Cognite 3D transformation edge list to the writing version."""
         return Cognite3DTransformationEdgeWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> Cognite3DTransformationEdgeWriteList:
-        """Convert these read versions of Cognite 3D transformation edge list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite3DTransformationEdgeWriteList(DomainRelationWriteList[Cognite3DTransformationEdgeWrite]):
     """List of Cognite 3D transformation edges in the writing version."""
 
     _INSTANCE = Cognite3DTransformationEdgeWrite
-
-
-class Cognite3DTransformationEdgeApplyList(Cognite3DTransformationEdgeWriteList): ...
 
 
 def _create_cognite_3_d_transformation_edge_filter(

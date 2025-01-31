@@ -213,15 +213,6 @@ class Cognite360ImageAnnotation(CogniteAnnotation):
         """Convert this read version of Cognite 360 image annotation to the writing version."""
         return Cognite360ImageAnnotationWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Cognite360ImageAnnotationWrite:
-        """Convert this read version of Cognite 360 image annotation to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
     Cognite360ImageWrite: {Cognite3DObjectWrite},
@@ -299,19 +290,6 @@ class Cognite360ImageAnnotationWrite(CogniteAnnotationWrite):
     polygon: Optional[list[float]] = None
 
 
-class Cognite360ImageAnnotationApply(Cognite360ImageAnnotationWrite):
-    def __new__(cls, *args, **kwargs) -> Cognite360ImageAnnotationApply:
-        warnings.warn(
-            "Cognite360ImageAnnotationApply is deprecated and will be removed in v1.0. "
-            "Use Cognite360ImageAnnotationWrite instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Cognite360ImageAnnotation.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Cognite360ImageAnnotationList(DomainRelationList[Cognite360ImageAnnotation]):
     """List of Cognite 360 image annotations in the reading version."""
 
@@ -321,23 +299,11 @@ class Cognite360ImageAnnotationList(DomainRelationList[Cognite360ImageAnnotation
         """Convert this read version of Cognite 360 image annotation list to the writing version."""
         return Cognite360ImageAnnotationWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> Cognite360ImageAnnotationWriteList:
-        """Convert these read versions of Cognite 360 image annotation list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite360ImageAnnotationWriteList(DomainRelationWriteList[Cognite360ImageAnnotationWrite]):
     """List of Cognite 360 image annotations in the writing version."""
 
     _INSTANCE = Cognite360ImageAnnotationWrite
-
-
-class Cognite360ImageAnnotationApplyList(Cognite360ImageAnnotationWriteList): ...
 
 
 def _create_cognite_360_image_annotation_filter(

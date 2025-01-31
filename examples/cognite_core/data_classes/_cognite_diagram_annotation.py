@@ -290,15 +290,6 @@ class CogniteDiagramAnnotation(CogniteAnnotation):
         """Convert this read version of Cognite diagram annotation to the writing version."""
         return CogniteDiagramAnnotationWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteDiagramAnnotationWrite:
-        """Convert this read version of Cognite diagram annotation to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
@@ -415,19 +406,6 @@ class CogniteDiagramAnnotationWrite(CogniteAnnotationWrite):
     start_node_y_min: Optional[float] = Field(None, alias="startNodeYMin")
 
 
-class CogniteDiagramAnnotationApply(CogniteDiagramAnnotationWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteDiagramAnnotationApply:
-        warnings.warn(
-            "CogniteDiagramAnnotationApply is deprecated and will be removed in v1.0. "
-            "Use CogniteDiagramAnnotationWrite instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteDiagramAnnotation.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteDiagramAnnotationList(DomainRelationList[CogniteDiagramAnnotation]):
     """List of Cognite diagram annotations in the reading version."""
 
@@ -437,23 +415,11 @@ class CogniteDiagramAnnotationList(DomainRelationList[CogniteDiagramAnnotation])
         """Convert this read version of Cognite diagram annotation list to the writing version."""
         return CogniteDiagramAnnotationWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> CogniteDiagramAnnotationWriteList:
-        """Convert these read versions of Cognite diagram annotation list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteDiagramAnnotationWriteList(DomainRelationWriteList[CogniteDiagramAnnotationWrite]):
     """List of Cognite diagram annotations in the writing version."""
 
     _INSTANCE = CogniteDiagramAnnotationWrite
-
-
-class CogniteDiagramAnnotationApplyList(CogniteDiagramAnnotationWriteList): ...
 
 
 def _create_cognite_diagram_annotation_filter(

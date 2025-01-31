@@ -158,7 +158,7 @@ class CogniteCoreClient:
         allow_version_increase: bool,
     ) -> data_classes.ResourcesWrite:
         if isinstance(items, data_classes.DomainModelWrite):
-            instances = items.to_instances_write(False, allow_version_increase)
+            instances = items.to_instances_write(allow_version_increase)
         else:
             instances = data_classes.ResourcesWrite()
             cache: set[tuple[str, str]] = set()
