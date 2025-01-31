@@ -475,7 +475,6 @@ class MultiAPIGenerator:
                 continue
             api_classes.append(api.api_class)
             api_classes.extend(api.edge_apis or [])
-            api_classes.extend(api.timeseries_apis or [])
 
         api_classes = sorted(api_classes, key=lambda api: api.name)
 
@@ -773,8 +772,6 @@ class APIGenerator:
         self.api_class = NodeAPIClass.from_view(
             view.as_id(), self.base_name, isinstance(self.data_class, EdgeDataClass), config.naming.api_class
         )
-        self.query_api: QueryAPIClass = QueryAPIClass.create(self.data_class, self.base_name, config.naming.api_class)
-
         # These attributes require fields to be initialized
         self._list_method: FilterMethod | None = None
         self._timeseries_apis: list[TimeSeriesAPIClass] | None = None
@@ -945,9 +942,7 @@ class APIGenerator:
                 api_class=self.api_class,
                 data_class=self.data_class,
                 list_method=self.list_method,
-                timeseries_apis=self.timeseries_apis,
                 edge_apis=self.edge_apis,
-                query_api=self.query_api,
                 edge_data_classes=unique_edge_data_classes,
                 has_default_instance_space=self.has_default_instance_space,
                 # ft = field types

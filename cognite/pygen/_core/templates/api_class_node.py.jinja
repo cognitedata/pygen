@@ -73,9 +73,6 @@ from {{ top_level_package }}.data_classes import (
 from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.name }}
 {% endif %}
 {% endfor %}
-{% for class_ in timeseries_apis %}
-from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.name }}
-{% endfor %}
 
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):
@@ -101,9 +98,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% if edge_api.field.is_write_field %}
         self.{{ edge_api.parent_attribute }} = {{ edge_api.name }}(client)
         {% endif %}
-        {% endfor %}
-        {% for timeseries_api in timeseries_apis %}
-        self.{{ timeseries_api.parent_attribute }} = {{ timeseries_api.name }}(client, self._view_id)
         {% endfor %}
 
 {% if data_class.is_writable %}
