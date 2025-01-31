@@ -6,9 +6,6 @@ from wind_turbine._api.generator import GeneratorAPI
 from wind_turbine._api.high_speed_shaft import HighSpeedShaftAPI
 from wind_turbine._api.main_shaft import MainShaftAPI
 from wind_turbine._api.metmast import MetmastAPI
-from wind_turbine._api.metmast_temperature import MetmastTemperatureAPI
-from wind_turbine._api.metmast_tilt_angle import MetmastTiltAngleAPI
-from wind_turbine._api.metmast_wind_speed import MetmastWindSpeedAPI
 from wind_turbine._api.metmast_wind_turbines import MetmastWindTurbinesAPI
 from wind_turbine._api.nacelle import NacelleAPI
 from wind_turbine._api.power_inverter import PowerInverterAPI
@@ -28,9 +25,6 @@ __all__ = [
     "HighSpeedShaftAPI",
     "MainShaftAPI",
     "MetmastAPI",
-    "MetmastTemperatureAPI",
-    "MetmastTiltAngleAPI",
-    "MetmastWindSpeedAPI",
     "MetmastWindTurbinesAPI",
     "NacelleAPI",
     "PowerInverterAPI",

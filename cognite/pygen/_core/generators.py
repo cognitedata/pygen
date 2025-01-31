@@ -772,6 +772,7 @@ class APIGenerator:
         self.api_class = NodeAPIClass.from_view(
             view.as_id(), self.base_name, isinstance(self.data_class, EdgeDataClass), config.naming.api_class
         )
+        self.query_api: QueryAPIClass = QueryAPIClass.create(self.data_class, self.base_name, config.naming.api_class)
         # These attributes require fields to be initialized
         self._list_method: FilterMethod | None = None
         self._timeseries_apis: list[TimeSeriesAPIClass] | None = None

@@ -40,7 +40,6 @@ from omni.data_classes import (
     CDFExternalReferencesListedWriteList,
     CDFExternalReferencesListedTextFields,
 )
-from omni._api.cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
 
 
 class CDFExternalReferencesListedAPI(
@@ -59,8 +58,6 @@ class CDFExternalReferencesListedAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-        self.timeseries = CDFExternalReferencesListedTimeseriesAPI(client, self._view_id)
 
     def apply(
         self,

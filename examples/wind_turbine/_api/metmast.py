@@ -46,9 +46,6 @@ from wind_turbine.data_classes import (
     WindTurbine,
 )
 from wind_turbine._api.metmast_wind_turbines import MetmastWindTurbinesAPI
-from wind_turbine._api.metmast_temperature import MetmastTemperatureAPI
-from wind_turbine._api.metmast_tilt_angle import MetmastTiltAngleAPI
-from wind_turbine._api.metmast_wind_speed import MetmastWindSpeedAPI
 
 
 class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
@@ -62,9 +59,6 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
         super().__init__(client=client)
 
         self.wind_turbines_edge = MetmastWindTurbinesAPI(client)
-        self.temperature = MetmastTemperatureAPI(client, self._view_id)
-        self.tilt_angle = MetmastTiltAngleAPI(client, self._view_id)
-        self.wind_speed = MetmastWindSpeedAPI(client, self._view_id)
 
     def apply(
         self,

@@ -1,7 +1,5 @@
 from omni._api.cdf_external_references import CDFExternalReferencesAPI
 from omni._api.cdf_external_references_listed import CDFExternalReferencesListedAPI
-from omni._api.cdf_external_references_listed_timeseries import CDFExternalReferencesListedTimeseriesAPI
-from omni._api.cdf_external_references_timeseries import CDFExternalReferencesTimeseriesAPI
 from omni._api.connection_item_a import ConnectionItemAAPI
 from omni._api.connection_item_a_outwards import ConnectionItemAOutwardsAPI
 from omni._api.connection_item_b import ConnectionItemBAPI
@@ -37,8 +35,6 @@ from omni._api.sub_interface import SubInterfaceAPI
 __all__ = [
     "CDFExternalReferencesAPI",
     "CDFExternalReferencesListedAPI",
-    "CDFExternalReferencesListedTimeseriesAPI",
-    "CDFExternalReferencesTimeseriesAPI",
     "ConnectionItemAAPI",
     "ConnectionItemAOutwardsAPI",
     "ConnectionItemBAPI",
