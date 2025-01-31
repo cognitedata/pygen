@@ -427,7 +427,6 @@ class MultiAPIGenerator:
 
             for file_name, file_content in itertools.chain(
                 api.generate_edge_api_files(self.client_name),
-                api.generate_timeseries_api_files(self.client_name),
             ):
                 sdk[api_dir / f"{file_name}.py"] = file_content
 
@@ -981,35 +980,6 @@ class APIGenerator:
                         edge_api=edge_api,
                         api_class=self.api_class,
                         has_default_instance_space=self.has_default_instance_space,
-                        # ft = field types
-                        ft=fields,
-                        dm=dm,
-                    )
-                    + "\n"
-                ),
-            )
-
-    def generate_timeseries_api_files(self, client_name: str) -> Iterator[tuple[str, str]]:
-        """Generate the timeseries API files for the view.
-
-        Args:
-            client_name: The name of the client class.
-
-        Returns:
-            Iterator of tuples of file names and file contents for the timeseries APIs.
-        """
-        timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
-        for timeseries in self.timeseries_apis:
-            yield (
-                timeseries.file_name,
-                (
-                    timeseries_api.render(
-                        top_level_package=self.top_level_package,
-                        client_name=client_name,
-                        api_class=self.api_class,
-                        data_class=self.data_class,
-                        list_method=self.list_method,
-                        timeseries_api=timeseries,
                         # ft = field types
                         ft=fields,
                         dm=dm,
