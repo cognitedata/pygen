@@ -13,6 +13,11 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+
+## [1.0.0] - 2025-01-31
+## Removed
+- All deprecated features/classes have been removed.
+
 ## [0.99.63] - 2025-01-31
 ### Changed
 - In the `generate_sdk`, the `format_code` parameter is now default to `False`. In addition, in the
