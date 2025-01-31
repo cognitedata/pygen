@@ -22,7 +22,7 @@ Changes are grouped as follows
 - The generated SDK now longer raises a `ValidationError` if there are new properties added to the data model,
   or new values are added to an enum property.
 
-## [0.99.62] - 24-11-16
+## [0.99.62] - 25-01-16
 ### Fixed
 - A view with a relation to a view with a property of type Field would generate a SDK with a corrupted file making the SDK unsuable.
 
