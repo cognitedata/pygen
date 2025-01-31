@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [1.0.0] - 2025-01-31
 ## Removed
 - All deprecated features/classes have been removed.
 
