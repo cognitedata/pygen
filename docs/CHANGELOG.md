@@ -14,7 +14,6 @@ Changes are grouped as follows
 - `Security` in case of vulnerabilities.
 
 ## TBD
-
 ## Removed
 - All deprecated features/classes have been removed.
 
