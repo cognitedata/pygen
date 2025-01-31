@@ -150,15 +150,6 @@ class Blade(DomainModel):
         """Convert this read version of blade to the writing version."""
         return BladeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> BladeWrite:
-        """Convert this read version of blade to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class BladeWrite(DomainModelWrite):
     """This represents the writing version of blade.
@@ -186,19 +177,6 @@ class BladeWrite(DomainModelWrite):
     name: Optional[str] = None
 
 
-class BladeApply(BladeWrite):
-    def __new__(cls, *args, **kwargs) -> BladeApply:
-        warnings.warn(
-            "BladeApply is deprecated and will be removed in v1.0. "
-            "Use BladeWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Blade.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class BladeList(DomainModelList[Blade]):
     """List of blades in the read version."""
 
@@ -207,15 +185,6 @@ class BladeList(DomainModelList[Blade]):
     def as_write(self) -> BladeWriteList:
         """Convert these read versions of blade to the writing versions."""
         return BladeWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> BladeWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def sensor_positions(self) -> SensorPositionList:
@@ -230,9 +199,6 @@ class BladeWriteList(DomainModelWriteList[BladeWrite]):
     """List of blades in the writing version."""
 
     _INSTANCE = BladeWrite
-
-
-class BladeApplyList(BladeWriteList): ...
 
 
 def _create_blade_filter(

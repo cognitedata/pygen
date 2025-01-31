@@ -41,7 +41,6 @@ from omni.data_classes import (
     PrimitiveNullableListedWriteList,
     PrimitiveNullableListedTextFields,
 )
-from omni._api.primitive_nullable_listed_query import PrimitiveNullableListedQueryAPI
 
 
 class PrimitiveNullableListedAPI(
@@ -60,120 +59,6 @@ class PrimitiveNullableListedAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> PrimitiveNullableListedQueryAPI[PrimitiveNullableListed, PrimitiveNullableListedList]:
-        """Query starting at primitive nullable listeds.
-
-        Args:
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of primitive nullable listeds to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for primitive nullable listeds.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_primitive_nullable_listed_filter(
-            self._view_id,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return PrimitiveNullableListedQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
-
-    def apply(
-        self,
-        primitive_nullable_listed: PrimitiveNullableListedWrite | Sequence[PrimitiveNullableListedWrite],
-        replace: bool = False,
-        write_none: bool = False,
-    ) -> ResourcesWriteResult:
-        """Add or update (upsert) primitive nullable listeds.
-
-        Args:
-            primitive_nullable_listed: Primitive nullable listed or
-                sequence of primitive nullable listeds to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and
-                existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)?
-                Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None.
-                However, if you want to set properties to None,
-                you can set this parameter to True. Note this only applies to properties that are nullable.
-        Returns:
-            Created instance(s), i.e., nodes, edges, and time series.
-
-        Examples:
-
-            Create a new primitive_nullable_listed:
-
-                >>> from omni import OmniClient
-                >>> from omni.data_classes import PrimitiveNullableListedWrite
-                >>> client = OmniClient()
-                >>> primitive_nullable_listed = PrimitiveNullableListedWrite(
-                ...     external_id="my_primitive_nullable_listed", ...
-                ... )
-                >>> result = client.primitive_nullable_listed.apply(primitive_nullable_listed)
-
-        """
-        warnings.warn(
-            "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .upsert method on the client instead. This means instead of "
-            "`my_client.primitive_nullable_listed.apply(my_items)` please use `my_client.upsert(my_items)`."
-            "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient."
-            "In addition, .upsert method is more descriptive of what the method does.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._apply(primitive_nullable_listed, replace, write_none)
-
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
-        """Delete one or more primitive nullable listed.
-
-        Args:
-            external_id: External id of the primitive nullable listed to delete.
-            space: The space where all the primitive nullable listed are located.
-
-        Returns:
-            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
-
-        Examples:
-
-            Delete primitive_nullable_listed by id:
-
-                >>> from omni import OmniClient
-                >>> client = OmniClient()
-                >>> client.primitive_nullable_listed.delete("my_primitive_nullable_listed")
-        """
-        warnings.warn(
-            "The .delete method is deprecated and will be removed in v1.0. "
-            "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.primitive_nullable_listed.delete(my_ids)` please use `my_client.delete(my_ids)`."
-            "The motivation is that all delete methods are the same, and having one delete method per API "
-            " class encourages users to delete items in small batches, which is inefficient.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._delete(external_id, space)
 
     @overload
     def retrieve(

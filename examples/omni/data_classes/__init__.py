@@ -19,8 +19,6 @@ from omni.data_classes._core import (
 )
 from ._cdf_external_references import (
     CDFExternalReferences,
-    CDFExternalReferencesApply,
-    CDFExternalReferencesApplyList,
     CDFExternalReferencesFields,
     CDFExternalReferencesGraphQL,
     CDFExternalReferencesList,
@@ -30,8 +28,6 @@ from ._cdf_external_references import (
 )
 from ._cdf_external_references_listed import (
     CDFExternalReferencesListed,
-    CDFExternalReferencesListedApply,
-    CDFExternalReferencesListedApplyList,
     CDFExternalReferencesListedFields,
     CDFExternalReferencesListedGraphQL,
     CDFExternalReferencesListedList,
@@ -41,8 +37,6 @@ from ._cdf_external_references_listed import (
 )
 from ._connection_edge_a import (
     ConnectionEdgeA,
-    ConnectionEdgeAApply,
-    ConnectionEdgeAApplyList,
     ConnectionEdgeAFields,
     ConnectionEdgeAGraphQL,
     ConnectionEdgeAList,
@@ -52,8 +46,6 @@ from ._connection_edge_a import (
 )
 from ._connection_item_a import (
     ConnectionItemA,
-    ConnectionItemAApply,
-    ConnectionItemAApplyList,
     ConnectionItemAFields,
     ConnectionItemAGraphQL,
     ConnectionItemAList,
@@ -63,8 +55,6 @@ from ._connection_item_a import (
 )
 from ._connection_item_b import (
     ConnectionItemB,
-    ConnectionItemBApply,
-    ConnectionItemBApplyList,
     ConnectionItemBFields,
     ConnectionItemBGraphQL,
     ConnectionItemBList,
@@ -81,8 +71,6 @@ from ._connection_item_c_edge import (
 )
 from ._connection_item_c_node import (
     ConnectionItemCNode,
-    ConnectionItemCNodeApply,
-    ConnectionItemCNodeApplyList,
     ConnectionItemCNodeFields,
     ConnectionItemCNodeGraphQL,
     ConnectionItemCNodeList,
@@ -92,8 +80,6 @@ from ._connection_item_c_node import (
 )
 from ._connection_item_d import (
     ConnectionItemD,
-    ConnectionItemDApply,
-    ConnectionItemDApplyList,
     ConnectionItemDFields,
     ConnectionItemDGraphQL,
     ConnectionItemDList,
@@ -103,8 +89,6 @@ from ._connection_item_d import (
 )
 from ._connection_item_e import (
     ConnectionItemE,
-    ConnectionItemEApply,
-    ConnectionItemEApplyList,
     ConnectionItemEFields,
     ConnectionItemEGraphQL,
     ConnectionItemEList,
@@ -114,8 +98,6 @@ from ._connection_item_e import (
 )
 from ._connection_item_f import (
     ConnectionItemF,
-    ConnectionItemFApply,
-    ConnectionItemFApplyList,
     ConnectionItemFFields,
     ConnectionItemFGraphQL,
     ConnectionItemFList,
@@ -125,8 +107,6 @@ from ._connection_item_f import (
 )
 from ._connection_item_g import (
     ConnectionItemG,
-    ConnectionItemGApply,
-    ConnectionItemGApplyList,
     ConnectionItemGFields,
     ConnectionItemGGraphQL,
     ConnectionItemGList,
@@ -136,8 +116,6 @@ from ._connection_item_g import (
 )
 from ._dependent_on_non_writable import (
     DependentOnNonWritable,
-    DependentOnNonWritableApply,
-    DependentOnNonWritableApplyList,
     DependentOnNonWritableFields,
     DependentOnNonWritableGraphQL,
     DependentOnNonWritableList,
@@ -145,21 +123,9 @@ from ._dependent_on_non_writable import (
     DependentOnNonWritableWrite,
     DependentOnNonWritableWriteList,
 )
-from ._empty import (
-    Empty,
-    EmptyApply,
-    EmptyApplyList,
-    EmptyFields,
-    EmptyGraphQL,
-    EmptyList,
-    EmptyTextFields,
-    EmptyWrite,
-    EmptyWriteList,
-)
+from ._empty import Empty, EmptyFields, EmptyGraphQL, EmptyList, EmptyTextFields, EmptyWrite, EmptyWriteList
 from ._implementation_1 import (
     Implementation1,
-    Implementation1Apply,
-    Implementation1ApplyList,
     Implementation1Fields,
     Implementation1GraphQL,
     Implementation1List,
@@ -176,8 +142,6 @@ from ._implementation_1_non_writeable import (
 )
 from ._implementation_2 import (
     Implementation2,
-    Implementation2Apply,
-    Implementation2ApplyList,
     Implementation2Fields,
     Implementation2GraphQL,
     Implementation2List,
@@ -187,8 +151,6 @@ from ._implementation_2 import (
 )
 from ._main_interface import (
     MainInterface,
-    MainInterfaceApply,
-    MainInterfaceApplyList,
     MainInterfaceFields,
     MainInterfaceGraphQL,
     MainInterfaceList,
@@ -198,8 +160,6 @@ from ._main_interface import (
 )
 from ._primitive_nullable import (
     PrimitiveNullable,
-    PrimitiveNullableApply,
-    PrimitiveNullableApplyList,
     PrimitiveNullableFields,
     PrimitiveNullableGraphQL,
     PrimitiveNullableList,
@@ -209,8 +169,6 @@ from ._primitive_nullable import (
 )
 from ._primitive_nullable_listed import (
     PrimitiveNullableListed,
-    PrimitiveNullableListedApply,
-    PrimitiveNullableListedApplyList,
     PrimitiveNullableListedFields,
     PrimitiveNullableListedGraphQL,
     PrimitiveNullableListedList,
@@ -220,8 +178,6 @@ from ._primitive_nullable_listed import (
 )
 from ._primitive_required import (
     PrimitiveRequired,
-    PrimitiveRequiredApply,
-    PrimitiveRequiredApplyList,
     PrimitiveRequiredFields,
     PrimitiveRequiredGraphQL,
     PrimitiveRequiredList,
@@ -231,8 +187,6 @@ from ._primitive_required import (
 )
 from ._primitive_required_listed import (
     PrimitiveRequiredListed,
-    PrimitiveRequiredListedApply,
-    PrimitiveRequiredListedApplyList,
     PrimitiveRequiredListedFields,
     PrimitiveRequiredListedGraphQL,
     PrimitiveRequiredListedList,
@@ -242,8 +196,6 @@ from ._primitive_required_listed import (
 )
 from ._primitive_with_defaults import (
     PrimitiveWithDefaults,
-    PrimitiveWithDefaultsApply,
-    PrimitiveWithDefaultsApplyList,
     PrimitiveWithDefaultsFields,
     PrimitiveWithDefaultsGraphQL,
     PrimitiveWithDefaultsList,
@@ -253,8 +205,6 @@ from ._primitive_with_defaults import (
 )
 from ._sub_interface import (
     SubInterface,
-    SubInterfaceApply,
-    SubInterfaceApplyList,
     SubInterfaceFields,
     SubInterfaceGraphQL,
     SubInterfaceList,
@@ -266,49 +216,38 @@ from ._sub_interface import (
 CDFExternalReferences.model_rebuild()
 CDFExternalReferencesGraphQL.model_rebuild()
 CDFExternalReferencesWrite.model_rebuild()
-CDFExternalReferencesApply.model_rebuild()
 CDFExternalReferencesListed.model_rebuild()
 CDFExternalReferencesListedGraphQL.model_rebuild()
 CDFExternalReferencesListedWrite.model_rebuild()
-CDFExternalReferencesListedApply.model_rebuild()
 ConnectionItemA.model_rebuild()
 ConnectionItemAGraphQL.model_rebuild()
 ConnectionItemAWrite.model_rebuild()
-ConnectionItemAApply.model_rebuild()
 ConnectionItemB.model_rebuild()
 ConnectionItemBGraphQL.model_rebuild()
 ConnectionItemBWrite.model_rebuild()
-ConnectionItemBApply.model_rebuild()
 ConnectionItemCNode.model_rebuild()
 ConnectionItemCNodeGraphQL.model_rebuild()
 ConnectionItemCNodeWrite.model_rebuild()
-ConnectionItemCNodeApply.model_rebuild()
 ConnectionItemD.model_rebuild()
 ConnectionItemDGraphQL.model_rebuild()
 ConnectionItemDWrite.model_rebuild()
-ConnectionItemDApply.model_rebuild()
 ConnectionItemE.model_rebuild()
 ConnectionItemEGraphQL.model_rebuild()
 ConnectionItemEWrite.model_rebuild()
-ConnectionItemEApply.model_rebuild()
 ConnectionItemF.model_rebuild()
 ConnectionItemFGraphQL.model_rebuild()
 ConnectionItemFWrite.model_rebuild()
-ConnectionItemFApply.model_rebuild()
 ConnectionItemG.model_rebuild()
 ConnectionItemGGraphQL.model_rebuild()
 ConnectionItemGWrite.model_rebuild()
-ConnectionItemGApply.model_rebuild()
 DependentOnNonWritable.model_rebuild()
 DependentOnNonWritableGraphQL.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
-DependentOnNonWritableApply.model_rebuild()
 Implementation1NonWriteable.model_rebuild()
 Implementation1NonWriteableGraphQL.model_rebuild()
 ConnectionEdgeA.model_rebuild()
 ConnectionEdgeAGraphQL.model_rebuild()
 ConnectionEdgeAWrite.model_rebuild()
-ConnectionEdgeAApply.model_rebuild()
 ConnectionItemCEdge.model_rebuild()
 ConnectionItemCEdgeGraphQL.model_rebuild()
 
@@ -334,46 +273,36 @@ __all__ = [
     "CDFExternalReferences",
     "CDFExternalReferencesGraphQL",
     "CDFExternalReferencesWrite",
-    "CDFExternalReferencesApply",
     "CDFExternalReferencesList",
     "CDFExternalReferencesWriteList",
-    "CDFExternalReferencesApplyList",
     "CDFExternalReferencesFields",
     "CDFExternalReferencesTextFields",
     "CDFExternalReferencesListed",
     "CDFExternalReferencesListedGraphQL",
     "CDFExternalReferencesListedWrite",
-    "CDFExternalReferencesListedApply",
     "CDFExternalReferencesListedList",
     "CDFExternalReferencesListedWriteList",
-    "CDFExternalReferencesListedApplyList",
     "CDFExternalReferencesListedFields",
     "CDFExternalReferencesListedTextFields",
     "ConnectionEdgeA",
     "ConnectionEdgeAGraphQL",
     "ConnectionEdgeAWrite",
-    "ConnectionEdgeAApply",
     "ConnectionEdgeAList",
     "ConnectionEdgeAWriteList",
-    "ConnectionEdgeAApplyList",
     "ConnectionEdgeAFields",
     "ConnectionEdgeATextFields",
     "ConnectionItemA",
     "ConnectionItemAGraphQL",
     "ConnectionItemAWrite",
-    "ConnectionItemAApply",
     "ConnectionItemAList",
     "ConnectionItemAWriteList",
-    "ConnectionItemAApplyList",
     "ConnectionItemAFields",
     "ConnectionItemATextFields",
     "ConnectionItemB",
     "ConnectionItemBGraphQL",
     "ConnectionItemBWrite",
-    "ConnectionItemBApply",
     "ConnectionItemBList",
     "ConnectionItemBWriteList",
-    "ConnectionItemBApplyList",
     "ConnectionItemBFields",
     "ConnectionItemBTextFields",
     "ConnectionItemCEdge",
@@ -384,73 +313,57 @@ __all__ = [
     "ConnectionItemCNode",
     "ConnectionItemCNodeGraphQL",
     "ConnectionItemCNodeWrite",
-    "ConnectionItemCNodeApply",
     "ConnectionItemCNodeList",
     "ConnectionItemCNodeWriteList",
-    "ConnectionItemCNodeApplyList",
     "ConnectionItemCNodeFields",
     "ConnectionItemCNodeTextFields",
     "ConnectionItemD",
     "ConnectionItemDGraphQL",
     "ConnectionItemDWrite",
-    "ConnectionItemDApply",
     "ConnectionItemDList",
     "ConnectionItemDWriteList",
-    "ConnectionItemDApplyList",
     "ConnectionItemDFields",
     "ConnectionItemDTextFields",
     "ConnectionItemE",
     "ConnectionItemEGraphQL",
     "ConnectionItemEWrite",
-    "ConnectionItemEApply",
     "ConnectionItemEList",
     "ConnectionItemEWriteList",
-    "ConnectionItemEApplyList",
     "ConnectionItemEFields",
     "ConnectionItemETextFields",
     "ConnectionItemF",
     "ConnectionItemFGraphQL",
     "ConnectionItemFWrite",
-    "ConnectionItemFApply",
     "ConnectionItemFList",
     "ConnectionItemFWriteList",
-    "ConnectionItemFApplyList",
     "ConnectionItemFFields",
     "ConnectionItemFTextFields",
     "ConnectionItemG",
     "ConnectionItemGGraphQL",
     "ConnectionItemGWrite",
-    "ConnectionItemGApply",
     "ConnectionItemGList",
     "ConnectionItemGWriteList",
-    "ConnectionItemGApplyList",
     "ConnectionItemGFields",
     "ConnectionItemGTextFields",
     "DependentOnNonWritable",
     "DependentOnNonWritableGraphQL",
     "DependentOnNonWritableWrite",
-    "DependentOnNonWritableApply",
     "DependentOnNonWritableList",
     "DependentOnNonWritableWriteList",
-    "DependentOnNonWritableApplyList",
     "DependentOnNonWritableFields",
     "DependentOnNonWritableTextFields",
     "Empty",
     "EmptyGraphQL",
     "EmptyWrite",
-    "EmptyApply",
     "EmptyList",
     "EmptyWriteList",
-    "EmptyApplyList",
     "EmptyFields",
     "EmptyTextFields",
     "Implementation1",
     "Implementation1GraphQL",
     "Implementation1Write",
-    "Implementation1Apply",
     "Implementation1List",
     "Implementation1WriteList",
-    "Implementation1ApplyList",
     "Implementation1Fields",
     "Implementation1TextFields",
     "Implementation1NonWriteable",
@@ -461,73 +374,57 @@ __all__ = [
     "Implementation2",
     "Implementation2GraphQL",
     "Implementation2Write",
-    "Implementation2Apply",
     "Implementation2List",
     "Implementation2WriteList",
-    "Implementation2ApplyList",
     "Implementation2Fields",
     "Implementation2TextFields",
     "MainInterface",
     "MainInterfaceGraphQL",
     "MainInterfaceWrite",
-    "MainInterfaceApply",
     "MainInterfaceList",
     "MainInterfaceWriteList",
-    "MainInterfaceApplyList",
     "MainInterfaceFields",
     "MainInterfaceTextFields",
     "PrimitiveNullable",
     "PrimitiveNullableGraphQL",
     "PrimitiveNullableWrite",
-    "PrimitiveNullableApply",
     "PrimitiveNullableList",
     "PrimitiveNullableWriteList",
-    "PrimitiveNullableApplyList",
     "PrimitiveNullableFields",
     "PrimitiveNullableTextFields",
     "PrimitiveNullableListed",
     "PrimitiveNullableListedGraphQL",
     "PrimitiveNullableListedWrite",
-    "PrimitiveNullableListedApply",
     "PrimitiveNullableListedList",
     "PrimitiveNullableListedWriteList",
-    "PrimitiveNullableListedApplyList",
     "PrimitiveNullableListedFields",
     "PrimitiveNullableListedTextFields",
     "PrimitiveRequired",
     "PrimitiveRequiredGraphQL",
     "PrimitiveRequiredWrite",
-    "PrimitiveRequiredApply",
     "PrimitiveRequiredList",
     "PrimitiveRequiredWriteList",
-    "PrimitiveRequiredApplyList",
     "PrimitiveRequiredFields",
     "PrimitiveRequiredTextFields",
     "PrimitiveRequiredListed",
     "PrimitiveRequiredListedGraphQL",
     "PrimitiveRequiredListedWrite",
-    "PrimitiveRequiredListedApply",
     "PrimitiveRequiredListedList",
     "PrimitiveRequiredListedWriteList",
-    "PrimitiveRequiredListedApplyList",
     "PrimitiveRequiredListedFields",
     "PrimitiveRequiredListedTextFields",
     "PrimitiveWithDefaults",
     "PrimitiveWithDefaultsGraphQL",
     "PrimitiveWithDefaultsWrite",
-    "PrimitiveWithDefaultsApply",
     "PrimitiveWithDefaultsList",
     "PrimitiveWithDefaultsWriteList",
-    "PrimitiveWithDefaultsApplyList",
     "PrimitiveWithDefaultsFields",
     "PrimitiveWithDefaultsTextFields",
     "SubInterface",
     "SubInterfaceGraphQL",
     "SubInterfaceWrite",
-    "SubInterfaceApply",
     "SubInterfaceList",
     "SubInterfaceWriteList",
-    "SubInterfaceApplyList",
     "SubInterfaceFields",
     "SubInterfaceTextFields",
 ]

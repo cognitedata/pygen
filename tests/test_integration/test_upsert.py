@@ -154,8 +154,8 @@ def test_upsert_recursive(omni_client: OmniClient, cognite_client: CogniteClient
 @pytest.fixture(scope="module")
 def primitive_nullable_node(
     omni_client: OmniClient, cognite_client: CogniteClient
-) -> Iterable[dc.PrimitiveNullableApply]:
-    node = dc.PrimitiveNullableApply(
+) -> Iterable[dc.PrimitiveNullableWrite]:
+    node = dc.PrimitiveNullableWrite(
         external_id="integration_test:PrimitiveNullable",
         text="string",
         int_32=1,
@@ -168,61 +168,31 @@ def primitive_nullable_node(
         json_={"a": 1, "b": 2},
     )
     try:
-        omni_client.primitive_nullable.apply(node)
+        omni_client.upsert(node)
         yield node
     finally:
         cognite_client.data_modeling.instances.delete(nodes=node.as_tuple_id())
 
 
-def test_update_to_null(
-    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
-) -> None:
-    update = primitive_nullable_node.model_copy()
-
-    update.text = None
-    update.int_32 = None
-    update.int_64 = None
-    update.float_32 = None
-    update.float_64 = None
-    update.boolean = None
-    update.timestamp = None
-    update.date = None
-    update.json_ = None
-
-    omni_client.upsert(update, write_none=True)
-
-    retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
-    assert retrieved is not None
-    assert retrieved.text is None
-    assert retrieved.int_32 is None
-    assert retrieved.int_64 is None
-    assert retrieved.float_32 is None
-    assert retrieved.float_64 is None
-    assert retrieved.boolean is None
-    assert retrieved.timestamp is None
-    assert retrieved.date is None
-    assert retrieved.json_ is None
-
-
 def test_set_empty_string(
-    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
+    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableWrite
 ) -> None:
     update = primitive_nullable_node.model_copy()
 
     update.text = ""
-    omni_client.upsert(update, write_none=True)
+    omni_client.upsert(update)
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
     assert retrieved is not None, f"Node {primitive_nullable_node.external_id} not found"
     assert retrieved.text == ""
 
 
 def test_upsert_multiple_list(
-    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
+    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableWrite
 ) -> None:
     # Arrange
     test_name = "integration_test:ApplyMultipleList"
     new_items = [
-        dc.PrimitiveNullableApply(
+        dc.PrimitiveNullableWrite(
             external_id=f"{test_name}:PrimitiveNullable:{i}",
             text="string",
             int_32=i,

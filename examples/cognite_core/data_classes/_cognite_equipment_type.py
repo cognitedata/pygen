@@ -151,15 +151,6 @@ class CogniteEquipmentType(CogniteDescribableNode):
         """Convert this read version of Cognite equipment type to the writing version."""
         return CogniteEquipmentTypeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteEquipmentTypeWrite:
-        """Convert this read version of Cognite equipment type to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteEquipmentTypeWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite equipment type.
@@ -200,19 +191,6 @@ class CogniteEquipmentTypeWrite(CogniteDescribableNodeWrite):
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
 
-class CogniteEquipmentTypeApply(CogniteEquipmentTypeWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteEquipmentTypeApply:
-        warnings.warn(
-            "CogniteEquipmentTypeApply is deprecated and will be removed in v1.0. "
-            "Use CogniteEquipmentTypeWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteEquipmentType.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteEquipmentTypeList(DomainModelList[CogniteEquipmentType]):
     """List of Cognite equipment types in the read version."""
 
@@ -222,23 +200,11 @@ class CogniteEquipmentTypeList(DomainModelList[CogniteEquipmentType]):
         """Convert these read versions of Cognite equipment type to the writing versions."""
         return CogniteEquipmentTypeWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> CogniteEquipmentTypeWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteEquipmentTypeWriteList(DomainModelWriteList[CogniteEquipmentTypeWrite]):
     """List of Cognite equipment types in the writing version."""
 
     _INSTANCE = CogniteEquipmentTypeWrite
-
-
-class CogniteEquipmentTypeApplyList(CogniteEquipmentTypeWriteList): ...
 
 
 def _create_cognite_equipment_type_filter(

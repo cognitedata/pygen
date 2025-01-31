@@ -151,15 +151,6 @@ class Rotor(DomainModel):
         """Convert this read version of rotor to the writing version."""
         return RotorWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> RotorWrite:
-        """Convert this read version of rotor to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class RotorWrite(DomainModelWrite):
     """This represents the writing version of rotor.
@@ -201,19 +192,6 @@ class RotorWrite(DomainModelWrite):
         return value
 
 
-class RotorApply(RotorWrite):
-    def __new__(cls, *args, **kwargs) -> RotorApply:
-        warnings.warn(
-            "RotorApply is deprecated and will be removed in v1.0. "
-            "Use RotorWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Rotor.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class RotorList(DomainModelList[Rotor]):
     """List of rotors in the read version."""
 
@@ -222,15 +200,6 @@ class RotorList(DomainModelList[Rotor]):
     def as_write(self) -> RotorWriteList:
         """Convert these read versions of rotor to the writing versions."""
         return RotorWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> RotorWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def rotor_speed_controller(self) -> SensorTimeSeriesList:
@@ -287,9 +256,6 @@ class RotorWriteList(DomainModelWriteList[RotorWrite]):
                 if isinstance(item.rpm_low_speed_shaft, SensorTimeSeriesWrite)
             ]
         )
-
-
-class RotorApplyList(RotorWriteList): ...
 
 
 def _create_rotor_filter(

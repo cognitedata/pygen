@@ -336,11 +336,9 @@ class DataClass:
         import_classes = [self.read_name, self.graphql_name]
         if self.is_writable or self.is_interface:
             import_classes.append(self.write_name)
-            import_classes.append(f"{self.read_name}Apply")
         import_classes.append(self.read_list_name)
         if self.is_writable or self.is_interface:
             import_classes.append(self.write_list_name)
-            import_classes.append(f"{self.read_name}ApplyList")
         import_classes.append(self.field_names)
         import_classes.append(self.text_field_names)
         return f"from .{self.file_name} import {', '.join(sorted(import_classes))}"

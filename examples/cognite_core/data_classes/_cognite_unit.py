@@ -151,15 +151,6 @@ class CogniteUnit(CogniteDescribableNode):
         """Convert this read version of Cognite unit to the writing version."""
         return CogniteUnitWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteUnitWrite:
-        """Convert this read version of Cognite unit to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteUnitWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite unit.
@@ -200,19 +191,6 @@ class CogniteUnitWrite(CogniteDescribableNodeWrite):
     symbol: Optional[str] = None
 
 
-class CogniteUnitApply(CogniteUnitWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteUnitApply:
-        warnings.warn(
-            "CogniteUnitApply is deprecated and will be removed in v1.0. "
-            "Use CogniteUnitWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteUnit.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteUnitList(DomainModelList[CogniteUnit]):
     """List of Cognite units in the read version."""
 
@@ -222,23 +200,11 @@ class CogniteUnitList(DomainModelList[CogniteUnit]):
         """Convert these read versions of Cognite unit to the writing versions."""
         return CogniteUnitWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> CogniteUnitWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteUnitWriteList(DomainModelWriteList[CogniteUnitWrite]):
     """List of Cognite units in the writing version."""
 
     _INSTANCE = CogniteUnitWrite
-
-
-class CogniteUnitApplyList(CogniteUnitWriteList): ...
 
 
 def _create_cognite_unit_filter(

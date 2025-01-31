@@ -147,15 +147,6 @@ class Generator(DomainModel):
         """Convert this read version of generator to the writing version."""
         return GeneratorWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> GeneratorWrite:
-        """Convert this read version of generator to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class GeneratorWrite(DomainModelWrite):
     """This represents the writing version of generator.
@@ -199,19 +190,6 @@ class GeneratorWrite(DomainModelWrite):
         return value
 
 
-class GeneratorApply(GeneratorWrite):
-    def __new__(cls, *args, **kwargs) -> GeneratorApply:
-        warnings.warn(
-            "GeneratorApply is deprecated and will be removed in v1.0. "
-            "Use GeneratorWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Generator.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class GeneratorList(DomainModelList[Generator]):
     """List of generators in the read version."""
 
@@ -220,15 +198,6 @@ class GeneratorList(DomainModelList[Generator]):
     def as_write(self) -> GeneratorWriteList:
         """Convert these read versions of generator to the writing versions."""
         return GeneratorWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> GeneratorWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def generator_speed_controller(self) -> SensorTimeSeriesList:
@@ -289,9 +258,6 @@ class GeneratorWriteList(DomainModelWriteList[GeneratorWrite]):
                 if isinstance(item.generator_speed_controller_reference, SensorTimeSeriesWrite)
             ]
         )
-
-
-class GeneratorApplyList(GeneratorWriteList): ...
 
 
 def _create_generator_filter(

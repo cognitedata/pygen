@@ -149,15 +149,6 @@ class DataSheet(DomainModel):
         """Convert this read version of data sheet to the writing version."""
         return DataSheetWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> DataSheetWrite:
-        """Convert this read version of data sheet to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class DataSheetWrite(DomainModelWrite):
     """This represents the writing version of data sheet.
@@ -192,19 +183,6 @@ class DataSheetWrite(DomainModelWrite):
     name: Optional[str] = None
 
 
-class DataSheetApply(DataSheetWrite):
-    def __new__(cls, *args, **kwargs) -> DataSheetApply:
-        warnings.warn(
-            "DataSheetApply is deprecated and will be removed in v1.0. "
-            "Use DataSheetWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "DataSheet.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class DataSheetList(DomainModelList[DataSheet]):
     """List of data sheets in the read version."""
 
@@ -214,23 +192,11 @@ class DataSheetList(DomainModelList[DataSheet]):
         """Convert these read versions of data sheet to the writing versions."""
         return DataSheetWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> DataSheetWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class DataSheetWriteList(DomainModelWriteList[DataSheetWrite]):
     """List of data sheets in the writing version."""
 
     _INSTANCE = DataSheetWrite
-
-
-class DataSheetApplyList(DataSheetWriteList): ...
 
 
 def _create_data_sheet_filter(

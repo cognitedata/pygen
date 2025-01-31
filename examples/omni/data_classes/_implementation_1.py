@@ -131,15 +131,6 @@ class Implementation1(SubInterface):
         """Convert this read version of implementation 1 to the writing version."""
         return Implementation1Write.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Implementation1Write:
-        """Convert this read version of implementation 1 to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Implementation1Write(SubInterfaceWrite):
     """This represents the writing version of implementation 1.
@@ -172,19 +163,6 @@ class Implementation1Write(SubInterfaceWrite):
     value_2: str = Field(alias="value2")
 
 
-class Implementation1Apply(Implementation1Write):
-    def __new__(cls, *args, **kwargs) -> Implementation1Apply:
-        warnings.warn(
-            "Implementation1Apply is deprecated and will be removed in v1.0. "
-            "Use Implementation1Write instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Implementation1.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Implementation1List(DomainModelList[Implementation1]):
     """List of implementation 1 in the read version."""
 
@@ -194,23 +172,11 @@ class Implementation1List(DomainModelList[Implementation1]):
         """Convert these read versions of implementation 1 to the writing versions."""
         return Implementation1WriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> Implementation1WriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Implementation1WriteList(DomainModelWriteList[Implementation1Write]):
     """List of implementation 1 in the writing version."""
 
     _INSTANCE = Implementation1Write
-
-
-class Implementation1ApplyList(Implementation1WriteList): ...
 
 
 def _create_implementation_1_filter(

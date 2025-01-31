@@ -271,15 +271,6 @@ class CogniteActivity(CogniteDescribableNode, CogniteSourceableNode, CogniteSche
         """Convert this read version of Cognite activity to the writing version."""
         return CogniteActivityWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteActivityWrite:
-        """Convert this read version of Cognite activity to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteActivityWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite, CogniteSchedulableWrite):
     """This represents the writing version of Cognite activity.
@@ -360,19 +351,6 @@ class CogniteActivityWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWri
         return value
 
 
-class CogniteActivityApply(CogniteActivityWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteActivityApply:
-        warnings.warn(
-            "CogniteActivityApply is deprecated and will be removed in v1.0. "
-            "Use CogniteActivityWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteActivity.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteActivityList(DomainModelList[CogniteActivity]):
     """List of Cognite activities in the read version."""
 
@@ -381,15 +359,6 @@ class CogniteActivityList(DomainModelList[CogniteActivity]):
     def as_write(self) -> CogniteActivityWriteList:
         """Convert these read versions of Cognite activity to the writing versions."""
         return CogniteActivityWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CogniteActivityWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def assets(self) -> CogniteAssetList:
@@ -465,9 +434,6 @@ class CogniteActivityWriteList(DomainModelWriteList[CogniteActivityWrite]):
                 if isinstance(item, CogniteTimeSeriesWrite)
             ]
         )
-
-
-class CogniteActivityApplyList(CogniteActivityWriteList): ...
 
 
 def _create_cognite_activity_filter(

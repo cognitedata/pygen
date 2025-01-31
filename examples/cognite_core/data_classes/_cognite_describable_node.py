@@ -130,15 +130,6 @@ class CogniteDescribableNode(DomainModel):
         """Convert this read version of Cognite describable node to the writing version."""
         return CogniteDescribableNodeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteDescribableNodeWrite:
-        """Convert this read version of Cognite describable node to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteDescribableNodeWrite(DomainModelWrite):
     """This represents the writing version of Cognite describable node.
@@ -172,19 +163,6 @@ class CogniteDescribableNodeWrite(DomainModelWrite):
     tags: Optional[list[str]] = None
 
 
-class CogniteDescribableNodeApply(CogniteDescribableNodeWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteDescribableNodeApply:
-        warnings.warn(
-            "CogniteDescribableNodeApply is deprecated and will be removed in v1.0. "
-            "Use CogniteDescribableNodeWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteDescribableNode.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteDescribableNodeList(DomainModelList[CogniteDescribableNode]):
     """List of Cognite describable nodes in the read version."""
 
@@ -194,23 +172,11 @@ class CogniteDescribableNodeList(DomainModelList[CogniteDescribableNode]):
         """Convert these read versions of Cognite describable node to the writing versions."""
         return CogniteDescribableNodeWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> CogniteDescribableNodeWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteDescribableNodeWriteList(DomainModelWriteList[CogniteDescribableNodeWrite]):
     """List of Cognite describable nodes in the writing version."""
 
     _INSTANCE = CogniteDescribableNodeWrite
-
-
-class CogniteDescribableNodeApplyList(CogniteDescribableNodeWriteList): ...
 
 
 def _create_cognite_describable_node_filter(

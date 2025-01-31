@@ -46,7 +46,6 @@ from omni.data_classes import (
     ConnectionItemF,
 )
 from omni._api.connection_item_g_inwards_multi_property import ConnectionItemGInwardsMultiPropertyAPI
-from omni._api.connection_item_g_query import ConnectionItemGQueryAPI
 
 
 class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, ConnectionItemGList, ConnectionItemGWriteList]):
@@ -60,126 +59,6 @@ class ConnectionItemGAPI(NodeAPI[ConnectionItemG, ConnectionItemGWrite, Connecti
         super().__init__(client=client)
 
         self.inwards_multi_property_edge = ConnectionItemGInwardsMultiPropertyAPI(client)
-
-    def __call__(
-        self,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> ConnectionItemGQueryAPI[ConnectionItemG, ConnectionItemGList]:
-        """Query starting at connection item gs.
-
-        Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of connection item gs to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for connection item gs.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_connection_item_g_filter(
-            self._view_id,
-            name,
-            name_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return ConnectionItemGQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
-
-    def apply(
-        self,
-        connection_item_g: ConnectionItemGWrite | Sequence[ConnectionItemGWrite],
-        replace: bool = False,
-        write_none: bool = False,
-    ) -> ResourcesWriteResult:
-        """Add or update (upsert) connection item gs.
-
-        Args:
-            connection_item_g: Connection item g or
-                sequence of connection item gs to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and
-                existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)?
-                Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None.
-                However, if you want to set properties to None,
-                you can set this parameter to True. Note this only applies to properties that are nullable.
-        Returns:
-            Created instance(s), i.e., nodes, edges, and time series.
-
-        Examples:
-
-            Create a new connection_item_g:
-
-                >>> from omni import OmniClient
-                >>> from omni.data_classes import ConnectionItemGWrite
-                >>> client = OmniClient()
-                >>> connection_item_g = ConnectionItemGWrite(
-                ...     external_id="my_connection_item_g", ...
-                ... )
-                >>> result = client.connection_item_g.apply(connection_item_g)
-
-        """
-        warnings.warn(
-            "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .upsert method on the client instead. This means instead of "
-            "`my_client.connection_item_g.apply(my_items)` please use `my_client.upsert(my_items)`."
-            "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient."
-            "In addition, .upsert method is more descriptive of what the method does.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._apply(connection_item_g, replace, write_none)
-
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
-        """Delete one or more connection item g.
-
-        Args:
-            external_id: External id of the connection item g to delete.
-            space: The space where all the connection item g are located.
-
-        Returns:
-            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
-
-        Examples:
-
-            Delete connection_item_g by id:
-
-                >>> from omni import OmniClient
-                >>> client = OmniClient()
-                >>> client.connection_item_g.delete("my_connection_item_g")
-        """
-        warnings.warn(
-            "The .delete method is deprecated and will be removed in v1.0. "
-            "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.connection_item_g.delete(my_ids)` please use `my_client.delete(my_ids)`."
-            "The motivation is that all delete methods are the same, and having one delete method per API "
-            " class encourages users to delete items in small batches, which is inefficient.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._delete(external_id, space)
 
     @overload
     def retrieve(

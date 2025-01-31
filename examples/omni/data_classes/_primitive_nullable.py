@@ -164,15 +164,6 @@ class PrimitiveNullable(DomainModel):
         """Convert this read version of primitive nullable to the writing version."""
         return PrimitiveNullableWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> PrimitiveNullableWrite:
-        """Convert this read version of primitive nullable to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class PrimitiveNullableWrite(DomainModelWrite):
     """This represents the writing version of primitive nullable.
@@ -221,19 +212,6 @@ class PrimitiveNullableWrite(DomainModelWrite):
     timestamp: Optional[datetime.datetime] = None
 
 
-class PrimitiveNullableApply(PrimitiveNullableWrite):
-    def __new__(cls, *args, **kwargs) -> PrimitiveNullableApply:
-        warnings.warn(
-            "PrimitiveNullableApply is deprecated and will be removed in v1.0. "
-            "Use PrimitiveNullableWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "PrimitiveNullable.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class PrimitiveNullableList(DomainModelList[PrimitiveNullable]):
     """List of primitive nullables in the read version."""
 
@@ -243,23 +221,11 @@ class PrimitiveNullableList(DomainModelList[PrimitiveNullable]):
         """Convert these read versions of primitive nullable to the writing versions."""
         return PrimitiveNullableWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> PrimitiveNullableWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class PrimitiveNullableWriteList(DomainModelWriteList[PrimitiveNullableWrite]):
     """List of primitive nullables in the writing version."""
 
     _INSTANCE = PrimitiveNullableWrite
-
-
-class PrimitiveNullableApplyList(PrimitiveNullableWriteList): ...
 
 
 def _create_primitive_nullable_filter(

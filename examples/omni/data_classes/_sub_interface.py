@@ -120,15 +120,6 @@ class SubInterface(MainInterface):
         """Convert this read version of sub interface to the writing version."""
         return SubInterfaceWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> SubInterfaceWrite:
-        """Convert this read version of sub interface to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class SubInterfaceWrite(MainInterfaceWrite):
     """This represents the writing version of sub interface.
@@ -154,19 +145,6 @@ class SubInterfaceWrite(MainInterfaceWrite):
     sub_value: Optional[str] = Field(None, alias="subValue")
 
 
-class SubInterfaceApply(SubInterfaceWrite):
-    def __new__(cls, *args, **kwargs) -> SubInterfaceApply:
-        warnings.warn(
-            "SubInterfaceApply is deprecated and will be removed in v1.0. "
-            "Use SubInterfaceWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "SubInterface.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class SubInterfaceList(DomainModelList[SubInterface]):
     """List of sub interfaces in the read version."""
 
@@ -176,23 +154,11 @@ class SubInterfaceList(DomainModelList[SubInterface]):
         """Convert these read versions of sub interface to the writing versions."""
         return SubInterfaceWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> SubInterfaceWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class SubInterfaceWriteList(DomainModelWriteList[SubInterfaceWrite]):
     """List of sub interfaces in the writing version."""
 
     _INSTANCE = SubInterfaceWrite
-
-
-class SubInterfaceApplyList(SubInterfaceWriteList): ...
 
 
 def _create_sub_interface_filter(

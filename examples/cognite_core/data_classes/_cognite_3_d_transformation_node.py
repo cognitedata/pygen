@@ -167,15 +167,6 @@ class Cognite3DTransformationNode(DomainModel):
         """Convert this read version of Cognite 3D transformation node to the writing version."""
         return Cognite3DTransformationNodeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Cognite3DTransformationNodeWrite:
-        """Convert this read version of Cognite 3D transformation node to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite3DTransformationNodeWrite(DomainModelWrite):
     """This represents the writing version of Cognite 3D transformation node.
@@ -224,19 +215,6 @@ class Cognite3DTransformationNodeWrite(DomainModelWrite):
     translation_z: Optional[float] = Field(None, alias="translationZ")
 
 
-class Cognite3DTransformationNodeApply(Cognite3DTransformationNodeWrite):
-    def __new__(cls, *args, **kwargs) -> Cognite3DTransformationNodeApply:
-        warnings.warn(
-            "Cognite3DTransformationNodeApply is deprecated and will be removed in v1.0. "
-            "Use Cognite3DTransformationNodeWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Cognite3DTransformationNode.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Cognite3DTransformationNodeList(DomainModelList[Cognite3DTransformationNode]):
     """List of Cognite 3D transformation nodes in the read version."""
 
@@ -246,23 +224,11 @@ class Cognite3DTransformationNodeList(DomainModelList[Cognite3DTransformationNod
         """Convert these read versions of Cognite 3D transformation node to the writing versions."""
         return Cognite3DTransformationNodeWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> Cognite3DTransformationNodeWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite3DTransformationNodeWriteList(DomainModelWriteList[Cognite3DTransformationNodeWrite]):
     """List of Cognite 3D transformation nodes in the writing version."""
 
     _INSTANCE = Cognite3DTransformationNodeWrite
-
-
-class Cognite3DTransformationNodeApplyList(Cognite3DTransformationNodeWriteList): ...
 
 
 def _create_cognite_3_d_transformation_node_filter(

@@ -156,15 +156,6 @@ class CogniteCubeMap(DomainModel):
         """Convert this read version of Cognite cube map to the writing version."""
         return CogniteCubeMapWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteCubeMapWrite:
-        """Convert this read version of Cognite cube map to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteCubeMapWrite(DomainModelWrite):
     """This represents the writing version of Cognite cube map.
@@ -222,19 +213,6 @@ class CogniteCubeMapWrite(DomainModelWrite):
         return value
 
 
-class CogniteCubeMapApply(CogniteCubeMapWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteCubeMapApply:
-        warnings.warn(
-            "CogniteCubeMapApply is deprecated and will be removed in v1.0. "
-            "Use CogniteCubeMapWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteCubeMap.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteCubeMapList(DomainModelList[CogniteCubeMap]):
     """List of Cognite cube maps in the read version."""
 
@@ -243,15 +221,6 @@ class CogniteCubeMapList(DomainModelList[CogniteCubeMap]):
     def as_write(self) -> CogniteCubeMapWriteList:
         """Convert these read versions of Cognite cube map to the writing versions."""
         return CogniteCubeMapWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CogniteCubeMapWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def back(self) -> CogniteFileList:
@@ -330,9 +299,6 @@ class CogniteCubeMapWriteList(DomainModelWriteList[CogniteCubeMapWrite]):
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
 
         return CogniteFileWriteList([item.top for item in self.data if isinstance(item.top, CogniteFileWrite)])
-
-
-class CogniteCubeMapApplyList(CogniteCubeMapWriteList): ...
 
 
 def _create_cognite_cube_map_filter(

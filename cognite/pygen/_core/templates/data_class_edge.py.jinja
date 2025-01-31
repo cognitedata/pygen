@@ -144,15 +144,6 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}.model_validate(as_write_args(self))
 
-    def as_apply(self) -> {{ data_class.write_name }}:
-        """Convert this read version of {{ data_class.doc_name }} to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {% raw %}{{% endraw %}{% for end_class, classes in grouped_edge_classes.items() %}
     {{ end_class }}: {% raw %}{{% endraw %}{{ ", ".join(classes) }}{% raw %}}{% endraw %},{% endfor %}
@@ -212,18 +203,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
     {% endfor %}
 
 
-class {{ data_class.read_name }}Apply({{ data_class.write_name }}):
-    def __new__(cls, *args, **kwargs) -> {{ data_class.read_name }}Apply:
-        warnings.warn(
-            "{{ data_class.read_name }}Apply is deprecated and will be removed in v1.0. "
-            "Use {{ data_class.write_name }} instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "{{ data_class.read_name }}.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
 {% endif %}
 class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name }}]):
     """List of {{ data_class.doc_list_name }} in the reading version."""
@@ -234,14 +213,6 @@ class {{ data_class.read_list_name }}(DomainRelationList[{{ data_class.read_name
         """Convert this read version of {{ data_class.doc_name }} list to the writing version."""
         return {{ data_class.write_list_name }}([edge.as_write() for edge in self])
 
-    def as_apply(self) -> {{ data_class.write_list_name }}:
-        """Convert these read versions of {{ data_class.doc_name }} list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
 
 class {{ data_class.write_list_name }}(DomainRelationWriteList[{{ data_class.write_name }}]):
@@ -249,8 +220,6 @@ class {{ data_class.write_list_name }}(DomainRelationWriteList[{{ data_class.wri
 
     _INSTANCE = {{ data_class.write_name }}
 
-
-class {{ data_class.read_name }}ApplyList({{ data_class.write_list_name }}): ...
 
 {% endif %}
 def {{ data_class.filter_name }}(

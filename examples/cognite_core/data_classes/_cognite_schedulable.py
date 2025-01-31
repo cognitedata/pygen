@@ -134,15 +134,6 @@ class CogniteSchedulable(DomainModel):
         """Convert this read version of Cognite schedulable to the writing version."""
         return CogniteSchedulableWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteSchedulableWrite:
-        """Convert this read version of Cognite schedulable to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteSchedulableWrite(DomainModelWrite):
     """This represents the writing version of Cognite schedulable.
@@ -176,19 +167,6 @@ class CogniteSchedulableWrite(DomainModelWrite):
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
 
-class CogniteSchedulableApply(CogniteSchedulableWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteSchedulableApply:
-        warnings.warn(
-            "CogniteSchedulableApply is deprecated and will be removed in v1.0. "
-            "Use CogniteSchedulableWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteSchedulable.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteSchedulableList(DomainModelList[CogniteSchedulable]):
     """List of Cognite schedulables in the read version."""
 
@@ -198,23 +176,11 @@ class CogniteSchedulableList(DomainModelList[CogniteSchedulable]):
         """Convert these read versions of Cognite schedulable to the writing versions."""
         return CogniteSchedulableWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> CogniteSchedulableWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteSchedulableWriteList(DomainModelWriteList[CogniteSchedulableWrite]):
     """List of Cognite schedulables in the writing version."""
 
     _INSTANCE = CogniteSchedulableWrite
-
-
-class CogniteSchedulableApplyList(CogniteSchedulableWriteList): ...
 
 
 def _create_cognite_schedulable_filter(

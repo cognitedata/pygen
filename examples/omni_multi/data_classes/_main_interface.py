@@ -115,15 +115,6 @@ class MainInterface(DomainModel):
         """Convert this read version of main interface to the writing version."""
         return MainInterfaceWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> MainInterfaceWrite:
-        """Convert this read version of main interface to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class MainInterfaceWrite(DomainModelWrite):
     """This represents the writing version of main interface.
@@ -146,19 +137,6 @@ class MainInterfaceWrite(DomainModelWrite):
     main_value: Optional[str] = Field(None, alias="mainValue")
 
 
-class MainInterfaceApply(MainInterfaceWrite):
-    def __new__(cls, *args, **kwargs) -> MainInterfaceApply:
-        warnings.warn(
-            "MainInterfaceApply is deprecated and will be removed in v1.0. "
-            "Use MainInterfaceWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "MainInterface.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class MainInterfaceList(DomainModelList[MainInterface]):
     """List of main interfaces in the read version."""
 
@@ -168,23 +146,11 @@ class MainInterfaceList(DomainModelList[MainInterface]):
         """Convert these read versions of main interface to the writing versions."""
         return MainInterfaceWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> MainInterfaceWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class MainInterfaceWriteList(DomainModelWriteList[MainInterfaceWrite]):
     """List of main interfaces in the writing version."""
 
     _INSTANCE = MainInterfaceWrite
-
-
-class MainInterfaceApplyList(MainInterfaceWriteList): ...
 
 
 def _create_main_interface_filter(

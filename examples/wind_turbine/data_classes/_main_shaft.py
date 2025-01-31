@@ -161,15 +161,6 @@ class MainShaft(DomainModel):
         """Convert this read version of main shaft to the writing version."""
         return MainShaftWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> MainShaftWrite:
-        """Convert this read version of main shaft to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class MainShaftWrite(DomainModelWrite):
     """This represents the writing version of main shaft.
@@ -225,19 +216,6 @@ class MainShaftWrite(DomainModelWrite):
         return value
 
 
-class MainShaftApply(MainShaftWrite):
-    def __new__(cls, *args, **kwargs) -> MainShaftApply:
-        warnings.warn(
-            "MainShaftApply is deprecated and will be removed in v1.0. "
-            "Use MainShaftWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "MainShaft.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class MainShaftList(DomainModelList[MainShaft]):
     """List of main shafts in the read version."""
 
@@ -246,15 +224,6 @@ class MainShaftList(DomainModelList[MainShaft]):
     def as_write(self) -> MainShaftWriteList:
         """Convert these read versions of main shaft to the writing versions."""
         return MainShaftWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> MainShaftWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def bending_x(self) -> SensorTimeSeriesList:
@@ -361,9 +330,6 @@ class MainShaftWriteList(DomainModelWriteList[MainShaftWrite]):
         return SensorTimeSeriesWriteList(
             [item.torque for item in self.data if isinstance(item.torque, SensorTimeSeriesWrite)]
         )
-
-
-class MainShaftApplyList(MainShaftWriteList): ...
 
 
 def _create_main_shaft_filter(

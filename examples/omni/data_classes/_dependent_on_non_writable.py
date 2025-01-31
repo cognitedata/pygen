@@ -148,15 +148,6 @@ class DependentOnNonWritable(DomainModel):
         """Convert this read version of dependent on non writable to the writing version."""
         return DependentOnNonWritableWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> DependentOnNonWritableWrite:
-        """Convert this read version of dependent on non writable to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class DependentOnNonWritableWrite(DomainModelWrite):
     """This represents the writing version of dependent on non writable.
@@ -196,19 +187,6 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         return value
 
 
-class DependentOnNonWritableApply(DependentOnNonWritableWrite):
-    def __new__(cls, *args, **kwargs) -> DependentOnNonWritableApply:
-        warnings.warn(
-            "DependentOnNonWritableApply is deprecated and will be removed in v1.0. "
-            "Use DependentOnNonWritableWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "DependentOnNonWritable.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class DependentOnNonWritableList(DomainModelList[DependentOnNonWritable]):
     """List of dependent on non writables in the read version."""
 
@@ -217,15 +195,6 @@ class DependentOnNonWritableList(DomainModelList[DependentOnNonWritable]):
     def as_write(self) -> DependentOnNonWritableWriteList:
         """Convert these read versions of dependent on non writable to the writing versions."""
         return DependentOnNonWritableWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> DependentOnNonWritableWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def to_non_writable(self) -> Implementation1NonWriteableList:
@@ -245,9 +214,6 @@ class DependentOnNonWritableWriteList(DomainModelWriteList[DependentOnNonWritabl
     """List of dependent on non writables in the writing version."""
 
     _INSTANCE = DependentOnNonWritableWrite
-
-
-class DependentOnNonWritableApplyList(DependentOnNonWritableWriteList): ...
 
 
 def _create_dependent_on_non_writable_filter(

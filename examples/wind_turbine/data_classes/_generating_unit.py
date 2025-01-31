@@ -126,15 +126,6 @@ class GeneratingUnit(DomainModel):
         """Convert this read version of generating unit to the writing version."""
         return GeneratingUnitWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> GeneratingUnitWrite:
-        """Convert this read version of generating unit to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class GeneratingUnitWrite(DomainModelWrite):
     """This represents the writing version of generating unit.
@@ -165,19 +156,6 @@ class GeneratingUnitWrite(DomainModelWrite):
     name: Optional[str] = None
 
 
-class GeneratingUnitApply(GeneratingUnitWrite):
-    def __new__(cls, *args, **kwargs) -> GeneratingUnitApply:
-        warnings.warn(
-            "GeneratingUnitApply is deprecated and will be removed in v1.0. "
-            "Use GeneratingUnitWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "GeneratingUnit.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class GeneratingUnitList(DomainModelList[GeneratingUnit]):
     """List of generating units in the read version."""
 
@@ -187,23 +165,11 @@ class GeneratingUnitList(DomainModelList[GeneratingUnit]):
         """Convert these read versions of generating unit to the writing versions."""
         return GeneratingUnitWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> GeneratingUnitWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class GeneratingUnitWriteList(DomainModelWriteList[GeneratingUnitWrite]):
     """List of generating units in the writing version."""
 
     _INSTANCE = GeneratingUnitWrite
-
-
-class GeneratingUnitApplyList(GeneratingUnitWriteList): ...
 
 
 def _create_generating_unit_filter(

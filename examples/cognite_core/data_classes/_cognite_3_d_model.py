@@ -159,15 +159,6 @@ class Cognite3DModel(CogniteDescribableNode):
         """Convert this read version of Cognite 3D model to the writing version."""
         return Cognite3DModelWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> Cognite3DModelWrite:
-        """Convert this read version of Cognite 3D model to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class Cognite3DModelWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite 3D model.
@@ -213,19 +204,6 @@ class Cognite3DModelWrite(CogniteDescribableNodeWrite):
         return value
 
 
-class Cognite3DModelApply(Cognite3DModelWrite):
-    def __new__(cls, *args, **kwargs) -> Cognite3DModelApply:
-        warnings.warn(
-            "Cognite3DModelApply is deprecated and will be removed in v1.0. "
-            "Use Cognite3DModelWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Cognite3DModel.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class Cognite3DModelList(DomainModelList[Cognite3DModel]):
     """List of Cognite 3D models in the read version."""
 
@@ -234,15 +212,6 @@ class Cognite3DModelList(DomainModelList[Cognite3DModel]):
     def as_write(self) -> Cognite3DModelWriteList:
         """Convert these read versions of Cognite 3D model to the writing versions."""
         return Cognite3DModelWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> Cognite3DModelWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def thumbnail(self) -> CogniteFileList:
@@ -263,9 +232,6 @@ class Cognite3DModelWriteList(DomainModelWriteList[Cognite3DModelWrite]):
         return CogniteFileWriteList(
             [item.thumbnail for item in self.data if isinstance(item.thumbnail, CogniteFileWrite)]
         )
-
-
-class Cognite3DModelApplyList(Cognite3DModelWriteList): ...
 
 
 def _create_cognite_3_d_model_filter(

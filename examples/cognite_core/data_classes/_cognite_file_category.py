@@ -146,15 +146,6 @@ class CogniteFileCategory(CogniteDescribableNode):
         """Convert this read version of Cognite file category to the writing version."""
         return CogniteFileCategoryWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteFileCategoryWrite:
-        """Convert this read version of Cognite file category to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteFileCategoryWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite file category.
@@ -192,19 +183,6 @@ class CogniteFileCategoryWrite(CogniteDescribableNodeWrite):
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
 
-class CogniteFileCategoryApply(CogniteFileCategoryWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteFileCategoryApply:
-        warnings.warn(
-            "CogniteFileCategoryApply is deprecated and will be removed in v1.0. "
-            "Use CogniteFileCategoryWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteFileCategory.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteFileCategoryList(DomainModelList[CogniteFileCategory]):
     """List of Cognite file categories in the read version."""
 
@@ -214,23 +192,11 @@ class CogniteFileCategoryList(DomainModelList[CogniteFileCategory]):
         """Convert these read versions of Cognite file category to the writing versions."""
         return CogniteFileCategoryWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> CogniteFileCategoryWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteFileCategoryWriteList(DomainModelWriteList[CogniteFileCategoryWrite]):
     """List of Cognite file categories in the writing version."""
 
     _INSTANCE = CogniteFileCategoryWrite
-
-
-class CogniteFileCategoryApplyList(CogniteFileCategoryWriteList): ...
 
 
 def _create_cognite_file_category_filter(

@@ -24,7 +24,6 @@ from {{ top_level_package }}.data_classes._core import (
 {{ graphql_name }}.model_rebuild()
 {% if has_write_class %}
 {{ write_name }}.model_rebuild()
-{{ read_name }}Apply.model_rebuild()
 {% endif %}
 {% endfor %}
 
@@ -52,12 +51,10 @@ __all__ = [
     "{{ class_.graphql_name }}",
     {% if class_.is_writable or class_.is_interface %}
     "{{ class_.write_name }}",
-    "{{ class_.read_name }}Apply",
     {% endif %}
     "{{ class_.read_list_name }}",
     {% if class_.is_writable or class_.is_interface %}
     "{{ class_.write_list_name }}",
-    "{{ class_.read_name }}ApplyList",
     {% endif %}
     "{{ class_.field_names }}",
     "{{ class_.text_field_names }}",

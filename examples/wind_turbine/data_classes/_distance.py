@@ -112,15 +112,6 @@ class Distance(DomainRelation):
         """Convert this read version of distance to the writing version."""
         return DistanceWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> DistanceWrite:
-        """Convert this read version of distance to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
     MetmastWrite: {WindTurbineWrite},
@@ -166,19 +157,6 @@ class DistanceWrite(DomainRelationWrite):
     distance: Optional[float] = None
 
 
-class DistanceApply(DistanceWrite):
-    def __new__(cls, *args, **kwargs) -> DistanceApply:
-        warnings.warn(
-            "DistanceApply is deprecated and will be removed in v1.0. "
-            "Use DistanceWrite instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Distance.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class DistanceList(DomainRelationList[Distance]):
     """List of distances in the reading version."""
 
@@ -188,23 +166,11 @@ class DistanceList(DomainRelationList[Distance]):
         """Convert this read version of distance list to the writing version."""
         return DistanceWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> DistanceWriteList:
-        """Convert these read versions of distance list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class DistanceWriteList(DomainRelationWriteList[DistanceWrite]):
     """List of distances in the writing version."""
 
     _INSTANCE = DistanceWrite
-
-
-class DistanceApplyList(DistanceWriteList): ...
 
 
 def _create_distance_filter(

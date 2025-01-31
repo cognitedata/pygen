@@ -42,7 +42,6 @@ from omni.data_classes import (
     Implementation1NonWriteable,
 )
 from omni._api.dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
-from omni._api.dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 
 
 class DependentOnNonWritableAPI(
@@ -60,126 +59,6 @@ class DependentOnNonWritableAPI(
         super().__init__(client=client)
 
         self.to_non_writable_edge = DependentOnNonWritableToNonWritableAPI(client)
-
-    def __call__(
-        self,
-        a_value: str | list[str] | None = None,
-        a_value_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> DependentOnNonWritableQueryAPI[DependentOnNonWritable, DependentOnNonWritableList]:
-        """Query starting at dependent on non writables.
-
-        Args:
-            a_value: The a value to filter on.
-            a_value_prefix: The prefix of the a value to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of dependent on non writables to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for dependent on non writables.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_dependent_on_non_writable_filter(
-            self._view_id,
-            a_value,
-            a_value_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return DependentOnNonWritableQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
-
-    def apply(
-        self,
-        dependent_on_non_writable: DependentOnNonWritableWrite | Sequence[DependentOnNonWritableWrite],
-        replace: bool = False,
-        write_none: bool = False,
-    ) -> ResourcesWriteResult:
-        """Add or update (upsert) dependent on non writables.
-
-        Args:
-            dependent_on_non_writable: Dependent on non writable or
-                sequence of dependent on non writables to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and
-                existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)?
-                Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None.
-                However, if you want to set properties to None,
-                you can set this parameter to True. Note this only applies to properties that are nullable.
-        Returns:
-            Created instance(s), i.e., nodes, edges, and time series.
-
-        Examples:
-
-            Create a new dependent_on_non_writable:
-
-                >>> from omni import OmniClient
-                >>> from omni.data_classes import DependentOnNonWritableWrite
-                >>> client = OmniClient()
-                >>> dependent_on_non_writable = DependentOnNonWritableWrite(
-                ...     external_id="my_dependent_on_non_writable", ...
-                ... )
-                >>> result = client.dependent_on_non_writable.apply(dependent_on_non_writable)
-
-        """
-        warnings.warn(
-            "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .upsert method on the client instead. This means instead of "
-            "`my_client.dependent_on_non_writable.apply(my_items)` please use `my_client.upsert(my_items)`."
-            "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient."
-            "In addition, .upsert method is more descriptive of what the method does.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._apply(dependent_on_non_writable, replace, write_none)
-
-    def delete(
-        self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE
-    ) -> dm.InstancesDeleteResult:
-        """Delete one or more dependent on non writable.
-
-        Args:
-            external_id: External id of the dependent on non writable to delete.
-            space: The space where all the dependent on non writable are located.
-
-        Returns:
-            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
-
-        Examples:
-
-            Delete dependent_on_non_writable by id:
-
-                >>> from omni import OmniClient
-                >>> client = OmniClient()
-                >>> client.dependent_on_non_writable.delete("my_dependent_on_non_writable")
-        """
-        warnings.warn(
-            "The .delete method is deprecated and will be removed in v1.0. "
-            "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.dependent_on_non_writable.delete(my_ids)` please use `my_client.delete(my_ids)`."
-            "The motivation is that all delete methods are the same, and having one delete method per API "
-            " class encourages users to delete items in small batches, which is inefficient.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._delete(external_id, space)
 
     @overload
     def retrieve(

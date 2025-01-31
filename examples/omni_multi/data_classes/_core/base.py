@@ -333,18 +333,9 @@ class DomainModelWrite(DomainModelCore, extra="ignore", populate_by_name=True):
 
     def to_instances_write(
         self,
-        write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         return self._to_resources_write(set(), allow_version_increase)
-
-    def to_instances_apply(self, write_none: bool = False) -> ResourcesWrite:
-        warnings.warn(
-            "to_instances_apply is deprecated and will be removed in v1.0. Use to_instances_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.to_instances_write(write_none)
 
     def _to_resources_write(self, cache: set[tuple[str, str]], allow_version_increase: bool = False) -> ResourcesWrite:
         resources = ResourcesWrite()
@@ -490,7 +481,6 @@ class DomainModelWriteList(CoreList[T_DomainModelWrite]):
 
     def to_instances_write(
         self,
-        write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         cache: set[tuple[str, str]] = set()
@@ -499,14 +489,6 @@ class DomainModelWriteList(CoreList[T_DomainModelWrite]):
             result = node._to_resources_write(cache, allow_version_increase)
             domains.extend(result)
         return domains
-
-    def to_instances_apply(self, write_none: bool = False) -> ResourcesWrite:
-        warnings.warn(
-            "to_instances_apply is deprecated and will be removed in v1.0. Use to_instances_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.to_instances_write(write_none)
 
 
 T_DomainModelWriteList = TypeVar("T_DomainModelWriteList", bound=DomainModelWriteList, covariant=True)
@@ -671,7 +653,6 @@ class DomainRelationWrite(Core, extra="forbid"):
         start_node: DomainModelWrite | dm.NodeId,
         end_node: DomainModelWrite | dm.NodeId,
         edge_type: dm.DirectRelationReference,
-        write_none: bool = False,
         allow_version_increase: bool = False,
     ) -> ResourcesWrite:
         resources = ResourcesWrite()
@@ -801,7 +782,6 @@ def connection_resources(
                     start_node=model,  # type: ignore[arg-type]
                     end_node=item,  # type: ignore[arg-type]
                     edge_type=edge_type,
-                    write_none=False,
                     allow_version_increase=allow_version_increase,
                 )
             resources.extend(other_resources)
@@ -822,7 +802,6 @@ def connection_resources(
                     start_node=item,  # type: ignore[arg-type]
                     end_node=model,  # type: ignore[arg-type]
                     edge_type=edge_type,
-                    write_none=False,
                     allow_version_increase=allow_version_increase,
                 )
             resources.extend(other_resources)

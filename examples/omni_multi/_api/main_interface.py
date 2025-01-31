@@ -40,7 +40,6 @@ from omni_multi.data_classes import (
     MainInterfaceTextFields,
     SubInterface,
 )
-from omni_multi._api.main_interface_query import MainInterfaceQueryAPI
 
 
 class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceList, MainInterfaceWriteList]):
@@ -55,124 +54,6 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        main_value: str | list[str] | None = None,
-        main_value_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> MainInterfaceQueryAPI[MainInterface, MainInterfaceList]:
-        """Query starting at main interfaces.
-
-        Args:
-            main_value: The main value to filter on.
-            main_value_prefix: The prefix of the main value to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of main interfaces to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for main interfaces.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_main_interface_filter(
-            self._view_id,
-            main_value,
-            main_value_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return MainInterfaceQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
-
-    def apply(
-        self,
-        main_interface: MainInterfaceWrite | Sequence[MainInterfaceWrite],
-        replace: bool = False,
-        write_none: bool = False,
-    ) -> ResourcesWriteResult:
-        """Add or update (upsert) main interfaces.
-
-        Args:
-            main_interface: Main interface or
-                sequence of main interfaces to upsert.
-            replace (bool): How do we behave when a property value exists? Do we replace all matching and
-                existing values with the supplied values (true)?
-                Or should we merge in new values for properties together with the existing values (false)?
-                Note: This setting applies for all nodes or edges specified in the ingestion call.
-            write_none (bool): This method, will by default, skip properties that are set to None.
-                However, if you want to set properties to None,
-                you can set this parameter to True. Note this only applies to properties that are nullable.
-        Returns:
-            Created instance(s), i.e., nodes, edges, and time series.
-
-        Examples:
-
-            Create a new main_interface:
-
-                >>> from omni_multi import OmniMultiClient
-                >>> from omni_multi.data_classes import MainInterfaceWrite
-                >>> client = OmniMultiClient()
-                >>> main_interface = MainInterfaceWrite(
-                ...     external_id="my_main_interface", ...
-                ... )
-                >>> result = client.main_interface.apply(main_interface)
-
-        """
-        warnings.warn(
-            "The .apply method is deprecated and will be removed in v1.0. "
-            "Please use the .upsert method on the client instead. This means instead of "
-            "`my_client.main_interface.apply(my_items)` please use `my_client.upsert(my_items)`."
-            "The motivation is that all apply methods are the same, and having one apply method per API "
-            " class encourages users to create items in small batches, which is inefficient."
-            "In addition, .upsert method is more descriptive of what the method does.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._apply(main_interface, replace, write_none)
-
-    def delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
-        """Delete one or more main interface.
-
-        Args:
-            external_id: External id of the main interface to delete.
-            space: The space where all the main interface are located.
-
-        Returns:
-            The instance(s), i.e., nodes and edges which has been deleted. Empty list if nothing was deleted.
-
-        Examples:
-
-            Delete main_interface by id:
-
-                >>> from omni_multi import OmniMultiClient
-                >>> client = OmniMultiClient()
-                >>> client.main_interface.delete("my_main_interface")
-        """
-        warnings.warn(
-            "The .delete method is deprecated and will be removed in v1.0. "
-            "Please use the .delete method on the client instead. This means instead of "
-            "`my_client.main_interface.delete(my_ids)` please use `my_client.delete(my_ids)`."
-            "The motivation is that all delete methods are the same, and having one delete method per API "
-            " class encourages users to delete items in small batches, which is inefficient.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self._delete(external_id, space)
 
     @overload
     def retrieve(

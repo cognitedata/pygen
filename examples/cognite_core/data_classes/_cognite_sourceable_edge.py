@@ -161,15 +161,6 @@ class CogniteSourceableEdge(DomainRelation):
         """Convert this read version of Cognite sourceable edge to the writing version."""
         return CogniteSourceableEdgeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteSourceableEdgeWrite:
-        """Convert this read version of Cognite sourceable edge to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
@@ -235,19 +226,6 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
 
 
-class CogniteSourceableEdgeApply(CogniteSourceableEdgeWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteSourceableEdgeApply:
-        warnings.warn(
-            "CogniteSourceableEdgeApply is deprecated and will be removed in v1.0. "
-            "Use CogniteSourceableEdgeWrite instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteSourceableEdge.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteSourceableEdgeList(DomainRelationList[CogniteSourceableEdge]):
     """List of Cognite sourceable edges in the reading version."""
 
@@ -257,23 +235,11 @@ class CogniteSourceableEdgeList(DomainRelationList[CogniteSourceableEdge]):
         """Convert this read version of Cognite sourceable edge list to the writing version."""
         return CogniteSourceableEdgeWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> CogniteSourceableEdgeWriteList:
-        """Convert these read versions of Cognite sourceable edge list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteSourceableEdgeWriteList(DomainRelationWriteList[CogniteSourceableEdgeWrite]):
     """List of Cognite sourceable edges in the writing version."""
 
     _INSTANCE = CogniteSourceableEdgeWrite
-
-
-class CogniteSourceableEdgeApplyList(CogniteSourceableEdgeWriteList): ...
 
 
 def _create_cognite_sourceable_edge_filter(

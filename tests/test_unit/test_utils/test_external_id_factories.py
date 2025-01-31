@@ -7,16 +7,11 @@ from wind_turbine.data_classes import DomainModelWrite, RotorWrite, WindTurbineW
 
 from cognite.pygen.utils.external_id_factories import (
     ExternalIdFactory,
-    create_incremental_factory,
-    create_sha256_factory,
-    create_uuid_factory,
     domain_name,
     incremental_id,
     sha256,
-    sha256_factory,
     shorten_string,
     uuid,
-    uuid_factory,
 )
 
 
@@ -241,55 +236,6 @@ def test_create_external_id_factory_custom():
     assert callable(factory)
     assert actual_1 == "tes|foo"
     assert actual_2 == "tes|no_"
-
-
-@pytest.mark.skip("This depends on the order of the test executions. Needs rewrite.")
-@pytest.mark.parametrize(
-    "domain_cls, data, shorten, starts_with, expected_sha256",
-    [
-        (
-            RotorWrite,
-            {"name": "foo"},
-            False,
-            "rotor:",
-            "c6c9d7497c9a7d180d7c8a5f88b01a5030260cc4bc833467fcc45dcfb1a4a4d1",
-        ),
-        (WindTurbineWrite, {"name": "foobar"}, True, "windturbine:", "df323f4"),
-    ],
-)
-def test_external_id_factories_to_be_deprecated(
-    domain_cls: type, data: dict, shorten: bool, starts_with: str, expected_sha256: str
-):
-    uuid_factory_func = create_uuid_factory(shorten)
-    actual_uuid = uuid_factory_func(domain_cls, data)
-    actual_uuid_fac = uuid_factory(domain_cls, data)
-
-    sha256_factory_fun = create_sha256_factory(shorten)
-    actual_sha256 = sha256_factory_fun(domain_cls, data)
-    actual_sha256_fac = sha256_factory(domain_cls, data)
-
-    incremental_factory_func = create_incremental_factory()
-    actual_incremental = incremental_factory_func(domain_cls, data)
-
-    assert actual_uuid.startswith(starts_with)
-    assert actual_uuid_fac.startswith(starts_with)
-    assert actual_uuid != actual_uuid_fac
-
-    assert actual_sha256.startswith(starts_with)
-    assert actual_sha256_fac.startswith(starts_with)
-
-    assert actual_incremental.startswith(starts_with)
-
-    assert actual_sha256.removeprefix(starts_with) == expected_sha256
-    assert int(actual_incremental.removeprefix(starts_with))
-
-    if shorten:
-        assert len(actual_uuid.removeprefix(starts_with)) == 7
-        assert len(actual_sha256.removeprefix(starts_with)) == 7
-    else:
-        assert uuid_.UUID(actual_uuid.removeprefix(starts_with))
-        assert len(actual_sha256.removeprefix(starts_with)) == 64
-        assert actual_sha256 == actual_sha256_fac
 
 
 @pytest.mark.skip("There is something strange with the uuid_.UUID assert")

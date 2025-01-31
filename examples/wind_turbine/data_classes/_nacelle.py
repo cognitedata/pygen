@@ -238,15 +238,6 @@ class Nacelle(DomainModel):
         """Convert this read version of nacelle to the writing version."""
         return NacelleWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> NacelleWrite:
-        """Convert this read version of nacelle to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class NacelleWrite(DomainModelWrite):
     """This represents the writing version of nacelle.
@@ -330,19 +321,6 @@ class NacelleWrite(DomainModelWrite):
         return value
 
 
-class NacelleApply(NacelleWrite):
-    def __new__(cls, *args, **kwargs) -> NacelleApply:
-        warnings.warn(
-            "NacelleApply is deprecated and will be removed in v1.0. "
-            "Use NacelleWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "Nacelle.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class NacelleList(DomainModelList[Nacelle]):
     """List of nacelles in the read version."""
 
@@ -351,15 +329,6 @@ class NacelleList(DomainModelList[Nacelle]):
     def as_write(self) -> NacelleWriteList:
         """Convert these read versions of nacelle to the writing versions."""
         return NacelleWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> NacelleWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def acc_from_back_side_y(self) -> SensorTimeSeriesList:
@@ -514,9 +483,6 @@ class NacelleWriteList(DomainModelWriteList[NacelleWrite]):
         return SensorTimeSeriesWriteList(
             [item.yaw_error for item in self.data if isinstance(item.yaw_error, SensorTimeSeriesWrite)]
         )
-
-
-class NacelleApplyList(NacelleWriteList): ...
 
 
 def _create_nacelle_filter(

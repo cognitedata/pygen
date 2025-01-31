@@ -206,15 +206,6 @@ class SensorPosition(DomainModel):
         """Convert this read version of sensor position to the writing version."""
         return SensorPositionWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> SensorPositionWrite:
-        """Convert this read version of sensor position to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class SensorPositionWrite(DomainModelWrite):
     """This represents the writing version of sensor position.
@@ -306,19 +297,6 @@ class SensorPositionWrite(DomainModelWrite):
         return value
 
 
-class SensorPositionApply(SensorPositionWrite):
-    def __new__(cls, *args, **kwargs) -> SensorPositionApply:
-        warnings.warn(
-            "SensorPositionApply is deprecated and will be removed in v1.0. "
-            "Use SensorPositionWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "SensorPosition.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class SensorPositionList(DomainModelList[SensorPosition]):
     """List of sensor positions in the read version."""
 
@@ -327,15 +305,6 @@ class SensorPositionList(DomainModelList[SensorPosition]):
     def as_write(self) -> SensorPositionWriteList:
         """Convert these read versions of sensor position to the writing versions."""
         return SensorPositionWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> SensorPositionWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def blade(self) -> BladeList:
@@ -538,9 +507,6 @@ class SensorPositionWriteList(DomainModelWriteList[SensorPositionWrite]):
                 if isinstance(item.flapwise_bend_mom_offset_crosstalk_corrected, SensorTimeSeriesWrite)
             ]
         )
-
-
-class SensorPositionApplyList(SensorPositionWriteList): ...
 
 
 def _create_sensor_position_filter(

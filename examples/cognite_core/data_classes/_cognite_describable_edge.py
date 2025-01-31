@@ -121,15 +121,6 @@ class CogniteDescribableEdge(DomainRelation):
         """Convert this read version of Cognite describable edge to the writing version."""
         return CogniteDescribableEdgeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteDescribableEdgeWrite:
-        """Convert this read version of Cognite describable edge to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
@@ -182,19 +173,6 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
     tags: Optional[list[str]] = None
 
 
-class CogniteDescribableEdgeApply(CogniteDescribableEdgeWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteDescribableEdgeApply:
-        warnings.warn(
-            "CogniteDescribableEdgeApply is deprecated and will be removed in v1.0. "
-            "Use CogniteDescribableEdgeWrite instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteDescribableEdge.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteDescribableEdgeList(DomainRelationList[CogniteDescribableEdge]):
     """List of Cognite describable edges in the reading version."""
 
@@ -204,23 +182,11 @@ class CogniteDescribableEdgeList(DomainRelationList[CogniteDescribableEdge]):
         """Convert this read version of Cognite describable edge list to the writing version."""
         return CogniteDescribableEdgeWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> CogniteDescribableEdgeWriteList:
-        """Convert these read versions of Cognite describable edge list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteDescribableEdgeWriteList(DomainRelationWriteList[CogniteDescribableEdgeWrite]):
     """List of Cognite describable edges in the writing version."""
 
     _INSTANCE = CogniteDescribableEdgeWrite
-
-
-class CogniteDescribableEdgeApplyList(CogniteDescribableEdgeWriteList): ...
 
 
 def _create_cognite_describable_edge_filter(

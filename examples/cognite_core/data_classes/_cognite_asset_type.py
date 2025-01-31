@@ -164,15 +164,6 @@ class CogniteAssetType(CogniteDescribableNode):
         """Convert this read version of Cognite asset type to the writing version."""
         return CogniteAssetTypeWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteAssetTypeWrite:
-        """Convert this read version of Cognite asset type to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite asset type.
@@ -223,19 +214,6 @@ class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
         return value
 
 
-class CogniteAssetTypeApply(CogniteAssetTypeWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteAssetTypeApply:
-        warnings.warn(
-            "CogniteAssetTypeApply is deprecated and will be removed in v1.0. "
-            "Use CogniteAssetTypeWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteAssetType.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteAssetTypeList(DomainModelList[CogniteAssetType]):
     """List of Cognite asset types in the read version."""
 
@@ -244,15 +222,6 @@ class CogniteAssetTypeList(DomainModelList[CogniteAssetType]):
     def as_write(self) -> CogniteAssetTypeWriteList:
         """Convert these read versions of Cognite asset type to the writing versions."""
         return CogniteAssetTypeWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> CogniteAssetTypeWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def asset_class(self) -> CogniteAssetClassList:
@@ -275,9 +244,6 @@ class CogniteAssetTypeWriteList(DomainModelWriteList[CogniteAssetTypeWrite]):
         return CogniteAssetClassWriteList(
             [item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClassWrite)]
         )
-
-
-class CogniteAssetTypeApplyList(CogniteAssetTypeWriteList): ...
 
 
 def _create_cognite_asset_type_filter(

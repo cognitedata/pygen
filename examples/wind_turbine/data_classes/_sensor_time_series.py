@@ -157,15 +157,6 @@ class SensorTimeSeries(DomainModel):
         """Convert this read version of sensor time series to the writing version."""
         return SensorTimeSeriesWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> SensorTimeSeriesWrite:
-        """Convert this read version of sensor time series to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class SensorTimeSeriesWrite(DomainModelWrite):
     """This represents the writing version of sensor time series.
@@ -211,19 +202,6 @@ class SensorTimeSeriesWrite(DomainModelWrite):
     type_: Literal["numeric", "string"] = Field(alias="type")
 
 
-class SensorTimeSeriesApply(SensorTimeSeriesWrite):
-    def __new__(cls, *args, **kwargs) -> SensorTimeSeriesApply:
-        warnings.warn(
-            "SensorTimeSeriesApply is deprecated and will be removed in v1.0. "
-            "Use SensorTimeSeriesWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "SensorTimeSeries.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class SensorTimeSeriesList(DomainModelList[SensorTimeSeries]):
     """List of sensor time series in the read version."""
 
@@ -233,23 +211,11 @@ class SensorTimeSeriesList(DomainModelList[SensorTimeSeries]):
         """Convert these read versions of sensor time series to the writing versions."""
         return SensorTimeSeriesWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> SensorTimeSeriesWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class SensorTimeSeriesWriteList(DomainModelWriteList[SensorTimeSeriesWrite]):
     """List of sensor time series in the writing version."""
 
     _INSTANCE = SensorTimeSeriesWrite
-
-
-class SensorTimeSeriesApplyList(SensorTimeSeriesWriteList): ...
 
 
 def _create_sensor_time_series_filter(

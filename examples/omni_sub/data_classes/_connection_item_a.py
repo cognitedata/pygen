@@ -166,15 +166,6 @@ class ConnectionItemA(DomainModel):
         """Convert this read version of connection item a to the writing version."""
         return ConnectionItemAWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> ConnectionItemAWrite:
-        """Convert this read version of connection item a to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class ConnectionItemAWrite(DomainModelWrite):
     """This represents the writing version of connection item a.
@@ -228,19 +219,6 @@ class ConnectionItemAWrite(DomainModelWrite):
         return value
 
 
-class ConnectionItemAApply(ConnectionItemAWrite):
-    def __new__(cls, *args, **kwargs) -> ConnectionItemAApply:
-        warnings.warn(
-            "ConnectionItemAApply is deprecated and will be removed in v1.0. "
-            "Use ConnectionItemAWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "ConnectionItemA.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class ConnectionItemAList(DomainModelList[ConnectionItemA]):
     """List of connection item as in the read version."""
 
@@ -249,15 +227,6 @@ class ConnectionItemAList(DomainModelList[ConnectionItemA]):
     def as_write(self) -> ConnectionItemAWriteList:
         """Convert these read versions of connection item a to the writing versions."""
         return ConnectionItemAWriteList([node.as_write() for node in self.data])
-
-    def as_apply(self) -> ConnectionItemAWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     @property
     def other_direct(self) -> ConnectionItemCNodeList:
@@ -308,9 +277,6 @@ class ConnectionItemAWriteList(DomainModelWriteList[ConnectionItemAWrite]):
         return ConnectionItemAWriteList(
             [item.self_direct for item in self.data if isinstance(item.self_direct, ConnectionItemAWrite)]
         )
-
-
-class ConnectionItemAApplyList(ConnectionItemAWriteList): ...
 
 
 def _create_connection_item_a_filter(

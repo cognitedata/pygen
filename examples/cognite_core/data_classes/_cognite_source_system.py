@@ -139,15 +139,6 @@ class CogniteSourceSystem(CogniteDescribableNode):
         """Convert this read version of Cognite source system to the writing version."""
         return CogniteSourceSystemWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteSourceSystemWrite:
-        """Convert this read version of Cognite source system to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
     """This represents the writing version of Cognite source system.
@@ -182,19 +173,6 @@ class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
     version_: Optional[str] = Field(None, alias="version")
 
 
-class CogniteSourceSystemApply(CogniteSourceSystemWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteSourceSystemApply:
-        warnings.warn(
-            "CogniteSourceSystemApply is deprecated and will be removed in v1.0. "
-            "Use CogniteSourceSystemWrite instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteSourceSystem.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteSourceSystemList(DomainModelList[CogniteSourceSystem]):
     """List of Cognite source systems in the read version."""
 
@@ -204,23 +182,11 @@ class CogniteSourceSystemList(DomainModelList[CogniteSourceSystem]):
         """Convert these read versions of Cognite source system to the writing versions."""
         return CogniteSourceSystemWriteList([node.as_write() for node in self.data])
 
-    def as_apply(self) -> CogniteSourceSystemWriteList:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteSourceSystemWriteList(DomainModelWriteList[CogniteSourceSystemWrite]):
     """List of Cognite source systems in the writing version."""
 
     _INSTANCE = CogniteSourceSystemWrite
-
-
-class CogniteSourceSystemApplyList(CogniteSourceSystemWriteList): ...
 
 
 def _create_cognite_source_system_filter(

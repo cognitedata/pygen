@@ -425,11 +425,8 @@ class MultiAPIGenerator:
                 continue
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.client_name)
 
-            sdk[api_dir / f"{api.query_api.file_name}.py"] = api.generate_api_query_file(self.client_name)
-
             for file_name, file_content in itertools.chain(
                 api.generate_edge_api_files(self.client_name),
-                api.generate_timeseries_api_files(self.client_name),
             ):
                 sdk[api_dir / f"{file_name}.py"] = file_content
 
@@ -477,9 +474,7 @@ class MultiAPIGenerator:
             if api.used_for != "node":
                 continue
             api_classes.append(api.api_class)
-            api_classes.append(api.query_api)
             api_classes.extend(api.edge_apis or [])
-            api_classes.extend(api.timeseries_apis or [])
 
         api_classes = sorted(api_classes, key=lambda api: api.name)
 
@@ -778,7 +773,6 @@ class APIGenerator:
             view.as_id(), self.base_name, isinstance(self.data_class, EdgeDataClass), config.naming.api_class
         )
         self.query_api: QueryAPIClass = QueryAPIClass.create(self.data_class, self.base_name, config.naming.api_class)
-
         # These attributes require fields to be initialized
         self._list_method: FilterMethod | None = None
         self._timeseries_apis: list[TimeSeriesAPIClass] | None = None
@@ -949,49 +943,13 @@ class APIGenerator:
                 api_class=self.api_class,
                 data_class=self.data_class,
                 list_method=self.list_method,
-                timeseries_apis=self.timeseries_apis,
                 edge_apis=self.edge_apis,
-                query_api=self.query_api,
                 edge_data_classes=unique_edge_data_classes,
                 has_default_instance_space=self.has_default_instance_space,
                 # ft = field types
                 ft=fields,
                 dm=dm,
                 retrieve_connections_doc=retrieve_connections_doc,
-            )
-            + "\n"
-        )
-
-    def generate_api_query_file(self, client_name: str) -> str:
-        """Generate the API query file for the view.
-
-        This is the basis for the Python query functionality for the view.
-
-        Args:
-            client_name: The name of the client class.
-
-        Returns:
-            The generated API query file as a string.
-        """
-        query_api = self._env.get_template("api_class_query.py.jinja")
-
-        unique_edge_data_classes = _unique_data_classes([api.edge_class for api in self.edge_apis if api.edge_class])
-
-        return (
-            query_api.render(
-                client_name=client_name,
-                api_class=self.api_class,
-                data_class=self.data_class,
-                list_method=self.list_method,
-                query_api=self.query_api,
-                edge_apis=self.edge_apis,
-                has_edge_api_dependencies=self.has_edge_api_dependencies,
-                unique_edge_data_classes=unique_edge_data_classes,
-                # ft = field types
-                ft=fields,
-                dm=dm,
-                sorted=sorted,
-                top_level_package=self.top_level_package,
             )
             + "\n"
         )
@@ -1018,35 +976,6 @@ class APIGenerator:
                         edge_api=edge_api,
                         api_class=self.api_class,
                         has_default_instance_space=self.has_default_instance_space,
-                        # ft = field types
-                        ft=fields,
-                        dm=dm,
-                    )
-                    + "\n"
-                ),
-            )
-
-    def generate_timeseries_api_files(self, client_name: str) -> Iterator[tuple[str, str]]:
-        """Generate the timeseries API files for the view.
-
-        Args:
-            client_name: The name of the client class.
-
-        Returns:
-            Iterator of tuples of file names and file contents for the timeseries APIs.
-        """
-        timeseries_api = self._env.get_template("api_class_timeseries.py.jinja")
-        for timeseries in self.timeseries_apis:
-            yield (
-                timeseries.file_name,
-                (
-                    timeseries_api.render(
-                        top_level_package=self.top_level_package,
-                        client_name=client_name,
-                        api_class=self.api_class,
-                        data_class=self.data_class,
-                        list_method=self.list_method,
-                        timeseries_api=timeseries,
                         # ft = field types
                         ft=fields,
                         dm=dm,

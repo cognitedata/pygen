@@ -128,15 +128,6 @@ class ConnectionEdgeA(DomainRelation):
         """Convert this read version of connection edge a to the writing version."""
         return ConnectionEdgeAWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> ConnectionEdgeAWrite:
-        """Convert this read version of connection edge a to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
     ConnectionItemEWrite: {ConnectionItemFWrite},
@@ -195,19 +186,6 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
 
-class ConnectionEdgeAApply(ConnectionEdgeAWrite):
-    def __new__(cls, *args, **kwargs) -> ConnectionEdgeAApply:
-        warnings.warn(
-            "ConnectionEdgeAApply is deprecated and will be removed in v1.0. "
-            "Use ConnectionEdgeAWrite instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "ConnectionEdgeA.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class ConnectionEdgeAList(DomainRelationList[ConnectionEdgeA]):
     """List of connection edge as in the reading version."""
 
@@ -217,23 +195,11 @@ class ConnectionEdgeAList(DomainRelationList[ConnectionEdgeA]):
         """Convert this read version of connection edge a list to the writing version."""
         return ConnectionEdgeAWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> ConnectionEdgeAWriteList:
-        """Convert these read versions of connection edge a list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class ConnectionEdgeAWriteList(DomainRelationWriteList[ConnectionEdgeAWrite]):
     """List of connection edge as in the writing version."""
 
     _INSTANCE = ConnectionEdgeAWrite
-
-
-class ConnectionEdgeAApplyList(ConnectionEdgeAWriteList): ...
 
 
 def _create_connection_edge_a_filter(

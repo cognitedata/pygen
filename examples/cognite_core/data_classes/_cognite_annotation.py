@@ -196,15 +196,6 @@ class CogniteAnnotation(CogniteDescribableEdge, CogniteSourceableEdge):
         """Convert this read version of Cognite annotation to the writing version."""
         return CogniteAnnotationWrite.model_validate(as_write_args(self))
 
-    def as_apply(self) -> CogniteAnnotationWrite:
-        """Convert this read version of Cognite annotation to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
@@ -276,19 +267,6 @@ class CogniteAnnotationWrite(CogniteDescribableEdgeWrite, CogniteSourceableEdgeW
     status: Optional[Literal["Approved", "Rejected", "Suggested"]] = None
 
 
-class CogniteAnnotationApply(CogniteAnnotationWrite):
-    def __new__(cls, *args, **kwargs) -> CogniteAnnotationApply:
-        warnings.warn(
-            "CogniteAnnotationApply is deprecated and will be removed in v1.0. "
-            "Use CogniteAnnotationWrite instead."
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "CogniteAnnotation.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
-
 class CogniteAnnotationList(DomainRelationList[CogniteAnnotation]):
     """List of Cognite annotations in the reading version."""
 
@@ -298,23 +276,11 @@ class CogniteAnnotationList(DomainRelationList[CogniteAnnotation]):
         """Convert this read version of Cognite annotation list to the writing version."""
         return CogniteAnnotationWriteList([edge.as_write() for edge in self])
 
-    def as_apply(self) -> CogniteAnnotationWriteList:
-        """Convert these read versions of Cognite annotation list to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class CogniteAnnotationWriteList(DomainRelationWriteList[CogniteAnnotationWrite]):
     """List of Cognite annotations in the writing version."""
 
     _INSTANCE = CogniteAnnotationWrite
-
-
-class CogniteAnnotationApplyList(CogniteAnnotationWriteList): ...
 
 
 def _create_cognite_annotation_filter(

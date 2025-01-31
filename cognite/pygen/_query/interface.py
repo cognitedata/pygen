@@ -1,5 +1,4 @@
 import itertools
-import warnings
 from collections import defaultdict
 from collections.abc import Sequence
 from typing import Any, Literal, overload
@@ -35,49 +34,6 @@ class QueryExecutor:
         client.config.client_name = f"CognitePygen:{__version__}:QueryExecutor"
         self._view_by_id: dict[dm.ViewId, dm.View] = {view.as_id(): view for view in views or []}
         self._unpack_edges: Literal["skip", "include"] = "include"
-
-    def execute_query(
-        self,
-        view: dm.ViewId,
-        operation: Literal["list", "aggregate", "search"],
-        properties: SelectedProperties | None = None,
-        filter: filters.Filter | None = None,
-        query: str | None = None,
-        group_by: str | SequenceNotStr[str] | None = None,
-        aggregates: Aggregation | Sequence[Aggregation] | None = None,
-        sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None = None,
-        limit: int | None = None,
-    ) -> dict[str, Any]:
-        """Generic execution method for list, aggregate and search operations.
-
-        DEPRECATED: Use list, aggregate or search methods instead.
-
-        The motivation for the deprecation methods is that the specific methods provides
-        clearer parmeters that makes them easier to use. This method is kept for backwards
-        compatibility.
-        """
-        warnings.warn(
-            "This method is deprecated. Use list, aggregate or search methods instead", UserWarning, stacklevel=2
-        )
-        dumped: Any
-        if operation == "list":
-            if properties is None:
-                raise ValueError("Properties are required for list operation")
-            dumped = self._execute_list(view, properties, filter, sort, limit)
-        elif operation == "aggregate":
-            if not aggregates:
-                raise ValueError("Aggregates are required for aggregate operation")
-            flatten_props = self._as_property_list(properties, operation) if properties else None
-            dumped = self._execute_aggregation(view, aggregates, flatten_props, query, filter, group_by, limit)
-        elif operation == "search":
-            flatten_props = self._as_property_list(properties, operation) if properties else None
-            search_result = self._client.data_modeling.instances.search(
-                view, query, properties=flatten_props, filter=filter, limit=limit or SEARCH_LIMIT, sort=sort
-            )
-            dumped = self._prepare_list_result(search_result, set(flatten_props) if flatten_props else None)
-        else:
-            raise NotImplementedError(f"Operation {operation} is not supported")
-        return {f"{operation}{view.external_id}": dumped}
 
     def search(
         self,
