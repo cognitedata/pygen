@@ -425,8 +425,6 @@ class MultiAPIGenerator:
                 continue
             sdk[api_dir / f"{file_name}.py"] = api.generate_api_file(self.client_name)
 
-            sdk[api_dir / f"{api.query_api.file_name}.py"] = api.generate_api_query_file(self.client_name)
-
             for file_name, file_content in itertools.chain(
                 api.generate_edge_api_files(self.client_name),
                 api.generate_timeseries_api_files(self.client_name),
@@ -958,40 +956,6 @@ class APIGenerator:
                 ft=fields,
                 dm=dm,
                 retrieve_connections_doc=retrieve_connections_doc,
-            )
-            + "\n"
-        )
-
-    def generate_api_query_file(self, client_name: str) -> str:
-        """Generate the API query file for the view.
-
-        This is the basis for the Python query functionality for the view.
-
-        Args:
-            client_name: The name of the client class.
-
-        Returns:
-            The generated API query file as a string.
-        """
-        query_api = self._env.get_template("api_class_query.py.jinja")
-
-        unique_edge_data_classes = _unique_data_classes([api.edge_class for api in self.edge_apis if api.edge_class])
-
-        return (
-            query_api.render(
-                client_name=client_name,
-                api_class=self.api_class,
-                data_class=self.data_class,
-                list_method=self.list_method,
-                query_api=self.query_api,
-                edge_apis=self.edge_apis,
-                has_edge_api_dependencies=self.has_edge_api_dependencies,
-                unique_edge_data_classes=unique_edge_data_classes,
-                # ft = field types
-                ft=fields,
-                dm=dm,
-                sorted=sorted,
-                top_level_package=self.top_level_package,
             )
             + "\n"
         )
