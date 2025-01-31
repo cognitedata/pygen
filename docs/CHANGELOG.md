@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [0.99.63] - 2025-01-31
 ### Changed
 - In the `generate_sdk`, the `format_code` parameter is now default to `False`. In addition, in the
   `pygen generate` the flag `skip-formating` is now renamed to `format-code` and is default to `False`. The reason
