@@ -3,7 +3,7 @@
 import re
 import time
 from collections import defaultdict
-from datetime import datetime
+from datetime import date, datetime
 from multiprocessing import Pool
 from typing import TypeVar
 
@@ -25,6 +25,8 @@ app = typer.Typer(
     pretty_exceptions_show_locals=False,
     pretty_exceptions_enable=False,
 )
+
+TBD_HEADING = "## TBD"
 
 
 @app.command("generate", help=f"Generate all example SDKs in directory '{EXAMPLES_DIR.relative_to(REPO_ROOT)}/'")
@@ -168,7 +170,7 @@ def mock(deploy: bool = False):
 @app.command(
     "bump", help="Bump the version of Pygen. This also updates the cognite-sdk and pydantic version in all examples"
 )
-def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bool = False):
+def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bool = False, auto_yes: bool = False):
     if sum([major, minor, patch, skip]) != 1:
         raise typer.BadParameter("Exactly one of --major, --minor, --patch, or --skip must be set")
 
@@ -176,6 +178,7 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
     version_py = REPO_ROOT / "cognite" / "pygen" / "_version.py"
     api_client_files = list((REPO_ROOT / "examples").glob("**/_api_client.py"))
     quickstart_streamlit = REPO_ROOT / "docs" / "quickstart" / "cdf_streamlit.md"
+    changelog_file = REPO_ROOT / "docs" / "CHANGELOG.md"
 
     current_version = toml.loads(pyproject_toml.read_text())["tool"]["poetry"]["version"]
 
@@ -192,13 +195,25 @@ def bump(major: bool = False, minor: bool = False, patch: bool = False, skip: bo
     new_version = f"{current_major}.{current_minor}.{current_patch}"
     typer.echo(f"Bumping version from {current_version} to {new_version}...")
     typer.echo(f"...and setting cognite-sdk={cognite_sdk_version} and pydantic={PYDANTIC_VERSION} in examples.")
-    answer = typer.confirm("Are you sure you want to continue?")
-    if not answer:
-        typer.echo("Aborting")
-        raise typer.Abort()
+    if not auto_yes:
+        answer = typer.confirm("Are you sure you want to continue?")
+        if not answer:
+            typer.echo("Aborting")
+            raise typer.Abort()
 
     if current_version == cognite_sdk_version or current_version == PYDANTIC_VERSION:
         raise ValueError(f"Edge case not handled: {current_version=}, {cognite_sdk_version=}, {PYDANTIC_VERSION=}")
+
+    changelog = changelog_file.read_text(encoding="utf-8")
+    if TBD_HEADING not in changelog:
+        raise ValueError(
+            f"There are no changes to release. The changelog does not contain a TBD section: {TBD_HEADING}."
+        )
+    today = date.today().strftime("%Y-%m-%d")
+    new_heading = f"## [{new_version}] - {today}"
+    changelog = changelog.replace(TBD_HEADING, new_heading)
+    changelog_file.write_text(changelog, encoding="utf-8")
+    typer.echo(f"Updated changelog with new heading: {new_heading}")
 
     for file in [pyproject_toml, version_py, *api_client_files]:
         content = file.read_text()
