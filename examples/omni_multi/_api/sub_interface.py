@@ -40,7 +40,6 @@ from omni_multi.data_classes import (
     SubInterfaceTextFields,
     Implementation1v2,
 )
-from omni_multi._api.sub_interface_query import SubInterfaceQueryAPI
 
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):
@@ -55,55 +54,6 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        main_value: str | list[str] | None = None,
-        main_value_prefix: str | None = None,
-        sub_value: str | list[str] | None = None,
-        sub_value_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> SubInterfaceQueryAPI[SubInterface, SubInterfaceList]:
-        """Query starting at sub interfaces.
-
-        Args:
-            main_value: The main value to filter on.
-            main_value_prefix: The prefix of the main value to filter on.
-            sub_value: The sub value to filter on.
-            sub_value_prefix: The prefix of the sub value to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of sub interfaces to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for sub interfaces.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_sub_interface_filter(
-            self._view_id,
-            main_value,
-            main_value_prefix,
-            sub_value,
-            sub_value_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return SubInterfaceQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

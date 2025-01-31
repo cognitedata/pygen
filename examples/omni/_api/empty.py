@@ -41,7 +41,6 @@ from omni.data_classes import (
     EmptyWriteList,
     EmptyTextFields,
 )
-from omni._api.empty_query import EmptyQueryAPI
 
 
 class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
@@ -53,86 +52,6 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        boolean: bool | None = None,
-        min_date: datetime.date | None = None,
-        max_date: datetime.date | None = None,
-        min_float_32: float | None = None,
-        max_float_32: float | None = None,
-        min_float_64: float | None = None,
-        max_float_64: float | None = None,
-        min_int_32: int | None = None,
-        max_int_32: int | None = None,
-        min_int_64: int | None = None,
-        max_int_64: int | None = None,
-        text: str | list[str] | None = None,
-        text_prefix: str | None = None,
-        min_timestamp: datetime.datetime | None = None,
-        max_timestamp: datetime.datetime | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> EmptyQueryAPI[Empty, EmptyList]:
-        """Query starting at empties.
-
-        Args:
-            boolean: The boolean to filter on.
-            min_date: The minimum value of the date to filter on.
-            max_date: The maximum value of the date to filter on.
-            min_float_32: The minimum value of the float 32 to filter on.
-            max_float_32: The maximum value of the float 32 to filter on.
-            min_float_64: The minimum value of the float 64 to filter on.
-            max_float_64: The maximum value of the float 64 to filter on.
-            min_int_32: The minimum value of the int 32 to filter on.
-            max_int_32: The maximum value of the int 32 to filter on.
-            min_int_64: The minimum value of the int 64 to filter on.
-            max_int_64: The maximum value of the int 64 to filter on.
-            text: The text to filter on.
-            text_prefix: The prefix of the text to filter on.
-            min_timestamp: The minimum value of the timestamp to filter on.
-            max_timestamp: The maximum value of the timestamp to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of empties to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for empties.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_empty_filter(
-            self._view_id,
-            boolean,
-            min_date,
-            max_date,
-            min_float_32,
-            max_float_32,
-            min_float_64,
-            max_float_64,
-            min_int_32,
-            max_int_32,
-            min_int_64,
-            max_int_64,
-            text,
-            text_prefix,
-            min_timestamp,
-            max_timestamp,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return EmptyQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit)
 
     def apply(
         self,

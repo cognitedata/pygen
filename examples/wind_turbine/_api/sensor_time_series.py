@@ -40,7 +40,6 @@ from wind_turbine.data_classes import (
     SensorTimeSeriesWriteList,
     SensorTimeSeriesTextFields,
 )
-from wind_turbine._api.sensor_time_series_query import SensorTimeSeriesQueryAPI
 
 
 class SensorTimeSeriesAPI(
@@ -54,76 +53,6 @@ class SensorTimeSeriesAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        concept_id: str | list[str] | None = None,
-        concept_id_prefix: str | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        is_step: bool | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
-        standard_name: str | list[str] | None = None,
-        standard_name_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> SensorTimeSeriesQueryAPI[SensorTimeSeries, SensorTimeSeriesList]:
-        """Query starting at sensor time series.
-
-        Args:
-            concept_id: The concept id to filter on.
-            concept_id_prefix: The prefix of the concept id to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            is_step: The is step to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            source_unit: The source unit to filter on.
-            source_unit_prefix: The prefix of the source unit to filter on.
-            standard_name: The standard name to filter on.
-            standard_name_prefix: The prefix of the standard name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of sensor time series to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for sensor time series.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_sensor_time_series_filter(
-            self._view_id,
-            concept_id,
-            concept_id_prefix,
-            description,
-            description_prefix,
-            is_step,
-            name,
-            name_prefix,
-            source_unit,
-            source_unit_prefix,
-            standard_name,
-            standard_name_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return SensorTimeSeriesQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

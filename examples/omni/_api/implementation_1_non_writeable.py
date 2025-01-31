@@ -39,7 +39,6 @@ from omni.data_classes import (
     Implementation1NonWriteableTextFields,
     Implementation1,
 )
-from omni._api.implementation_1_non_writeable_query import Implementation1NonWriteableQueryAPI
 
 
 class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Implementation1NonWriteableList]):
@@ -50,71 +49,6 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        connection_value: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        main_value: str | list[str] | None = None,
-        main_value_prefix: str | None = None,
-        sub_value: str | list[str] | None = None,
-        sub_value_prefix: str | None = None,
-        value_1: str | list[str] | None = None,
-        value_1_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> Implementation1NonWriteableQueryAPI[Implementation1NonWriteable, Implementation1NonWriteableList]:
-        """Query starting at implementation 1 non writeables.
-
-        Args:
-            connection_value: The connection value to filter on.
-            main_value: The main value to filter on.
-            main_value_prefix: The prefix of the main value to filter on.
-            sub_value: The sub value to filter on.
-            sub_value_prefix: The prefix of the sub value to filter on.
-            value_1: The value 1 to filter on.
-            value_1_prefix: The prefix of the value 1 to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of implementation 1 non writeables to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for implementation 1 non writeables.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_implementation_1_non_writeable_filter(
-            self._view_id,
-            connection_value,
-            main_value,
-            main_value_prefix,
-            sub_value,
-            sub_value_prefix,
-            value_1,
-            value_1_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return Implementation1NonWriteableQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def delete(
         self, external_id: str | SequenceNotStr[str], space: str = DEFAULT_INSTANCE_SPACE

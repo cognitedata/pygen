@@ -43,7 +43,6 @@ from cognite_core.data_classes import (
     CogniteCADModel,
     CogniteCADRevision,
 )
-from cognite_core._api.cognite_point_cloud_volume_query import CognitePointCloudVolumeQueryAPI
 
 
 class CognitePointCloudVolumeAPI(
@@ -62,91 +61,6 @@ class CognitePointCloudVolumeAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        format_version: str | list[str] | None = None,
-        format_version_prefix: str | None = None,
-        model_3d: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        object_3d: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        revisions: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> CognitePointCloudVolumeQueryAPI[CognitePointCloudVolume, CognitePointCloudVolumeList]:
-        """Query starting at Cognite point cloud volumes.
-
-        Args:
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            format_version: The format version to filter on.
-            format_version_prefix: The prefix of the format version to filter on.
-            model_3d: The model 3d to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            object_3d: The object 3d to filter on.
-            revisions: The revision to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of Cognite point cloud volumes to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for Cognite point cloud volumes.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_cognite_point_cloud_volume_filter(
-            self._view_id,
-            description,
-            description_prefix,
-            format_version,
-            format_version_prefix,
-            model_3d,
-            name,
-            name_prefix,
-            object_3d,
-            revisions,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return CognitePointCloudVolumeQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

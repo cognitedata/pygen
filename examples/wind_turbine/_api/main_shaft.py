@@ -41,7 +41,6 @@ from wind_turbine.data_classes import (
     Nacelle,
     SensorTimeSeries,
 )
-from wind_turbine._api.main_shaft_query import MainShaftQueryAPI
 
 
 class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWriteList]):
@@ -53,91 +52,6 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        bending_x: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        bending_y: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        calculated_tilt_moment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        calculated_yaw_moment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        torque: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> MainShaftQueryAPI[MainShaft, MainShaftList]:
-        """Query starting at main shafts.
-
-        Args:
-            bending_x: The bending x to filter on.
-            bending_y: The bending y to filter on.
-            calculated_tilt_moment: The calculated tilt moment to filter on.
-            calculated_yaw_moment: The calculated yaw moment to filter on.
-            torque: The torque to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of main shafts to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for main shafts.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_main_shaft_filter(
-            self._view_id,
-            bending_x,
-            bending_y,
-            calculated_tilt_moment,
-            calculated_yaw_moment,
-            torque,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return MainShaftQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit)
 
     def apply(
         self,

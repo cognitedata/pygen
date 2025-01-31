@@ -76,7 +76,6 @@ from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.name }
 {% for class_ in timeseries_apis %}
 from {{ top_level_package }}._api.{{ class_.file_name }} import {{ class_.name }}
 {% endfor %}
-from {{ top_level_package }}._api.{{ query_api.file_name }} import {{ query_api.name }}
 
 
 class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeReadAPI{% endif %}[{{ data_class.read_name }}{% if data_class.is_writable %}, {{ data_class.write_name }}{% endif %}, {{ data_class.read_list_name }}{% if data_class.is_writable %}, {{ data_class.write_list_name }}{% endif %}]):
@@ -106,47 +105,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% for timeseries_api in timeseries_apis %}
         self.{{ timeseries_api.parent_attribute }} = {{ timeseries_api.name }}(client, self._view_id)
         {% endfor %}
-
-    def __call__(
-        self,
-        {% for parm in list_method.parameters %}
-        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
-        {% endfor %}
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> {{ query_api.name }}[{{ data_class.read_name }}, {{ data_class.read_list_name }}]:
-        """Query starting at {{ data_class.doc_list_name }}.
-
-        Args:
-            {% for parm in list_method.parameters %}
-            {{ parm.name }}: {{ parm.description }}
-            {% endfor %}
-            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for {{ data_class.doc_list_name}}.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. "
-            "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = {{ data_class.filter_name }}(
-            self._view_id,
-            {% for parm in list_method.parameters %}
-            {{ parm.name }},
-            {% endfor %}
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return {{ query_api.name }}(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
 {% if data_class.is_writable %}
     def apply(

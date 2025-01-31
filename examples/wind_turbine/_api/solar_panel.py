@@ -41,7 +41,6 @@ from wind_turbine.data_classes import (
     SolarPanelTextFields,
     SensorTimeSeries,
 )
-from wind_turbine._api.solar_panel_query import SolarPanelQueryAPI
 
 
 class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPanelWriteList]):
@@ -53,81 +52,6 @@ class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPa
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        min_capacity: float | None = None,
-        max_capacity: float | None = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        efficiency: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        orientation: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> SolarPanelQueryAPI[SolarPanel, SolarPanelList]:
-        """Query starting at solar panels.
-
-        Args:
-            min_capacity: The minimum value of the capacity to filter on.
-            max_capacity: The maximum value of the capacity to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            efficiency: The efficiency to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            orientation: The orientation to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of solar panels to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for solar panels.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_solar_panel_filter(
-            self._view_id,
-            min_capacity,
-            max_capacity,
-            description,
-            description_prefix,
-            efficiency,
-            name,
-            name_prefix,
-            orientation,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return SolarPanelQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

@@ -48,7 +48,6 @@ from omni.data_classes import (
 )
 from omni._api.connection_item_e_inwards_single import ConnectionItemEInwardsSingleAPI
 from omni._api.connection_item_e_inwards_single_property import ConnectionItemEInwardsSinglePropertyAPI
-from omni._api.connection_item_e_query import ConnectionItemEQueryAPI
 
 
 class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, ConnectionItemEList, ConnectionItemEWriteList]):
@@ -63,69 +62,6 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
 
         self.inwards_single_edge = ConnectionItemEInwardsSingleAPI(client)
         self.inwards_single_property_edge = ConnectionItemEInwardsSinglePropertyAPI(client)
-
-    def __call__(
-        self,
-        direct_list_no_source: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        direct_no_source: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> ConnectionItemEQueryAPI[ConnectionItemE, ConnectionItemEList]:
-        """Query starting at connection item es.
-
-        Args:
-            direct_list_no_source: The direct list no source to filter on.
-            direct_no_source: The direct no source to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of connection item es to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for connection item es.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_connection_item_e_filter(
-            self._view_id,
-            direct_list_no_source,
-            direct_no_source,
-            name,
-            name_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return ConnectionItemEQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

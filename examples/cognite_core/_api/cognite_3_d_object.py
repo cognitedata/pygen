@@ -49,7 +49,6 @@ from cognite_core.data_classes import (
     CognitePointCloudVolume,
 )
 from cognite_core._api.cognite_3_d_object_images_360 import Cognite3DObjectImages360API
-from cognite_core._api.cognite_3_d_object_query import Cognite3DObjectQueryAPI
 
 
 class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3DObjectList, Cognite3DObjectWriteList]):
@@ -63,91 +62,6 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
         super().__init__(client=client)
 
         self.images_360_edge = Cognite3DObjectImages360API(client)
-
-    def __call__(
-        self,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        min_x_max: float | None = None,
-        max_x_max: float | None = None,
-        min_x_min: float | None = None,
-        max_x_min: float | None = None,
-        min_y_max: float | None = None,
-        max_y_max: float | None = None,
-        min_y_min: float | None = None,
-        max_y_min: float | None = None,
-        min_z_max: float | None = None,
-        max_z_max: float | None = None,
-        min_z_min: float | None = None,
-        max_z_min: float | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> Cognite3DObjectQueryAPI[Cognite3DObject, Cognite3DObjectList]:
-        """Query starting at Cognite 3D objects.
-
-        Args:
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            min_x_max: The minimum value of the x max to filter on.
-            max_x_max: The maximum value of the x max to filter on.
-            min_x_min: The minimum value of the x min to filter on.
-            max_x_min: The maximum value of the x min to filter on.
-            min_y_max: The minimum value of the y max to filter on.
-            max_y_max: The maximum value of the y max to filter on.
-            min_y_min: The minimum value of the y min to filter on.
-            max_y_min: The maximum value of the y min to filter on.
-            min_z_max: The minimum value of the z max to filter on.
-            max_z_max: The maximum value of the z max to filter on.
-            min_z_min: The minimum value of the z min to filter on.
-            max_z_min: The maximum value of the z min to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of Cognite 3D objects to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for Cognite 3D objects.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_cognite_3_d_object_filter(
-            self._view_id,
-            description,
-            description_prefix,
-            name,
-            name_prefix,
-            min_x_max,
-            max_x_max,
-            min_x_min,
-            max_x_min,
-            min_y_max,
-            max_y_max,
-            min_y_min,
-            max_y_min,
-            min_z_max,
-            max_z_max,
-            min_z_min,
-            max_z_min,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return Cognite3DObjectQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

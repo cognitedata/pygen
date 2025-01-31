@@ -40,7 +40,6 @@ from omni.data_classes import (
     PrimitiveWithDefaultsWriteList,
     PrimitiveWithDefaultsTextFields,
 )
-from omni._api.primitive_with_defaults_query import PrimitiveWithDefaultsQueryAPI
 
 
 class PrimitiveWithDefaultsAPI(
@@ -56,64 +55,6 @@ class PrimitiveWithDefaultsAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        min_auto_increment_int_32: int | None = None,
-        max_auto_increment_int_32: int | None = None,
-        default_boolean: bool | None = None,
-        min_default_float_32: float | None = None,
-        max_default_float_32: float | None = None,
-        default_string: str | list[str] | None = None,
-        default_string_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> PrimitiveWithDefaultsQueryAPI[PrimitiveWithDefaults, PrimitiveWithDefaultsList]:
-        """Query starting at primitive with defaults.
-
-        Args:
-            min_auto_increment_int_32: The minimum value of the auto increment int 32 to filter on.
-            max_auto_increment_int_32: The maximum value of the auto increment int 32 to filter on.
-            default_boolean: The default boolean to filter on.
-            min_default_float_32: The minimum value of the default float 32 to filter on.
-            max_default_float_32: The maximum value of the default float 32 to filter on.
-            default_string: The default string to filter on.
-            default_string_prefix: The prefix of the default string to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of primitive with defaults to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for primitive with defaults.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_primitive_with_default_filter(
-            self._view_id,
-            min_auto_increment_int_32,
-            max_auto_increment_int_32,
-            default_boolean,
-            min_default_float_32,
-            max_default_float_32,
-            default_string,
-            default_string_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return PrimitiveWithDefaultsQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

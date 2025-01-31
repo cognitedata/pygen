@@ -50,7 +50,6 @@ from wind_turbine.data_classes import (
     Rotor,
 )
 from wind_turbine._api.wind_turbine_metmast import WindTurbineMetmastAPI
-from wind_turbine._api.wind_turbine_query import WindTurbineQueryAPI
 
 
 class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, WindTurbineWriteList]):
@@ -64,107 +63,6 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
         super().__init__(client=client)
 
         self.metmast_edge = WindTurbineMetmastAPI(client)
-
-    def __call__(
-        self,
-        blades: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        min_capacity: float | None = None,
-        max_capacity: float | None = None,
-        datasheets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        nacelle: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        rotor: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        windfarm: str | list[str] | None = None,
-        windfarm_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> WindTurbineQueryAPI[WindTurbine, WindTurbineList]:
-        """Query starting at wind turbines.
-
-        Args:
-            blades: The blade to filter on.
-            min_capacity: The minimum value of the capacity to filter on.
-            max_capacity: The maximum value of the capacity to filter on.
-            datasheets: The datasheet to filter on.
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            nacelle: The nacelle to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            rotor: The rotor to filter on.
-            windfarm: The windfarm to filter on.
-            windfarm_prefix: The prefix of the windfarm to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of wind turbines to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for wind turbines.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_wind_turbine_filter(
-            self._view_id,
-            blades,
-            min_capacity,
-            max_capacity,
-            datasheets,
-            description,
-            description_prefix,
-            nacelle,
-            name,
-            name_prefix,
-            rotor,
-            windfarm,
-            windfarm_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return WindTurbineQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

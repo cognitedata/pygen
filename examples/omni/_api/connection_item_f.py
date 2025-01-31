@@ -49,7 +49,6 @@ from omni.data_classes import (
 )
 from omni._api.connection_item_f_outwards_multi import ConnectionItemFOutwardsMultiAPI
 from omni._api.connection_item_f_outwards_single import ConnectionItemFOutwardsSingleAPI
-from omni._api.connection_item_f_query import ConnectionItemFQueryAPI
 
 
 class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, ConnectionItemFList, ConnectionItemFWriteList]):
@@ -64,59 +63,6 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
 
         self.outwards_multi_edge = ConnectionItemFOutwardsMultiAPI(client)
         self.outwards_single_edge = ConnectionItemFOutwardsSingleAPI(client)
-
-    def __call__(
-        self,
-        direct_list: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> ConnectionItemFQueryAPI[ConnectionItemF, ConnectionItemFList]:
-        """Query starting at connection item fs.
-
-        Args:
-            direct_list: The direct list to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of connection item fs to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for connection item fs.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_connection_item_f_filter(
-            self._view_id,
-            direct_list,
-            name,
-            name_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return ConnectionItemFQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

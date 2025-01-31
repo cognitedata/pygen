@@ -41,7 +41,6 @@ from cognite_core.data_classes import (
     CogniteCADRevisionTextFields,
     CogniteCADModel,
 )
-from cognite_core._api.cognite_cad_revision_query import CogniteCADRevisionQueryAPI
 
 
 class CogniteCADRevisionAPI(
@@ -55,62 +54,6 @@ class CogniteCADRevisionAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        model_3d: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        published: bool | None = None,
-        min_revision_id: int | None = None,
-        max_revision_id: int | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> CogniteCADRevisionQueryAPI[CogniteCADRevision, CogniteCADRevisionList]:
-        """Query starting at Cognite cad revisions.
-
-        Args:
-            model_3d: The model 3d to filter on.
-            published: The published to filter on.
-            min_revision_id: The minimum value of the revision id to filter on.
-            max_revision_id: The maximum value of the revision id to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of Cognite cad revisions to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for Cognite cad revisions.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_cognite_cad_revision_filter(
-            self._view_id,
-            model_3d,
-            published,
-            min_revision_id,
-            max_revision_id,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return CogniteCADRevisionQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

@@ -41,7 +41,6 @@ from cognite_core.data_classes import (
     Cognite3DTransformationNodeTextFields,
     Cognite360Image,
 )
-from cognite_core._api.cognite_3_d_transformation_node_query import Cognite3DTransformationNodeQueryAPI
 
 
 class Cognite3DTransformationNodeAPI(
@@ -63,97 +62,6 @@ class Cognite3DTransformationNodeAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        min_euler_rotation_x: float | None = None,
-        max_euler_rotation_x: float | None = None,
-        min_euler_rotation_y: float | None = None,
-        max_euler_rotation_y: float | None = None,
-        min_euler_rotation_z: float | None = None,
-        max_euler_rotation_z: float | None = None,
-        min_scale_x: float | None = None,
-        max_scale_x: float | None = None,
-        min_scale_y: float | None = None,
-        max_scale_y: float | None = None,
-        min_scale_z: float | None = None,
-        max_scale_z: float | None = None,
-        min_translation_x: float | None = None,
-        max_translation_x: float | None = None,
-        min_translation_y: float | None = None,
-        max_translation_y: float | None = None,
-        min_translation_z: float | None = None,
-        max_translation_z: float | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> Cognite3DTransformationNodeQueryAPI[Cognite3DTransformationNode, Cognite3DTransformationNodeList]:
-        """Query starting at Cognite 3D transformation nodes.
-
-        Args:
-            min_euler_rotation_x: The minimum value of the euler rotation x to filter on.
-            max_euler_rotation_x: The maximum value of the euler rotation x to filter on.
-            min_euler_rotation_y: The minimum value of the euler rotation y to filter on.
-            max_euler_rotation_y: The maximum value of the euler rotation y to filter on.
-            min_euler_rotation_z: The minimum value of the euler rotation z to filter on.
-            max_euler_rotation_z: The maximum value of the euler rotation z to filter on.
-            min_scale_x: The minimum value of the scale x to filter on.
-            max_scale_x: The maximum value of the scale x to filter on.
-            min_scale_y: The minimum value of the scale y to filter on.
-            max_scale_y: The maximum value of the scale y to filter on.
-            min_scale_z: The minimum value of the scale z to filter on.
-            max_scale_z: The maximum value of the scale z to filter on.
-            min_translation_x: The minimum value of the translation x to filter on.
-            max_translation_x: The maximum value of the translation x to filter on.
-            min_translation_y: The minimum value of the translation y to filter on.
-            max_translation_y: The maximum value of the translation y to filter on.
-            min_translation_z: The minimum value of the translation z to filter on.
-            max_translation_z: The maximum value of the translation z to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for Cognite 3D transformation nodes.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_cognite_3_d_transformation_node_filter(
-            self._view_id,
-            min_euler_rotation_x,
-            max_euler_rotation_x,
-            min_euler_rotation_y,
-            max_euler_rotation_y,
-            min_euler_rotation_z,
-            max_euler_rotation_z,
-            min_scale_x,
-            max_scale_x,
-            min_scale_y,
-            max_scale_y,
-            min_scale_z,
-            max_scale_z,
-            min_translation_x,
-            max_translation_x,
-            min_translation_y,
-            max_translation_y,
-            min_translation_z,
-            max_translation_z,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return Cognite3DTransformationNodeQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

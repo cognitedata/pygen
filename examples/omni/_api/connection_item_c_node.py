@@ -43,7 +43,6 @@ from omni.data_classes import (
 )
 from omni._api.connection_item_c_node_connection_item_a import ConnectionItemCNodeConnectionItemAAPI
 from omni._api.connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
-from omni._api.connection_item_c_node_query import ConnectionItemCNodeQueryAPI
 
 
 class ConnectionItemCNodeAPI(
@@ -60,43 +59,6 @@ class ConnectionItemCNodeAPI(
 
         self.connection_item_a_edge = ConnectionItemCNodeConnectionItemAAPI(client)
         self.connection_item_b_edge = ConnectionItemCNodeConnectionItemBAPI(client)
-
-    def __call__(
-        self,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> ConnectionItemCNodeQueryAPI[ConnectionItemCNode, ConnectionItemCNodeList]:
-        """Query starting at connection item c nodes.
-
-        Args:
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of connection item c nodes to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for connection item c nodes.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_connection_item_c_node_filter(
-            self._view_id,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return ConnectionItemCNodeQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

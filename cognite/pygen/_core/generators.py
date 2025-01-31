@@ -475,7 +475,6 @@ class MultiAPIGenerator:
             if api.used_for != "node":
                 continue
             api_classes.append(api.api_class)
-            api_classes.append(api.query_api)
             api_classes.extend(api.edge_apis or [])
             api_classes.extend(api.timeseries_apis or [])
 

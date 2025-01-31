@@ -42,7 +42,6 @@ from omni_sub.data_classes import (
 )
 from omni_sub._api.connection_item_b_inwards import ConnectionItemBInwardsAPI
 from omni_sub._api.connection_item_b_self_edge import ConnectionItemBSelfEdgeAPI
-from omni_sub._api.connection_item_b_query import ConnectionItemBQueryAPI
 
 
 class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, ConnectionItemBList, ConnectionItemBWriteList]):
@@ -57,49 +56,6 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
 
         self.inwards_edge = ConnectionItemBInwardsAPI(client)
         self.self_edge_edge = ConnectionItemBSelfEdgeAPI(client)
-
-    def __call__(
-        self,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> ConnectionItemBQueryAPI[ConnectionItemB, ConnectionItemBList]:
-        """Query starting at connection item bs.
-
-        Args:
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of connection item bs to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for connection item bs.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_connection_item_b_filter(
-            self._view_id,
-            name,
-            name_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return ConnectionItemBQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

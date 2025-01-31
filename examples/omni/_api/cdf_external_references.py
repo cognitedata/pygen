@@ -41,7 +41,6 @@ from omni.data_classes import (
     CDFExternalReferencesTextFields,
 )
 from omni._api.cdf_external_references_timeseries import CDFExternalReferencesTimeseriesAPI
-from omni._api.cdf_external_references_query import CDFExternalReferencesQueryAPI
 
 
 class CDFExternalReferencesAPI(
@@ -59,43 +58,6 @@ class CDFExternalReferencesAPI(
         super().__init__(client=client)
 
         self.timeseries = CDFExternalReferencesTimeseriesAPI(client, self._view_id)
-
-    def __call__(
-        self,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> CDFExternalReferencesQueryAPI[CDFExternalReferences, CDFExternalReferencesList]:
-        """Query starting at cdf external references.
-
-        Args:
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of cdf external references to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for cdf external references.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_cdf_external_reference_filter(
-            self._view_id,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return CDFExternalReferencesQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

@@ -47,7 +47,6 @@ from cognite_core.data_classes import (
     CogniteFile,
     CogniteTimeSeries,
 )
-from cognite_core._api.cognite_sourceable_node_query import CogniteSourceableNodeQueryAPI
 
 
 class CogniteSourceableNodeAPI(
@@ -70,89 +69,6 @@ class CogniteSourceableNodeAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        source: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        source_context: str | list[str] | None = None,
-        source_context_prefix: str | None = None,
-        min_source_created_time: datetime.datetime | None = None,
-        max_source_created_time: datetime.datetime | None = None,
-        source_created_user: str | list[str] | None = None,
-        source_created_user_prefix: str | None = None,
-        source_id: str | list[str] | None = None,
-        source_id_prefix: str | None = None,
-        min_source_updated_time: datetime.datetime | None = None,
-        max_source_updated_time: datetime.datetime | None = None,
-        source_updated_user: str | list[str] | None = None,
-        source_updated_user_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> CogniteSourceableNodeQueryAPI[CogniteSourceableNode, CogniteSourceableNodeList]:
-        """Query starting at Cognite sourceable nodes.
-
-        Args:
-            source: The source to filter on.
-            source_context: The source context to filter on.
-            source_context_prefix: The prefix of the source context to filter on.
-            min_source_created_time: The minimum value of the source created time to filter on.
-            max_source_created_time: The maximum value of the source created time to filter on.
-            source_created_user: The source created user to filter on.
-            source_created_user_prefix: The prefix of the source created user to filter on.
-            source_id: The source id to filter on.
-            source_id_prefix: The prefix of the source id to filter on.
-            min_source_updated_time: The minimum value of the source updated time to filter on.
-            max_source_updated_time: The maximum value of the source updated time to filter on.
-            source_updated_user: The source updated user to filter on.
-            source_updated_user_prefix: The prefix of the source updated user to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of Cognite sourceable nodes to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for Cognite sourceable nodes.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_cognite_sourceable_node_filter(
-            self._view_id,
-            source,
-            source_context,
-            source_context_prefix,
-            min_source_created_time,
-            max_source_created_time,
-            source_created_user,
-            source_created_user_prefix,
-            source_id,
-            source_id_prefix,
-            min_source_updated_time,
-            max_source_updated_time,
-            source_updated_user,
-            source_updated_user_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return CogniteSourceableNodeQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

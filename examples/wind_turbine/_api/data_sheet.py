@@ -41,7 +41,6 @@ from wind_turbine.data_classes import (
     DataSheetWriteList,
     DataSheetTextFields,
 )
-from wind_turbine._api.data_sheet_query import DataSheetQueryAPI
 
 
 class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWriteList]):
@@ -53,74 +52,6 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        directory: str | list[str] | None = None,
-        directory_prefix: str | None = None,
-        is_uploaded: bool | None = None,
-        mime_type: str | list[str] | None = None,
-        mime_type_prefix: str | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        min_uploaded_time: datetime.datetime | None = None,
-        max_uploaded_time: datetime.datetime | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> DataSheetQueryAPI[DataSheet, DataSheetList]:
-        """Query starting at data sheets.
-
-        Args:
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            directory: The directory to filter on.
-            directory_prefix: The prefix of the directory to filter on.
-            is_uploaded: The is uploaded to filter on.
-            mime_type: The mime type to filter on.
-            mime_type_prefix: The prefix of the mime type to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            min_uploaded_time: The minimum value of the uploaded time to filter on.
-            max_uploaded_time: The maximum value of the uploaded time to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of data sheets to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for data sheets.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_data_sheet_filter(
-            self._view_id,
-            description,
-            description_prefix,
-            directory,
-            directory_prefix,
-            is_uploaded,
-            mime_type,
-            mime_type_prefix,
-            name,
-            name_prefix,
-            min_uploaded_time,
-            max_uploaded_time,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return DataSheetQueryAPI(self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit)
 
     def apply(
         self,

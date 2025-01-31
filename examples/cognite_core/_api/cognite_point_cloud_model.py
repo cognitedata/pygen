@@ -42,7 +42,6 @@ from cognite_core.data_classes import (
     CogniteFile,
     CognitePointCloudRevision,
 )
-from cognite_core._api.cognite_point_cloud_model_query import CognitePointCloudModelQueryAPI
 
 
 class CognitePointCloudModelAPI(
@@ -58,65 +57,6 @@ class CognitePointCloudModelAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        description: str | list[str] | None = None,
-        description_prefix: str | None = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        thumbnail: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> CognitePointCloudModelQueryAPI[CognitePointCloudModel, CognitePointCloudModelList]:
-        """Query starting at Cognite point cloud models.
-
-        Args:
-            description: The description to filter on.
-            description_prefix: The prefix of the description to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            thumbnail: The thumbnail to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of Cognite point cloud models to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for Cognite point cloud models.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_cognite_point_cloud_model_filter(
-            self._view_id,
-            description,
-            description_prefix,
-            name,
-            name_prefix,
-            thumbnail,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return CognitePointCloudModelQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

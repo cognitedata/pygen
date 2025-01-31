@@ -39,7 +39,6 @@ from omni_multi.data_classes import (
     Implementation1v1WriteList,
     Implementation1v1TextFields,
 )
-from omni_multi._api.implementation_1_v_1_query import Implementation1v1QueryAPI
 
 
 class Implementation1v1API(
@@ -53,61 +52,6 @@ class Implementation1v1API(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
-    def __call__(
-        self,
-        main_value: str | list[str] | None = None,
-        main_value_prefix: str | None = None,
-        value_1: str | list[str] | None = None,
-        value_1_prefix: str | None = None,
-        value_2: str | list[str] | None = None,
-        value_2_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> Implementation1v1QueryAPI[Implementation1v1, Implementation1v1List]:
-        """Query starting at implementation 1 v 1.
-
-        Args:
-            main_value: The main value to filter on.
-            main_value_prefix: The prefix of the main value to filter on.
-            value_1: The value 1 to filter on.
-            value_1_prefix: The prefix of the value 1 to filter on.
-            value_2: The value 2 to filter on.
-            value_2_prefix: The prefix of the value 2 to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for implementation 1 v 1.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_implementation_1_v_1_filter(
-            self._view_id,
-            main_value,
-            main_value_prefix,
-            value_1,
-            value_1_prefix,
-            value_2,
-            value_2_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return Implementation1v1QueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

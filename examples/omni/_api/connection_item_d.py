@@ -42,7 +42,6 @@ from omni.data_classes import (
     ConnectionItemE,
 )
 from omni._api.connection_item_d_outwards_single import ConnectionItemDOutwardsSingleAPI
-from omni._api.connection_item_d_query import ConnectionItemDQueryAPI
 
 
 class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, ConnectionItemDList, ConnectionItemDWriteList]):
@@ -56,69 +55,6 @@ class ConnectionItemDAPI(NodeAPI[ConnectionItemD, ConnectionItemDWrite, Connecti
         super().__init__(client=client)
 
         self.outwards_single_edge = ConnectionItemDOutwardsSingleAPI(client)
-
-    def __call__(
-        self,
-        direct_multi: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        direct_single: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> ConnectionItemDQueryAPI[ConnectionItemD, ConnectionItemDList]:
-        """Query starting at connection item ds.
-
-        Args:
-            direct_multi: The direct multi to filter on.
-            direct_single: The direct single to filter on.
-            name: The name to filter on.
-            name_prefix: The prefix of the name to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of connection item ds to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for connection item ds.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_connection_item_d_filter(
-            self._view_id,
-            direct_multi,
-            direct_single,
-            name,
-            name_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return ConnectionItemDQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,

@@ -42,7 +42,6 @@ from omni.data_classes import (
     Implementation1NonWriteable,
 )
 from omni._api.dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
-from omni._api.dependent_on_non_writable_query import DependentOnNonWritableQueryAPI
 
 
 class DependentOnNonWritableAPI(
@@ -60,49 +59,6 @@ class DependentOnNonWritableAPI(
         super().__init__(client=client)
 
         self.to_non_writable_edge = DependentOnNonWritableToNonWritableAPI(client)
-
-    def __call__(
-        self,
-        a_value: str | list[str] | None = None,
-        a_value_prefix: str | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        limit: int = DEFAULT_QUERY_LIMIT,
-        filter: dm.Filter | None = None,
-    ) -> DependentOnNonWritableQueryAPI[DependentOnNonWritable, DependentOnNonWritableList]:
-        """Query starting at dependent on non writables.
-
-        Args:
-            a_value: The a value to filter on.
-            a_value_prefix: The prefix of the a value to filter on.
-            external_id_prefix: The prefix of the external ID to filter on.
-            space: The space to filter on.
-            limit: Maximum number of dependent on non writables to return. Defaults to 25.
-                Set to -1, float("inf") or None to return all items.
-            filter: (Advanced) If the filtering available in the above is not sufficient, you can write
-                your own filtering which will be ANDed with the filter above.
-
-        Returns:
-            A query API for dependent on non writables.
-
-        """
-        warnings.warn(
-            "This method is deprecated and will soon be removed. " "Use the .select() method instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        has_data = dm.filters.HasData(views=[self._view_id])
-        filter_ = _create_dependent_on_non_writable_filter(
-            self._view_id,
-            a_value,
-            a_value_prefix,
-            external_id_prefix,
-            space,
-            (filter and dm.filters.And(filter, has_data)) or has_data,
-        )
-        return DependentOnNonWritableQueryAPI(
-            self._client, QueryBuilder(), self._class_type, self._class_list, None, filter_, limit
-        )
 
     def apply(
         self,
