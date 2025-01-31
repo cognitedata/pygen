@@ -23,7 +23,6 @@ from cognite.client.data_classes.data_modeling.data_types import Enum
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._query.extract_code import get_file_content
 from cognite.pygen._version import __version__
 from cognite.pygen._warnings import PydanticNamespaceCollisionWarning
 from cognite.pygen.config import PygenConfig
@@ -451,8 +450,6 @@ class MultiAPIGenerator:
             self.generate_data_class_core_query_filter_classes()
         )
         sdk[data_classes_dir / "_core" / "query" / "select.py"] = self.generate_data_class_core_query_select()
-        for file_name, file_content in self.generate_data_class_core_query_files().items():
-            sdk[data_classes_dir / "_core" / "query" / file_name] = file_content
 
         return sdk
 
@@ -531,19 +528,6 @@ class MultiAPIGenerator:
             )
             + "\n"
         )
-
-    def generate_data_class_core_query_files(self) -> dict[str, str]:
-        """Generate the core query classes files for the SDK.
-
-        These are the exact same files as in cognite.pygen._query.
-        """
-        output: dict[str, str] = {}
-        for file_name in ["builder", "constants", "processing", "step"]:
-            file_content = get_file_content(f"{file_name}.py")
-            output[f"{file_name}.py"] = file_content.replace(
-                "cognite.pygen._query", f"{self.top_level_package}.data_classes._core.query"
-            )
-        return output
 
     def generate_data_class_core_query_select(self) -> str:
         data_class_core = self.env.get_template("data_classes_core_query_select.py.jinja")

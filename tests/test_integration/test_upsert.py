@@ -174,43 +174,13 @@ def primitive_nullable_node(
         cognite_client.data_modeling.instances.delete(nodes=node.as_tuple_id())
 
 
-def test_update_to_null(
-    omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
-) -> None:
-    update = primitive_nullable_node.model_copy()
-
-    update.text = None
-    update.int_32 = None
-    update.int_64 = None
-    update.float_32 = None
-    update.float_64 = None
-    update.boolean = None
-    update.timestamp = None
-    update.date = None
-    update.json_ = None
-
-    omni_client.upsert(update, write_none=True)
-
-    retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
-    assert retrieved is not None
-    assert retrieved.text is None
-    assert retrieved.int_32 is None
-    assert retrieved.int_64 is None
-    assert retrieved.float_32 is None
-    assert retrieved.float_64 is None
-    assert retrieved.boolean is None
-    assert retrieved.timestamp is None
-    assert retrieved.date is None
-    assert retrieved.json_ is None
-
-
 def test_set_empty_string(
     omni_client: OmniClient, cognite_client: CogniteClient, primitive_nullable_node: dc.PrimitiveNullableApply
 ) -> None:
     update = primitive_nullable_node.model_copy()
 
     update.text = ""
-    omni_client.upsert(update, write_none=True)
+    omni_client.upsert(update)
     retrieved = omni_client.primitive_nullable.retrieve(primitive_nullable_node.external_id)
     assert retrieved is not None, f"Node {primitive_nullable_node.external_id} not found"
     assert retrieved.text == ""

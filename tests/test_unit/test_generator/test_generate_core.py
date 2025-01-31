@@ -82,16 +82,6 @@ def test_generate_data_class_core_query_select(omni_multi_api_generator: MultiAP
     assert actual == expected
 
 
-def test_generate_data_class_query_files(omni_multi_api_generator: MultiAPIGenerator) -> None:
-    # Arrange
-    content_by_file = omni_multi_api_generator.generate_data_class_core_query_files()
-    for filename, actual in content_by_file.items():
-        expected = (OmniFiles.core_query_data / filename).read_text()
-
-        # Assert
-        assert actual == expected, f"File: {filename}"
-
-
 def test_generate_data_class_core_cdf_external(omni_multi_api_generator: MultiAPIGenerator) -> None:
     # Arrange
     expected = OmniFiles.data_core_cdf_external.read_text()

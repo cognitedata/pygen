@@ -239,15 +239,6 @@ class {{ data_class.read_name }}({{ data_class.read_base_class }}{% if data_clas
         """Convert this read version of {{ data_class.doc_name }} to the writing version."""
         return {{ data_class.write_name }}.model_validate(as_write_args(self))
 
-    def as_apply(self) -> {{ data_class.write_name }}:
-        """Convert this read version of {{ data_class.doc_name }} to the writing version."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
-
 
 class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_class.has_any_field_model_prefix %}, protected_namespaces=(){% endif %}):
     """This represents the writing version of {{ data_class.doc_name }}.
@@ -299,19 +290,6 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
         return value
     {% endif %}
 
-
-class {{ data_class.read_name }}Apply({{ data_class.write_name }}):
-    def __new__(cls, *args, **kwargs) -> {{ data_class.read_name }}Apply:
-        warnings.warn(
-            "{{ data_class.read_name }}Apply is deprecated and will be removed in v1.0. "
-            "Use {{ data_class.write_name }} instead. "
-            "The motivation for this change is that Write is a more descriptive name for the writing version of the"
-            "{{ data_class.read_name }}.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return super().__new__(cls)
-
 {% endif %}
 class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}]):
     """List of {{ data_class.doc_list_name }} in the read version."""
@@ -321,15 +299,6 @@ class {{ data_class.read_list_name }}(DomainModelList[{{ data_class.read_name }}
     def as_write(self) -> {{ data_class.write_list_name }}:
         """Convert these read versions of {{ data_class.doc_name }} to the writing versions."""
         return {{ data_class.write_list_name }}([node.as_write() for node in self.data])
-
-    def as_apply(self) -> {{ data_class.write_list_name }}:
-        """Convert these read versions of primitive nullable to the writing versions."""
-        warnings.warn(
-            "as_apply is deprecated and will be removed in v1.0. Use as_write instead.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return self.as_write()
 
     {% for field in data_class.read_connection_fields_including_parents %}
     @property
