@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -41,10 +40,8 @@ from wind_turbine.data_classes._core import (
 __all__ = [
     "SensorTimeSeries",
     "SensorTimeSeriesWrite",
-    "SensorTimeSeriesApply",
     "SensorTimeSeriesList",
     "SensorTimeSeriesWriteList",
-    "SensorTimeSeriesApplyList",
     "SensorTimeSeriesFields",
     "SensorTimeSeriesTextFields",
     "SensorTimeSeriesGraphQL",

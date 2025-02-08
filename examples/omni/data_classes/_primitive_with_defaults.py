@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -42,10 +41,8 @@ from omni.data_classes._core import (
 __all__ = [
     "PrimitiveWithDefaults",
     "PrimitiveWithDefaultsWrite",
-    "PrimitiveWithDefaultsApply",
     "PrimitiveWithDefaultsList",
     "PrimitiveWithDefaultsWriteList",
-    "PrimitiveWithDefaultsApplyList",
     "PrimitiveWithDefaultsFields",
     "PrimitiveWithDefaultsTextFields",
     "PrimitiveWithDefaultsGraphQL",

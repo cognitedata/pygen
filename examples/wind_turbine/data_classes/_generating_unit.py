@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -39,10 +38,8 @@ from wind_turbine.data_classes._core import (
 __all__ = [
     "GeneratingUnit",
     "GeneratingUnitWrite",
-    "GeneratingUnitApply",
     "GeneratingUnitList",
     "GeneratingUnitWriteList",
-    "GeneratingUnitApplyList",
     "GeneratingUnitFields",
     "GeneratingUnitTextFields",
     "GeneratingUnitGraphQL",

@@ -3,7 +3,6 @@ from __future__ import annotations
 {% if data_class.has_primitive_field_of_type((dm.Timestamp, dm.Date)) %}
 import datetime
 {% endif %}
-import warnings
 from collections.abc import Sequence
 {% if data_class.has_dependencies %}
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
@@ -107,12 +106,10 @@ __all__ = [
     "{{ data_class.read_name }}",
     {% if data_class.is_writable or data_class.is_interface %}
     "{{ data_class.write_name }}",
-    "{{ data_class.read_name }}Apply",
     {% endif %}
     "{{ data_class.read_list_name }}",
     {% if data_class.is_writable or data_class.is_interface %}
     "{{ data_class.write_list_name }}",
-    "{{ data_class.read_name }}ApplyList",
     {% endif %}
     {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
     "{{ data_class.field_names }}",

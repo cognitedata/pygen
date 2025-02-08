@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
@@ -60,10 +59,8 @@ if TYPE_CHECKING:
 __all__ = [
     "Metmast",
     "MetmastWrite",
-    "MetmastApply",
     "MetmastList",
     "MetmastWriteList",
-    "MetmastApplyList",
     "MetmastFields",
     "MetmastTextFields",
     "MetmastGraphQL",

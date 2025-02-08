@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
@@ -71,10 +70,8 @@ if TYPE_CHECKING:
 __all__ = [
     "Cognite360Image",
     "Cognite360ImageWrite",
-    "Cognite360ImageApply",
     "Cognite360ImageList",
     "Cognite360ImageWriteList",
-    "Cognite360ImageApplyList",
     "Cognite360ImageFields",
     "Cognite360ImageGraphQL",
 ]

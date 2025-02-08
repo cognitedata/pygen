@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
@@ -57,10 +56,8 @@ if TYPE_CHECKING:
 __all__ = [
     "Cognite360ImageModel",
     "Cognite360ImageModelWrite",
-    "Cognite360ImageModelApply",
     "Cognite360ImageModelList",
     "Cognite360ImageModelWriteList",
-    "Cognite360ImageModelApplyList",
     "Cognite360ImageModelFields",
     "Cognite360ImageModelTextFields",
     "Cognite360ImageModelGraphQL",

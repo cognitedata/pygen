@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
@@ -50,10 +49,8 @@ if TYPE_CHECKING:
 __all__ = [
     "ConnectionEdgeA",
     "ConnectionEdgeAWrite",
-    "ConnectionEdgeAApply",
     "ConnectionEdgeAList",
     "ConnectionEdgeAWriteList",
-    "ConnectionEdgeAApplyList",
     "ConnectionEdgeAFields",
     "ConnectionEdgeATextFields",
 ]

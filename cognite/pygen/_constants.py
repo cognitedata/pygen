@@ -2,6 +2,15 @@ from collections.abc import Mapping
 
 from cognite.client import data_modeling as dm
 
+
+def is_pyodide() -> bool:
+    try:
+        from pyodide.ffi import IN_BROWSER  # type: ignore [import-not-found]
+    except ModuleNotFoundError:
+        return False
+    return IN_BROWSER
+
+
 _READONLY_PROPERTIES: Mapping[dm.ContainerId, frozenset[str]] = {
     dm.ContainerId("cdf_cdm", "CogniteAsset"): frozenset(
         {"assetHierarchy_root", "assetHierarchy_path", "assetHierarchy_path_last_updated_time"}
