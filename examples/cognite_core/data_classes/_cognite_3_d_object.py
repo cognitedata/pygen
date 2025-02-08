@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
@@ -71,10 +70,8 @@ if TYPE_CHECKING:
 __all__ = [
     "Cognite3DObject",
     "Cognite3DObjectWrite",
-    "Cognite3DObjectApply",
     "Cognite3DObjectList",
     "Cognite3DObjectWriteList",
-    "Cognite3DObjectApplyList",
     "Cognite3DObjectFields",
     "Cognite3DObjectTextFields",
     "Cognite3DObjectGraphQL",

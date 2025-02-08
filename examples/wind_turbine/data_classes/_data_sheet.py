@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -43,10 +42,8 @@ from wind_turbine.data_classes._core import (
 __all__ = [
     "DataSheet",
     "DataSheetWrite",
-    "DataSheetApply",
     "DataSheetList",
     "DataSheetWriteList",
-    "DataSheetApplyList",
     "DataSheetFields",
     "DataSheetTextFields",
     "DataSheetGraphQL",

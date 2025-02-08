@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -41,10 +40,8 @@ from cognite_core.data_classes._core import (
 __all__ = [
     "CogniteSchedulable",
     "CogniteSchedulableWrite",
-    "CogniteSchedulableApply",
     "CogniteSchedulableList",
     "CogniteSchedulableWriteList",
-    "CogniteSchedulableApplyList",
     "CogniteSchedulableFields",
     "CogniteSchedulableGraphQL",
 ]

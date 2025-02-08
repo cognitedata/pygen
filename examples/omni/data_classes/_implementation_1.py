@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -40,10 +39,8 @@ from omni.data_classes._sub_interface import SubInterface, SubInterfaceWrite
 __all__ = [
     "Implementation1",
     "Implementation1Write",
-    "Implementation1Apply",
     "Implementation1List",
     "Implementation1WriteList",
-    "Implementation1ApplyList",
     "Implementation1Fields",
     "Implementation1TextFields",
     "Implementation1GraphQL",

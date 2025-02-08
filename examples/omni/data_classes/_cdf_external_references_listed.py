@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -56,10 +55,8 @@ from omni.data_classes._core import (
 __all__ = [
     "CDFExternalReferencesListed",
     "CDFExternalReferencesListedWrite",
-    "CDFExternalReferencesListedApply",
     "CDFExternalReferencesListedList",
     "CDFExternalReferencesListedWriteList",
-    "CDFExternalReferencesListedApplyList",
     "CDFExternalReferencesListedFields",
     "CDFExternalReferencesListedTextFields",
     "CDFExternalReferencesListedGraphQL",

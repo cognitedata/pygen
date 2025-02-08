@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, TYPE_CHECKING, Union
 
@@ -41,10 +40,8 @@ from cognite_core.data_classes._core import (
 __all__ = [
     "Cognite3DTransformationEdge",
     "Cognite3DTransformationEdgeWrite",
-    "Cognite3DTransformationEdgeApply",
     "Cognite3DTransformationEdgeList",
     "Cognite3DTransformationEdgeWriteList",
-    "Cognite3DTransformationEdgeApplyList",
     "Cognite3DTransformationEdgeFields",
 ]
 

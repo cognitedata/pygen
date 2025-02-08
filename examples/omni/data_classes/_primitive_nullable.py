@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -45,10 +44,8 @@ from omni.data_classes._core import (
 __all__ = [
     "PrimitiveNullable",
     "PrimitiveNullableWrite",
-    "PrimitiveNullableApply",
     "PrimitiveNullableList",
     "PrimitiveNullableWriteList",
-    "PrimitiveNullableApplyList",
     "PrimitiveNullableFields",
     "PrimitiveNullableTextFields",
     "PrimitiveNullableGraphQL",

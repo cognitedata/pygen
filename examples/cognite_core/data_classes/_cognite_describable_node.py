@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
@@ -38,10 +37,8 @@ from cognite_core.data_classes._core import (
 __all__ = [
     "CogniteDescribableNode",
     "CogniteDescribableNodeWrite",
-    "CogniteDescribableNodeApply",
     "CogniteDescribableNodeList",
     "CogniteDescribableNodeWriteList",
-    "CogniteDescribableNodeApplyList",
     "CogniteDescribableNodeFields",
     "CogniteDescribableNodeTextFields",
     "CogniteDescribableNodeGraphQL",

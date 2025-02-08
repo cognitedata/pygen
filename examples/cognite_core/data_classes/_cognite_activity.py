@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
@@ -75,10 +74,8 @@ if TYPE_CHECKING:
 __all__ = [
     "CogniteActivity",
     "CogniteActivityWrite",
-    "CogniteActivityApply",
     "CogniteActivityList",
     "CogniteActivityWriteList",
-    "CogniteActivityApplyList",
     "CogniteActivityFields",
     "CogniteActivityTextFields",
     "CogniteActivityGraphQL",

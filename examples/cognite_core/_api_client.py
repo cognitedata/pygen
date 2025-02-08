@@ -53,7 +53,7 @@ class CogniteCoreClient:
 
     Generated with:
         pygen = 1.0.0
-        cognite-sdk = 7.70.7
+        cognite-sdk = 7.73.3
         pydantic = 2.10.4
 
     Data Model:
