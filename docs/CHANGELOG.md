@@ -13,6 +13,10 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## TBD
+### Fixed
+- In a Pyodide environment with a large model, the `generate_sdk_notebook` can hit a recursion limit in pydantic
+  when doing schema validation. If the this occurs, the `generate_sdk_notebook` will now skip the schema validation.
 
 ## [1.0.0] - 2025-01-31
 ## Removed
