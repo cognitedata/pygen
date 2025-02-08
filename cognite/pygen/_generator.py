@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import os
 import re
 import shutil
 import sys
@@ -15,7 +16,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelIdentifier
 from cognite.client.data_classes.data_modeling.ids import DataModelId
 from cognite.client.exceptions import CogniteAPIError
+from pydantic_core import SchemaError
 
+from cognite.pygen._constants import is_pyodide
 from cognite.pygen._core.generators import SDKGenerator
 from cognite.pygen._core.models import DataClass
 from cognite.pygen._settings import _load_pyproject_toml
@@ -242,7 +245,16 @@ def generate_sdk_notebook(
         print(f"Added {output_dir} to sys.path to enable import")
     else:
         print(f"{output_dir} already in sys.path")
-    module = vars(importlib.import_module(top_level_package))
+    try:
+        module = vars(importlib.import_module(top_level_package))
+    except SchemaError as error:
+        if is_pyodide() and "recursion_loop" in {e["type"] for e in error.errors() if "type" in e}:
+            print("Large SDK detected. Reached recursion limit in Pyodide. Tying again skipping schema validation.")
+            os.environ["PYDANTIC_SKIP_VALIDATING_CORE_SCHEMAS"] = "true"
+            module = vars(importlib.import_module(top_level_package))
+        else:
+            raise error
+
     print(f"Imported {top_level_package}")
     print("You can now use the generated SDK in the current Python session.")
     if isinstance(data_model, dm.DataModel):
