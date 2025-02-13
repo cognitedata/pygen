@@ -10,7 +10,7 @@ version = "0.4.5"
 [plugins]
 run = false
 pull = false
-dump = false
+dump = true
 
 [alpha_flags]
 graphql = true
