@@ -11,7 +11,7 @@ adding `cognite-pygen` to the installed packages under `settings`.
 
 ```text
 pyodide-http==0.2.1
-cognite-sdk==7.70.7
+cognite-sdk==7.73.3
 pydantic==2.7.0
 cognite-pygen==0.99.60
 ```
