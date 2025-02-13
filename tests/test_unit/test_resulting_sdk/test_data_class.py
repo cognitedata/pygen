@@ -213,7 +213,7 @@ def test_cognite_file_as_nodes() -> None:
 class TestAsWrite:
     def test_as_write_with_extra_arg(self) -> None:
         now = datetime.now(timezone.utc)
-        read_cls = dc.PrimitiveNullable( # type: ignore[call-arg]
+        read_cls = dc.PrimitiveNullable(  # type: ignore[call-arg]
             space="my_space",
             external_id="my_external_id",
             data_record=dc.DataRecord(version=1, last_updated_time=now, created_time=now),
