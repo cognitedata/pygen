@@ -16,7 +16,9 @@ Changes are grouped as follows
 ## TBD
 ### Fixed
 - In a Pyodide environment with a large model, the `generate_sdk_notebook` can hit a recursion limit in pydantic
-  when doing schema validation. If the this occurs, the `generate_sdk_notebook` will now skip the schema validation.
+  when doing schema validation. If this occurs, the `generate_sdk_notebook` will now skip the schema validation.
+- The `.as_write()` method no longer fails with a `KeyError` if the view has an new property that was added
+  after the SDK was generated.
 
 ## [1.0.0] - 2025-01-31
 ## Removed
