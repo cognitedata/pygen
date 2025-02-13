@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
@@ -64,10 +63,8 @@ if TYPE_CHECKING:
 __all__ = [
     "CognitePointCloudVolume",
     "CognitePointCloudVolumeWrite",
-    "CognitePointCloudVolumeApply",
     "CognitePointCloudVolumeList",
     "CognitePointCloudVolumeWriteList",
-    "CognitePointCloudVolumeApplyList",
     "CognitePointCloudVolumeFields",
     "CognitePointCloudVolumeTextFields",
     "CognitePointCloudVolumeGraphQL",

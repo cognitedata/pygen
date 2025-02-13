@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
@@ -55,10 +54,8 @@ if TYPE_CHECKING:
 __all__ = [
     "ConnectionItemCNode",
     "ConnectionItemCNodeWrite",
-    "ConnectionItemCNodeApply",
     "ConnectionItemCNodeList",
     "ConnectionItemCNodeWriteList",
-    "ConnectionItemCNodeApplyList",
     "ConnectionItemCNodeGraphQL",
 ]
 

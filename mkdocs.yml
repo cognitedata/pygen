@@ -120,4 +120,3 @@ plugins:
   - search
 exclude_docs: |
   .*
-  examples/movie_domain/.*

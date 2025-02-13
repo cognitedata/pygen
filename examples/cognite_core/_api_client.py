@@ -52,9 +52,9 @@ class CogniteCoreClient:
     CogniteCoreClient
 
     Generated with:
-        pygen = 1.0.0
-        cognite-sdk = 7.70.7
-        pydantic = 2.10.4
+        pygen = 1.0.1
+        cognite-sdk = 7.73.3
+        pydantic = 2.10.6
 
     Data Model:
         space: cdf_cdm
@@ -70,7 +70,7 @@ class CogniteCoreClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:1.0.0"
+        client.config.client_name = "CognitePygen:1.0.1"
 
         self._client = client
 

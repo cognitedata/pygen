@@ -1,5 +1,6 @@
 import json
 from collections.abc import Callable
+from datetime import datetime, timezone
 from typing import cast
 
 import pytest
@@ -207,3 +208,23 @@ def test_cognite_file_as_nodes() -> None:
     resources = obj.to_instances_write()
 
     assert len(resources.nodes) == 1
+
+
+class TestAsWrite:
+    def test_as_write_with_extra_arg(self) -> None:
+        now = datetime.now(timezone.utc)
+        read_cls = dc.PrimitiveNullable(  # type: ignore[call-arg]
+            space="my_space",
+            external_id="my_external_id",
+            data_record=dc.DataRecord(version=1, last_updated_time=now, created_time=now),
+            text="Some text",
+            extra="My New Property",
+        )
+
+        write_cls = read_cls.as_write()
+        assert write_cls.model_dump(exclude_unset=True, by_alias=True) == {
+            "space": "my_space",
+            "externalId": "my_external_id",
+            "data_record": {"existing_version": 1},
+            "text": "Some text",
+        }

@@ -912,6 +912,11 @@ def as_read_value(value: Any) -> Any:
 def as_write_args(model: DomainModel | GraphQLCore | DomainRelation | GraphQLExternal) -> dict[str, Any]:
     output: dict[str, Any] = {}
     for field_name in model.model_fields_set:
+        if field_name not in model.model_fields:
+            # The field is an extra field. Typically, happens when a property has been added
+            # to the model after the SDK was generated. Extra fields are not allowed in the write
+            # format of the data class.
+            continue
         value = getattr(model, field_name)
         key = model.model_fields[field_name].alias or field_name
         if field_name == "data_record" and isinstance(model, DomainModel | DomainRelation):
