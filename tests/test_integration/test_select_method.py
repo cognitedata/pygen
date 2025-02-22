@@ -143,6 +143,13 @@ def test_select_circular_raises_value_error(omni_client: OmniClient) -> None:
     assert "Circular" in str(e.value)
 
 
+def test_select_above_max_depth_raises_value_error(omni_client: OmniClient) -> None:
+    with pytest.raises(ValueError) as e:
+        omni_client.connection_item_a.select().outwards.inwards.other_direct.list_connection_item_c_node(limit=5)
+
+    assert "Max select depth reached" in str(e.value)
+
+
 def test_select_past_reverse_list_value_error(omni_client: OmniClient) -> None:
     with pytest.raises(ValueError) as e:
         omni_client.connection_item_e.select().direct_reverse_multi.direct_single.list_full(limit=5)
