@@ -62,6 +62,8 @@ class CogniteCoreClient:
         version: v1
     """
 
+    _data_model_id = dm.DataModelId("cdf_cdm", "CogniteCore", "v1")
+
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
         if isinstance(config_or_client, CogniteClient):
             client = config_or_client

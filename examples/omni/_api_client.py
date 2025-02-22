@@ -53,6 +53,8 @@ class OmniClient:
         version: 1
     """
 
+    _data_model_id = dm.DataModelId("sp_pygen_models", "Omni", "1")
+
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
         if isinstance(config_or_client, CogniteClient):
             client = config_or_client
