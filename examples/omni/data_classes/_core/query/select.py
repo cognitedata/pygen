@@ -87,7 +87,9 @@ from omni.config import global_config
 global_config.max_select_depth = {global_config.max_select_depth+1}
 ```
 """
-            raise ValueError(f"Max select depth reached. Cannot query deeper than {global_config.max_select_depth}.\n{hint}")
+            raise ValueError(
+                f"Max select depth reached. Cannot query deeper than {global_config.max_select_depth}.\n{hint}"
+            )
         error_message = f"'{self.__class__.__name__}' object has no attribute '{item}'"
         attributes = [name for name in vars(self).keys() if not name.startswith("_")]
         if matches := difflib.get_close_matches(item, attributes):

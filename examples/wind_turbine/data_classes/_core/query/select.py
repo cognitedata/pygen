@@ -15,6 +15,7 @@ from typing import (
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 
+from wind_turbine.config import global_config
 from wind_turbine.data_classes._core.query.filter_classes import Filtering
 from wind_turbine.data_classes._core.base import (
     DomainModelList,
@@ -78,6 +79,17 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
             raise ValueError(f"Circular reference detected. Cannot query a circular reference: {nodes}")
         elif self._connection_type == "reverse-list":
             raise ValueError(f"Cannot query across a reverse-list connection.")
+        elif len(self._creation_path) >= global_config.max_select_depth:
+            hint = f"""You can increase the max_select_depth in the global config.
+```
+from omni.config import global_config
+
+global_config.max_select_depth = {global_config.max_select_depth+1}
+```
+"""
+            raise ValueError(
+                f"Max select depth reached. Cannot query deeper than {global_config.max_select_depth}.\n{hint}"
+            )
         error_message = f"'{self.__class__.__name__}' object has no attribute '{item}'"
         attributes = [name for name in vars(self).keys() if not name.startswith("_")]
         if matches := difflib.get_close_matches(item, attributes):
