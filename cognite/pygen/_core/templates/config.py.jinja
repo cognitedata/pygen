@@ -13,7 +13,7 @@ class GlobalConfig(BaseModel, validate_assignment=True):
     """
 
     validate_retrieve: bool = True
-    max_select_depth: int = Field(4, ge=1)
+    max_select_depth: int = Field(3, ge=1)
 
 
 global_config = GlobalConfig()

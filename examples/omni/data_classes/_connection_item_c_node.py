@@ -304,7 +304,7 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
             reverse_expression,
         )
 
-        if _ConnectionItemAQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemAQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.connection_item_a = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -318,7 +318,7 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
                 connection_property=ViewPropertyId(self._view_id, "connectionItemA"),
             )
 
-        if _ConnectionItemBQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemBQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.connection_item_b = _ConnectionItemBQuery(
                 created_types.copy(),
                 self._creation_path,

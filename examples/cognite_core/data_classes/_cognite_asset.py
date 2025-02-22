@@ -791,7 +791,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
             reverse_expression,
         )
 
-        if _CogniteActivityQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteActivityQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.activities = _CogniteActivityQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -806,7 +806,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_type="reverse-list",
             )
 
-        if _CogniteAssetClassQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetClassQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.asset_class = _CogniteAssetClassQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -820,7 +820,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_property=ViewPropertyId(self._view_id, "assetClass"),
             )
 
-        if _CogniteAssetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.children = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -834,7 +834,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_property=ViewPropertyId(self._view_id, "children"),
             )
 
-        if _CogniteEquipmentQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteEquipmentQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.equipment = _CogniteEquipmentQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -848,7 +848,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_property=ViewPropertyId(self._view_id, "equipment"),
             )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.files = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -863,7 +863,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_type="reverse-list",
             )
 
-        if _Cognite3DObjectQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _Cognite3DObjectQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.object_3d = _Cognite3DObjectQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -877,7 +877,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_property=ViewPropertyId(self._view_id, "object3D"),
             )
 
-        if _CogniteAssetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.parent = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -891,7 +891,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_property=ViewPropertyId(self._view_id, "parent"),
             )
 
-        if _CogniteAssetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.path = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -905,7 +905,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_property=ViewPropertyId(self._view_id, "path"),
             )
 
-        if _CogniteAssetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.root = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -919,7 +919,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_property=ViewPropertyId(self._view_id, "root"),
             )
 
-        if _CogniteSourceSystemQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteSourceSystemQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.source = _CogniteSourceSystemQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -933,7 +933,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
-        if _CogniteTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.time_series = _CogniteTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -948,7 +948,7 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
                 connection_type="reverse-list",
             )
 
-        if _CogniteAssetTypeQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetTypeQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.type_ = _CogniteAssetTypeQuery(
                 created_types.copy(),
                 self._creation_path,

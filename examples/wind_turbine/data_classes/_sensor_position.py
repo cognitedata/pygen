@@ -802,7 +802,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
             reverse_expression,
         )
 
-        if _BladeQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _BladeQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.blade = _BladeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -816,7 +816,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_property=ViewPropertyId(self._view_id, "blade"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.edgewise_bend_mom_crosstalk_corrected = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -830,7 +830,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_crosstalk_corrected"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.edgewise_bend_mom_offset = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -844,7 +844,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_offset"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.edgewise_bend_mom_offset_crosstalk_corrected = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -858,7 +858,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_property=ViewPropertyId(self._view_id, "edgewise_bend_mom_offset_crosstalk_corrected"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.edgewisewise_bend_mom = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -872,7 +872,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_property=ViewPropertyId(self._view_id, "edgewisewise_bend_mom"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.flapwise_bend_mom = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -886,7 +886,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.flapwise_bend_mom_crosstalk_corrected = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -900,7 +900,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_crosstalk_corrected"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.flapwise_bend_mom_offset = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -914,7 +914,7 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
                 connection_property=ViewPropertyId(self._view_id, "flapwise_bend_mom_offset"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.flapwise_bend_mom_offset_crosstalk_corrected = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,

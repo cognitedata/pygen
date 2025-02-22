@@ -497,7 +497,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
             reverse_expression,
         )
 
-        if _BladeQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _BladeQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.blades = _BladeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -511,7 +511,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 connection_property=ViewPropertyId(self._view_id, "blades"),
             )
 
-        if _DataSheetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _DataSheetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.datasheets = _DataSheetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -525,7 +525,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 connection_property=ViewPropertyId(self._view_id, "datasheets"),
             )
 
-        if _DistanceQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _DistanceQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.metmast = _DistanceQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -540,7 +540,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 connection_property=ViewPropertyId(self._view_id, "metmast"),
             )
 
-        if _NacelleQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _NacelleQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.nacelle = _NacelleQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -554,7 +554,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
                 connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
-        if _RotorQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _RotorQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.rotor = _RotorQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -263,7 +263,7 @@ class _CogniteVisualizableQuery(NodeQueryCore[T_DomainModelList, CogniteVisualiz
             reverse_expression,
         )
 
-        if _Cognite3DObjectQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _Cognite3DObjectQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.object_3d = _Cognite3DObjectQuery(
                 created_types.copy(),
                 self._creation_path,

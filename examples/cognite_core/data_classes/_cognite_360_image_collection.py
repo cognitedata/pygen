@@ -319,7 +319,7 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
             reverse_expression,
         )
 
-        if _Cognite360ImageModelQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _Cognite360ImageModelQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.model_3d = _Cognite360ImageModelQuery(
                 created_types.copy(),
                 self._creation_path,

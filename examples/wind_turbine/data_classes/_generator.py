@@ -367,7 +367,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.generator_speed_controller = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -381,7 +381,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                 connection_property=ViewPropertyId(self._view_id, "generator_speed_controller"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.generator_speed_controller_reference = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -395,7 +395,7 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
                 connection_property=ViewPropertyId(self._view_id, "generator_speed_controller_reference"),
             )
 
-        if _NacelleQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _NacelleQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.nacelle = _NacelleQuery(
                 created_types.copy(),
                 self._creation_path,

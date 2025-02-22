@@ -292,7 +292,7 @@ class _Cognite3DRevisionQuery(NodeQueryCore[T_DomainModelList, Cognite3DRevision
             reverse_expression,
         )
 
-        if _Cognite3DModelQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _Cognite3DModelQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.model_3d = _Cognite3DModelQuery(
                 created_types.copy(),
                 self._creation_path,

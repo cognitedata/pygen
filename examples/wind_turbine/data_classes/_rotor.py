@@ -363,7 +363,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.rotor_speed_controller = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -377,7 +377,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                 connection_property=ViewPropertyId(self._view_id, "rotor_speed_controller"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.rpm_low_speed_shaft = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -391,7 +391,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
                 connection_property=ViewPropertyId(self._view_id, "rpm_low_speed_shaft"),
             )
 
-        if _WindTurbineQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _WindTurbineQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.wind_turbine = _WindTurbineQuery(
                 created_types.copy(),
                 self._creation_path,

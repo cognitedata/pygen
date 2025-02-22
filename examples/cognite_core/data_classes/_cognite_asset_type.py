@@ -347,7 +347,7 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
             reverse_expression,
         )
 
-        if _CogniteAssetClassQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetClassQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.asset_class = _CogniteAssetClassQuery(
                 created_types.copy(),
                 self._creation_path,

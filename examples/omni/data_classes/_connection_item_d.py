@@ -387,7 +387,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
             reverse_expression,
         )
 
-        if _ConnectionItemEQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemEQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.direct_multi = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -401,7 +401,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 connection_property=ViewPropertyId(self._view_id, "directMulti"),
             )
 
-        if _ConnectionItemEQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemEQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.direct_single = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -415,7 +415,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 connection_property=ViewPropertyId(self._view_id, "directSingle"),
             )
 
-        if _ConnectionItemEQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemEQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.outwards_single = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,

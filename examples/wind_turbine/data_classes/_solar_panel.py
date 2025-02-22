@@ -361,7 +361,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.efficiency = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -375,7 +375,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
                 connection_property=ViewPropertyId(self._view_id, "efficiency"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.orientation = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,

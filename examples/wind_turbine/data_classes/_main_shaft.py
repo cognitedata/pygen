@@ -483,7 +483,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.bending_x = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -497,7 +497,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_property=ViewPropertyId(self._view_id, "bending_x"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.bending_y = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -511,7 +511,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_property=ViewPropertyId(self._view_id, "bending_y"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.calculated_tilt_moment = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -525,7 +525,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_property=ViewPropertyId(self._view_id, "calculated_tilt_moment"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.calculated_yaw_moment = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -539,7 +539,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_property=ViewPropertyId(self._view_id, "calculated_yaw_moment"),
             )
 
-        if _NacelleQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _NacelleQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.nacelle = _NacelleQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -553,7 +553,7 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
                 connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.torque = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,

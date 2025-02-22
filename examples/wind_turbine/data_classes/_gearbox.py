@@ -382,7 +382,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.displacement_x = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -396,7 +396,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_property=ViewPropertyId(self._view_id, "displacement_x"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.displacement_y = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -410,7 +410,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_property=ViewPropertyId(self._view_id, "displacement_y"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.displacement_z = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -424,7 +424,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_property=ViewPropertyId(self._view_id, "displacement_z"),
             )
 
-        if _NacelleQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _NacelleQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.nacelle = _NacelleQuery(
                 created_types.copy(),
                 self._creation_path,

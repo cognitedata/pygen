@@ -304,7 +304,7 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
             reverse_expression,
         )
 
-        if _DistanceQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _DistanceQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.wind_turbines = _DistanceQuery(
                 created_types.copy(),
                 self._creation_path,

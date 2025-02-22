@@ -664,7 +664,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
             reverse_expression,
         )
 
-        if _CogniteAssetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.assets = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -678,7 +678,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
                 connection_property=ViewPropertyId(self._view_id, "assets"),
             )
 
-        if _CogniteEquipmentQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteEquipmentQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.equipment = _CogniteEquipmentQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -692,7 +692,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
                 connection_property=ViewPropertyId(self._view_id, "equipment"),
             )
 
-        if _CogniteSourceSystemQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteSourceSystemQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.source = _CogniteSourceSystemQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -706,7 +706,7 @@ class _CogniteActivityQuery(NodeQueryCore[T_DomainModelList, CogniteActivityList
                 connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
-        if _CogniteTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.time_series = _CogniteTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,

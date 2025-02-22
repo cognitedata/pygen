@@ -689,7 +689,7 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
             reverse_expression,
         )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.back = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -703,7 +703,7 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "back"),
             )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.bottom = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -717,7 +717,10 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "bottom"),
             )
 
-        if _Cognite360ImageCollectionQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if (
+            _Cognite360ImageCollectionQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.collection_360 = _Cognite360ImageCollectionQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -731,7 +734,7 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "collection360"),
             )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.front = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -745,7 +748,7 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "front"),
             )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.left = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -759,7 +762,7 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "left"),
             )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.right = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -773,7 +776,10 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "right"),
             )
 
-        if _Cognite360ImageStationQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if (
+            _Cognite360ImageStationQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.station_360 = _Cognite360ImageStationQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -787,7 +793,7 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "station360"),
             )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.top = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,

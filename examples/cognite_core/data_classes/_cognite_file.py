@@ -620,7 +620,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
             reverse_expression,
         )
 
-        if _CogniteAssetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteAssetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.assets = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -634,7 +634,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_property=ViewPropertyId(self._view_id, "assets"),
             )
 
-        if _CogniteFileCategoryQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileCategoryQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.category = _CogniteFileCategoryQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -648,7 +648,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_property=ViewPropertyId(self._view_id, "category"),
             )
 
-        if _CogniteEquipmentQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteEquipmentQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.equipment = _CogniteEquipmentQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -663,7 +663,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_type="reverse-list",
             )
 
-        if _CogniteSourceSystemQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteSourceSystemQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.source = _CogniteSourceSystemQuery(
                 created_types.copy(),
                 self._creation_path,

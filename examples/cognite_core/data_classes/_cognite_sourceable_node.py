@@ -392,7 +392,7 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
             reverse_expression,
         )
 
-        if _CogniteSourceSystemQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteSourceSystemQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.source = _CogniteSourceSystemQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -290,7 +290,10 @@ class _CognitePointCloudRevisionQuery(NodeQueryCore[T_DomainModelList, CognitePo
             reverse_expression,
         )
 
-        if _CognitePointCloudModelQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if (
+            _CognitePointCloudModelQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.model_3d = _CognitePointCloudModelQuery(
                 created_types.copy(),
                 self._creation_path,

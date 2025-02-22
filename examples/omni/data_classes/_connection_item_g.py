@@ -290,7 +290,7 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
             reverse_expression,
         )
 
-        if _ConnectionEdgeAQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionEdgeAQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.inwards_multi_property = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

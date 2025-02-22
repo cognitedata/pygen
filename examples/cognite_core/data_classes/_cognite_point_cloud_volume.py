@@ -462,7 +462,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
             reverse_expression,
         )
 
-        if _CogniteCADModelQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteCADModelQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.model_3d = _CogniteCADModelQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -476,7 +476,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
                 connection_property=ViewPropertyId(self._view_id, "model3D"),
             )
 
-        if _Cognite3DObjectQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _Cognite3DObjectQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.object_3d = _Cognite3DObjectQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -490,7 +490,7 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
                 connection_property=ViewPropertyId(self._view_id, "object3D"),
             )
 
-        if _CogniteCADRevisionQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteCADRevisionQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.revisions = _CogniteCADRevisionQuery(
                 created_types.copy(),
                 self._creation_path,

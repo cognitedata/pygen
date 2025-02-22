@@ -332,7 +332,10 @@ class _Cognite360ImageModelQuery(NodeQueryCore[T_DomainModelList, Cognite360Imag
             reverse_expression,
         )
 
-        if _Cognite360ImageCollectionQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if (
+            _Cognite360ImageCollectionQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.collections = _Cognite360ImageCollectionQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -346,7 +349,7 @@ class _Cognite360ImageModelQuery(NodeQueryCore[T_DomainModelList, Cognite360Imag
                 connection_property=ViewPropertyId(self._view_id, "collections"),
             )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.thumbnail = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,

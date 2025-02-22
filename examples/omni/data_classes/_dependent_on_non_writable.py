@@ -274,7 +274,7 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
 
         if (
             _Implementation1NonWriteableQuery not in created_types
-            and len(creation_path) < global_config.max_select_depth
+            and len(creation_path) + 1 < global_config.max_select_depth
         ):
             self.to_non_writable = _Implementation1NonWriteableQuery(
                 created_types.copy(),

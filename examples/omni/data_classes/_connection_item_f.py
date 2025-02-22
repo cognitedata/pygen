@@ -367,7 +367,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
             reverse_expression,
         )
 
-        if _ConnectionItemDQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemDQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.direct_list = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -381,7 +381,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                 connection_property=ViewPropertyId(self._view_id, "directList"),
             )
 
-        if _ConnectionEdgeAQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionEdgeAQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.outwards_multi = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -396,7 +396,7 @@ class _ConnectionItemFQuery(NodeQueryCore[T_DomainModelList, ConnectionItemFList
                 connection_property=ViewPropertyId(self._view_id, "outwardsMulti"),
             )
 
-        if _ConnectionEdgeAQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionEdgeAQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.outwards_single = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -327,7 +327,7 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
             reverse_expression,
         )
 
-        if _CogniteCADRevisionQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteCADRevisionQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.revisions = _CogniteCADRevisionQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -341,7 +341,7 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
                 connection_property=ViewPropertyId(self._view_id, "revisions"),
             )
 
-        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.thumbnail = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,

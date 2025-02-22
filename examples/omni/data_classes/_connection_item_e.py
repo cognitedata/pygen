@@ -442,7 +442,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             reverse_expression,
         )
 
-        if _ConnectionItemDQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemDQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.direct_reverse_multi = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -457,7 +457,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_type="reverse-list",
             )
 
-        if _ConnectionItemDQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemDQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.direct_reverse_single = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -471,7 +471,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_property=ViewPropertyId(self._view_id, "directReverseSingle"),
             )
 
-        if _ConnectionItemDQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionItemDQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.inwards_single = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -485,7 +485,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_property=ViewPropertyId(self._view_id, "inwardsSingle"),
             )
 
-        if _ConnectionEdgeAQuery not in created_types and len(creation_path) < global_config.max_select_depth:
+        if _ConnectionEdgeAQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.inwards_single_property = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,
