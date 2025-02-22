@@ -36,6 +36,7 @@ class {{ client_name }}:
         externalId: {{ data_model.external_id }}
         version: {{ data_model.version }}
     """
+    _data_model_id = dm.DataModelId("{{ data_model.space }}", "{{ data_model.external_id }}", "{{ data_model.version }}")
 
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
         if isinstance(config_or_client, CogniteClient):
