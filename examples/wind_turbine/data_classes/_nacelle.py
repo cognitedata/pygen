@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from wind_turbine.config import global_config
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -759,7 +760,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.acc_from_back_side_y = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -773,7 +774,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "acc_from_back_side_y"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.acc_from_back_side_z = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -787,7 +788,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "acc_from_back_side_z"),
             )
 
-        if _GearboxQuery not in created_types:
+        if _GearboxQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.gearbox = _GearboxQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -801,7 +802,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "gearbox"),
             )
 
-        if _GeneratorQuery not in created_types:
+        if _GeneratorQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.generator = _GeneratorQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -815,7 +816,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "generator"),
             )
 
-        if _HighSpeedShaftQuery not in created_types:
+        if _HighSpeedShaftQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.high_speed_shaft = _HighSpeedShaftQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -829,7 +830,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "high_speed_shaft"),
             )
 
-        if _MainShaftQuery not in created_types:
+        if _MainShaftQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.main_shaft = _MainShaftQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -843,7 +844,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "main_shaft"),
             )
 
-        if _PowerInverterQuery not in created_types:
+        if _PowerInverterQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.power_inverter = _PowerInverterQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -857,7 +858,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "power_inverter"),
             )
 
-        if _WindTurbineQuery not in created_types:
+        if _WindTurbineQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.wind_turbine = _WindTurbineQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -871,7 +872,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.yaw_direction = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -885,7 +886,7 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
                 connection_property=ViewPropertyId(self._view_id, "yaw_direction"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.yaw_error = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,

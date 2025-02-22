@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from cognite_core.config import global_config
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -446,7 +447,7 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
             reverse_expression,
         )
 
-        if _CogniteCADModelQuery not in created_types:
+        if _CogniteCADModelQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.model_3d = _CogniteCADModelQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -460,7 +461,7 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
                 connection_property=ViewPropertyId(self._view_id, "model3D"),
             )
 
-        if _Cognite3DObjectQuery not in created_types:
+        if _Cognite3DObjectQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.object_3d = _Cognite3DObjectQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -474,7 +475,7 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
                 connection_property=ViewPropertyId(self._view_id, "object3D"),
             )
 
-        if _CogniteCADRevisionQuery not in created_types:
+        if _CogniteCADRevisionQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.revisions = _CogniteCADRevisionQuery(
                 created_types.copy(),
                 self._creation_path,

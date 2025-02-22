@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from omni_sub.config import global_config
 from omni_sub.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     DataRecord,
@@ -302,7 +303,7 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
             reverse_expression,
         )
 
-        if _ConnectionItemAQuery not in created_types:
+        if _ConnectionItemAQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.connection_item_a = _ConnectionItemAQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -316,7 +317,7 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
                 connection_property=ViewPropertyId(self._view_id, "connectionItemA"),
             )
 
-        if _ConnectionItemBQuery not in created_types:
+        if _ConnectionItemBQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.connection_item_b = _ConnectionItemBQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from cognite_core.config import global_config
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -432,7 +433,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
             reverse_expression,
         )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.back = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -446,7 +447,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                 connection_property=ViewPropertyId(self._view_id, "back"),
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.bottom = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -460,7 +461,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                 connection_property=ViewPropertyId(self._view_id, "bottom"),
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.front = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -474,7 +475,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                 connection_property=ViewPropertyId(self._view_id, "front"),
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.left = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -488,7 +489,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                 connection_property=ViewPropertyId(self._view_id, "left"),
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.right = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -502,7 +503,7 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
                 connection_property=ViewPropertyId(self._view_id, "right"),
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.top = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,

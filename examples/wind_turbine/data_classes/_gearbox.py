@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from wind_turbine.config import global_config
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -381,7 +382,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.displacement_x = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -395,7 +396,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_property=ViewPropertyId(self._view_id, "displacement_x"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.displacement_y = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -409,7 +410,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_property=ViewPropertyId(self._view_id, "displacement_y"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.displacement_z = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -423,7 +424,7 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
                 connection_property=ViewPropertyId(self._view_id, "displacement_z"),
             )
 
-        if _NacelleQuery not in created_types:
+        if _NacelleQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.nacelle = _NacelleQuery(
                 created_types.copy(),
                 self._creation_path,

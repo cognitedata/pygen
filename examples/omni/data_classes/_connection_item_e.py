@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from omni.config import global_config
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -441,7 +442,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             reverse_expression,
         )
 
-        if _ConnectionItemDQuery not in created_types:
+        if _ConnectionItemDQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.direct_reverse_multi = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -456,7 +457,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_type="reverse-list",
             )
 
-        if _ConnectionItemDQuery not in created_types:
+        if _ConnectionItemDQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.direct_reverse_single = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -470,7 +471,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_property=ViewPropertyId(self._view_id, "directReverseSingle"),
             )
 
-        if _ConnectionItemDQuery not in created_types:
+        if _ConnectionItemDQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.inwards_single = _ConnectionItemDQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -484,7 +485,7 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
                 connection_property=ViewPropertyId(self._view_id, "inwardsSingle"),
             )
 
-        if _ConnectionEdgeAQuery not in created_types:
+        if _ConnectionEdgeAQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.inwards_single_property = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

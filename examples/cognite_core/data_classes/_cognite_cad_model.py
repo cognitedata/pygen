@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from cognite_core.config import global_config
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -326,7 +327,7 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
             reverse_expression,
         )
 
-        if _CogniteCADRevisionQuery not in created_types:
+        if _CogniteCADRevisionQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.revisions = _CogniteCADRevisionQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -340,7 +341,7 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
                 connection_property=ViewPropertyId(self._view_id, "revisions"),
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.thumbnail = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,

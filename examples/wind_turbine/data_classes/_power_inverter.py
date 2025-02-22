@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from wind_turbine.config import global_config
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -406,7 +407,7 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.active_power_total = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -420,7 +421,7 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
                 connection_property=ViewPropertyId(self._view_id, "active_power_total"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.apparent_power_total = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -434,7 +435,7 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
                 connection_property=ViewPropertyId(self._view_id, "apparent_power_total"),
             )
 
-        if _NacelleQuery not in created_types:
+        if _NacelleQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.nacelle = _NacelleQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -448,7 +449,7 @@ class _PowerInverterQuery(NodeQueryCore[T_DomainModelList, PowerInverterList]):
                 connection_property=ViewPropertyId(self._view_id, "nacelle"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.reactive_power_total = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,

@@ -8,6 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from cognite_core.config import global_config
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -661,7 +662,7 @@ class _CogniteEquipmentQuery(NodeQueryCore[T_DomainModelList, CogniteEquipmentLi
             reverse_expression,
         )
 
-        if _CogniteActivityQuery not in created_types:
+        if _CogniteActivityQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.activities = _CogniteActivityQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -676,7 +677,7 @@ class _CogniteEquipmentQuery(NodeQueryCore[T_DomainModelList, CogniteEquipmentLi
                 connection_type="reverse-list",
             )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.asset = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -690,7 +691,7 @@ class _CogniteEquipmentQuery(NodeQueryCore[T_DomainModelList, CogniteEquipmentLi
                 connection_property=ViewPropertyId(self._view_id, "asset"),
             )
 
-        if _CogniteEquipmentTypeQuery not in created_types:
+        if _CogniteEquipmentTypeQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.equipment_type = _CogniteEquipmentTypeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -704,7 +705,7 @@ class _CogniteEquipmentQuery(NodeQueryCore[T_DomainModelList, CogniteEquipmentLi
                 connection_property=ViewPropertyId(self._view_id, "equipmentType"),
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.files = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -718,7 +719,7 @@ class _CogniteEquipmentQuery(NodeQueryCore[T_DomainModelList, CogniteEquipmentLi
                 connection_property=ViewPropertyId(self._view_id, "files"),
             )
 
-        if _CogniteSourceSystemQuery not in created_types:
+        if _CogniteSourceSystemQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.source = _CogniteSourceSystemQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -732,7 +733,7 @@ class _CogniteEquipmentQuery(NodeQueryCore[T_DomainModelList, CogniteEquipmentLi
                 connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
-        if _CogniteTimeSeriesQuery not in created_types:
+        if _CogniteTimeSeriesQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.time_series = _CogniteTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,

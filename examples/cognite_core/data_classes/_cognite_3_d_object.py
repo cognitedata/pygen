@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from cognite_core.config import global_config
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -451,7 +452,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
             reverse_expression,
         )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.asset = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -465,7 +466,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                 connection_property=ViewPropertyId(self._view_id, "asset"),
             )
 
-        if _CogniteCADNodeQuery not in created_types:
+        if _CogniteCADNodeQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.cad_nodes = _CogniteCADNodeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -479,7 +480,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                 connection_property=ViewPropertyId(self._view_id, "cadNodes"),
             )
 
-        if _Cognite360ImageAnnotationQuery not in created_types:
+        if _Cognite360ImageAnnotationQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.images_360 = _Cognite360ImageAnnotationQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -494,7 +495,7 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                 connection_property=ViewPropertyId(self._view_id, "images360"),
             )
 
-        if _CognitePointCloudVolumeQuery not in created_types:
+        if _CognitePointCloudVolumeQuery not in created_types and len(creation_path) < global_config.max_select_depth:
             self.point_cloud_volumes = _CognitePointCloudVolumeQuery(
                 created_types.copy(),
                 self._creation_path,
