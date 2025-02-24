@@ -13,6 +13,13 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.0.2] - 2025-02-24
+### Fixed
+- Calling `.select()` on large, highly connected data models no longer raises a `MemoryExceptionError`. This was caused
+  by the underlying data structure created by pygen increasing in size exponentially with the number of connections.
+  This is now fixed by introducing a `global_config.max_select_depth` that limits the size of the data structure
+  pygen created.
+
 ## [1.0.1] - 2025-02-13
 ### Fixed
 - In a Pyodide environment with a large model, the `generate_sdk_notebook` can hit a recursion limit in pydantic

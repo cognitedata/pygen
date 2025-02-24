@@ -14,6 +14,7 @@ from cognite.client.data_classes import (
 )
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from omni.config import global_config
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,

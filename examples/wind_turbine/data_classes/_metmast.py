@@ -11,6 +11,7 @@ from cognite.client.data_classes import (
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from wind_turbine.config import global_config
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -303,7 +304,7 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
             reverse_expression,
         )
 
-        if _DistanceQuery not in created_types:
+        if _DistanceQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.wind_turbines = _DistanceQuery(
                 created_types.copy(),
                 self._creation_path,

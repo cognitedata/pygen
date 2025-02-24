@@ -163,6 +163,7 @@ def _generate_sdk(
     if return_sdk_files:
         return sdk
     output_dir = output_dir or (Path.cwd() / Path(top_level_package.replace(".", "/")))
+    output_dir = Path(output_dir)
     logger(f"Writing SDK to {output_dir}")
     write_sdk_to_disk(sdk, output_dir, overwrite, logger, format_code)
     logger("Done!")

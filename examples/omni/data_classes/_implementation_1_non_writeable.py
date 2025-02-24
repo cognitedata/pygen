@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from omni.config import global_config
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -247,7 +248,7 @@ class _Implementation1NonWriteableQuery(NodeQueryCore[T_DomainModelList, Impleme
             reverse_expression,
         )
 
-        if _Implementation1Query not in created_types:
+        if _Implementation1Query not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.connection_value = _Implementation1Query(
                 created_types.copy(),
                 self._creation_path,

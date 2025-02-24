@@ -8,6 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from cognite_core.config import global_config
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -619,7 +620,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
             reverse_expression,
         )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.assets = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -633,7 +634,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_property=ViewPropertyId(self._view_id, "assets"),
             )
 
-        if _CogniteFileCategoryQuery not in created_types:
+        if _CogniteFileCategoryQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.category = _CogniteFileCategoryQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -647,7 +648,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_property=ViewPropertyId(self._view_id, "category"),
             )
 
-        if _CogniteEquipmentQuery not in created_types:
+        if _CogniteEquipmentQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.equipment = _CogniteEquipmentQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -662,7 +663,7 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
                 connection_type="reverse-list",
             )
 
-        if _CogniteSourceSystemQuery not in created_types:
+        if _CogniteSourceSystemQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.source = _CogniteSourceSystemQuery(
                 created_types.copy(),
                 self._creation_path,

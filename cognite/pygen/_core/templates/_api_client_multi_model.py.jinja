@@ -28,6 +28,7 @@ class {{ api.name }}:
         version: {{ api.model.version }}
 
     """
+    _data_model_id = dm.DataModelId("{{ data_model.space }}", "{{ data_model.external_id }}", "{{ data_model.version }}")
 
     def __init__(self, client: CogniteClient):
         self._client = client

@@ -32,6 +32,8 @@ class OmniMultiAAPIs:
 
     """
 
+    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
+
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -60,6 +62,8 @@ class OmniMultiBAPIs:
         version: 1
 
     """
+
+    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -91,6 +95,8 @@ class OmniMultiCAPIs:
 
     """
 
+    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
+
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -113,7 +119,7 @@ class OmniMultiClient:
     OmniMultiClient
 
     Generated with:
-        pygen = 1.0.1
+        pygen = 1.0.2
         cognite-sdk = 7.73.3
         pydantic = 2.10.6
 
@@ -127,7 +133,7 @@ class OmniMultiClient:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:1.0.1"
+        client.config.client_name = "CognitePygen:1.0.2"
 
         self.omni_multi_a = OmniMultiAAPIs(client)
         self.omni_multi_b = OmniMultiBAPIs(client)

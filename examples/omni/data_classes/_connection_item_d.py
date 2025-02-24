@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from omni.config import global_config
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -386,7 +387,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
             reverse_expression,
         )
 
-        if _ConnectionItemEQuery not in created_types:
+        if _ConnectionItemEQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.direct_multi = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -400,7 +401,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 connection_property=ViewPropertyId(self._view_id, "directMulti"),
             )
 
-        if _ConnectionItemEQuery not in created_types:
+        if _ConnectionItemEQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.direct_single = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -414,7 +415,7 @@ class _ConnectionItemDQuery(NodeQueryCore[T_DomainModelList, ConnectionItemDList
                 connection_property=ViewPropertyId(self._view_id, "directSingle"),
             )
 
-        if _ConnectionItemEQuery not in created_types:
+        if _ConnectionItemEQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.outwards_single = _ConnectionItemEQuery(
                 created_types.copy(),
                 self._creation_path,
