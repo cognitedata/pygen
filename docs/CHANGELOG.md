@@ -13,7 +13,7 @@ Changes are grouped as follows
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## TBD
+## [1.0.2] - 2025-02-24
 ### Fixed
 - Calling `.select()` on large, highly connected data models no longer raises a `MemoryExceptionError`. This was caused
   by the underlying data structure created by pygen increasing in size exponentially with the number of connections.
