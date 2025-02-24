@@ -8,6 +8,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from cognite_core.config import global_config
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -635,7 +636,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
             reverse_expression,
         )
 
-        if _CogniteActivityQuery not in created_types:
+        if _CogniteActivityQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.activities = _CogniteActivityQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -650,7 +651,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 connection_type="reverse-list",
             )
 
-        if _CogniteAssetQuery not in created_types:
+        if _CogniteAssetQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.assets = _CogniteAssetQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -664,7 +665,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 connection_property=ViewPropertyId(self._view_id, "assets"),
             )
 
-        if _CogniteEquipmentQuery not in created_types:
+        if _CogniteEquipmentQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.equipment = _CogniteEquipmentQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -678,7 +679,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 connection_property=ViewPropertyId(self._view_id, "equipment"),
             )
 
-        if _CogniteSourceSystemQuery not in created_types:
+        if _CogniteSourceSystemQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.source = _CogniteSourceSystemQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -692,7 +693,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 connection_property=ViewPropertyId(self._view_id, "source"),
             )
 
-        if _CogniteUnitQuery not in created_types:
+        if _CogniteUnitQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.unit = _CogniteUnitQuery(
                 created_types.copy(),
                 self._creation_path,

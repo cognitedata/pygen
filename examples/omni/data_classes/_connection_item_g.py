@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from omni.config import global_config
 from omni.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -289,7 +290,7 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
             reverse_expression,
         )
 
-        if _ConnectionEdgeAQuery not in created_types:
+        if _ConnectionEdgeAQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.inwards_multi_property = _ConnectionEdgeAQuery(
                 created_types.copy(),
                 self._creation_path,

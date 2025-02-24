@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from omni_multi.config import global_config
 from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     DataRecord,

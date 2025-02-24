@@ -32,6 +32,8 @@ class OmniMultiAAPIs:
 
     """
 
+    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
+
     def __init__(self, client: CogniteClient):
         self._client = client
 
@@ -60,6 +62,8 @@ class OmniMultiBAPIs:
         version: 1
 
     """
+
+    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -90,6 +94,8 @@ class OmniMultiCAPIs:
         version: 1
 
     """
+
+    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
         self._client = client

@@ -6,6 +6,7 @@ from typing import Any, ClassVar, Literal, Optional, Union
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from wind_turbine.config import global_config
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,

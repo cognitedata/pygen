@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from cognite_core.config import global_config
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -331,7 +332,10 @@ class _Cognite360ImageModelQuery(NodeQueryCore[T_DomainModelList, Cognite360Imag
             reverse_expression,
         )
 
-        if _Cognite360ImageCollectionQuery not in created_types:
+        if (
+            _Cognite360ImageCollectionQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.collections = _Cognite360ImageCollectionQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -345,7 +349,7 @@ class _Cognite360ImageModelQuery(NodeQueryCore[T_DomainModelList, Cognite360Imag
                 connection_property=ViewPropertyId(self._view_id, "collections"),
             )
 
-        if _CogniteFileQuery not in created_types:
+        if _CogniteFileQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.thumbnail = _CogniteFileQuery(
                 created_types.copy(),
                 self._creation_path,

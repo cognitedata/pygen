@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
+from wind_turbine.config import global_config
 from wind_turbine.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
@@ -360,7 +361,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
             reverse_expression,
         )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.efficiency = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -374,7 +375,7 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
                 connection_property=ViewPropertyId(self._view_id, "efficiency"),
             )
 
-        if _SensorTimeSeriesQuery not in created_types:
+        if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.orientation = _SensorTimeSeriesQuery(
                 created_types.copy(),
                 self._creation_path,
