@@ -152,3 +152,27 @@ jobs:
           PYGEN_FILE_PATH=$whl_file \
           PACKAGES="[\"pyodide-http\", \"pandas\", \"typing-extensions>=4.10.0\", \"http://localhost:3000/dist/$whl_file\"]" \
           node test-pyodide.js
+
+  validate-description:
+    name: Validate PR description
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip poetry
+          poetry config virtualenvs.create false
+          poetry install -E all
+      - name: Dump description to file
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const description = context.payload.pull_request.body;
+            fs.writeFileSync('last_git_message.txt', description);
+      - name: Validate Changelog section in PR description
+        run: python dev.py changelog

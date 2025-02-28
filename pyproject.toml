@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cognite-pygen"
-version = "1.0.2"
+version = "0.0.0"
 description = "Cognite Python SDK Generator"
 readme = "README.md"
 authors = ["Cognite <support@cognite.com>"]
@@ -78,6 +78,7 @@ packaging = {version=">=21.3", optional=true}
 typer = {version = ">=0.9", extras = ["rich"], optional=true }
 black = {version=">=24.4.2", optional = true}
 build = {version=">=1.1", optional=true}
+marko = "^2.1.2"
 
 [tool.poetry.extras]
 cli = ["packaging", "typer", "toml", "build"]
