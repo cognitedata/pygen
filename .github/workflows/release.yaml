@@ -4,7 +4,7 @@ name: release
 on:
   push:
     branches:
-      - release-* # This will trigger the workflow on any branch that starts with "release-"
+      - main
 
 env:
   PYTHON_VERSION: '3.10'
@@ -30,21 +30,46 @@ jobs:
     environment: CD
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip poetry
           poetry config virtualenvs.create false
           poetry install -E all
+      - name: Dump last commit message to file
+        run: git log -1 --pretty=%B > last_git_message.txt
+      - name: Dump last tag to file
+        run: git describe --tags --abbrev=0 > last_version.txt
+      - name: Bump Version
+        run: python dev.py bump --verbose
+      - name: Create CHANGELOG entry
+        run: python dev.py changelog
+      - id: version
+        name: Read the new version
+        # Read the version from the cognite/pygen/_version.py file
+        run: echo "version=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' cognite/pygen/_version.py)" >> $GITHUB_ENV
 
       - name: Build package
+        if: env.version != '0.0.0'
         run: poetry build
 
       - name: Release to PyPI
+        if: env.version != '0.0.0'
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: twine upload --skip-existing --verbose dist/*
+
+      - name: Add entry to CHANGELOG
+        if: env.version != '0.0.0'
+        uses: ncipollo/release-action@v1
+        with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            prerelease: false
+            draft: false
+            tag: ${{ env.version }}
+            bodyFile: last_changelog_entry.md
