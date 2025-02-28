@@ -27,7 +27,6 @@ app = typer.Typer(
     pretty_exceptions_enable=False,
 )
 
-TBD_HEADING = "## TBD"
 VALID_CHANGELOG_HEADERS = {"Added", "Changed", "Removed", "Fixed"}
 BUMP_OPTIONS = Literal["major", "minor", "patch", "skip"]
 VALID_BUMP_OPTIONS = get_args(BUMP_OPTIONS)
@@ -260,7 +259,7 @@ def _isoformat_timestamps(nodes: dm.NodeList):
 def bump(verbose: bool = False) -> None:
     version_files = [
         REPO_ROOT / "pyproject.toml",
-        REPO_ROOT / "cognite" / "neat" / "_version.py",
+        REPO_ROOT / "cognite" / "pygen" / "_version.py",
     ]
     last_version_str = LAST_VERSION.read_text().strip().removeprefix("v")
     try:
