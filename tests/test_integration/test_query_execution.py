@@ -151,6 +151,20 @@ def test_aggregate_count(cognite_client: CogniteClient, omni_views: dict[str, dm
     assert "count" in result
 
 
+def test_aggregate_count_filter_no_results(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    view = omni_views["PrimitiveRequired"]
+    executor = QueryExecutor(cognite_client, views=[view])
+    result = executor.aggregate(
+        view.as_id(),
+        aggregates=dm.aggregations.Avg(property="int64"),
+        filter=filters.Equals(["node", "externalId"], "non_existing_id"),
+    )
+
+    assert isinstance(result, dict)
+    assert "count" in result
+    assert result["count"] == 0
+
+
 def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
     executor = QueryExecutor(cognite_client, views=[view])
