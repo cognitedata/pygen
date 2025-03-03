@@ -46,7 +46,7 @@ class {{ client_name }}:
         else:
             raise ValueError(f"Expected CogniteClient or ClientConfig, got {type(config_or_client)}")
         # The client name is used for aggregated logging of Pygen Usage
-        client.config.client_name = "CognitePygen:{{ pygen_version }}"
+        client.config.client_name = f"CognitePygen:{{ pygen_version }}:SDK:{client.config.client_name}"
 
         self._client = client
 
