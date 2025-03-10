@@ -8,6 +8,7 @@ def test_aggregate_count(omni_client: OmniClient) -> None:
     result = omni_client.primitive_required.aggregate("count")
 
     # Assert
+    assert isinstance(result.value, float)
     assert result.value > 0
 
 
@@ -17,7 +18,9 @@ def test_aggregate_count_with_group_by(omni_client: OmniClient) -> None:
 
     # Assert
     assert len(result) == 2
+    assert isinstance(result[0].aggregates[0].value, float)
     assert result[0].aggregates[0].value > 0
+    assert isinstance(result[1].aggregates[0].value, float)
     assert result[1].aggregates[0].value > 0
 
 
