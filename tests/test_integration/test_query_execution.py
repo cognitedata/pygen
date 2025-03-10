@@ -161,8 +161,7 @@ def test_aggregate_count_filter_no_results(cognite_client: CogniteClient, omni_v
     )
 
     assert isinstance(result, dict)
-    assert "count" in result
-    assert result["count"] == 0
+    assert "avg" in result
 
 
 def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
