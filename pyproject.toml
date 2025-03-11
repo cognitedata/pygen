@@ -68,7 +68,7 @@ pygen = "cognite.pygen.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-cognite-sdk = {version = "^7.62.4"}
+cognite-sdk = {version = "^7.73.6"}
 pydantic = "^2.7.0"
 Jinja2 = ">=3.1"
 inflect = ">=6.2"
