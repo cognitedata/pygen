@@ -10,4 +10,4 @@ pymdown-extensions==10.14.*
 mkdocstrings[python]==0.28.*
 # dependencies for mkdocstrings
 # 3.1.0 breaks nbconvert
-mistune==3.0.2
+mistune==3.1.2
