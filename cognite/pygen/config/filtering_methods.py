@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes.data_modeling.data_types import Enum
 
 
 @dataclass
@@ -51,6 +52,7 @@ class Filtering:
     date: tuple[type[dm.Filter], ...] = (dm.filters.Range,)
     datetime: tuple[type[dm.Filter], ...] = (dm.filters.Range,)
     string: tuple[type[dm.Filter], ...] = (dm.filters.Equals, dm.filters.In, dm.filters.Prefix)
+    enum: tuple[type[dm.Filter], ...] = (dm.filters.Equals, dm.filters.In)
     edge_one_to_one: tuple[type[dm.Filter], ...] = (dm.filters.Equals, dm.filters.In)
     by_name: dict[str, tuple[type[dm.Filter], ...]] = dataclass_field(
         default_factory=lambda: {"externalId": (dm.filters.Prefix,), "space": (dm.filters.Equals, dm.filters.In)}
@@ -72,6 +74,8 @@ class Filtering:
             return self.datetime
         elif isinstance(type_, dm.Text):
             return self.string
+        elif isinstance(type_, Enum):
+            return self.enum
         elif isinstance(type_, dm.DirectRelation):
             return self.edge_one_to_one
         else:
