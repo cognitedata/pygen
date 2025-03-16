@@ -263,6 +263,7 @@ def _create_cognite_360_image_model_filter(
         | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
         | None
     ) = None,
+    type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -288,6 +289,10 @@ def _create_cognite_360_image_model_filter(
                 view_id.as_property_ref("thumbnail"), values=[as_instance_dict_id(item) for item in thumbnail]
             )
         )
+    if isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

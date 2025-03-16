@@ -374,6 +374,7 @@ def _create_cognite_point_cloud_volume_filter(
         | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
         | None
     ) = None,
+    volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -417,6 +418,10 @@ def _create_cognite_point_cloud_volume_filter(
                 view_id.as_property_ref("revisions"), values=[as_instance_dict_id(item) for item in revisions]
             )
         )
+    if isinstance(volume_type, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("volumeType"), value=volume_type))
+    if volume_type and isinstance(volume_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("volumeType"), values=volume_type))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

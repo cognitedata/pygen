@@ -476,6 +476,9 @@ def _create_cognite_diagram_annotation_filter(
     max_start_node_y_max: float | None = None,
     min_start_node_y_min: float | None = None,
     max_start_node_y_min: float | None = None,
+    status: (
+        Literal["Approved", "Rejected", "Suggested"] | list[Literal["Approved", "Rejected", "Suggested"]] | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -660,6 +663,10 @@ def _create_cognite_diagram_annotation_filter(
                 view_id.as_property_ref("startNodeYMin"), gte=min_start_node_y_min, lte=max_start_node_y_min
             )
         )
+    if isinstance(status, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
+    if status and isinstance(status, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("status"), values=status))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

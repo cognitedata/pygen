@@ -106,6 +106,7 @@ class Cognite360ImageStationAPI(
         properties: Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
+        group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -123,6 +124,7 @@ class Cognite360ImageStationAPI(
             properties: The property to search, if nothing is passed all text fields will be searched.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
+            group_type: The group type to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -155,6 +157,7 @@ class Cognite360ImageStationAPI(
             self._view_id,
             description,
             description_prefix,
+            group_type,
             name,
             name_prefix,
             external_id_prefix,
@@ -183,6 +186,7 @@ class Cognite360ImageStationAPI(
         ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
+        group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -203,6 +207,7 @@ class Cognite360ImageStationAPI(
         ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
+        group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -227,6 +232,7 @@ class Cognite360ImageStationAPI(
         ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
+        group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -250,6 +256,7 @@ class Cognite360ImageStationAPI(
         ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
+        group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -271,6 +278,7 @@ class Cognite360ImageStationAPI(
             search_property: The text field to search in.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
+            group_type: The group type to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -297,6 +305,7 @@ class Cognite360ImageStationAPI(
             self._view_id,
             description,
             description_prefix,
+            group_type,
             name,
             name_prefix,
             external_id_prefix,
@@ -323,6 +332,7 @@ class Cognite360ImageStationAPI(
         ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
+        group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -339,6 +349,7 @@ class Cognite360ImageStationAPI(
             search_property: The text field to search in.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
+            group_type: The group type to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -356,6 +367,7 @@ class Cognite360ImageStationAPI(
             self._view_id,
             description,
             description_prefix,
+            group_type,
             name,
             name_prefix,
             external_id_prefix,
@@ -400,6 +412,7 @@ class Cognite360ImageStationAPI(
         self,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
+        group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -415,6 +428,7 @@ class Cognite360ImageStationAPI(
         Args:
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
+            group_type: The group type to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
@@ -445,6 +459,7 @@ class Cognite360ImageStationAPI(
             self._view_id,
             description,
             description_prefix,
+            group_type,
             name,
             name_prefix,
             external_id_prefix,

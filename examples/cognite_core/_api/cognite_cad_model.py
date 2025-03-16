@@ -121,6 +121,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -139,6 +140,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             thumbnail: The thumbnail to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite cad models to return. Defaults to 25.
@@ -172,6 +174,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             name,
             name_prefix,
             thumbnail,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -206,6 +209,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -232,6 +236,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -262,6 +267,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -291,6 +297,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -313,6 +320,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             thumbnail: The thumbnail to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite cad models to return. Defaults to 25.
@@ -340,6 +348,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             name,
             name_prefix,
             thumbnail,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -372,6 +381,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -389,6 +399,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             thumbnail: The thumbnail to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite cad models to return.
@@ -407,6 +418,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             name,
             name_prefix,
             thumbnail,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -476,6 +488,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -493,6 +506,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             thumbnail: The thumbnail to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite cad models to return.
@@ -527,6 +541,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             name,
             name_prefix,
             thumbnail,
+            type_,
             external_id_prefix,
             space,
             filter,

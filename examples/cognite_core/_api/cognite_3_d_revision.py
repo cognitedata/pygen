@@ -140,6 +140,12 @@ class Cognite3DRevisionAPI(
             | None
         ) = None,
         published: bool | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -155,6 +161,8 @@ class Cognite3DRevisionAPI(
             properties: The property to search, if nothing is passed all text fields will be searched.
             model_3d: The model 3d to filter on.
             published: The published to filter on.
+            status: The status to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite 3D revisions to return. Defaults to 25.
@@ -185,6 +193,8 @@ class Cognite3DRevisionAPI(
             self._view_id,
             model_3d,
             published,
+            status,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -214,6 +224,12 @@ class Cognite3DRevisionAPI(
             | None
         ) = None,
         published: bool | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -235,6 +251,12 @@ class Cognite3DRevisionAPI(
             | None
         ) = None,
         published: bool | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -260,6 +282,12 @@ class Cognite3DRevisionAPI(
             | None
         ) = None,
         published: bool | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -284,6 +312,12 @@ class Cognite3DRevisionAPI(
             | None
         ) = None,
         published: bool | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -301,6 +335,8 @@ class Cognite3DRevisionAPI(
             property: The property to perform aggregation on.
             model_3d: The model 3d to filter on.
             published: The published to filter on.
+            status: The status to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite 3D revisions to return. Defaults to 25.
@@ -325,6 +361,8 @@ class Cognite3DRevisionAPI(
             self._view_id,
             model_3d,
             published,
+            status,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -352,6 +390,12 @@ class Cognite3DRevisionAPI(
             | None
         ) = None,
         published: bool | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -364,6 +408,8 @@ class Cognite3DRevisionAPI(
             interval: The interval to use for the histogram bins.
             model_3d: The model 3d to filter on.
             published: The published to filter on.
+            status: The status to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite 3D revisions to return.
@@ -379,6 +425,8 @@ class Cognite3DRevisionAPI(
             self._view_id,
             model_3d,
             published,
+            status,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -436,6 +484,12 @@ class Cognite3DRevisionAPI(
             | None
         ) = None,
         published: bool | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -450,6 +504,8 @@ class Cognite3DRevisionAPI(
         Args:
             model_3d: The model 3d to filter on.
             published: The published to filter on.
+            status: The status to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite 3D revisions to return.
@@ -481,6 +537,8 @@ class Cognite3DRevisionAPI(
             self._view_id,
             model_3d,
             published,
+            status,
+            type_,
             external_id_prefix,
             space,
             filter,

@@ -123,6 +123,7 @@ class Cognite360ImageModelAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -141,6 +142,7 @@ class Cognite360ImageModelAPI(
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             thumbnail: The thumbnail to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite 360 image models to return. Defaults to 25.
@@ -174,6 +176,7 @@ class Cognite360ImageModelAPI(
             name,
             name_prefix,
             thumbnail,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -208,6 +211,7 @@ class Cognite360ImageModelAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -234,6 +238,7 @@ class Cognite360ImageModelAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -264,6 +269,7 @@ class Cognite360ImageModelAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -293,6 +299,7 @@ class Cognite360ImageModelAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -315,6 +322,7 @@ class Cognite360ImageModelAPI(
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             thumbnail: The thumbnail to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite 360 image models to return. Defaults to 25.
@@ -342,6 +350,7 @@ class Cognite360ImageModelAPI(
             name,
             name_prefix,
             thumbnail,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -374,6 +383,7 @@ class Cognite360ImageModelAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -391,6 +401,7 @@ class Cognite360ImageModelAPI(
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             thumbnail: The thumbnail to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite 360 image models to return.
@@ -409,6 +420,7 @@ class Cognite360ImageModelAPI(
             name,
             name_prefix,
             thumbnail,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -478,6 +490,7 @@ class Cognite360ImageModelAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -495,6 +508,7 @@ class Cognite360ImageModelAPI(
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             thumbnail: The thumbnail to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite 360 image models to return.
@@ -529,6 +543,7 @@ class Cognite360ImageModelAPI(
             name,
             name_prefix,
             thumbnail,
+            type_,
             external_id_prefix,
             space,
             filter,

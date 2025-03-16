@@ -56,6 +56,9 @@ class Cognite3DObjectImages360API(EdgePropertyAPI):
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
+        status: (
+            Literal["Approved", "Rejected", "Suggested"] | list[Literal["Approved", "Rejected", "Suggested"]] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit=DEFAULT_LIMIT_READ,
@@ -88,6 +91,7 @@ class Cognite3DObjectImages360API(EdgePropertyAPI):
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
+            status: The status to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of images 360 edges to return. Defaults to 25.
@@ -135,6 +139,7 @@ class Cognite3DObjectImages360API(EdgePropertyAPI):
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
+            status,
             external_id_prefix,
             space,
         )

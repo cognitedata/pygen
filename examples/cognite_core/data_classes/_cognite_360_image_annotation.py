@@ -338,6 +338,9 @@ def _create_cognite_360_image_annotation_filter(
     max_source_updated_time: datetime.datetime | None = None,
     source_updated_user: str | list[str] | None = None,
     source_updated_user_prefix: str | None = None,
+    status: (
+        Literal["Approved", "Rejected", "Suggested"] | list[Literal["Approved", "Rejected", "Suggested"]] | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -462,6 +465,10 @@ def _create_cognite_360_image_annotation_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
         )
+    if isinstance(status, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
+    if status and isinstance(status, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("status"), values=status))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

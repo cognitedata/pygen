@@ -147,6 +147,7 @@ class CognitePointCloudVolumeAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -169,6 +170,7 @@ class CognitePointCloudVolumeAPI(
             name_prefix: The prefix of the name to filter on.
             object_3d: The object 3d to filter on.
             revisions: The revision to filter on.
+            volume_type: The volume type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite point cloud volumes to return. Defaults to 25.
@@ -206,6 +208,7 @@ class CognitePointCloudVolumeAPI(
             name_prefix,
             object_3d,
             revisions,
+            volume_type,
             external_id_prefix,
             space,
             filter,
@@ -260,6 +263,7 @@ class CognitePointCloudVolumeAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -306,6 +310,7 @@ class CognitePointCloudVolumeAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -356,6 +361,7 @@ class CognitePointCloudVolumeAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -405,6 +411,7 @@ class CognitePointCloudVolumeAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -431,6 +438,7 @@ class CognitePointCloudVolumeAPI(
             name_prefix: The prefix of the name to filter on.
             object_3d: The object 3d to filter on.
             revisions: The revision to filter on.
+            volume_type: The volume type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite point cloud volumes to return. Defaults to 25.
@@ -462,6 +470,7 @@ class CognitePointCloudVolumeAPI(
             name_prefix,
             object_3d,
             revisions,
+            volume_type,
             external_id_prefix,
             space,
             filter,
@@ -514,6 +523,7 @@ class CognitePointCloudVolumeAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -535,6 +545,7 @@ class CognitePointCloudVolumeAPI(
             name_prefix: The prefix of the name to filter on.
             object_3d: The object 3d to filter on.
             revisions: The revision to filter on.
+            volume_type: The volume type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite point cloud volumes to return.
@@ -557,6 +568,7 @@ class CognitePointCloudVolumeAPI(
             name_prefix,
             object_3d,
             revisions,
+            volume_type,
             external_id_prefix,
             space,
             filter,
@@ -649,6 +661,7 @@ class CognitePointCloudVolumeAPI(
             | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -670,6 +683,7 @@ class CognitePointCloudVolumeAPI(
             name_prefix: The prefix of the name to filter on.
             object_3d: The object 3d to filter on.
             revisions: The revision to filter on.
+            volume_type: The volume type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite point cloud volumes to return.
@@ -708,6 +722,7 @@ class CognitePointCloudVolumeAPI(
             name_prefix,
             object_3d,
             revisions,
+            volume_type,
             external_id_prefix,
             space,
             filter,
