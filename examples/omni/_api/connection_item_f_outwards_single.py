@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Sequence
-
+from typing import Literal
 from cognite.client import data_modeling as dm
 
 from omni.data_classes import (
