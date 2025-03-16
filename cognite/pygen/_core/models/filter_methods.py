@@ -10,6 +10,7 @@ from cognite.client.data_classes import data_modeling as dm
 
 from cognite.pygen import config as pygen_config
 from cognite.pygen.config.reserved_words import is_reserved_word
+from cognite.pygen.utils.helper import _get_literal_str
 
 from .fields import (
     BaseConnectionField,
@@ -94,6 +95,8 @@ class FilterImplementation:
         elif self.filter is dm.filters.Equals:
             parameter = next(iter(self.keyword_arguments.values()))
             parameter_type = parameter.type_
+            if match := _get_literal_str(parameter_type):
+                parameter_type = parameter_type.replace(match, "str")
             if "|" in parameter_type:
                 parameter_type = parameter_type.split("|")[0].strip()
             return f"isinstance({parameter.name}, {parameter_type})"
@@ -157,7 +160,7 @@ class FilterImplementationOnetoOneEdge(FilterImplementation):
 
 @dataclass
 class FilterMethod:
-    """This classe represents a filter that can be used in any method that requires filtering.
+    """This class represents a filter that can be used in any method that requires filtering.
 
     Args:
         parameters: The parameters of the filter.
