@@ -7,6 +7,7 @@ from pathlib import Path
 from cognite.client import data_modeling as dm
 
 from cognite.pygen import generate_sdk
+from tests.constants import CORE_SDK
 
 
 @contextmanager
@@ -151,6 +152,30 @@ class TestGenerateSDK:
                 overwrite=True,
                 client_name=client_name,
                 default_instance_space="reverse_direct_relation_space",
+            )
+            assert len(logger) == 0
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+
+    def test_generate_sdk_exclude_views(self, tmp_path: Path) -> None:
+        core = CORE_SDK.load_data_model()
+        exclude_views: set[str | dm.ViewId] = {
+            view.as_id() for view in core.views if view.external_id != "CogniteAsset"
+        }
+        top_level_package = "core_sdk"
+        client_name = "CoreClient"
+
+        with warnings.catch_warnings(record=True) as logger:
+            warnings.simplefilter("always")
+            generate_sdk(
+                core,
+                top_level_package=top_level_package,
+                output_dir=tmp_path / top_level_package,
+                overwrite=True,
+                client_name=client_name,
+                default_instance_space="my_space",
+                exclude_views=exclude_views,
             )
             assert len(logger) == 0
         with append_to_sys_path(str(tmp_path)):
