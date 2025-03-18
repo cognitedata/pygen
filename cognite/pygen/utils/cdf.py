@@ -774,6 +774,10 @@ def _reduce_model(
             # Creating a copy to avoid mutating input.
             new_view = dm.View._load(view.dump())
             new_views.append(new_view)
+    if not new_views:
+        raise ValueError(
+            f"No views left in {model.as_id()}. Please check your exclude_views and exclude_spaces" f"parameters"
+        )
 
     for view in new_views:
         # Creating a copy to avoid mutating input.
