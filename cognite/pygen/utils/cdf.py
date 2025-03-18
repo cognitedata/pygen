@@ -771,15 +771,17 @@ def _reduce_model(
         elif exclude_spaces and view.space in exclude_spaces:
             excluded_views.add(view_id)
         else:
-            new_views.append(view)
+            # Creating a copy to avoid mutating input.
+            new_view = dm.View._load(view.dump())
+            new_views.append(new_view)
 
     for view in new_views:
-        new_view = dm.View._load(view.dump())
+        # Creating a copy to avoid mutating input.
         new_properties: dict[str, ViewProperty] = {}
         for prop_id, prop in view.properties.items():
             if _include_property(prop, excluded_views):
                 new_properties[prop_id] = prop
-        new_view.properties = new_properties
+        view.properties = new_properties
     model.views = new_views
     return model
 
