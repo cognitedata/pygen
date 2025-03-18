@@ -26,6 +26,7 @@ from cognite.pygen._version import __version__
 from cognite.pygen._warnings import InvalidCodeGenerated, print_warnings
 from cognite.pygen.config import PygenConfig
 from cognite.pygen.exceptions import DataModelNotFound
+from cognite.pygen.utils.cdf import _reduce_model
 from cognite.pygen.utils.text import to_pascal, to_snake
 
 DataModel = Union[DataModelIdentifier, dm.DataModel[dm.View]]
@@ -46,6 +47,8 @@ def generate_sdk(  # type: ignore[overload-overlap, misc]
     format_code: bool = False,
     config: Optional[PygenConfig] = None,
     return_sdk_files: Literal[False] = False,
+    exclude_views: set[dm.ViewId | str] | None = None,
+    exclude_spaces: set[str] | None = None,
 ) -> None: ...
 
 
@@ -62,6 +65,8 @@ def generate_sdk(
     format_code: bool = False,
     config: Optional[PygenConfig] = None,
     return_sdk_files: Literal[True] = False,  # type: ignore[assignment]
+    exclude_views: set[dm.ViewId | str] | None = None,
+    exclude_spaces: set[str] | None = None,
 ) -> dict[Path, str]: ...
 
 
@@ -77,6 +82,8 @@ def generate_sdk(
     format_code: bool = False,
     config: Optional[PygenConfig] = None,
     return_sdk_files: bool = False,
+    exclude_views: set[dm.ViewId | str] | None = None,
+    exclude_spaces: set[str] | None = None,
 ) -> None | dict[Path, str]:
     """
     Generates a Python SDK tailored to the given Data Model(s).
@@ -103,6 +110,10 @@ def generate_sdk(
         config: The configuration used to control how to generate the SDK.
         return_sdk_files: Whether to return the generated SDK files as a dictionary. Defaults to False.
             This is useful for granular control of how to write the SDK to disk.
+        exclude_views: A set of view IDs to exclude from the generated SDK. If None, all views are included.
+            Given as a ViewId or a view ExternalId.
+        exclude_spaces: A set of space IDs to exclude from the generated SDK. If None, all spaces
+            are included. Given as a space name.
     """
     return _generate_sdk(
         model_id,
@@ -116,6 +127,8 @@ def generate_sdk(
         format_code,
         config,
         return_sdk_files,
+        exclude_views,
+        exclude_spaces,
     )
 
 
@@ -131,12 +144,22 @@ def _generate_sdk(
     format_code: bool = False,
     config: Optional[PygenConfig] = None,
     return_sdk_files: bool = False,
+    exclude_views: set[dm.ViewId | str] | None = None,
+    exclude_spaces: set[str] | None = None,
     context: Literal["notebook", "cli"] = "cli",
 ) -> None | dict[Path, str]:
     if output_dir is not None and top_level_package is None:
         raise ValueError("top_level_package must be provided if output_dir is provided")
     logger = logger or print
     data_model = _get_data_model(model_id, client, logger)
+    if exclude_views or exclude_spaces:
+        if isinstance(data_model, dm.DataModel):
+            data_model = _reduce_model(data_model, exclude_views, exclude_spaces)
+        elif isinstance(data_model, dm.DataModelList):
+            data_models = dm.DataModelList[dm.View]([])
+            for model in data_model:
+                data_models.append(_reduce_model(model, exclude_views, exclude_spaces))
+            data_model = data_models
 
     external_id = _extract_external_id(data_model)
 
@@ -178,6 +201,8 @@ def generate_sdk_notebook(
     default_instance_space: str | None = None,
     config: Optional[PygenConfig] = None,
     clean_pygen_temp_dir: bool = True,
+    exclude_views: set[dm.ViewId | str] | None = None,
+    exclude_spaces: set[str] | None = None,
 ) -> Any:
     """
     Generates a Python SDK tailored to the given Data Model(s) and imports it into the current Python session.
@@ -207,7 +232,10 @@ def generate_sdk_notebook(
         config: The configuration used to control how to generate the SDK.
         clean_pygen_temp_dir: Whether to clean the temporary directory used to store the generated SDK.
             Defaults to True.
-
+        exclude_views: A set of view IDs to exclude from the generated SDK. If None, all views are included.
+            Given as a ViewId or a view ExternalId.
+        exclude_spaces: A set of space IDs to exclude from the generated SDK. If None, all spaces
+            are included. Given as a space name.
     Returns:
         The instantiated generated client class.
     """
@@ -240,6 +268,8 @@ def generate_sdk_notebook(
         format_code=False,
         config=config,
         context="notebook",
+        exclude_views=exclude_views,
+        exclude_spaces=exclude_spaces,
     )
     if str(output_dir) not in sys.path:
         sys.path.append(str(output_dir))

@@ -754,3 +754,11 @@ def _find_first_node_type(filter_: dm.filters.Filter | None) -> dm.DirectRelatio
             if list(property_) == ["node", "type"] and "space" in value and "externalId" in value:
                 return dm.DirectRelationReference(space=value["space"], external_id=value["externalId"])
     return None
+
+
+def _reduce_model(
+    model: dm.DataModel[dm.View],
+    exclude_views: set[str | dm.ViewId] | None = None,
+    exclude_spaces: set[str] | None = None,
+) -> dm.DataModel[dm.View]:
+    raise NotImplementedError
