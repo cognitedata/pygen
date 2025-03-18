@@ -34,6 +34,7 @@ from cognite.client.data_classes.data_modeling import (
     data_types,
     filters,
 )
+from cognite.client.data_classes.data_modeling.views import EdgeConnection, ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteNotFoundError
 from cognite.client.utils.useful_types import SequenceNotStr
 
@@ -761,4 +762,33 @@ def _reduce_model(
     exclude_views: set[str | dm.ViewId] | None = None,
     exclude_spaces: set[str] | None = None,
 ) -> dm.DataModel[dm.View]:
-    raise NotImplementedError
+    excluded_views: set[dm.ViewId] = set()
+    new_views: list[dm.View] = []
+    for view in model.views:
+        view_id = view.as_id()
+        if exclude_views and (view_id in exclude_views or view.external_id in exclude_views):
+            excluded_views.add(view_id)
+        elif exclude_spaces and view.space in exclude_spaces:
+            excluded_views.add(view_id)
+        else:
+            new_views.append(view)
+
+    for view in new_views:
+        new_view = dm.View._load(view.dump())
+        new_properties: dict[str, ViewProperty] = {}
+        for prop_id, prop in view.properties.items():
+            if _include_property(prop, excluded_views):
+                new_properties[prop_id] = prop
+        new_view.properties = new_properties
+    model.views = new_views
+    return model
+
+
+def _include_property(prop: ViewProperty, excluded_views: set[dm.ViewId]) -> bool:
+    if isinstance(prop, MappedProperty):
+        return prop.source not in excluded_views
+    elif isinstance(prop, EdgeConnection):
+        return prop.source not in excluded_views and prop.edge_source not in excluded_views
+    elif isinstance(prop, ReverseDirectRelation):
+        return prop.source not in excluded_views and prop.through.source not in excluded_views
+    return True
