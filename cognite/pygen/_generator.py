@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import inspect
 import os
 import re
 import shutil
@@ -20,7 +21,6 @@ from pydantic_core import SchemaError
 
 from cognite.pygen._constants import is_pyodide
 from cognite.pygen._core.generators import SDKGenerator
-from cognite.pygen._core.models import DataClass
 from cognite.pygen._settings import _load_pyproject_toml
 from cognite.pygen._version import __version__
 from cognite.pygen._warnings import InvalidCodeGenerated, print_warnings
@@ -288,17 +288,14 @@ def generate_sdk_notebook(
 
     print(f"Imported {top_level_package}")
     print("You can now use the generated SDK in the current Python session.")
-    if isinstance(data_model, dm.DataModel):
-        view = data_model.views[0]
-    elif isinstance(data_model, Sequence):
-        view = data_model[0].views[0]
-    else:
-        view = None
+    first_write_cls = next(
+        (name for name, _ in inspect.getmembers(module["data_classes"]) if name.endswith("Write")), None
+    )
 
-    if view:
+    if first_write_cls:
         print(
             "The data classes are available by importing, for example, "
-            f"`from {top_level_package}.data_classes import {DataClass.to_base_name(view)}Write`"
+            f"`from {top_level_package}.data_classes import {first_write_cls}`"
         )
     return module[client_name](client)
 
