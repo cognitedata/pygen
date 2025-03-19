@@ -46,6 +46,8 @@ from omni.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -211,9 +213,9 @@ def _create_cdf_external_references_listed_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _CDFExternalReferencesListedQuery(NodeQueryCore[T_DomainModelList, CDFExternalReferencesListedList]):
+class _CDFExternalReferencesListedQuery(NodeQueryCore[T_DomainModelList, CDFExternalReferencesListedList]):  # type: ignore[type-var, valid-type]
     _view_id = CDFExternalReferencesListed._view_id
-    _result_cls = CDFExternalReferencesListed
+    _result_cls = CDFExternalReferencesListed  # type: ignore[assignment]
     _result_list_cls_end = CDFExternalReferencesListedList
 
     def __init__(
@@ -221,7 +223,7 @@ class _CDFExternalReferencesListedQuery(NodeQueryCore[T_DomainModelList, CDFExte
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,

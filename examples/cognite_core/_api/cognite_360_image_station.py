@@ -18,6 +18,8 @@ from cognite_core._api._core import (
 from cognite_core.data_classes._core import (
     DEFAULT_INSTANCE_SPACE,
     DEFAULT_QUERY_LIMIT,
+)
+from omni.data_classes._core.query import (
     QueryStepFactory,
     QueryBuilder,
     QueryUnpacker,

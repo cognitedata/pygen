@@ -28,6 +28,8 @@ from cognite_core.data_classes._core import (
     as_write_args,
     as_pygen_node_id,
     is_tuple_id,
+)
+from omni.data_classes._core.query import (
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -363,9 +365,9 @@ def _create_cognite_3_d_transformation_edge_filter(
     return dm.filters.And(*filters)
 
 
-class _Cognite3DTransformationEdgeQuery(EdgeQueryCore[T_DomainList, Cognite3DTransformationEdgeList]):
+class _Cognite3DTransformationEdgeQuery(EdgeQueryCore[T_DomainList, Cognite3DTransformationEdgeList]):  # type: ignore[type-var, valid-type]
     _view_id = Cognite3DTransformationEdge._view_id
-    _result_cls = Cognite3DTransformationEdge
+    _result_cls = Cognite3DTransformationEdge  # type: ignore[assignment]
     _result_list_cls_end = Cognite3DTransformationEdgeList
 
     def __init__(
@@ -373,7 +375,7 @@ class _Cognite3DTransformationEdgeQuery(EdgeQueryCore[T_DomainList, Cognite3DTra
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainList],
+        result_list_cls: type[T_DomainList],  # type: ignore[valid-type]
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,

@@ -3,7 +3,7 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from omni import data_classes as dc
-from omni.data_classes._core import QueryBuilder, QueryStep, QueryUnpacker, ViewPropertyId
+from omni.data_classes._core.query import QueryBuilder, QueryStep, QueryUnpacker, ViewPropertyId
 
 
 class TestQueryBuilder:

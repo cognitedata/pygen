@@ -29,6 +29,8 @@ from wind_turbine.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -340,9 +342,9 @@ def _create_high_speed_shaft_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList]):
+class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList]):  # type: ignore[type-var, valid-type]
     _view_id = HighSpeedShaft._view_id
-    _result_cls = HighSpeedShaft
+    _result_cls = HighSpeedShaft  # type: ignore[assignment]
     _result_list_cls_end = HighSpeedShaftList
 
     def __init__(
@@ -350,7 +352,7 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,

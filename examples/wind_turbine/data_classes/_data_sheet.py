@@ -31,6 +31,8 @@ from wind_turbine.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -260,9 +262,9 @@ def _create_data_sheet_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _DataSheetQuery(NodeQueryCore[T_DomainModelList, DataSheetList]):
+class _DataSheetQuery(NodeQueryCore[T_DomainModelList, DataSheetList]):  # type: ignore[type-var, valid-type]
     _view_id = DataSheet._view_id
-    _result_cls = DataSheet
+    _result_cls = DataSheet  # type: ignore[assignment]
     _result_list_cls_end = DataSheetList
 
     def __init__(
@@ -270,7 +272,7 @@ class _DataSheetQuery(NodeQueryCore[T_DomainModelList, DataSheetList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,

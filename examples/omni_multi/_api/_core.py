@@ -25,10 +25,8 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 from omni_multi.config import global_config
 from omni_multi import data_classes
 from omni_multi.data_classes._core import (
-    chunker,
     DomainModel,
     DomainModelWrite,
-    IN_FILTER_CHUNK_SIZE,
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -40,6 +38,10 @@ from omni_multi.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
+)
+from omni.data_classes._core.query import (
+    chunker,
+    IN_FILTER_CHUNK_SIZE,
     QueryBuilder,
     QueryUnpacker,
 )

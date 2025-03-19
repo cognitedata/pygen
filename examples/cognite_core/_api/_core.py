@@ -25,11 +25,9 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 from cognite_core.config import global_config
 from cognite_core import data_classes
 from cognite_core.data_classes._core import (
-    chunker,
     DomainModel,
     DomainModelWrite,
     DEFAULT_INSTANCE_SPACE,
-    IN_FILTER_CHUNK_SIZE,
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -41,6 +39,10 @@ from cognite_core.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
+)
+from omni.data_classes._core.query import (
+    chunker,
+    IN_FILTER_CHUNK_SIZE,
     QueryBuilder,
     QueryUnpacker,
 )

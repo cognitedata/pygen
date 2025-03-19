@@ -29,6 +29,8 @@ from cognite_core.data_classes._core import (
     as_write_args,
     as_pygen_node_id,
     is_tuple_id,
+)
+from omni.data_classes._core.query import (
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -678,9 +680,9 @@ def _create_cognite_diagram_annotation_filter(
     return dm.filters.And(*filters)
 
 
-class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramAnnotationList]):
+class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramAnnotationList]):  # type: ignore[type-var, valid-type]
     _view_id = CogniteDiagramAnnotation._view_id
-    _result_cls = CogniteDiagramAnnotation
+    _result_cls = CogniteDiagramAnnotation  # type: ignore[assignment]
     _result_list_cls_end = CogniteDiagramAnnotationList
 
     def __init__(
@@ -688,7 +690,7 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainList],
+        result_list_cls: type[T_DomainList],  # type: ignore[valid-type]
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,

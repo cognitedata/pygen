@@ -4,4 +4,3 @@ from omni_sub.data_classes._core.cdf_external import *  # noqa
 from omni_sub.data_classes._core.datapoints_api import *  # noqa
 from omni_sub.data_classes._core.helpers import *  # noqa
 from omni_sub.data_classes._core.filecontent_api import *  # noqa
-from omni_sub.data_classes._core.query import *  # noqa

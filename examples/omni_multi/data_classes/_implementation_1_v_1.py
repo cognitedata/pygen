@@ -28,6 +28,8 @@ from omni_multi.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -213,9 +215,9 @@ def _create_implementation_1_v_1_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1List]):
+class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1List]):  # type: ignore[type-var, valid-type]
     _view_id = Implementation1v1._view_id
-    _result_cls = Implementation1v1
+    _result_cls = Implementation1v1  # type: ignore[assignment]
     _result_list_cls_end = Implementation1v1List
 
     def __init__(
@@ -223,7 +225,7 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,

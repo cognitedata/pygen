@@ -29,6 +29,8 @@ from cognite_core.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -231,9 +233,9 @@ def _create_cognite_visualizable_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _CogniteVisualizableQuery(NodeQueryCore[T_DomainModelList, CogniteVisualizableList]):
+class _CogniteVisualizableQuery(NodeQueryCore[T_DomainModelList, CogniteVisualizableList]):  # type: ignore[type-var, valid-type]
     _view_id = CogniteVisualizable._view_id
-    _result_cls = CogniteVisualizable
+    _result_cls = CogniteVisualizable  # type: ignore[assignment]
     _result_list_cls_end = CogniteVisualizableList
 
     def __init__(
@@ -241,7 +243,7 @@ class _CogniteVisualizableQuery(NodeQueryCore[T_DomainModelList, CogniteVisualiz
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
