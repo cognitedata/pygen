@@ -42,14 +42,16 @@ def _get_literal_str(text: str) -> str | None:
         "Literal['hello', 'world']"
         >>> _get_literal_str('None | Literal["hello", "world", "!"]')
         'Literal["hello", "world", "!"]'
+        >>> _get_literal_str('Literal["incomplete')
+
     """
     if "Literal[" not in text:
         return None
 
     start = text.find("Literal[")
-    end = text.find("]", start) + 1
+    end = text.find("]", start)
 
     if start == -1 or end == -1:
         return None
 
-    return text[start:end]
+    return text[start : end + 1]
