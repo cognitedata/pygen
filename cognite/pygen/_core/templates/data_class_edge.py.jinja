@@ -297,9 +297,9 @@ def {{ data_class.filter_name }}(
     return dm.filters.And(*filters)
 
 
-class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class.read_list_name }}]):
+class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class.read_list_name }}]):  # type: ignore[type-var, valid-type]
     _view_id = {{ data_class.read_name }}._view_id
-    _result_cls = {{ data_class.read_name }}
+    _result_cls = {{ data_class.read_name }}  # type: ignore[assignment]
     _result_list_cls_end = {{ data_class.read_list_name }}
 
     def __init__(
@@ -307,7 +307,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainList],
+        result_list_cls: type[T_DomainList],  # type: ignore[valid-type]
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
