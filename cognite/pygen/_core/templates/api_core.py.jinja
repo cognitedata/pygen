@@ -25,13 +25,11 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 from {{ top_level_package }}.config import global_config
 from {{ top_level_package }} import data_classes
 from {{ top_level_package }}.data_classes._core import (
-    chunker,
     DomainModel,
     DomainModelWrite,
     {% if has_default_instance_space %}
     DEFAULT_INSTANCE_SPACE,
     {% endif %}
-    IN_FILTER_CHUNK_SIZE,
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -43,6 +41,10 @@ from {{ top_level_package }}.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
+)
+from omni.data_classes._core.query import (
+    chunker,
+    IN_FILTER_CHUNK_SIZE,
     QueryBuilder,
     QueryUnpacker,
 )
