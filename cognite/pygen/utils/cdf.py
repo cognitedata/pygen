@@ -34,6 +34,7 @@ from cognite.client.data_classes.data_modeling import (
     data_types,
     filters,
 )
+from cognite.client.data_classes.data_modeling.views import EdgeConnection, ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteNotFoundError
 from cognite.client.utils.useful_types import SequenceNotStr
 
@@ -754,3 +755,46 @@ def _find_first_node_type(filter_: dm.filters.Filter | None) -> dm.DirectRelatio
             if list(property_) == ["node", "type"] and "space" in value and "externalId" in value:
                 return dm.DirectRelationReference(space=value["space"], external_id=value["externalId"])
     return None
+
+
+def _reduce_model(
+    model: dm.DataModel[dm.View],
+    exclude_views: set[str | dm.ViewId] | None = None,
+    exclude_spaces: set[str] | None = None,
+) -> dm.DataModel[dm.View]:
+    excluded_views: set[dm.ViewId] = set()
+    new_views: list[dm.View] = []
+    for view in model.views:
+        view_id = view.as_id()
+        if exclude_views and (view_id in exclude_views or view.external_id in exclude_views):
+            excluded_views.add(view_id)
+        elif exclude_spaces and view.space in exclude_spaces:
+            excluded_views.add(view_id)
+        else:
+            # Creating a copy to avoid mutating input.
+            new_view = dm.View._load(view.dump())
+            new_views.append(new_view)
+    if not new_views:
+        raise ValueError(
+            f"No views left in {model.as_id()}. Please check your exclude_views and exclude_spaces" f"parameters"
+        )
+
+    for view in new_views:
+        # Creating a copy to avoid mutating input.
+        new_properties: dict[str, ViewProperty] = {}
+        for prop_id, prop in view.properties.items():
+            if _include_property(prop, excluded_views):
+                new_properties[prop_id] = prop
+        view.properties = new_properties
+    model.views = new_views
+    return model
+
+
+def _include_property(prop: ViewProperty, excluded_views: set[dm.ViewId]) -> bool:
+    if isinstance(prop, MappedProperty):
+        return prop.source not in excluded_views
+    elif isinstance(prop, EdgeConnection):
+        return prop.source not in excluded_views and prop.edge_source not in excluded_views
+    elif isinstance(prop, ReverseDirectRelation):
+        return prop.source not in excluded_views and prop.through.source not in excluded_views
+    return True
