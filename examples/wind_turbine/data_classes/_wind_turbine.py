@@ -39,6 +39,8 @@ from wind_turbine.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -460,9 +462,9 @@ def _create_wind_turbine_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
+class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):  # type: ignore[type-var, valid-type]
     _view_id = WindTurbine._view_id
-    _result_cls = WindTurbine
+    _result_cls = WindTurbine  # type: ignore[assignment]
     _result_list_cls_end = WindTurbineList
 
     def __init__(
@@ -470,7 +472,7 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,

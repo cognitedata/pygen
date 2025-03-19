@@ -29,6 +29,8 @@ from wind_turbine.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -330,9 +332,9 @@ def _create_rotor_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
+class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):  # type: ignore[type-var, valid-type]
     _view_id = Rotor._view_id
-    _result_cls = Rotor
+    _result_cls = Rotor  # type: ignore[assignment]
     _result_list_cls_end = RotorList
 
     def __init__(
@@ -340,7 +342,7 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,

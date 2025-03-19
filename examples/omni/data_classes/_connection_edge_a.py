@@ -29,6 +29,8 @@ from omni.data_classes._core import (
     as_write_args,
     as_pygen_node_id,
     is_tuple_id,
+)
+from omni.data_classes._core.query import (
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -299,9 +301,9 @@ def _create_connection_edge_a_filter(
     return dm.filters.And(*filters)
 
 
-class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
+class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):  # type: ignore[type-var, valid-type]
     _view_id = ConnectionEdgeA._view_id
-    _result_cls = ConnectionEdgeA
+    _result_cls = ConnectionEdgeA  # type: ignore[assignment]
     _result_list_cls_end = ConnectionEdgeAList
 
     def __init__(
@@ -309,7 +311,7 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainList],
+        result_list_cls: type[T_DomainList],  # type: ignore[valid-type]
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,

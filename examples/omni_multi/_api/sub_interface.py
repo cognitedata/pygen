@@ -17,6 +17,8 @@ from omni_multi._api._core import (
 )
 from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
+)
+from omni.data_classes._core.query import (
     QueryStepFactory,
     QueryBuilder,
     QueryUnpacker,

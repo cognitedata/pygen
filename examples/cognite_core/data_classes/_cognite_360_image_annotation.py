@@ -29,6 +29,8 @@ from cognite_core.data_classes._core import (
     as_write_args,
     as_pygen_node_id,
     is_tuple_id,
+)
+from omni.data_classes._core.query import (
     EdgeQueryCore,
     NodeQueryCore,
     QueryCore,
@@ -480,9 +482,9 @@ def _create_cognite_360_image_annotation_filter(
     return dm.filters.And(*filters)
 
 
-class _Cognite360ImageAnnotationQuery(EdgeQueryCore[T_DomainList, Cognite360ImageAnnotationList]):
+class _Cognite360ImageAnnotationQuery(EdgeQueryCore[T_DomainList, Cognite360ImageAnnotationList]):  # type: ignore[type-var, valid-type]
     _view_id = Cognite360ImageAnnotation._view_id
-    _result_cls = Cognite360ImageAnnotation
+    _result_cls = Cognite360ImageAnnotation  # type: ignore[assignment]
     _result_list_cls_end = Cognite360ImageAnnotationList
 
     def __init__(
@@ -490,7 +492,7 @@ class _Cognite360ImageAnnotationQuery(EdgeQueryCore[T_DomainList, Cognite360Imag
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainList],
+        result_list_cls: type[T_DomainList],  # type: ignore[valid-type]
         end_node_cls: type[NodeQueryCore],
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,

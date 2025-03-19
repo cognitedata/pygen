@@ -29,6 +29,8 @@ from cognite_core.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -270,9 +272,9 @@ def _create_cognite_cad_revision_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisionList]):
+class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisionList]):  # type: ignore[type-var, valid-type]
     _view_id = CogniteCADRevision._view_id
-    _result_cls = CogniteCADRevision
+    _result_cls = CogniteCADRevision  # type: ignore[assignment]
     _result_list_cls_end = CogniteCADRevisionList
 
     def __init__(
@@ -280,7 +282,7 @@ class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisi
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,

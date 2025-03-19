@@ -29,6 +29,8 @@ from cognite_core.data_classes._core import (
     is_tuple_id,
     as_instance_dict_id,
     parse_single_connection,
+)
+from omni.data_classes._core.query import (
     QueryCore,
     NodeQueryCore,
     StringFilter,
@@ -287,9 +289,9 @@ def _create_cognite_3_d_model_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList]):
+class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList]):  # type: ignore[type-var, valid-type]
     _view_id = Cognite3DModel._view_id
-    _result_cls = Cognite3DModel
+    _result_cls = Cognite3DModel  # type: ignore[assignment]
     _result_list_cls_end = Cognite3DModelList
 
     def __init__(
@@ -297,7 +299,7 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
         created_types: set[type],
         creation_path: list[QueryCore],
         client: CogniteClient,
-        result_list_cls: type[T_DomainModelList],
+        result_list_cls: type[T_DomainModelList],  # type: ignore[valid-type]
         expression: dm.query.ResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,

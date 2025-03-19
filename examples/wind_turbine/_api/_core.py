@@ -25,11 +25,9 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 from wind_turbine.config import global_config
 from wind_turbine import data_classes
 from wind_turbine.data_classes._core import (
-    chunker,
     DomainModel,
     DomainModelWrite,
     DEFAULT_INSTANCE_SPACE,
-    IN_FILTER_CHUNK_SIZE,
     PageInfo,
     GraphQLCore,
     GraphQLList,
@@ -41,6 +39,10 @@ from wind_turbine.data_classes._core import (
     T_DomainRelation,
     T_DomainRelationWrite,
     T_DomainRelationList,
+)
+from omni.data_classes._core.query import (
+    chunker,
+    IN_FILTER_CHUNK_SIZE,
     QueryBuilder,
     QueryUnpacker,
 )
