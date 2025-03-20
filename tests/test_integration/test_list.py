@@ -196,3 +196,11 @@ def test_list_with_reversed_direct_relation_of_list(omni_client: OmniClient) -> 
     assert reverse_direct_relations, f"Missing reverse_direct_single: {reverse_direct_relations}"
     df = items.to_pandas()
     assert isinstance(df, pd.DataFrame)
+
+
+def test_list_filter_on_enum(turbine_client: WindTurbineClient) -> None:
+    items = turbine_client.sensor_time_series.list(type_="numeric", limit=5)
+
+    assert len(items) > 0
+    non_numeric = [item for item in items if item.type_ != "numeric"]
+    assert not non_numeric, f"Found items with type_ != 'numeric': {non_numeric}"

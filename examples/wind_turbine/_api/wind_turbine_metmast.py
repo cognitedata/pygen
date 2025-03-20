@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-
+from typing import Literal
 from cognite.client import data_modeling as dm
 
 from wind_turbine.data_classes import (

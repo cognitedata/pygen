@@ -121,6 +121,12 @@ class CogniteCADRevisionAPI(
         published: bool | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -138,6 +144,8 @@ class CogniteCADRevisionAPI(
             published: The published to filter on.
             min_revision_id: The minimum value of the revision id to filter on.
             max_revision_id: The maximum value of the revision id to filter on.
+            status: The status to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite cad revisions to return. Defaults to 25.
@@ -170,6 +178,8 @@ class CogniteCADRevisionAPI(
             published,
             min_revision_id,
             max_revision_id,
+            status,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -201,6 +211,12 @@ class CogniteCADRevisionAPI(
         published: bool | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -224,6 +240,12 @@ class CogniteCADRevisionAPI(
         published: bool | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -251,6 +273,12 @@ class CogniteCADRevisionAPI(
         published: bool | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -277,6 +305,12 @@ class CogniteCADRevisionAPI(
         published: bool | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -296,6 +330,8 @@ class CogniteCADRevisionAPI(
             published: The published to filter on.
             min_revision_id: The minimum value of the revision id to filter on.
             max_revision_id: The maximum value of the revision id to filter on.
+            status: The status to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite cad revisions to return. Defaults to 25.
@@ -322,6 +358,8 @@ class CogniteCADRevisionAPI(
             published,
             min_revision_id,
             max_revision_id,
+            status,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -351,6 +389,12 @@ class CogniteCADRevisionAPI(
         published: bool | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -365,6 +409,8 @@ class CogniteCADRevisionAPI(
             published: The published to filter on.
             min_revision_id: The minimum value of the revision id to filter on.
             max_revision_id: The maximum value of the revision id to filter on.
+            status: The status to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite cad revisions to return.
@@ -382,6 +428,8 @@ class CogniteCADRevisionAPI(
             published,
             min_revision_id,
             max_revision_id,
+            status,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -441,6 +489,12 @@ class CogniteCADRevisionAPI(
         published: bool | None = None,
         min_revision_id: int | None = None,
         max_revision_id: int | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
+        type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -457,6 +511,8 @@ class CogniteCADRevisionAPI(
             published: The published to filter on.
             min_revision_id: The minimum value of the revision id to filter on.
             max_revision_id: The maximum value of the revision id to filter on.
+            status: The status to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of Cognite cad revisions to return.
@@ -490,6 +546,8 @@ class CogniteCADRevisionAPI(
             published,
             min_revision_id,
             max_revision_id,
+            status,
+            type_,
             external_id_prefix,
             space,
             filter,

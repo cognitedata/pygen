@@ -181,6 +181,7 @@ def _create_cognite_360_image_station_filter(
     view_id: dm.ViewId,
     description: str | list[str] | None = None,
     description_prefix: str | None = None,
+    group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -194,6 +195,10 @@ def _create_cognite_360_image_station_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
     if description_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
+    if isinstance(group_type, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("groupType"), value=group_type))
+    if group_type and isinstance(group_type, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("groupType"), values=group_type))
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):

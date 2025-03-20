@@ -486,6 +486,7 @@ def _create_cognite_time_series_filter(
     max_source_updated_time: datetime.datetime | None = None,
     source_updated_user: str | list[str] | None = None,
     source_updated_user_prefix: str | None = None,
+    type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
     unit: (
         str
         | tuple[str, str]
@@ -583,6 +584,10 @@ def _create_cognite_time_series_filter(
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
         )
+    if isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if isinstance(unit, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(unit):
         filters.append(dm.filters.Equals(view_id.as_property_ref("unit"), value=as_instance_dict_id(unit)))
     if unit and isinstance(unit, Sequence) and not isinstance(unit, str) and not is_tuple_id(unit):

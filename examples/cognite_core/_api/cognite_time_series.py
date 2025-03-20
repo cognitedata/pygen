@@ -158,6 +158,7 @@ class CogniteTimeSeriesAPI(
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         unit: (
             str
             | tuple[str, str]
@@ -201,6 +202,7 @@ class CogniteTimeSeriesAPI(
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
+            type_: The type to filter on.
             unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -252,6 +254,7 @@ class CogniteTimeSeriesAPI(
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
+            type_,
             unit,
             external_id_prefix,
             space,
@@ -318,6 +321,7 @@ class CogniteTimeSeriesAPI(
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         unit: (
             str
             | tuple[str, str]
@@ -383,6 +387,7 @@ class CogniteTimeSeriesAPI(
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         unit: (
             str
             | tuple[str, str]
@@ -452,6 +457,7 @@ class CogniteTimeSeriesAPI(
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         unit: (
             str
             | tuple[str, str]
@@ -520,6 +526,7 @@ class CogniteTimeSeriesAPI(
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         unit: (
             str
             | tuple[str, str]
@@ -567,6 +574,7 @@ class CogniteTimeSeriesAPI(
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
+            type_: The type to filter on.
             unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -612,6 +620,7 @@ class CogniteTimeSeriesAPI(
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
+            type_,
             unit,
             external_id_prefix,
             space,
@@ -676,6 +685,7 @@ class CogniteTimeSeriesAPI(
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         unit: (
             str
             | tuple[str, str]
@@ -718,6 +728,7 @@ class CogniteTimeSeriesAPI(
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
+            type_: The type to filter on.
             unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -754,6 +765,7 @@ class CogniteTimeSeriesAPI(
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
+            type_,
             unit,
             external_id_prefix,
             space,
@@ -876,6 +888,7 @@ class CogniteTimeSeriesAPI(
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         unit: (
             str
             | tuple[str, str]
@@ -918,6 +931,7 @@ class CogniteTimeSeriesAPI(
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
+            type_: The type to filter on.
             unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -970,6 +984,7 @@ class CogniteTimeSeriesAPI(
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
+            type_,
             unit,
             external_id_prefix,
             space,

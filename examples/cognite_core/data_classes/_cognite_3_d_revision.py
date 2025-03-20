@@ -236,6 +236,12 @@ def _create_cognite_3_d_revision_filter(
         | None
     ) = None,
     published: bool | None = None,
+    status: (
+        Literal["Done", "Failed", "Processing", "Queued"]
+        | list[Literal["Done", "Failed", "Processing", "Queued"]]
+        | None
+    ) = None,
+    type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -249,6 +255,14 @@ def _create_cognite_3_d_revision_filter(
         )
     if isinstance(published, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("published"), value=published))
+    if isinstance(status, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
+    if status and isinstance(status, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("status"), values=status))
+    if isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

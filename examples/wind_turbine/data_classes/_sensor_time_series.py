@@ -229,6 +229,7 @@ def _create_sensor_time_series_filter(
     source_unit_prefix: str | None = None,
     standard_name: str | list[str] | None = None,
     standard_name_prefix: str | None = None,
+    type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -266,6 +267,10 @@ def _create_sensor_time_series_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("standardName"), values=standard_name))
     if standard_name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("standardName"), value=standard_name_prefix))
+    if isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):

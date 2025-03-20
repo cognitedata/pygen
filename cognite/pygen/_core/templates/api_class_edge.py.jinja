@@ -4,7 +4,7 @@ from __future__ import annotations
 import datetime
 {% endif %}
 from collections.abc import Sequence
-
+from typing import Literal
 from cognite.client import data_modeling as dm
 
 {% if edge_api.has_edge_class %}

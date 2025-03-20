@@ -113,6 +113,7 @@ class SensorTimeSeriesAPI(
         source_unit_prefix: str | None = None,
         standard_name: str | list[str] | None = None,
         standard_name_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -137,6 +138,7 @@ class SensorTimeSeriesAPI(
             source_unit_prefix: The prefix of the source unit to filter on.
             standard_name: The standard name to filter on.
             standard_name_prefix: The prefix of the standard name to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of sensor time series to return. Defaults to 25.
@@ -176,6 +178,7 @@ class SensorTimeSeriesAPI(
             source_unit_prefix,
             standard_name,
             standard_name_prefix,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -209,6 +212,7 @@ class SensorTimeSeriesAPI(
         source_unit_prefix: str | None = None,
         standard_name: str | list[str] | None = None,
         standard_name_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -234,6 +238,7 @@ class SensorTimeSeriesAPI(
         source_unit_prefix: str | None = None,
         standard_name: str | list[str] | None = None,
         standard_name_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -263,6 +268,7 @@ class SensorTimeSeriesAPI(
         source_unit_prefix: str | None = None,
         standard_name: str | list[str] | None = None,
         standard_name_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -291,6 +297,7 @@ class SensorTimeSeriesAPI(
         source_unit_prefix: str | None = None,
         standard_name: str | list[str] | None = None,
         standard_name_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -319,6 +326,7 @@ class SensorTimeSeriesAPI(
             source_unit_prefix: The prefix of the source unit to filter on.
             standard_name: The standard name to filter on.
             standard_name_prefix: The prefix of the standard name to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of sensor time series to return. Defaults to 25.
@@ -352,6 +360,7 @@ class SensorTimeSeriesAPI(
             source_unit_prefix,
             standard_name,
             standard_name_prefix,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -383,6 +392,7 @@ class SensorTimeSeriesAPI(
         source_unit_prefix: str | None = None,
         standard_name: str | list[str] | None = None,
         standard_name_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -406,6 +416,7 @@ class SensorTimeSeriesAPI(
             source_unit_prefix: The prefix of the source unit to filter on.
             standard_name: The standard name to filter on.
             standard_name_prefix: The prefix of the standard name to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of sensor time series to return.
@@ -430,6 +441,7 @@ class SensorTimeSeriesAPI(
             source_unit_prefix,
             standard_name,
             standard_name_prefix,
+            type_,
             external_id_prefix,
             space,
             filter,
@@ -481,6 +493,7 @@ class SensorTimeSeriesAPI(
         source_unit_prefix: str | None = None,
         standard_name: str | list[str] | None = None,
         standard_name_prefix: str | None = None,
+        type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -503,6 +516,7 @@ class SensorTimeSeriesAPI(
             source_unit_prefix: The prefix of the source unit to filter on.
             standard_name: The standard name to filter on.
             standard_name_prefix: The prefix of the standard name to filter on.
+            type_: The type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of sensor time series to return.
@@ -540,6 +554,7 @@ class SensorTimeSeriesAPI(
             source_unit_prefix,
             standard_name,
             standard_name_prefix,
+            type_,
             external_id_prefix,
             space,
             filter,

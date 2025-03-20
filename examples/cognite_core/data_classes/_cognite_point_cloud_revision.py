@@ -230,6 +230,12 @@ def _create_cognite_point_cloud_revision_filter(
     published: bool | None = None,
     min_revision_id: int | None = None,
     max_revision_id: int | None = None,
+    status: (
+        Literal["Done", "Failed", "Processing", "Queued"]
+        | list[Literal["Done", "Failed", "Processing", "Queued"]]
+        | None
+    ) = None,
+    type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -247,6 +253,14 @@ def _create_cognite_point_cloud_revision_filter(
         filters.append(
             dm.filters.Range(view_id.as_property_ref("revisionId"), gte=min_revision_id, lte=max_revision_id)
         )
+    if isinstance(status, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
+    if status and isinstance(status, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("status"), values=status))
+    if isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
