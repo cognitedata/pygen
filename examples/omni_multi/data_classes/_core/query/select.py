@@ -185,8 +185,8 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         unpacked = QueryUnpacker(builder[-1:]).unpack()
         return self._result_list_cls_end([self._result_cls.model_validate(item) for item in unpacked])  # type: ignore[return-value]
 
-    def _dump_yaml(self) -> str:
-        return self._create_query(DEFAULT_QUERY_LIMIT)._dump_yaml()
+    def _dump_yaml(self, return_step: Literal["first", "last"] = "first") -> str:
+        return self._create_query(DEFAULT_QUERY_LIMIT, return_step)._dump_yaml()
 
     def _create_query(
         self,
