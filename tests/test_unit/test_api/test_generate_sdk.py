@@ -182,6 +182,23 @@ class TestGenerateSDK:
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 
+    def test_generate_sdk_with_edge_view_with_reverse_direct_relation(self, tmp_path: Path) -> None:
+        top_level_package = "reverse_direct_relation_model"
+        client_name = "ReverseDirectRelationClient"
+
+        generate_sdk(
+            DATA_MODEL_REVERSE_DIRECT_RELATION_IN_EDGE_VIEW,
+            top_level_package=top_level_package,
+            output_dir=tmp_path / top_level_package,
+            overwrite=True,
+            client_name=client_name,
+            default_instance_space="the_instance_space",
+        )
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+
 
 DATA_MODEL_WITH_VIEW_PROPERTY_OF_TYPE_FIELD: dm.DataModel = dm.DataModel.load(
     {
@@ -678,6 +695,90 @@ DATA_MODEL_REVERSE_DIRECT_RELATION_THROUGH_CONTAINER = dm.DataModel(
             created_time=0,
             used_for="node",
             implements=None,
+            writable=True,
+            filter=None,
+        ),
+    ],
+)
+
+DATA_MODEL_REVERSE_DIRECT_RELATION_IN_EDGE_VIEW = dm.DataModel(
+    space="my_space",
+    external_id="MyModel",
+    version="1",
+    is_global=False,
+    last_updated_time=0,
+    created_time=0,
+    description=None,
+    name=None,
+    views=[
+        dm.View(
+            space="my_space",
+            external_id="WellboreMudRelationship",
+            version="1",
+            implements=[],
+            properties={
+                "muds": dm.MultiReverseDirectRelation(
+                    source=dm.ViewId("my_space", "Mud", "1"),
+                    through=dm.PropertyId(
+                        source=dm.ViewId("my_space", "Mud", "1"),
+                        property="wellbore",
+                    ),
+                )
+            },
+            used_for="all",
+            writable=False,
+            filter=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            name=None,
+            description=None,
+        ),
+        dm.View(
+            space="my_space",
+            name="Mud",
+            external_id="Mud",
+            version="1",
+            properties={
+                "wellbore": dm.MappedProperty(
+                    container=dm.ContainerId("my_space", "MudContainer"),
+                    container_property_identifier="wellbore",
+                    type=dm.DirectRelation(),
+                    nullable=True,
+                    auto_increment=False,
+                    immutable=False,
+                    source=dm.ViewId("my_space", "Wellbore", "1"),
+                ),
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            implements=None,
+            writable=True,
+            filter=None,
+        ),
+        dm.View(
+            space="my_space",
+            name="Wellbore",
+            external_id="Wellbore",
+            version="1",
+            implements=[dm.ViewId("my_space", "WellboreMudRelationship", "1")],
+            properties={
+                "muds": dm.MultiReverseDirectRelation(
+                    source=dm.ViewId("my_space", "Mud", "1"),
+                    through=dm.PropertyId(
+                        source=dm.ViewId("my_space", "Mud", "1"),
+                        property="wellbore",
+                    ),
+                )
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
             writable=True,
             filter=None,
         ),

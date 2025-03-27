@@ -329,8 +329,8 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
             )
 
         {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
-        {% if not field.is_no_source_direct_relation %}
-        if _{{ field.destination_class.query_cls_name }} not in created_types:
+        {% if not field.is_direct_relation_no_source %}
+        if _{{ field.linked_class.query_cls_name }} not in created_types:
             self.{{ field.name }} = _{{ field.destination_class.query_cls_name }}(
                 created_types.copy(),
                 self._creation_path,
@@ -343,7 +343,7 @@ class _{{ data_class.query_cls_name }}(EdgeQueryCore[T_DomainList, {{ data_class
                 ),
                 {% elif field.is_reverse_direct_relation %}
                 dm.query.NodeResultSetExpression(
-                    through={{ field.reverse_property.data_class.view_id_str }}.as_property_ref("{{ field.prop_name }}"),
+                    through={{ field.through_str }},
                     direction="inwards",
                 ),
                 {% else %}
