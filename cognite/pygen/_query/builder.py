@@ -22,7 +22,7 @@ from cognite.pygen._query.constants import (
     SEARCH_LIMIT,
 )
 from cognite.pygen._query.processing import QueryResultCleaner
-from cognite.pygen._query.step import QueryStep
+from cognite.pygen._query.step import QueryBuildStep
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -88,11 +88,11 @@ class Progress:
             print("Large query detected. Will print progress.")
 
 
-class QueryBuilder(list, MutableSequence[QueryStep]):
+class QueryBuilder(list, MutableSequence[QueryBuildStep]):
     """This is a helper class to build and execute a query. It is responsible for
     doing the paging of the query and keeping track of the results."""
 
-    def __init__(self, steps: Collection[QueryStep] | None = None):
+    def __init__(self, steps: Collection[QueryBuildStep] | None = None):
         super().__init__(steps or [])
 
     def _reset(self):
@@ -105,13 +105,13 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
         for expression in self:
             expression.update_expression_limit()
 
-    def _build(self) -> tuple[dm.query.Query, list[QueryStep], set[str]]:
+    def _build(self) -> tuple[dm.query.Query, list[QueryBuildStep], set[str]]:
         with_ = {step.name: step.expression for step in self if step.is_queryable}
         select = {step.name: step.select for step in self if step.select is not None and step.is_queryable}
         cursors = self._cursors
 
         step_by_name = {step.name: step for step in self}
-        search: list[QueryStep] = []
+        search: list[QueryBuildStep] = []
         temporary_select: set[str] = set()
         for step in self:
             if step.is_queryable:
@@ -206,7 +206,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
 
     @staticmethod
     def _fetch_reverse_direct_relation_of_lists(
-        client: CogniteClient, to_search: list[QueryStep], batch: dm.query.QueryResult
+        client: CogniteClient, to_search: list[QueryBuildStep], batch: dm.query.QueryResult
     ) -> None:
         """Reverse direct relations for lists are not supported by the query API.
         This method fetches them separately."""
@@ -250,7 +250,7 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
             return "0"
         return f"{from_}_{len(self)}"
 
-    def append(self, __object: QueryStep, /) -> None:
+    def append(self, __object: QueryBuildStep, /) -> None:
         # Extra validation to ensure all assumptions are met
         if len(self) == 0:
             if __object.from_ is not None:
@@ -260,22 +260,22 @@ class QueryBuilder(list, MutableSequence[QueryStep]):
                 raise ValueError("The 'from_' value should be set")
         super().append(__object)
 
-    def extend(self, __iterable: Iterable[QueryStep], /) -> None:
+    def extend(self, __iterable: Iterable[QueryBuildStep], /) -> None:
         for item in __iterable:
             self.append(item)
 
     # The implementations below are to get proper type hints
-    def __iter__(self) -> Iterator[QueryStep]:
+    def __iter__(self) -> Iterator[QueryBuildStep]:
         return super().__iter__()
 
     @overload
-    def __getitem__(self, item: SupportsIndex, /) -> QueryStep: ...
+    def __getitem__(self, item: SupportsIndex, /) -> QueryBuildStep: ...
 
     @overload
     def __getitem__(self, item: slice, /) -> Self: ...
 
-    def __getitem__(self, item: SupportsIndex | slice, /) -> QueryStep | Self:
+    def __getitem__(self, item: SupportsIndex | slice, /) -> QueryBuildStep | Self:
         value = super().__getitem__(item)
         if isinstance(item, slice):
             return QueryBuilder(value)  # type: ignore[arg-type, return-value]
-        return cast(QueryStep, value)
+        return cast(QueryBuildStep, value)

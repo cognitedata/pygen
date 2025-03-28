@@ -41,7 +41,7 @@ class ViewPropertyId(CogniteObject):
         }
 
 
-class QueryStep:
+class QueryBuildStep:
     """QueryStep represents a single step in a query execution.
 
     It is used to keep track of the state of a query step, such as the current cursor, the total number of retrieved
@@ -178,7 +178,7 @@ class QueryStep:
         return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
 
 
-class QueryStepFactory:
+class QueryBuildStepFactory:
     """QueryStepFactory is a factory class that creates query steps.
 
     Args:
@@ -269,7 +269,7 @@ class QueryStepFactory:
         sort: list[dm.InstanceSort] | None = None,
         limit: int | None = None,
         has_container_fields: bool = True,
-    ) -> QueryStep:
+    ) -> QueryBuildStep:
         if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
             select = self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id)
@@ -281,7 +281,7 @@ class QueryStepFactory:
         if self._root_name is not None:
             raise ValueError("Root step is already created")
         self._root_name = self._create_step_name(None)
-        return QueryStep(
+        return QueryBuildStep(
             self._root_name,
             dm.query.NodeResultSetExpression(
                 filter=self._full_filter(filter, has_container_fields, self._view_id),
@@ -296,7 +296,7 @@ class QueryStepFactory:
 
     def from_connection(
         self, connection_id: str, connection: ViewProperty, reverse_views: dict[dm.ViewId, dm.View]
-    ) -> list[QueryStep]:
+    ) -> list[QueryBuildStep]:
         connection_property = ViewPropertyId(self._view_id, connection_id)
         selected_properties: list[str | dict[str, list[str]]] = ["*"]
         if (nested := self._nested_properties_by_property) and connection_id in nested:
@@ -325,12 +325,12 @@ class QueryStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
-    ) -> list[QueryStep]:
+    ) -> list[QueryBuildStep]:
         if source is None:
             raise ValueError("Source view not found")
         query_properties = self._create_query_properties(selected_properties, None)
         return [
-            QueryStep(
+            QueryBuildStep(
                 self._create_step_name(self.root_name),
                 dm.query.NodeResultSetExpression(
                     filter=self._full_filter(None, has_container_fields, source),
@@ -354,10 +354,10 @@ class QueryStepFactory:
         include_end_node: bool = True,
         has_container_fields: bool = True,
         edge_view: dm.ViewId | None = None,
-    ) -> list[QueryStep]:
+    ) -> list[QueryBuildStep]:
         edge_name = self._create_step_name(self._root_name)
         steps = [
-            QueryStep(
+            QueryBuildStep(
                 edge_name,
                 dm.query.EdgeResultSetExpression(
                     from_=self._root_name,
@@ -382,7 +382,7 @@ class QueryStepFactory:
         query_properties = self._create_query_properties(selected_node_properties, None)
         target_view = source
 
-        step = QueryStep(
+        step = QueryBuildStep(
             self._create_step_name(edge_name),
             dm.query.NodeResultSetExpression(
                 from_=edge_name,
@@ -404,11 +404,11 @@ class QueryStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
-    ) -> list[QueryStep]:
+    ) -> list[QueryBuildStep]:
         query_properties = self._create_query_properties(selected_properties, through.property)
         other_view_id = source
         return [
-            QueryStep(
+            QueryBuildStep(
                 self._create_step_name(self._root_name),
                 dm.query.NodeResultSetExpression(
                     from_=self._root_name,

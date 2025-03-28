@@ -16,7 +16,7 @@ from cognite.pygen._version import __version__
 from .builder import QueryBuilder, chunker
 from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, SelectedProperties
 from .processing import QueryUnpacker
-from .step import QueryStepFactory
+from .step import QueryBuildStepFactory
 
 
 class QueryExecutor:
@@ -222,7 +222,7 @@ class QueryExecutor:
         view = self._get_view(view_id)
         root_properties = self._as_property_list(properties, "list")
         builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view=view, user_selected_properties=properties)
+        factory = QueryBuildStepFactory(builder.create_name, view=view, user_selected_properties=properties)
 
         if not factory.connection_properties:
             result = self._client.data_modeling.instances.list(
