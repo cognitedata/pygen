@@ -7,19 +7,19 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
 
 from cognite.pygen._query.constants import DATA_RECORD_PROPERTIES
-from cognite.pygen._query.step import QueryBuildStep
+from cognite.pygen._query.step import QueryResultStep
 
 
 class QueryResultCleaner:
     """Remove nodes and edges that are not connected through the entire query"""
 
-    def __init__(self, steps: list[QueryBuildStep]):
+    def __init__(self, steps: list[QueryResultStep]):
         self._tree = self._create_tree(steps)
         self._root = steps[0]
 
     @classmethod
-    def _create_tree(cls, steps: list[QueryBuildStep]) -> dict[str, list[QueryBuildStep]]:
-        tree: dict[str, list[QueryBuildStep]] = defaultdict(list)
+    def _create_tree(cls, steps: list[QueryResultStep]) -> dict[str, list[QueryResultStep]]:
+        tree: dict[str, list[QueryResultStep]] = defaultdict(list)
         for step in steps:
             if step.from_ is None:
                 continue
@@ -38,7 +38,7 @@ class QueryResultCleaner:
 
         return dm.NodeId(direct_relation.space, direct_relation.external_id)
 
-    def _clean(self, step: QueryBuildStep, removed_by_name: dict[str, int]) -> tuple[set[dm.NodeId], str | None]:
+    def _clean(self, step: QueryResultStep, removed_by_name: dict[str, int]) -> tuple[set[dm.NodeId], str | None]:
         if step.name not in self._tree:
             # Leaf Node
             # Nothing to clean, just return the node ids with the connection property
@@ -190,7 +190,7 @@ class QueryUnpacker:
 
     def __init__(
         self,
-        steps: Sequence[QueryBuildStep],
+        steps: Sequence[QueryResultStep],
         edges: Literal["skip", "identifier", "include"] = "skip",
         as_data_record: bool = True,
         edge_type_key: str = "edge_type",
@@ -288,7 +288,7 @@ class QueryUnpacker:
 
     def _unpack_node(
         self,
-        step: QueryBuildStep,
+        step: QueryResultStep,
         node_expression: dm.query.NodeResultSetExpression,
         connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
     ) -> dict[dm.NodeId, list[dict[str, Any]]]:
@@ -349,7 +349,7 @@ class QueryUnpacker:
 
     def _unpack_edge(
         self,
-        step: QueryBuildStep,
+        step: QueryResultStep,
         edge_expression: dm.query.EdgeResultSetExpression,
         connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
     ) -> dict[dm.NodeId, list[dict[str, Any]]]:

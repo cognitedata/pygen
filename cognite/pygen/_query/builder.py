@@ -7,6 +7,7 @@ from typing import (
 )
 
 from cognite.client.data_classes import data_modeling as dm
+from cognite.client.data_classes.data_modeling.query import ResultSetExpression
 
 from cognite.pygen._query.executer import QueryExecutor
 from cognite.pygen._query.step import QueryBuildStep
@@ -25,9 +26,16 @@ class QueryBuilder(list, MutableSequence[QueryBuildStep]):
         super().__init__(steps or [])
 
     def _build(self) -> tuple[dm.query.Query, list[QueryBuildStep], set[str]]:
-        with_ = {step.name: step.expression for step in self if step.is_queryable}
+        # We serialize and deserialize query steps to get a copy as we will modify the
+        # cursor and limit in the execution.
+        # The cast is needed as mypy does not understand that the ResultSetExpression is
+        # the parent of NodeSetExpression and EdgeSetExpression.
+        with_ = {
+            step.name: cast(ResultSetExpression, dm.query.ResultSetExpression._load(step.expression.dump()))
+            for step in self
+            if step.is_queryable
+        }
         select = {step.name: step.select for step in self if step.select is not None and step.is_queryable}
-
         step_by_name = {step.name: step for step in self}
         search: list[QueryBuildStep] = []
         temporary_select: set[str] = set()

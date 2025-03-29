@@ -1,28 +1,24 @@
 import datetime
-import sys
 import time
 import warnings
-from collections.abc import Collection, Iterator, MutableSequence, Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling.instances import Instance
+from cognite.client.data_classes.aggregations import Count
 from cognite.client.exceptions import CogniteAPIError
 
 from cognite.pygen._query.constants import (
+    ACTUAL_INSTANCE_QUERY_LIMIT,
     IN_FILTER_CHUNK_SIZE,
+    INSTANCE_QUERY_LIMIT,
     MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
     PRINT_PROGRESS_PER_N_NODES,
     SEARCH_LIMIT,
 )
 from cognite.pygen._query.processing import QueryResultCleaner
-from cognite.pygen._query.step import QueryBuildStep
-
-if sys.version_info >= (3, 11):
-    pass
-else:
-    pass
+from cognite.pygen._query.step import QueryBuildStep, QueryResultStep
 
 
 class QueryReducingBatchSize(UserWarning):
@@ -67,6 +63,25 @@ class Progress:
             print("Large query detected. Will print progress.")
 
 
+@dataclass
+class PaginationStatus:
+    is_unlimited: bool
+    max_retrieve_limit: int
+    is_queryable: bool
+    max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
+    cursor: str | None = None
+    total_retrieved: int = 0
+    last_batch_count: int = 0
+
+    @property
+    def is_finished(self) -> bool:
+        return (
+            (not self.is_unlimited and self.total_retrieved >= self.max_retrieve_limit)
+            or self.cursor is None
+            or self.last_batch_count == 0
+        )
+
+
 def chunker(sequence: Sequence, chunk_size: int) -> Iterator[Sequence]:
     """
     Split a sequence into chunks of size chunk_size.
@@ -83,31 +98,44 @@ def chunker(sequence: Sequence, chunk_size: int) -> Iterator[Sequence]:
         yield sequence[i : i + chunk_size]
 
 
-class QueryExecutor(list, MutableSequence[QueryBuildStep]):
+class QueryExecutor:
     def __init__(
         self,
-        steps: Collection[QueryBuildStep],
+        steps: Sequence[QueryBuildStep],
         query: dm.query.Query,
-        to_search: list[QueryBuildStep],
+        to_search: Sequence[QueryBuildStep],
         temp_select: set[str],
     ) -> None:
-        super().__init__(steps)
+        step_names = set(step.name for step in steps)
+        search_names = set(step.name for step in to_search)
+        if not set(query.with_).issubset(step_names):
+            raise ValueError("Bug in Pygen: Query step must be a subset of the query steps")
+        if not search_names.issubset(step_names):
+            raise ValueError("Bug in Pygen: Search step must be a subset of the query steps")
+        if (search_names | set(query.with_)) != step_names:
+            raise ValueError("Bug in Pygen: All steps must be either a query or a search step")
+        self._steps = steps
         self._query = query
         self._to_search = to_search
         self._temp_select = temp_select
+        self._status_by_name = {
+            step.name: PaginationStatus(step.is_unlimited, step.max_retrieve_limit, step.is_queryable) for step in steps
+        }
 
     def execute_query(
         self,
         client: CogniteClient,
         remove_not_connected: bool = False,
         init_cursors: dict[str, str | None] | None = None,
-    ) -> dict[str, list[Instance]]:
-        select_step = next((step for step in self if step.select is not None), None)
+    ) -> list[QueryResultStep]:
+        select_step = next((step for step in self._steps if step.select is not None), None)
         if select_step is None:
             raise ValueError("No select step found in the query")
-        total = select_step.count_total(client)
+        total = self.count_total(client, select_step)
         progress = Progress(total)
         self._query.cursors = init_cursors or self._cursors
+        status = self._status_by_name[select_step.name]
+        results: dict[str, QueryResultStep] = {}
         while True:
             self._update_expression_limits()
             t0 = time.time()
@@ -118,7 +146,7 @@ class QueryExecutor(list, MutableSequence[QueryBuildStep]):
                     # Too big query, try to reduce the limit
                     if self._reduce_max_batch_limit():
                         continue
-                    new_limit = select_step._max_retrieve_batch_limit
+                    new_limit = status.max_retrieve_batch_limit
                     warnings.warn(
                         f"Query is too large, reducing batch size to {new_limit:,}, and trying again",
                         QueryReducingBatchSize,
@@ -128,44 +156,60 @@ class QueryExecutor(list, MutableSequence[QueryBuildStep]):
                 raise e
 
             self._fetch_reverse_direct_relation_of_lists(client, self._to_search, batch)
+            last_execution_time = time.time() - t0
 
             for name in self._temp_select:
                 batch.pop(name, None)
 
-            last_execution_time = time.time() - t0
+            self._update_pagination_status(batch)
+            batch_results = self._as_results(batch)
+            if remove_not_connected and len(batch_results) > 1:
+                removed = QueryResultCleaner(batch_results).clean()
+                for step in batch_results:
+                    self._status_by_name[step.name].total_retrieved -= removed.get(step.name, 0)
 
-            self._update(batch)
-            if remove_not_connected and len(self) > 1:
-                removed = QueryResultCleaner(self).clean()
-                for step in self:
-                    step.total_retrieved -= removed.get(step.name, 0)
+            if results:
+                for step in batch_results:
+                    if step.name in results:
+                        results[step.name].results.extend(step.results)
+                    else:
+                        results[step.name] = step
+            else:
+                results = {step.name: step for step in batch_results}
 
-            if select_step.is_finished:
+            if status.is_finished:
                 break
 
-            progress.log(len(batch[select_step.name]), last_execution_time, select_step.total_retrieved)
+            progress.log(len(batch[select_step.name]), last_execution_time, status.total_retrieved)
 
             self._query.cursors = self._cursors
 
-        return {step.name: step.results for step in self}
+        return list(results.values())
 
     def _update_expression_limits(self) -> None:
-        for expression in self:
-            expression.update_expression_limit()
+        for name, status in self._status_by_name.items():
+            if name not in self._query.with_:
+                continue
+            expression = self._query.with_[name]
+            if status.is_unlimited:
+                expression.limit = status.max_retrieve_batch_limit
+            else:
+                expression.limit = max(min(INSTANCE_QUERY_LIMIT, status.max_retrieve_limit - status.total_retrieved), 0)
 
     @property
     def _cursors(self) -> dict[str, str | None]:
-        return {expression.name: expression.cursor for expression in self if expression.is_queryable}
+        return {name: status.cursor for name, status in self._status_by_name.items() if status.is_queryable}
 
     def _reduce_max_batch_limit(self) -> bool:
-        for expression in self:
-            if not expression.reduce_max_batch_limit():
+        for status in self._status_by_name.values():
+            status.max_retrieve_batch_limit = max(1, status.max_retrieve_batch_limit // 2)
+            if status.max_retrieve_batch_limit <= 1:
                 return False
         return True
 
     @staticmethod
     def _fetch_reverse_direct_relation_of_lists(
-        client: CogniteClient, to_search: list[QueryBuildStep], batch: dm.query.QueryResult
+        client: CogniteClient, to_search: Sequence[QueryBuildStep], batch: dm.query.QueryResult
     ) -> None:
         """Reverse direct relations for lists are not supported by the query API.
         This method fetches them separately."""
@@ -199,11 +243,30 @@ class QueryExecutor(list, MutableSequence[QueryBuildStep]):
             batch[step.name] = dm.NodeListWithCursor(step_result, None)
         return None
 
-    def _update(self, batch: dm.query.QueryResult):
-        for expression in self:
-            if expression.name not in batch:
+    def _update_pagination_status(self, batch: dm.query.QueryResult):
+        for name, status in self._status_by_name.items():
+            if name not in batch:
                 continue
-            expression.last_batch_count = len(batch[expression.name])
-            expression.total_retrieved += expression.last_batch_count
-            expression.cursor = batch.cursors.get(expression.name)
-            expression.results.extend(batch[expression.name].data)
+            status.last_batch_count = len(batch[name])
+            status.total_retrieved += status.last_batch_count
+            status.cursor = batch.cursors.get(name)
+
+    def _as_results(self, batch: dm.query.QueryResult) -> list[QueryResultStep]:
+        results: list[QueryResultStep] = []
+        for step in self._steps:
+            if step.name not in batch:
+                continue
+            results.append(QueryResultStep.from_build(batch[step.name], step))
+        return results
+
+    @staticmethod
+    def count_total(cognite_client: CogniteClient, step: QueryBuildStep) -> float | None:
+        if step.view_id is None:
+            # Cannot count the total without a view
+            return None
+        try:
+            return cognite_client.data_modeling.instances.aggregate(
+                step.view_id, Count("externalId"), filter=step.raw_filter
+            ).value
+        except CogniteAPIError:
+            return None
