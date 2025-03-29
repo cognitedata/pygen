@@ -8,14 +8,10 @@ from typing import Any, Literal
 from cognite.client import CogniteClient
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes._base import CogniteObject
-from cognite.client.data_classes.aggregations import Count
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
-from cognite.client.exceptions import CogniteAPIError
 
 from cognite_core.data_classes._core.query.constants import (
-    ACTUAL_INSTANCE_QUERY_LIMIT,
-    INSTANCE_QUERY_LIMIT,
     NODE_PROPERTIES,
     NotSetSentinel,
     SelectedProperties,
@@ -41,7 +37,7 @@ class ViewPropertyId(CogniteObject):
         }
 
 
-class QueryStep:
+class QueryBuildStep:
     """QueryStep represents a single step in a query execution.
 
     It is used to keep track of the state of a query step, such as the current cursor, the total number of retrieved
@@ -96,11 +92,6 @@ class QueryStep:
         self.connection_type = connection_type
         self.connection_property = connection_property
         self.selected_properties = selected_properties
-        self._max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
-        self.cursor: str | None = None
-        self.total_retrieved: int = 0
-        self.last_batch_count: int = 0
-        self.results: list[Instance] = []
 
     def _default_select(self) -> dm.query.Select:
         if self.view_id is None:
@@ -134,51 +125,14 @@ class QueryStep:
         return None
 
     @property
-    def node_results(self) -> Iterable[dm.Node]:
-        return (item for item in self.results if isinstance(item, dm.Node))
-
-    @property
-    def edge_results(self) -> Iterable[dm.Edge]:
-        return (item for item in self.results if isinstance(item, dm.Edge))
-
-    def update_expression_limit(self) -> None:
-        if self.is_unlimited:
-            self.expression.limit = self._max_retrieve_batch_limit
-        else:
-            self.expression.limit = max(min(INSTANCE_QUERY_LIMIT, self.max_retrieve_limit - self.total_retrieved), 0)
-
-    def reduce_max_batch_limit(self) -> bool:
-        self._max_retrieve_batch_limit = max(1, self._max_retrieve_batch_limit // 2)
-        return self._max_retrieve_batch_limit > 1
-
-    @property
     def is_unlimited(self) -> bool:
         return self.max_retrieve_limit in {None, -1, math.inf}
 
-    @property
-    def is_finished(self) -> bool:
-        return (
-            (not self.is_unlimited and self.total_retrieved >= self.max_retrieve_limit)
-            or self.cursor is None
-            or self.last_batch_count == 0
-        )
-
-    def count_total(self, cognite_client: CogniteClient) -> float | None:
-        if self.view_id is None:
-            # Cannot count the total without a view
-            return None
-        try:
-            return cognite_client.data_modeling.instances.aggregate(
-                self.view_id, Count("externalId"), filter=self.raw_filter
-            ).value
-        except CogniteAPIError:
-            return None
-
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
+        return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r})"
 
 
-class QueryStepFactory:
+class QueryBuildStepFactory:
     """QueryStepFactory is a factory class that creates query steps.
 
     Args:
@@ -269,7 +223,7 @@ class QueryStepFactory:
         sort: list[dm.InstanceSort] | None = None,
         limit: int | None = None,
         has_container_fields: bool = True,
-    ) -> QueryStep:
+    ) -> QueryBuildStep:
         if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
             select = self._create_select([prop for prop in self._root_properties if prop not in skip], self._view_id)
@@ -281,7 +235,7 @@ class QueryStepFactory:
         if self._root_name is not None:
             raise ValueError("Root step is already created")
         self._root_name = self._create_step_name(None)
-        return QueryStep(
+        return QueryBuildStep(
             self._root_name,
             dm.query.NodeResultSetExpression(
                 filter=self._full_filter(filter, has_container_fields, self._view_id),
@@ -296,7 +250,7 @@ class QueryStepFactory:
 
     def from_connection(
         self, connection_id: str, connection: ViewProperty, reverse_views: dict[dm.ViewId, dm.View]
-    ) -> list[QueryStep]:
+    ) -> list[QueryBuildStep]:
         connection_property = ViewPropertyId(self._view_id, connection_id)
         selected_properties: list[str | dict[str, list[str]]] = ["*"]
         if (nested := self._nested_properties_by_property) and connection_id in nested:
@@ -325,12 +279,12 @@ class QueryStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
-    ) -> list[QueryStep]:
+    ) -> list[QueryBuildStep]:
         if source is None:
             raise ValueError("Source view not found")
         query_properties = self._create_query_properties(selected_properties, None)
         return [
-            QueryStep(
+            QueryBuildStep(
                 self._create_step_name(self.root_name),
                 dm.query.NodeResultSetExpression(
                     filter=self._full_filter(None, has_container_fields, source),
@@ -354,10 +308,10 @@ class QueryStepFactory:
         include_end_node: bool = True,
         has_container_fields: bool = True,
         edge_view: dm.ViewId | None = None,
-    ) -> list[QueryStep]:
+    ) -> list[QueryBuildStep]:
         edge_name = self._create_step_name(self._root_name)
         steps = [
-            QueryStep(
+            QueryBuildStep(
                 edge_name,
                 dm.query.EdgeResultSetExpression(
                     from_=self._root_name,
@@ -382,7 +336,7 @@ class QueryStepFactory:
         query_properties = self._create_query_properties(selected_node_properties, None)
         target_view = source
 
-        step = QueryStep(
+        step = QueryBuildStep(
             self._create_step_name(edge_name),
             dm.query.NodeResultSetExpression(
                 from_=edge_name,
@@ -404,11 +358,11 @@ class QueryStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
-    ) -> list[QueryStep]:
+    ) -> list[QueryBuildStep]:
         query_properties = self._create_query_properties(selected_properties, through.property)
         other_view_id = source
         return [
-            QueryStep(
+            QueryBuildStep(
                 self._create_step_name(self._root_name),
                 dm.query.NodeResultSetExpression(
                     from_=self._root_name,
@@ -487,3 +441,59 @@ class QueryStepFactory:
             return dm.filters.And(filter, has_data) if filter else has_data
 
         return filter
+
+
+class QueryResultStep(QueryBuildStep):
+    def __init__(
+        self,
+        results: dm.NodeListWithCursor | dm.EdgeListWithCursor,
+        name: str,
+        expression: dm.query.ResultSetExpression,
+        view_id: dm.ViewId | None = None,
+        max_retrieve_limit: int = -1,
+        select: dm.query.Select | None | type[NotSetSentinel] = NotSetSentinel,
+        raw_filter: dm.Filter | None = None,
+        connection_type: Literal["reverse-list"] | None = None,
+        connection_property: ViewPropertyId | None = None,
+        selected_properties: list[str] | None = None,
+    ) -> None:
+        super().__init__(
+            name=name,
+            expression=expression,
+            view_id=view_id,
+            max_retrieve_limit=max_retrieve_limit,
+            select=select,
+            raw_filter=raw_filter,
+            connection_type=connection_type,
+            connection_property=connection_property,
+            selected_properties=selected_properties,
+        )
+        self.results: list[Instance] = list(results)
+
+    @classmethod
+    def from_build(
+        cls, results: dm.NodeListWithCursor | dm.EdgeListWithCursor, build: QueryBuildStep
+    ) -> "QueryResultStep":
+        return cls(
+            results=results,
+            name=build.name,
+            expression=build.expression,
+            view_id=build.view_id,
+            max_retrieve_limit=build.max_retrieve_limit,
+            select=build.select,
+            raw_filter=build.raw_filter,
+            connection_type=build.connection_type,
+            connection_property=build.connection_property,
+            selected_properties=build.selected_properties,
+        )
+
+    @property
+    def node_results(self) -> Iterable[dm.Node]:
+        return (item for item in self.results if isinstance(item, dm.Node))
+
+    @property
+    def edge_results(self) -> Iterable[dm.Edge]:
+        return (item for item in self.results if isinstance(item, dm.Edge))
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
