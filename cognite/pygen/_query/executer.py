@@ -128,6 +128,21 @@ class QueryExecutor:
         remove_not_connected: bool = False,
         init_cursors: dict[str, str | None] | None = None,
     ) -> list[QueryResultStep]:
+        results: dict[str, QueryResultStep] = {}
+        for batch_results in self.iterate(client, remove_not_connected, init_cursors):
+            for result in batch_results:
+                if result.name in results:
+                    results[result.name].results.extend(result.results)
+                else:
+                    results[result.name] = result
+        return list(results.values())
+
+    def iterate(
+        self,
+        client: CogniteClient,
+        remove_not_connected: bool = False,
+        init_cursors: dict[str, str | None] | None = None,
+    ) -> Iterator[list[QueryResultStep]]:
         select_step = next((step for step in self._steps if step.select is not None), None)
         if select_step is None:
             raise ValueError("No select step found in the query")
@@ -135,7 +150,6 @@ class QueryExecutor:
         progress = Progress(total)
         self._query.cursors = init_cursors or self._cursors
         status = self._status_by_name[select_step.name]
-        results: dict[str, QueryResultStep] = {}
         while True:
             self._update_expression_limits()
             t0 = time.time()
@@ -168,14 +182,7 @@ class QueryExecutor:
                 for step in batch_results:
                     self._status_by_name[step.name].total_retrieved -= removed.get(step.name, 0)
 
-            if results:
-                for step in batch_results:
-                    if step.name in results:
-                        results[step.name].results.extend(step.results)
-                    else:
-                        results[step.name] = step
-            else:
-                results = {step.name: step for step in batch_results}
+            yield batch_results
 
             if status.is_finished:
                 break
@@ -183,8 +190,6 @@ class QueryExecutor:
             progress.log(len(batch[select_step.name]), last_execution_time, status.total_retrieved)
 
             self._query.cursors = self._cursors
-
-        return list(results.values())
 
     def _update_expression_limits(self) -> None:
         for name, status in self._status_by_name.items():
