@@ -22,7 +22,7 @@ from {{ top_level_package }}.data_classes._core import (
     T_DomainModel,
     T_DomainModelList,
     QueryBuilder,
-    QueryStep,
+    QueryBuildStep,
 )
 {% for edge_api in edge_apis %}
 from {{ top_level_package }}.data_classes.{{ edge_api.end_class.file_name }} import (
@@ -67,7 +67,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModel, T_DomainModelList]):
         super().__init__(client, builder, result_cls, result_list_cls)
         from_ = self._builder.get_from()
         self._builder.append(
-            QueryStep(
+            QueryBuildStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,
@@ -125,7 +125,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModel, T_DomainModelList]):
             {% endfor %}
         )
         self._builder.append(
-            QueryStep(
+            QueryBuildStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.EdgeResultSetExpression(
                     filter=edge_filter,
@@ -197,7 +197,7 @@ class {{ query_api.name }}(QueryAPI[T_DomainModel, T_DomainModelList]):
     {% for field in data_class.one_to_one_direct_relations_with_source %}
     def _query_append_{{ field.name }}(self, from_: str) -> None:
         self._builder.append(
-            QueryStep(
+            QueryBuildStep(
                 name=self._builder.create_name(from_),
                 expression=dm.query.NodeResultSetExpression(
                     from_=from_,

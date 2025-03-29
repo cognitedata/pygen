@@ -29,7 +29,7 @@ from {{top_level_package}}.data_classes._core.base import (
 from {{top_level_package}}.data_classes._core.constants import DEFAULT_QUERY_LIMIT
 from {{top_level_package}}.data_classes._core.query.builder import QueryBuilder
 from {{top_level_package}}.data_classes._core.query.processing import QueryUnpacker
-from {{top_level_package}}.data_classes._core.query.step import QueryStep, ViewPropertyId
+from {{top_level_package}}.data_classes._core.query.step import QueryBuildStep, ViewPropertyId
 
 
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
@@ -172,8 +172,9 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
 
     def list_full(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
         builder = self._create_query(limit, return_step="first", try_reverse=True)
-        builder.execute_query(self._client, remove_not_connected=True)
-        unpacked = QueryUnpacker(builder).unpack()
+        executor = builder.build()
+        results = executor.execute_query(self._client, remove_not_connected=True)
+        unpacked = QueryUnpacker(results).unpack()
         cls_ = self._creation_path[0]._result_cls
         return self._result_list_cls([cls_.model_validate(item) for item in unpacked])
 
@@ -181,8 +182,9 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         builder = self._create_query(limit, return_step="last")
         for step in builder[:-1]:
             step.select = None
-        builder.execute_query(self._client, remove_not_connected=False)
-        unpacked = QueryUnpacker(builder[-1:]).unpack()
+        executor = builder.build()
+        results = executor.execute_query(self._client, remove_not_connected=True)
+        unpacked = QueryUnpacker(results[-1:]).unpack()
         return self._result_list_cls_end([self._result_cls.model_validate(item) for item in unpacked])  # type: ignore[return-value]
 
     def _dump_yaml(self, return_step: Literal["first", "last"] = "first") -> str:
@@ -210,7 +212,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
             name = builder.create_name(from_)
             if isinstance(item, NodeQueryCore) and isinstance(item._expression, dm.query.NodeResultSetExpression):
                 # Root step or direct/reverse direct step
-                step = QueryStep(
+                step = QueryBuildStep(
                     name=name,
                     expression=item._expression,
                     max_retrieve_limit=max_retrieve_limit,
@@ -231,7 +233,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 if not item._connection_property:
                     raise ValueError("Bug in pygen. Connection name is missing when building a query")
                 connection_property = item._connection_property
-                step = QueryStep(
+                step = QueryBuildStep(
                     name=edge_name,
                     expression=item._expression,
                     max_retrieve_limit=max_retrieve_limit,
@@ -241,7 +243,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 builder.append(step)
 
                 name = builder.create_name(edge_name)
-                node_step = QueryStep(
+                node_step = QueryBuildStep(
                     name=name,
                     expression=dm.query.NodeResultSetExpression(
                         from_=edge_name,
@@ -254,7 +256,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 builder.append(node_step)
             elif isinstance(item, EdgeQueryCore):
                 # Edge with properties
-                step = QueryStep(
+                step = QueryBuildStep(
                     name=name,
                     expression=cast(dm.query.EdgeResultSetExpression, item._expression),
                     connection_property=item._connection_property,
