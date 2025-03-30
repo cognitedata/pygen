@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni_multi._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -19,6 +20,7 @@ from omni_multi.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -343,13 +345,13 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
         """Start selecting from main interfaces."""
         return MainInterfaceQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -360,10 +362,77 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
                 has_container_fields=True,
             )
         )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        main_value: str | list[str] | None = None,
+        main_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        sort_by: MainInterfaceFields | Sequence[MainInterfaceFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        limit: int | None = None,
+    ) -> Iterator[MainInterfaceList]:
+        """Iterate over main interfaces
+
+        Args:
+            chunk_size: The number of main interfaces to return in each iteration. Defaults to 100.
+            main_value: The main value to filter on.
+            main_value_prefix: The prefix of the main value to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+            limit: Maximum number of main interfaces to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of main interfaces
+
+        Examples:
+
+            Iterate main interfaces in chunks of 100 up to 2000 items:
+
+                >>> from omni_multi import OmniMultiClient
+                >>> client = OmniMultiClient()
+                >>> for main_interfaces in client.main_interface.iterate(chunk_size=100, limit=2000):
+                ...     for main_interface in main_interfaces:
+                ...         print(main_interface.external_id)
+
+            Iterate main interfaces in chunks of 100 sorted by external_id in descending order:
+
+                >>> from omni_multi import OmniMultiClient
+                >>> client = OmniMultiClient()
+                >>> for main_interfaces in client.main_interface.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for main_interface in main_interfaces:
+                ...         print(main_interface.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
+        filter_ = _create_main_interface_filter(
+            self._view_id,
+            main_value,
+            main_value_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input)
 
     def list(
         self,

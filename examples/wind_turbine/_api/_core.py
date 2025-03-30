@@ -42,10 +42,12 @@ from wind_turbine.data_classes._core import (
     T_DomainRelationWrite,
     T_DomainRelationList,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
 )
 
 DEFAULT_LIMIT_READ = 25
+DEFAULT_CHUNK_SIZE = 100
 DEFAULT_QUERY_LIMIT = 3
 IN_FILTER_LIMIT = 5_000
 INSTANCE_QUERY_LIMIT = 1_000
@@ -160,11 +162,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                     filter_ = dm.filters.Equals(["node", "space"], space_key) & dm.filters.In(
                         ["node", "externalId"], ext_id_chunk
                     )
-                    items.extend(
-                        instantiate_classes(
-                            self._class_type, self._query(filter_, len(ext_id_chunk), retrieve_connections), "retrieve"
-                        )
-                    )
+                    items.extend(self._query(filter_, len(ext_id_chunk), retrieve_connections, None, "retrieve"))
 
         nodes = self._class_list(items)
 
@@ -175,14 +173,47 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         else:
             return nodes[0]
 
+    def _build(
+        self,
+        filter_: dm.Filter | None,
+        limit: int | None,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> QueryExecutor:
+        raise NotImplementedError
+
     def _query(
         self,
         filter_: dm.Filter | None,
         limit: int,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
-        raise NotImplementedError
+        context: Literal["query", "list", "retrieve"] = "query",
+    ) -> T_DomainModelList:
+        executor = self._build(filter_, limit, retrieve_connections, sort)
+        results = executor.execute_query(self._client, remove_not_connected=False)
+        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+        unpacked = QueryUnpacker(results, edges=unpack_edges).unpack()
+        item_list = instantiate_classes(self._class_type, unpacked, context)
+        return self._class_list(item_list)
+
+    def _iterate(
+        self,
+        chunk_size: int,
+        filter_: dm.Filter | None,
+        limit: int | None,
+        retrieve_connections: Literal["skip", "identifier", "full"],
+        sort: list[InstanceSort] | None = None,
+    ) -> Iterator[T_DomainModelList]:
+        executor = self._build(filter_, limit, retrieve_connections, sort)
+        for batch_results in executor.iterate(self._client, remove_not_connected=False):
+            unpack_edges: Literal["skip", "identifier"] = (
+                "identifier" if retrieve_connections == "identifier" else "skip"
+            )
+            unpacked = QueryUnpacker(batch_results, edges=unpack_edges).unpack()
+            item_list = self._class_list(instantiate_classes(self._class_type, unpacked, "iterate"))
+            for i in range(0, len(item_list), chunk_size):
+                yield item_list[i : i + chunk_size]
 
     def _search(
         self,

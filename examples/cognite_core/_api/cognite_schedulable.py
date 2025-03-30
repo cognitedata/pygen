@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -11,6 +11,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -21,6 +22,7 @@ from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -405,13 +407,13 @@ class CogniteSchedulableAPI(
         """Start selecting from Cognite schedulables."""
         return CogniteSchedulableQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -422,10 +424,95 @@ class CogniteSchedulableAPI(
                 has_container_fields=True,
             )
         )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        min_end_time: datetime.datetime | None = None,
+        max_end_time: datetime.datetime | None = None,
+        min_scheduled_end_time: datetime.datetime | None = None,
+        max_scheduled_end_time: datetime.datetime | None = None,
+        min_scheduled_start_time: datetime.datetime | None = None,
+        max_scheduled_start_time: datetime.datetime | None = None,
+        min_start_time: datetime.datetime | None = None,
+        max_start_time: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        sort_by: CogniteSchedulableFields | Sequence[CogniteSchedulableFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        limit: int | None = None,
+    ) -> Iterator[CogniteSchedulableList]:
+        """Iterate over Cognite schedulables
+
+        Args:
+            chunk_size: The number of Cognite schedulables to return in each iteration. Defaults to 100.
+            min_end_time: The minimum value of the end time to filter on.
+            max_end_time: The maximum value of the end time to filter on.
+            min_scheduled_end_time: The minimum value of the scheduled end time to filter on.
+            max_scheduled_end_time: The maximum value of the scheduled end time to filter on.
+            min_scheduled_start_time: The minimum value of the scheduled start time to filter on.
+            max_scheduled_start_time: The maximum value of the scheduled start time to filter on.
+            min_start_time: The minimum value of the start time to filter on.
+            max_start_time: The maximum value of the start time to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+            limit: Maximum number of Cognite schedulables to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of Cognite schedulables
+
+        Examples:
+
+            Iterate Cognite schedulables in chunks of 100 up to 2000 items:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for cognite_schedulables in client.cognite_schedulable.iterate(chunk_size=100, limit=2000):
+                ...     for cognite_schedulable in cognite_schedulables:
+                ...         print(cognite_schedulable.external_id)
+
+            Iterate Cognite schedulables in chunks of 100 sorted by external_id in descending order:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for cognite_schedulables in client.cognite_schedulable.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for cognite_schedulable in cognite_schedulables:
+                ...         print(cognite_schedulable.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
+        filter_ = _create_cognite_schedulable_filter(
+            self._view_id,
+            min_end_time,
+            max_end_time,
+            min_scheduled_end_time,
+            max_scheduled_end_time,
+            min_scheduled_start_time,
+            max_scheduled_start_time,
+            min_start_time,
+            max_start_time,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input)
 
     def list(
         self,

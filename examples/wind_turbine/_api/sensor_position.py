@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from wind_turbine._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -20,6 +21,7 @@ from wind_turbine.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -821,13 +823,13 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         """Start selecting from sensor positions."""
         return SensorPositionQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -902,10 +904,174 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
                     has_container_fields=True,
                 )
             )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        blade: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        edgewise_bend_mom_crosstalk_corrected: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        edgewise_bend_mom_offset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        edgewise_bend_mom_offset_crosstalk_corrected: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        edgewisewise_bend_mom: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        flapwise_bend_mom: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        flapwise_bend_mom_crosstalk_corrected: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        flapwise_bend_mom_offset: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        flapwise_bend_mom_offset_crosstalk_corrected: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        min_position: float | None = None,
+        max_position: float | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        sort_by: SensorPositionFields | Sequence[SensorPositionFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        limit: int | None = None,
+    ) -> Iterator[SensorPositionList]:
+        """Iterate over sensor positions
+
+        Args:
+            chunk_size: The number of sensor positions to return in each iteration. Defaults to 100.
+            blade: The blade to filter on.
+            edgewise_bend_mom_crosstalk_corrected: The edgewise bend mom crosstalk corrected to filter on.
+            edgewise_bend_mom_offset: The edgewise bend mom offset to filter on.
+            edgewise_bend_mom_offset_crosstalk_corrected: The edgewise bend mom offset crosstalk corrected to filter on.
+            edgewisewise_bend_mom: The edgewisewise bend mom to filter on.
+            flapwise_bend_mom: The flapwise bend mom to filter on.
+            flapwise_bend_mom_crosstalk_corrected: The flapwise bend mom crosstalk corrected to filter on.
+            flapwise_bend_mom_offset: The flapwise bend mom offset to filter on.
+            flapwise_bend_mom_offset_crosstalk_corrected: The flapwise bend mom offset crosstalk corrected to filter on.
+            min_position: The minimum value of the position to filter on.
+            max_position: The maximum value of the position to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+            retrieve_connections: Whether to retrieve `blade`, `edgewise_bend_mom_crosstalk_corrected`,
+            `edgewise_bend_mom_offset`, `edgewise_bend_mom_offset_crosstalk_corrected`, `edgewisewise_bend_mom`,
+            `flapwise_bend_mom`, `flapwise_bend_mom_crosstalk_corrected`, `flapwise_bend_mom_offset` and
+            `flapwise_bend_mom_offset_crosstalk_corrected` for the sensor positions. Defaults to 'skip'.'skip' will not
+            retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full'
+            will retrieve the full connected items.
+            limit: Maximum number of sensor positions to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of sensor positions
+
+        Examples:
+
+            Iterate sensor positions in chunks of 100 up to 2000 items:
+
+                >>> from wind_turbine import WindTurbineClient
+                >>> client = WindTurbineClient()
+                >>> for sensor_positions in client.sensor_position.iterate(chunk_size=100, limit=2000):
+                ...     for sensor_position in sensor_positions:
+                ...         print(sensor_position.external_id)
+
+            Iterate sensor positions in chunks of 100 sorted by external_id in descending order:
+
+                >>> from wind_turbine import WindTurbineClient
+                >>> client = WindTurbineClient()
+                >>> for sensor_positions in client.sensor_position.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for sensor_position in sensor_positions:
+                ...         print(sensor_position.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
+        filter_ = _create_sensor_position_filter(
+            self._view_id,
+            blade,
+            edgewise_bend_mom_crosstalk_corrected,
+            edgewise_bend_mom_offset,
+            edgewise_bend_mom_offset_crosstalk_corrected,
+            edgewisewise_bend_mom,
+            flapwise_bend_mom,
+            flapwise_bend_mom_crosstalk_corrected,
+            flapwise_bend_mom_offset,
+            flapwise_bend_mom_offset_crosstalk_corrected,
+            min_position,
+            max_position,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
 
     def list(
         self,
@@ -1056,5 +1222,4 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
             return self._list(limit=limit, filter=filter_, sort=sort_input)
-        values = self._query(filter_, limit, retrieve_connections, sort_input)
-        return self._class_list(instantiate_classes(self._class_type, values, "list"))
+        return self._query(filter_, limit, retrieve_connections, sort_input, "list")

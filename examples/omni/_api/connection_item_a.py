@@ -581,6 +581,9 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 ...         print(connection_item_a.external_id)
 
         """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
         filter_ = _create_connection_item_a_filter(
             self._view_id,
             name,

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -11,6 +11,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -21,6 +22,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -496,13 +498,13 @@ class PrimitiveNullableAPI(
         """Start selecting from primitive nullables."""
         return PrimitiveNullableQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -513,10 +515,116 @@ class PrimitiveNullableAPI(
                 has_container_fields=True,
             )
         )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        boolean: bool | None = None,
+        min_date: datetime.date | None = None,
+        max_date: datetime.date | None = None,
+        min_float_32: float | None = None,
+        max_float_32: float | None = None,
+        min_float_64: float | None = None,
+        max_float_64: float | None = None,
+        min_int_32: int | None = None,
+        max_int_32: int | None = None,
+        min_int_64: int | None = None,
+        max_int_64: int | None = None,
+        text: str | list[str] | None = None,
+        text_prefix: str | None = None,
+        min_timestamp: datetime.datetime | None = None,
+        max_timestamp: datetime.datetime | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        sort_by: PrimitiveNullableFields | Sequence[PrimitiveNullableFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        limit: int | None = None,
+    ) -> Iterator[PrimitiveNullableList]:
+        """Iterate over primitive nullables
+
+        Args:
+            chunk_size: The number of primitive nullables to return in each iteration. Defaults to 100.
+            boolean: The boolean to filter on.
+            min_date: The minimum value of the date to filter on.
+            max_date: The maximum value of the date to filter on.
+            min_float_32: The minimum value of the float 32 to filter on.
+            max_float_32: The maximum value of the float 32 to filter on.
+            min_float_64: The minimum value of the float 64 to filter on.
+            max_float_64: The maximum value of the float 64 to filter on.
+            min_int_32: The minimum value of the int 32 to filter on.
+            max_int_32: The maximum value of the int 32 to filter on.
+            min_int_64: The minimum value of the int 64 to filter on.
+            max_int_64: The maximum value of the int 64 to filter on.
+            text: The text to filter on.
+            text_prefix: The prefix of the text to filter on.
+            min_timestamp: The minimum value of the timestamp to filter on.
+            max_timestamp: The maximum value of the timestamp to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+            limit: Maximum number of primitive nullables to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of primitive nullables
+
+        Examples:
+
+            Iterate primitive nullables in chunks of 100 up to 2000 items:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for primitive_nullables in client.primitive_nullable.iterate(chunk_size=100, limit=2000):
+                ...     for primitive_nullable in primitive_nullables:
+                ...         print(primitive_nullable.external_id)
+
+            Iterate primitive nullables in chunks of 100 sorted by external_id in descending order:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for primitive_nullables in client.primitive_nullable.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for primitive_nullable in primitive_nullables:
+                ...         print(primitive_nullable.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
+        filter_ = _create_primitive_nullable_filter(
+            self._view_id,
+            boolean,
+            min_date,
+            max_date,
+            min_float_32,
+            max_float_32,
+            min_float_64,
+            max_float_64,
+            min_int_32,
+            max_int_32,
+            min_int_64,
+            max_int_64,
+            text,
+            text_prefix,
+            min_timestamp,
+            max_timestamp,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input)
 
     def list(
         self,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -20,6 +21,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -314,13 +316,13 @@ class ConnectionItemCNodeAPI(
         """Start selecting from connection item c nodes."""
         return ConnectionItemCNodeQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -330,28 +332,85 @@ class ConnectionItemCNodeAPI(
                 has_container_fields=False,
             )
         )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemA._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "connectionItemA"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
+        if retrieve_connections == "identifier" or retrieve_connections == "full":
+            builder.extend(
+                factory.from_edge(
+                    ConnectionItemA._view_id,
+                    "outwards",
+                    ViewPropertyId(self._view_id, "connectionItemA"),
+                    include_end_node=retrieve_connections == "full",
+                    has_container_fields=True,
+                )
             )
-        )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemB._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "connectionItemB"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
+            builder.extend(
+                factory.from_edge(
+                    ConnectionItemB._view_id,
+                    "outwards",
+                    ViewPropertyId(self._view_id, "connectionItemB"),
+                    include_end_node=retrieve_connections == "full",
+                    has_container_fields=True,
+                )
             )
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        limit: int | None = None,
+    ) -> Iterator[ConnectionItemCNodeList]:
+        """Iterate over connection item c nodes
+
+        Args:
+            chunk_size: The number of connection item c nodes to return in each iteration. Defaults to 100.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            retrieve_connections: Whether to retrieve `connection_item_a` and `connection_item_b` for the connection
+            item c nodes. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve
+            the identifier of the connected items, and 'full' will retrieve the full connected items.
+            limit: Maximum number of connection item c nodes to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of connection item c nodes
+
+        Examples:
+
+            Iterate connection item c nodes in chunks of 100 up to 2000 items:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for connection_item_c_nodes in client.connection_item_c_node.iterate(chunk_size=100, limit=2000):
+                ...     for connection_item_c_node in connection_item_c_nodes:
+                ...         print(connection_item_c_node.external_id)
+
+            Iterate connection item c nodes in chunks of 100 sorted by external_id in descending order:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for connection_item_c_nodes in client.connection_item_c_node.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for connection_item_c_node in connection_item_c_nodes:
+                ...         print(connection_item_c_node.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
         )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        filter_ = _create_connection_item_c_node_filter(
+            self._view_id,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections)
 
     def list(
         self,
@@ -394,5 +453,4 @@ class ConnectionItemCNodeAPI(
         )
         if retrieve_connections == "skip":
             return self._list(limit=limit, filter=filter_)
-        values = self._query(filter_, limit, retrieve_connections)
-        return self._class_list(instantiate_classes(self._class_type, values, "list"))
+        return self._query(filter_, limit, retrieve_connections, None, "list")

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -20,6 +21,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -362,13 +364,13 @@ class DependentOnNonWritableAPI(
         """Start selecting from dependent on non writables."""
         return DependentOnNonWritableQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -379,19 +381,91 @@ class DependentOnNonWritableAPI(
                 has_container_fields=True,
             )
         )
-        builder.extend(
-            factory.from_edge(
-                Implementation1NonWriteable._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "toNonWritable"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
+        if retrieve_connections == "identifier" or retrieve_connections == "full":
+            builder.extend(
+                factory.from_edge(
+                    Implementation1NonWriteable._view_id,
+                    "outwards",
+                    ViewPropertyId(self._view_id, "toNonWritable"),
+                    include_end_node=retrieve_connections == "full",
+                    has_container_fields=True,
+                )
             )
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        a_value: str | list[str] | None = None,
+        a_value_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        sort_by: DependentOnNonWritableFields | Sequence[DependentOnNonWritableFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        limit: int | None = None,
+    ) -> Iterator[DependentOnNonWritableList]:
+        """Iterate over dependent on non writables
+
+        Args:
+            chunk_size: The number of dependent on non writables to return in each iteration. Defaults to 100.
+            a_value: The a value to filter on.
+            a_value_prefix: The prefix of the a value to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+            retrieve_connections: Whether to retrieve `to_non_writable` for the dependent on non writables. Defaults to
+            'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the
+            connected items, and 'full' will retrieve the full connected items.
+            limit: Maximum number of dependent on non writables to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of dependent on non writables
+
+        Examples:
+
+            Iterate dependent on non writables in chunks of 100 up to 2000 items:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for dependent_on_non_writables in client.dependent_on_non_writable.iterate(chunk_size=100, limit=2000):
+                ...     for dependent_on_non_writable in dependent_on_non_writables:
+                ...         print(dependent_on_non_writable.external_id)
+
+            Iterate dependent on non writables in chunks of 100 sorted by external_id in descending order:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for dependent_on_non_writables in client.dependent_on_non_writable.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for dependent_on_non_writable in dependent_on_non_writables:
+                ...         print(dependent_on_non_writable.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
         )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        filter_ = _create_dependent_on_non_writable_filter(
+            self._view_id,
+            a_value,
+            a_value_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
 
     def list(
         self,
@@ -449,5 +523,4 @@ class DependentOnNonWritableAPI(
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
             return self._list(limit=limit, filter=filter_, sort=sort_input)
-        values = self._query(filter_, limit, retrieve_connections, sort_input)
-        return self._class_list(instantiate_classes(self._class_type, values, "list"))
+        return self._query(filter_, limit, retrieve_connections, sort_input, "list")

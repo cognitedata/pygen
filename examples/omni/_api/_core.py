@@ -207,12 +207,13 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
     ) -> Iterator[T_DomainModelList]:
         executor = self._build(filter_, limit, retrieve_connections, sort)
         for batch_results in executor.iterate(self._client, remove_not_connected=False):
-            unpack_edges: Literal[
-                "skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
+            unpack_edges: Literal["skip", "identifier"] = (
+                "identifier" if retrieve_connections == "identifier" else "skip"
+            )
             unpacked = QueryUnpacker(batch_results, edges=unpack_edges).unpack()
             item_list = self._class_list(instantiate_classes(self._class_type, unpacked, "iterate"))
             for i in range(0, len(item_list), chunk_size):
-                yield item_list[i: i + chunk_size]
+                yield item_list[i : i + chunk_size]
 
     def _search(
         self,

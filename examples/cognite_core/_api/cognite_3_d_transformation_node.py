@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -20,6 +21,7 @@ from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -531,13 +533,13 @@ class Cognite3DTransformationNodeAPI(
         """Start selecting from Cognite 3D transformation nodes."""
         return Cognite3DTransformationNodeQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -548,10 +550,125 @@ class Cognite3DTransformationNodeAPI(
                 has_container_fields=True,
             )
         )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        min_euler_rotation_x: float | None = None,
+        max_euler_rotation_x: float | None = None,
+        min_euler_rotation_y: float | None = None,
+        max_euler_rotation_y: float | None = None,
+        min_euler_rotation_z: float | None = None,
+        max_euler_rotation_z: float | None = None,
+        min_scale_x: float | None = None,
+        max_scale_x: float | None = None,
+        min_scale_y: float | None = None,
+        max_scale_y: float | None = None,
+        min_scale_z: float | None = None,
+        max_scale_z: float | None = None,
+        min_translation_x: float | None = None,
+        max_translation_x: float | None = None,
+        min_translation_y: float | None = None,
+        max_translation_y: float | None = None,
+        min_translation_z: float | None = None,
+        max_translation_z: float | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        sort_by: Cognite3DTransformationNodeFields | Sequence[Cognite3DTransformationNodeFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        limit: int | None = None,
+    ) -> Iterator[Cognite3DTransformationNodeList]:
+        """Iterate over Cognite 3D transformation nodes
+
+        Args:
+            chunk_size: The number of Cognite 3D transformation nodes to return in each iteration. Defaults to 100.
+            min_euler_rotation_x: The minimum value of the euler rotation x to filter on.
+            max_euler_rotation_x: The maximum value of the euler rotation x to filter on.
+            min_euler_rotation_y: The minimum value of the euler rotation y to filter on.
+            max_euler_rotation_y: The maximum value of the euler rotation y to filter on.
+            min_euler_rotation_z: The minimum value of the euler rotation z to filter on.
+            max_euler_rotation_z: The maximum value of the euler rotation z to filter on.
+            min_scale_x: The minimum value of the scale x to filter on.
+            max_scale_x: The maximum value of the scale x to filter on.
+            min_scale_y: The minimum value of the scale y to filter on.
+            max_scale_y: The maximum value of the scale y to filter on.
+            min_scale_z: The minimum value of the scale z to filter on.
+            max_scale_z: The maximum value of the scale z to filter on.
+            min_translation_x: The minimum value of the translation x to filter on.
+            max_translation_x: The maximum value of the translation x to filter on.
+            min_translation_y: The minimum value of the translation y to filter on.
+            max_translation_y: The maximum value of the translation y to filter on.
+            min_translation_z: The minimum value of the translation z to filter on.
+            max_translation_z: The maximum value of the translation z to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+            limit: Maximum number of Cognite 3D transformation nodes to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of Cognite 3D transformation nodes
+
+        Examples:
+
+            Iterate Cognite 3D transformation nodes in chunks of 100 up to 2000 items:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for cognite_3_d_transformation_nodes in client.cognite_3_d_transformation_node.iterate(chunk_size=100, limit=2000):
+                ...     for cognite_3_d_transformation_node in cognite_3_d_transformation_nodes:
+                ...         print(cognite_3_d_transformation_node.external_id)
+
+            Iterate Cognite 3D transformation nodes in chunks of 100 sorted by external_id in descending order:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for cognite_3_d_transformation_nodes in client.cognite_3_d_transformation_node.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for cognite_3_d_transformation_node in cognite_3_d_transformation_nodes:
+                ...         print(cognite_3_d_transformation_node.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
+        filter_ = _create_cognite_3_d_transformation_node_filter(
+            self._view_id,
+            min_euler_rotation_x,
+            max_euler_rotation_x,
+            min_euler_rotation_y,
+            max_euler_rotation_y,
+            min_euler_rotation_z,
+            max_euler_rotation_z,
+            min_scale_x,
+            max_scale_x,
+            min_scale_y,
+            max_scale_y,
+            min_scale_z,
+            max_scale_z,
+            min_translation_x,
+            max_translation_x,
+            min_translation_y,
+            max_translation_y,
+            min_translation_z,
+            max_translation_z,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input)
 
     def list(
         self,
