@@ -21,6 +21,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -458,13 +459,13 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         """Start selecting from connection item as."""
         return ConnectionItemAQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+        ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -475,7 +476,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 has_container_fields=True,
             )
         )
-        builder.extend(
+        if retrieve_connections == "identifier" or retrieve_connections == "full":
+            builder.extend(
             factory.from_edge(
                 ConnectionItemB._view_id,
                 "outwards",
@@ -499,10 +501,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                     has_container_fields=True,
                 )
             )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
 
     def iterate(
         self,
@@ -593,8 +592,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        for values in self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input):
-            yield self._class_list(instantiate_classes(self._class_type, values, "list"))
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
 
     def list(
         self,
@@ -672,5 +670,4 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
             return self._list(limit=limit, filter=filter_, sort=sort_input)
-        values = self._query(filter_, limit, retrieve_connections, sort_input)
-        return self._class_list(instantiate_classes(self._class_type, values, "list"))
+        return self._query(filter_, limit, retrieve_connections, sort_input, "list")
