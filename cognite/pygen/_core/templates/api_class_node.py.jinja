@@ -576,6 +576,9 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 ...         print({{ data_class.variable }}.external_id)
 
         """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
         filter_ = {{ data_class.filter_name }}(
             self._view_id,
             {% for parm in list_method.parameters %}
