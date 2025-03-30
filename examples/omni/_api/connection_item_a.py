@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence, Iterator
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -465,7 +465,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-        ) -> QueryExecutor:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -478,14 +478,14 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         )
         if retrieve_connections == "identifier" or retrieve_connections == "full":
             builder.extend(
-            factory.from_edge(
-                ConnectionItemB._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "outwards"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
+                factory.from_edge(
+                    ConnectionItemB._view_id,
+                    "outwards",
+                    ViewPropertyId(self._view_id, "outwards"),
+                    include_end_node=retrieve_connections == "full",
+                    has_container_fields=True,
+                )
             )
-        )
         if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
@@ -536,7 +536,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         """Iterate over connection item as
 
         Args:
-            chunk_size: The number of connection item as to return in each chunk. Defaults to 100.
+            chunk_size: The number of connection item as to return in each iteration. Defaults to 100.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
@@ -564,21 +564,21 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for connection_item_a_list in client.connection_item_a.iterate(chunk_size=100, limit=2000):
-                >>>     for connection_item_a in connection_item_a_list:
-                >>>         print(connection_item_a)
+                >>> for connection_item_as in client.connection_item_a.iterate(chunk_size=100, limit=2000):
+                ...     for connection_item_a in connection_item_as:
+                ...         print(connection_item_a.external_id)
 
             Iterate connection item as in chunks of 100 sorted by external_id in descending order:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for connection_item_a_list in client.connection_item_a.iterate(
+                >>> for connection_item_as in client.connection_item_a.iterate(
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
-                ...     direction="descending"
+                ...     direction="descending",
                 ... ):
-                >>>     for connection_item_a in connection_item_a_list:
-                >>>         print(connection_item_a)
+                ...     for connection_item_a in connection_item_as:
+                ...         print(connection_item_a.external_id)
 
         """
         filter_ = _create_connection_item_a_filter(
