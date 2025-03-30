@@ -162,7 +162,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
                     filter_ = dm.filters.Equals(["node", "space"], space_key) & dm.filters.In(
                         ["node", "externalId"], ext_id_chunk
                     )
-                    items.extend(self._query(filter_, len(ext_id_chunk), retrieve_connections, None,"retrieve"))
+                    items.extend(self._query(filter_, len(ext_id_chunk), retrieve_connections, None, "retrieve"))
 
         nodes = self._class_list(items)
 
@@ -204,7 +204,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-        ) -> Iterator[T_DomainModelList]:
+    ) -> Iterator[T_DomainModelList]:
         executor = self._build(filter_, limit, retrieve_connections, sort)
         for batch_results in executor.iterate(self._client, remove_not_connected=False):
             unpack_edges: Literal[
