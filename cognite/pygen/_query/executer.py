@@ -129,8 +129,8 @@ class QueryExecutor:
         init_cursors: dict[str, str | None] | None = None,
     ) -> list[QueryResultStep]:
         results: dict[str, QueryResultStep] = {}
-        for batch_results in self.iterate(client, remove_not_connected, init_cursors):
-            for result in batch_results:
+        for iterate_response in self.iterate(client, remove_not_connected, init_cursors):
+            for result in iterate_response:
                 if result.name in results:
                     results[result.name].results.extend(result.results)
                 else:
@@ -152,7 +152,7 @@ class QueryExecutor:
         status = self._status_by_name[select_step.name]
         while True:
             self._update_expression_limits()
-            t0 = time.time()
+            start_query = time.time()
             try:
                 batch = client.data_modeling.instances.query(self._query)
             except CogniteAPIError as e:
@@ -170,7 +170,7 @@ class QueryExecutor:
                 raise e
 
             self._fetch_reverse_direct_relation_of_lists(client, self._to_search, batch)
-            last_execution_time = time.time() - t0
+            last_execution_time = time.time() - start_query
 
             for name in self._temp_select:
                 batch.pop(name, None)
@@ -248,7 +248,7 @@ class QueryExecutor:
             batch[step.name] = dm.NodeListWithCursor(step_result, None)
         return None
 
-    def _update_pagination_status(self, batch: dm.query.QueryResult):
+    def _update_pagination_status(self, batch: dm.query.QueryResult) -> None:
         for name, status in self._status_by_name.items():
             if name not in batch:
                 continue
