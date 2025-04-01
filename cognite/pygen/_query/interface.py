@@ -15,7 +15,7 @@ from cognite.pygen._version import __version__
 
 from .builder import QueryBuilder
 from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, SelectedProperties
-from .executer import chunker
+from .executor import chunker
 from .processing import QueryUnpacker
 from .step import QueryBuildStepFactory
 

@@ -9,7 +9,7 @@ from typing import (
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.query import ResultSetExpression
 
-from cognite.pygen._query.executer import QueryExecutor
+from cognite.pygen._query.executor import QueryExecutor
 from cognite.pygen._query.step import QueryBuildStep
 
 if sys.version_info >= (3, 11):

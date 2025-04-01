@@ -533,7 +533,7 @@ class MultiAPIGenerator:
         These are the exact same files as in cognite.pygen._query.
         """
         output: dict[str, str] = {}
-        for file_name in ["builder", "constants", "processing", "step", "executer"]:
+        for file_name in ["builder", "constants", "processing", "step", "executor"]:
             file_content = get_file_content(f"{file_name}.py")
             output[f"{file_name}.py"] = file_content.replace(
                 "cognite.pygen._query", f"{self.top_level_package}.data_classes._core.query"
