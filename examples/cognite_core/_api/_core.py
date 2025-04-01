@@ -426,8 +426,9 @@ class QueryAPI(Generic[T_DomainModel, T_DomainModelList]):
         self._result_list_cls = result_list_cls
 
     def _query(self) -> T_DomainModelList:
-        self._builder.execute_query(self._client, remove_not_connected=True)
-        unpacked = QueryUnpacker(self._builder).unpack()
+        executor = self._builder.build()
+        results = executor.execute_query(self._client, remove_not_connected=True)
+        unpacked = QueryUnpacker(results).unpack()
         item_list = instantiate_classes(self._result_cls, unpacked, "query")
         return self._result_list_cls(item_list)
 

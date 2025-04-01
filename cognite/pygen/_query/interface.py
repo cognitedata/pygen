@@ -13,10 +13,11 @@ from cognite.client.utils.useful_types import SequenceNotStr
 
 from cognite.pygen._version import __version__
 
-from .builder import QueryBuilder, chunker
+from .builder import QueryBuilder
 from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, SelectedProperties
+from .executor import chunker
 from .processing import QueryUnpacker
-from .step import QueryStepFactory
+from .step import QueryBuildStepFactory
 
 
 class QueryExecutor:
@@ -222,7 +223,7 @@ class QueryExecutor:
         view = self._get_view(view_id)
         root_properties = self._as_property_list(properties, "list")
         builder = QueryBuilder()
-        factory = QueryStepFactory(builder.create_name, view=view, user_selected_properties=properties)
+        factory = QueryBuildStepFactory(builder.create_name, view=view, user_selected_properties=properties)
 
         if not factory.connection_properties:
             result = self._client.data_modeling.instances.list(
@@ -242,9 +243,10 @@ class QueryExecutor:
         builder.append(factory.root(filter, limit=limit))
         for connection_id, connection in factory.connection_properties.items():
             builder.extend(factory.from_connection(connection_id, connection, reverse_views))
-        _ = builder.execute_query(self._client, remove_not_connected=False)
+        executor = builder.build()
+        results = executor.execute_query(self._client, remove_not_connected=False)
         return QueryUnpacker(
-            builder, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
+            results, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
         ).unpack()
 
     @classmethod
