@@ -9,7 +9,7 @@ from typing import (
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.query import ResultSetExpression
 
-from wind_turbine.data_classes._core.query.executer import QueryExecutor
+from wind_turbine.data_classes._core.query.executor import QueryExecutor
 from wind_turbine.data_classes._core.query.step import QueryBuildStep
 
 if sys.version_info >= (3, 11):
