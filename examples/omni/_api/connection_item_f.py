@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from omni._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -20,6 +21,7 @@ from omni.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -410,13 +412,13 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         """Start selecting from connection item fs."""
         return ConnectionItemFQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -427,26 +429,27 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                 has_container_fields=True,
             )
         )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemG._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "outwardsMulti"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
-                edge_view=ConnectionEdgeA._view_id,
+        if retrieve_connections == "identifier" or retrieve_connections == "full":
+            builder.extend(
+                factory.from_edge(
+                    ConnectionItemG._view_id,
+                    "outwards",
+                    ViewPropertyId(self._view_id, "outwardsMulti"),
+                    include_end_node=retrieve_connections == "full",
+                    has_container_fields=True,
+                    edge_view=ConnectionEdgeA._view_id,
+                )
             )
-        )
-        builder.extend(
-            factory.from_edge(
-                ConnectionItemE._view_id,
-                "outwards",
-                ViewPropertyId(self._view_id, "outwardsSingle"),
-                include_end_node=retrieve_connections == "full",
-                has_container_fields=True,
-                edge_view=ConnectionEdgeA._view_id,
+            builder.extend(
+                factory.from_edge(
+                    ConnectionItemE._view_id,
+                    "outwards",
+                    ViewPropertyId(self._view_id, "outwardsSingle"),
+                    include_end_node=retrieve_connections == "full",
+                    has_container_fields=True,
+                    edge_view=ConnectionEdgeA._view_id,
+                )
             )
-        )
         if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
@@ -455,10 +458,91 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
                     has_container_fields=True,
                 )
             )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        direct_list: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        sort_by: ConnectionItemFFields | Sequence[ConnectionItemFFields] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        limit: int | None = None,
+    ) -> Iterator[ConnectionItemFList]:
+        """Iterate over connection item fs
+
+        Args:
+            chunk_size: The number of connection item fs to return in each iteration. Defaults to 100.
+            direct_list: The direct list to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+            retrieve_connections: Whether to retrieve `direct_list`, `outwards_multi` and `outwards_single` for the
+            connection item fs. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
+            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            limit: Maximum number of connection item fs to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of connection item fs
+
+        Examples:
+
+            Iterate connection item fs in chunks of 100 up to 2000 items:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for connection_item_fs in client.connection_item_f.iterate(chunk_size=100, limit=2000):
+                ...     for connection_item_f in connection_item_fs:
+                ...         print(connection_item_f.external_id)
+
+            Iterate connection item fs in chunks of 100 sorted by external_id in descending order:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for connection_item_fs in client.connection_item_f.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for connection_item_f in connection_item_fs:
+                ...         print(connection_item_f.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
+        filter_ = _create_connection_item_f_filter(
+            self._view_id,
+            direct_list,
+            name,
+            name_prefix,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
 
     def list(
         self,
@@ -526,5 +610,4 @@ class ConnectionItemFAPI(NodeAPI[ConnectionItemF, ConnectionItemFWrite, Connecti
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
             return self._list(limit=limit, filter=filter_, sort=sort_input)
-        values = self._query(filter_, limit, retrieve_connections, sort_input)
-        return self._class_list(instantiate_classes(self._class_type, values, "list"))
+        return self._query(filter_, limit, retrieve_connections, sort_input, "list")

@@ -4,7 +4,7 @@ from __future__ import annotations
 import datetime
 {% endif %}
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -13,6 +13,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from {{ top_level_package }}._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     {% if data_class.is_writable %}
@@ -29,6 +30,7 @@ from {{ top_level_package }}.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -425,13 +427,13 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         """Start selecting from {{ data_class.doc_list_name}}."""
         return {{ data_class.query_cls_name }}(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(factory.root(
@@ -446,24 +448,27 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             has_container_fields=False,
             {% endif %}
         ))
+        {% if data_class.has_edges %}
+        if retrieve_connections == "identifier" or retrieve_connections == "full":
+        {% endif %}
         {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
         {% if field.is_edge %}
-        builder.extend(
-            factory.from_edge(
-                {{field.destination_class.read_name }}._view_id,
-                "{{ field.edge_direction}}",
-                ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
-                include_end_node=retrieve_connections == "full",
-                {% if field.destination_class.has_container_fields %}
-                has_container_fields=True,
-                {% else %}
-                has_container_fields=False,
-                {% endif %}
-                {% if field.edge_class %}
-                edge_view={{ field.edge_class.read_name }}._view_id,
-                {% endif %}
+            builder.extend(
+                factory.from_edge(
+                    {{field.destination_class.read_name }}._view_id,
+                    "{{ field.edge_direction}}",
+                    ViewPropertyId(self._view_id, "{{ field.prop_name }}"),
+                    include_end_node=retrieve_connections == "full",
+                    {% if field.destination_class.has_container_fields %}
+                    has_container_fields=True,
+                    {% else %}
+                    has_container_fields=False,
+                    {% endif %}
+                    {% if field.edge_class %}
+                    edge_view={{ field.edge_class.read_name }}._view_id,
+                    {% endif %}
+                )
             )
-        )
         {% endif %}
         {% endfor %}
 {% if data_class.has_direct_or_reverse_relation_with_target %}
@@ -505,11 +510,86 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% endif %}
             {% endfor %}
 {% endif %}
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
 
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        {% for parm in list_method.parameters %}
+        {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
+        {% endfor %}
+        filter: dm.Filter | None = None,
+        {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+        sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
+        direction: Literal["ascending", "descending"] = "ascending",
+        sort: InstanceSort | list[InstanceSort] | None = None,
+        {% endif %}
+        {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        {% endif %}
+        limit: int | None = None,
+    ) -> Iterator[{{ data_class.read_list_name }}]:
+        """Iterate over {{ data_class.doc_list_name }}
+
+        Args:
+            chunk_size: The number of {{ data_class.doc_list_name }} to return in each iteration. Defaults to 100.
+            {% for parm in list_method.parameters %}
+            {{ parm.name }}: {{ parm.description }}
+            {% endfor %}
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+            sort_by: The property to sort by.
+            direction: The direction to sort by, either 'ascending' or 'descending'.
+            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
+                This will override the sort_by and direction. This allowos you to sort by multiple fields and
+                specify the direction for each field as well as how to handle null values.
+            {% endif %}
+            {% if data_class.has_connection_with_target %}
+            {{ retrieve_connections_doc }}
+            {% endif %}
+            limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of {{ data_class.doc_list_name}}
+
+        Examples:
+
+            Iterate {{ data_class.doc_list_name }} in chunks of 100 up to 2000 items:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> for {{ data_class.variable_list }} in client.{{ api_class.parent_attribute }}.iterate(chunk_size=100, limit=2000):
+                ...     for {{  data_class.variable }} in {{ data_class.variable_list }}:
+                ...         print({{ data_class.variable }}.external_id)
+
+            Iterate {{ data_class.doc_list_name }} in chunks of 100 sorted by external_id in descending order:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> for {{ data_class.variable_list }} in client.{{ api_class.parent_attribute }}.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for {{  data_class.variable }} in {{ data_class.variable_list }}:
+                ...         print({{ data_class.variable }}.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
+        filter_ = {{ data_class.filter_name }}(
+            self._view_id,
+            {% for parm in list_method.parameters %}
+            {{ parm.name }},
+            {% endfor %}
+            filter,
+        )
+        {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
+        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        {% endif %}
+        yield from self._iterate(chunk_size, filter_, limit, {% if data_class.has_connection_with_target %}retrieve_connections{% else %}"skip"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort_input{% endif %})
 
     def list(
         self,
@@ -573,8 +653,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 {% if data_class.has_connection_with_target %}
         if retrieve_connections == "skip":
             return self._list(limit=limit,  filter=filter_{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort=sort_input{% endif %})
-        values = self._query(filter_, limit, retrieve_connections{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort_input{% endif %})
-        return self._class_list(instantiate_classes(self._class_type, values, "list"))
+        return self._query(filter_, limit, retrieve_connections, {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}sort_input{% else %}None{% endif %}, "list")
         {% else %}
         return self._list(limit=limit,  filter=filter_{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort=sort_input{% endif %})
         {% endif %}

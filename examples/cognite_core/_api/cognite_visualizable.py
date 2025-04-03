@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from typing import Any, ClassVar, Literal, overload
 
 from cognite.client import CogniteClient
@@ -10,6 +10,7 @@ from cognite.client.data_classes.data_modeling.instances import InstanceAggregat
 
 from cognite_core._api._core import (
     DEFAULT_LIMIT_READ,
+    DEFAULT_CHUNK_SIZE,
     instantiate_classes,
     Aggregations,
     NodeAPI,
@@ -20,6 +21,7 @@ from cognite_core.data_classes._core import (
     DEFAULT_QUERY_LIMIT,
     QueryBuildStepFactory,
     QueryBuilder,
+    QueryExecutor,
     QueryUnpacker,
     ViewPropertyId,
 )
@@ -370,13 +372,13 @@ class CogniteVisualizableAPI(
         """Start selecting from Cognite visualizables."""
         return CogniteVisualizableQuery(self._client)
 
-    def _query(
+    def _build(
         self,
         filter_: dm.Filter | None,
-        limit: int,
+        limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
         builder.append(
@@ -394,10 +396,76 @@ class CogniteVisualizableAPI(
                     has_container_fields=True,
                 )
             )
-        unpack_edges: Literal["skip", "identifier"] = "identifier" if retrieve_connections == "identifier" else "skip"
-        executor = builder.build()
-        results = executor.execute_query(self._client, remove_not_connected=True if unpack_edges == "skip" else False)
-        return QueryUnpacker(results, edges=unpack_edges).unpack()
+        return builder.build()
+
+    def iterate(
+        self,
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        filter: dm.Filter | None = None,
+        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
+        limit: int | None = None,
+    ) -> Iterator[CogniteVisualizableList]:
+        """Iterate over Cognite visualizables
+
+        Args:
+            chunk_size: The number of Cognite visualizables to return in each iteration. Defaults to 100.
+            object_3d: The object 3d to filter on.
+            external_id_prefix: The prefix of the external ID to filter on.
+            space: The space to filter on.
+            filter: (Advanced) If the filtering available in the above is not sufficient,
+                you can write your own filtering which will be ANDed with the filter above.
+            retrieve_connections: Whether to retrieve `object_3d` for the Cognite visualizables. Defaults to
+            'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier of the
+            connected items, and 'full' will retrieve the full connected items.
+            limit: Maximum number of Cognite visualizables to return. Defaults to None, which will return all items.
+
+        Returns:
+            Iteration of Cognite visualizables
+
+        Examples:
+
+            Iterate Cognite visualizables in chunks of 100 up to 2000 items:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for cognite_visualizables in client.cognite_visualizable.iterate(chunk_size=100, limit=2000):
+                ...     for cognite_visualizable in cognite_visualizables:
+                ...         print(cognite_visualizable.external_id)
+
+            Iterate Cognite visualizables in chunks of 100 sorted by external_id in descending order:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for cognite_visualizables in client.cognite_visualizable.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
+                ...     for cognite_visualizable in cognite_visualizables:
+                ...         print(cognite_visualizable.external_id)
+
+        """
+        warnings.warn(
+            "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
+        )
+        filter_ = _create_cognite_visualizable_filter(
+            self._view_id,
+            object_3d,
+            external_id_prefix,
+            space,
+            filter,
+        )
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections)
 
     def list(
         self,
@@ -450,5 +518,4 @@ class CogniteVisualizableAPI(
         )
         if retrieve_connections == "skip":
             return self._list(limit=limit, filter=filter_)
-        values = self._query(filter_, limit, retrieve_connections)
-        return self._class_list(instantiate_classes(self._class_type, values, "list"))
+        return self._query(filter_, limit, retrieve_connections, None, "list")
