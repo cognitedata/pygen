@@ -82,7 +82,7 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         elif len(self._creation_path) >= global_config.max_select_depth:
             hint = f"""You can increase the max_select_depth in the global config.
 ```
-from omni.config import global_config
+from omni_multi.config import global_config
 
 global_config.max_select_depth = {global_config.max_select_depth+1}
 ```
