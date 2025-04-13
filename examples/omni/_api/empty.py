@@ -502,6 +502,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
+        chunk_size: int | None = None,
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
@@ -510,6 +511,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
                 filter=filter_,
                 sort=sort,
                 limit=limit,
+                max_retrieve_batch_limit=chunk_size,
                 has_container_fields=True,
             )
         )

@@ -386,6 +386,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
+        chunk_size: int | None = None,
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
@@ -394,6 +395,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
                 filter=filter_,
                 sort=sort,
                 limit=limit,
+                max_retrieve_batch_limit=chunk_size,
                 has_container_fields=True,
             )
         )

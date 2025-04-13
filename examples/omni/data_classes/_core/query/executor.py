@@ -10,7 +10,6 @@ from cognite.client.data_classes.aggregations import Count
 from cognite.client.exceptions import CogniteAPIError
 
 from omni.data_classes._core.query.constants import (
-    ACTUAL_INSTANCE_QUERY_LIMIT,
     IN_FILTER_CHUNK_SIZE,
     INSTANCE_QUERY_LIMIT,
     MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
@@ -36,7 +35,7 @@ class Progress:
 
     def _update_nodes_per_second(self, last_node_count: int, last_execution_time: float) -> None:
         # Estimate the number of nodes per second using exponential moving average
-        last_batch_nodes_per_second = last_node_count / last_execution_time
+        last_batch_nodes_per_second = last_node_count / max(last_execution_time, 1e-6)
         if self._estimated_nodes_per_second == 0.0:
             self._estimated_nodes_per_second = last_batch_nodes_per_second
         else:
@@ -68,7 +67,7 @@ class PaginationStatus:
     is_unlimited: bool
     max_retrieve_limit: int
     is_queryable: bool
-    max_retrieve_batch_limit = ACTUAL_INSTANCE_QUERY_LIMIT
+    max_retrieve_batch_limit: int = INSTANCE_QUERY_LIMIT
     cursor: str | None = None
     total_retrieved: int = 0
     last_batch_count: int = 0
@@ -119,7 +118,13 @@ class QueryExecutor:
         self._to_search = to_search
         self._temp_select = temp_select
         self._status_by_name = {
-            step.name: PaginationStatus(step.is_unlimited, step.max_retrieve_limit, step.is_queryable) for step in steps
+            step.name: PaginationStatus(
+                step.is_unlimited,
+                step.max_retrieve_limit,
+                step.is_queryable,
+                max_retrieve_batch_limit=step.max_retrieve_batch_limit,
+            )
+            for step in steps
         }
 
     def execute_query(
@@ -159,13 +164,13 @@ class QueryExecutor:
                 if e.code == 408:
                     # Too big query, try to reduce the limit
                     if self._reduce_max_batch_limit():
+                        new_limit = status.max_retrieve_batch_limit
+                        warnings.warn(
+                            f"Query is too large, reducing batch size to {new_limit:,}, and trying again",
+                            QueryReducingBatchSize,
+                            stacklevel=2,
+                        )
                         continue
-                    new_limit = status.max_retrieve_batch_limit
-                    warnings.warn(
-                        f"Query is too large, reducing batch size to {new_limit:,}, and trying again",
-                        QueryReducingBatchSize,
-                        stacklevel=2,
-                    )
 
                 raise e
 
@@ -199,7 +204,9 @@ class QueryExecutor:
             if status.is_unlimited:
                 expression.limit = status.max_retrieve_batch_limit
             else:
-                expression.limit = max(min(INSTANCE_QUERY_LIMIT, status.max_retrieve_limit - status.total_retrieved), 0)
+                expression.limit = max(
+                    min(status.max_retrieve_batch_limit, status.max_retrieve_limit - status.total_retrieved), 0
+                )
 
     @property
     def _cursors(self) -> dict[str, str | None]:

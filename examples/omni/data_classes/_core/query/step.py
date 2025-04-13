@@ -12,6 +12,7 @@ from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 
 from omni.data_classes._core.query.constants import (
+    ACTUAL_INSTANCE_QUERY_LIMIT,
     NODE_PROPERTIES,
     NotSetSentinel,
     SelectedProperties,
@@ -49,6 +50,7 @@ class QueryBuildStep:
         view_id: The view ID representing the view to query.
         max_retrieve_limit: The maximum number of instances to retrieve. Defaults to -1. If set to -1, it will
             continue to retrieve instances until there are no more instances to retrieve.
+        max_retrieve_batch_limit: The maximum number of instances to retrieve in a single batch. Defaults to -1.
         select: The selected properties to retrieve. If not set, it will default to all properties. None indicates
             to not retrieve any properties from the view.
         raw_filter: This is the same filter as the expression, but without the HasData filter. This is used to count
@@ -70,6 +72,7 @@ class QueryBuildStep:
         expression: dm.query.ResultSetExpression,
         view_id: dm.ViewId | None = None,
         max_retrieve_limit: int = -1,
+        max_retrieve_batch_limit: int | None = None,
         select: dm.query.Select | None | type[NotSetSentinel] = NotSetSentinel,
         raw_filter: dm.Filter | None = None,
         connection_type: Literal["reverse-list"] | None = None,
@@ -80,6 +83,7 @@ class QueryBuildStep:
         self.expression = expression
         self.view_id = view_id
         self.max_retrieve_limit = max_retrieve_limit
+        self._max_retrieve_batch_limit = max_retrieve_batch_limit
         self.select: dm.query.Select | None
         if select is NotSetSentinel:
             try:
@@ -127,6 +131,12 @@ class QueryBuildStep:
     @property
     def is_unlimited(self) -> bool:
         return self.max_retrieve_limit in {None, -1, math.inf}
+
+    @property
+    def max_retrieve_batch_limit(self) -> int:
+        if self._max_retrieve_batch_limit is None or self._max_retrieve_batch_limit in {-1, math.inf}:
+            return ACTUAL_INSTANCE_QUERY_LIMIT
+        return max(1, min(self._max_retrieve_batch_limit, ACTUAL_INSTANCE_QUERY_LIMIT))
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r})"
@@ -223,6 +233,7 @@ class QueryBuildStepFactory:
         sort: list[dm.InstanceSort] | None = None,
         limit: int | None = None,
         has_container_fields: bool = True,
+        max_retrieve_batch_limit: int | None = None,
     ) -> QueryBuildStep:
         if self._root_properties:
             skip = NODE_PROPERTIES | set(self.reverse_properties.keys())
@@ -246,6 +257,7 @@ class QueryBuildStepFactory:
             view_id=self._view_id,
             max_retrieve_limit=-1 if limit is None else limit,
             raw_filter=filter,
+            max_retrieve_batch_limit=max_retrieve_batch_limit,
         )
 
     def from_connection(
