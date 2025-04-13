@@ -11,7 +11,6 @@ from cognite.client.exceptions import CogniteAPIError
 
 from cognite.pygen._query.constants import (
     IN_FILTER_CHUNK_SIZE,
-    INSTANCE_QUERY_LIMIT,
     MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
     PRINT_PROGRESS_PER_N_NODES,
     SEARCH_LIMIT,
@@ -204,7 +203,9 @@ class QueryExecutor:
             if status.is_unlimited:
                 expression.limit = status.max_retrieve_batch_limit
             else:
-                expression.limit = max(min(INSTANCE_QUERY_LIMIT, status.max_retrieve_limit - status.total_retrieved), 0)
+                expression.limit = max(
+                    min(status.max_retrieve_batch_limit, status.max_retrieve_limit - status.total_retrieved), 0
+                )
 
     @property
     def _cursors(self) -> dict[str, str | None]:
