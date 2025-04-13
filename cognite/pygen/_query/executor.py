@@ -11,6 +11,7 @@ from cognite.client.exceptions import CogniteAPIError
 
 from cognite.pygen._query.constants import (
     IN_FILTER_CHUNK_SIZE,
+    INSTANCE_QUERY_LIMIT,
     MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
     PRINT_PROGRESS_PER_N_NODES,
     SEARCH_LIMIT,
