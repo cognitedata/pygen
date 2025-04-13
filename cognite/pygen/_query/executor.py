@@ -35,7 +35,7 @@ class Progress:
 
     def _update_nodes_per_second(self, last_node_count: int, last_execution_time: float) -> None:
         # Estimate the number of nodes per second using exponential moving average
-        last_batch_nodes_per_second = last_node_count / last_execution_time
+        last_batch_nodes_per_second = last_node_count / max(last_execution_time, 1e-6)
         if self._estimated_nodes_per_second == 0.0:
             self._estimated_nodes_per_second = last_batch_nodes_per_second
         else:
