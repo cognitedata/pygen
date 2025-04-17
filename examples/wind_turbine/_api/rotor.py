@@ -485,6 +485,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
         filter: dm.Filter | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[RotorList]:
         """Iterate over rotors
 
@@ -500,6 +501,8 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             for the rotors. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve
             the identifier of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of rotors to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of rotors
@@ -526,6 +529,21 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
                 ...     for rotor in rotors:
                 ...         print(rotor.external_id)
 
+            Iterate rotors in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from wind_turbine import WindTurbineClient
+                >>> client = WindTurbineClient()
+                >>> for first_iteration in client.rotor.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for rotors in client.rotor.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for rotor in rotors:
+                ...         print(rotor.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -538,7 +556,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
             space,
             filter,
         )
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, cursors=cursors)
 
     def list(
         self,

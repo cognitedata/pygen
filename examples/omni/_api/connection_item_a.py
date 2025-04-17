@@ -534,6 +534,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[ConnectionItemAList]:
         """Iterate over connection item as
 
@@ -556,6 +557,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             item as. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the
             identifier of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of connection item as to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of connection item as
@@ -582,6 +585,21 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
                 ...     for connection_item_a in connection_item_as:
                 ...         print(connection_item_a.external_id)
 
+            Iterate connection item as in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for first_iteration in client.connection_item_a.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for connection_item_as in client.connection_item_a.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for connection_item_a in connection_item_as:
+                ...         print(connection_item_a.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -597,7 +615,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input, cursors=cursors)
 
     def list(
         self,

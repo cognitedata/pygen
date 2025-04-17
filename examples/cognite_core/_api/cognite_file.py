@@ -875,6 +875,7 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[CogniteFileList]:
         """Iterate over Cognite files
 
@@ -919,6 +920,8 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
             files. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the
             identifier of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of Cognite files to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of Cognite files
@@ -941,6 +944,21 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
+                ... ):
+                ...     for cognite_file in cognite_files:
+                ...         print(cognite_file.external_id)
+
+            Iterate Cognite files in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for first_iteration in client.cognite_file.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for cognite_files in client.cognite_file.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
                 ... ):
                 ...     for cognite_file in cognite_files:
                 ...         print(cognite_file.external_id)
@@ -982,7 +1000,7 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input, cursors=cursors)
 
     def list(
         self,

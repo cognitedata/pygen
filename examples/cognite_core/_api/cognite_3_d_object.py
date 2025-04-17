@@ -612,6 +612,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[Cognite3DObjectList]:
         """Iterate over Cognite 3D objects
 
@@ -646,6 +647,8 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             the Cognite 3D objects. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
             retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of Cognite 3D objects to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of Cognite 3D objects
@@ -668,6 +671,21 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
+                ... ):
+                ...     for cognite_3_d_object in cognite_3_d_objects:
+                ...         print(cognite_3_d_object.external_id)
+
+            Iterate Cognite 3D objects in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for first_iteration in client.cognite_3_d_object.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for cognite_3_d_objects in client.cognite_3_d_object.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
                 ... ):
                 ...     for cognite_3_d_object in cognite_3_d_objects:
                 ...         print(cognite_3_d_object.external_id)
@@ -699,7 +717,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input, cursors=cursors)
 
     def list(
         self,

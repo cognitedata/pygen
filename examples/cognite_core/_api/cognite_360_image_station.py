@@ -425,6 +425,7 @@ class Cognite360ImageStationAPI(
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[Cognite360ImageStationList]:
         """Iterate over Cognite 360 image stations
 
@@ -445,6 +446,8 @@ class Cognite360ImageStationAPI(
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
             limit: Maximum number of Cognite 360 image stations to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of Cognite 360 image stations
@@ -471,6 +474,21 @@ class Cognite360ImageStationAPI(
                 ...     for cognite_360_image_station in cognite_360_image_stations:
                 ...         print(cognite_360_image_station.external_id)
 
+            Iterate Cognite 360 image stations in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for first_iteration in client.cognite_360_image_station.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for cognite_360_image_stations in client.cognite_360_image_station.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for cognite_360_image_station in cognite_360_image_stations:
+                ...         print(cognite_360_image_station.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -487,7 +505,7 @@ class Cognite360ImageStationAPI(
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input, cursors=cursors)
 
     def list(
         self,

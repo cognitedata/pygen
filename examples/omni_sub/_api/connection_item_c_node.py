@@ -362,6 +362,7 @@ class ConnectionItemCNodeAPI(
         filter: dm.Filter | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[ConnectionItemCNodeList]:
         """Iterate over connection item c nodes
 
@@ -375,6 +376,8 @@ class ConnectionItemCNodeAPI(
             item c nodes. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve
             the identifier of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of connection item c nodes to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of connection item c nodes
@@ -401,6 +404,21 @@ class ConnectionItemCNodeAPI(
                 ...     for connection_item_c_node in connection_item_c_nodes:
                 ...         print(connection_item_c_node.external_id)
 
+            Iterate connection item c nodes in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from omni_sub import OmniSubClient
+                >>> client = OmniSubClient()
+                >>> for first_iteration in client.connection_item_c_node.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for connection_item_c_nodes in client.connection_item_c_node.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for connection_item_c_node in connection_item_c_nodes:
+                ...         print(connection_item_c_node.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -411,7 +429,7 @@ class ConnectionItemCNodeAPI(
             space,
             filter,
         )
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, cursors=cursors)
 
     def list(
         self,

@@ -478,6 +478,7 @@ class CogniteFileCategoryAPI(
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[CogniteFileCategoryList]:
         """Iterate over Cognite file categories
 
@@ -503,6 +504,8 @@ class CogniteFileCategoryAPI(
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
             limit: Maximum number of Cognite file categories to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of Cognite file categories
@@ -529,6 +532,21 @@ class CogniteFileCategoryAPI(
                 ...     for cognite_file_category in cognite_file_categories:
                 ...         print(cognite_file_category.external_id)
 
+            Iterate Cognite file categories in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for first_iteration in client.cognite_file_category.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for cognite_file_categories in client.cognite_file_category.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for cognite_file_category in cognite_file_categories:
+                ...         print(cognite_file_category.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -550,7 +568,7 @@ class CogniteFileCategoryAPI(
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input, cursors=cursors)
 
     def list(
         self,

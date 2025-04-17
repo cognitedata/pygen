@@ -107,6 +107,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
 
     def __init__(self, client: CogniteClient):
         self._client = client
+        self._last_cursors: dict[str, str | None] | None = None
 
     def _delete(self, external_id: str | SequenceNotStr[str], space: str) -> dm.InstancesDeleteResult:
         if isinstance(external_id, str):
@@ -205,14 +206,23 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
         limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[T_DomainModelList]:
+        if cursors is not None and self._last_cursors is not None:
+            raise ValueError(
+                "Same cursors used twice. Please use a different set of cursors or start a new iteration. "
+                "This is to avoid accidental infinite loops."
+            )
+        self._last_cursors = cursors
         executor = self._build(filter_, limit, retrieve_connections, sort, chunk_size)
-        for batch_results in executor.iterate(self._client, remove_not_connected=False):
+        for batch_results in executor.iterate(self._client, remove_not_connected=False, init_cursors=cursors):
             unpack_edges: Literal["skip", "identifier"] = (
                 "identifier" if retrieve_connections == "identifier" else "skip"
             )
             unpacked = QueryUnpacker(batch_results, edges=unpack_edges).unpack()
-            yield self._class_list(instantiate_classes(self._class_type, unpacked, "iterate"))
+            yield self._class_list(
+                instantiate_classes(self._class_type, unpacked, "iterate"), cursors=batch_results._cursors
+            )
 
     def _search(
         self,

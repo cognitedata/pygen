@@ -399,7 +399,7 @@ class CoreList(UserList, Generic[T_Core]):
     _INSTANCE: type[T_Core]
     _PARENT_CLASS: type[Core]
 
-    def __init__(self, nodes: Collection[T_Core] | None = None):
+    def __init__(self, nodes: Collection[T_Core] | None = None) -> None:
         super().__init__(nodes or [])
 
     # The dunder implementations are to get proper type hints
@@ -457,6 +457,12 @@ class CoreList(UserList, Generic[T_Core]):
 
 class DomainModelList(CoreList[T_DomainModel]):
     _PARENT_CLASS = DomainModel
+
+    def __init__(
+        self, nodes: Collection[T_DomainModel] | None = None, cursors: dict[str, str | None] | None = None
+    ) -> None:
+        super().__init__(nodes)
+        self.cursors = cursors
 
     @property
     def data_records(self) -> DataRecordList:

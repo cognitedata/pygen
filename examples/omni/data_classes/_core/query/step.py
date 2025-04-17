@@ -1,6 +1,6 @@
 import math
 import warnings
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, MutableSequence
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Any, Literal
@@ -509,3 +509,14 @@ class QueryResultStep(QueryBuildStep):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, from={self.from_!r}, results={len(self.results)})"
+
+
+class QueryResultStepList(list, MutableSequence[QueryResultStep]):
+    """A list of QueryResultStep objects."""
+
+    def __init__(self, *args: QueryResultStep, cursors: dict[str, str | None] | None = None) -> None:
+        super().__init__(args)
+        self._cursors = cursors or {}
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(steps={len(self)})"

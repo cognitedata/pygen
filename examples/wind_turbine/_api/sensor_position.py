@@ -993,6 +993,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[SensorPositionList]:
         """Iterate over sensor positions
 
@@ -1025,6 +1026,8 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full'
             will retrieve the full connected items.
             limit: Maximum number of sensor positions to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of sensor positions
@@ -1051,6 +1054,21 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
                 ...     for sensor_position in sensor_positions:
                 ...         print(sensor_position.external_id)
 
+            Iterate sensor positions in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from wind_turbine import WindTurbineClient
+                >>> client = WindTurbineClient()
+                >>> for first_iteration in client.sensor_position.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for sensor_positions in client.sensor_position.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for sensor_position in sensor_positions:
+                ...         print(sensor_position.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -1073,7 +1091,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input, cursors=cursors)
 
     def list(
         self,

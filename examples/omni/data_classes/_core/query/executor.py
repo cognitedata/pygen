@@ -17,7 +17,7 @@ from omni.data_classes._core.query.constants import (
     SEARCH_LIMIT,
 )
 from omni.data_classes._core.query.processing import QueryResultCleaner
-from omni.data_classes._core.query.step import QueryBuildStep, QueryResultStep
+from omni.data_classes._core.query.step import QueryBuildStep, QueryResultStep, QueryResultStepList
 
 
 class QueryReducingBatchSize(UserWarning):
@@ -147,7 +147,7 @@ class QueryExecutor:
         client: CogniteClient,
         remove_not_connected: bool = False,
         init_cursors: dict[str, str | None] | None = None,
-    ) -> Iterator[list[QueryResultStep]]:
+    ) -> Iterator[QueryResultStepList]:
         select_step = next((step for step in self._steps if step.select is not None), None)
         if select_step is None:
             raise ValueError("No select step found in the query")
@@ -263,8 +263,8 @@ class QueryExecutor:
             status.total_retrieved += status.last_batch_count
             status.cursor = batch.cursors.get(name)
 
-    def _as_results(self, batch: dm.query.QueryResult) -> list[QueryResultStep]:
-        results: list[QueryResultStep] = []
+    def _as_results(self, batch: dm.query.QueryResult) -> QueryResultStepList:
+        results = QueryResultStepList(cursors=self._cursors)
         for step in self._steps:
             if step.name not in batch:
                 continue
