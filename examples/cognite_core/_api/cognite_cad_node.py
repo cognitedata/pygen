@@ -643,6 +643,7 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[CogniteCADNodeList]:
         """Iterate over Cognite cad nodes
 
@@ -670,6 +671,8 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
             Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve the identifier
             of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of Cognite cad nodes to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of Cognite cad nodes
@@ -696,6 +699,21 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
                 ...     for cognite_cad_node in cognite_cad_nodes:
                 ...         print(cognite_cad_node.external_id)
 
+            Iterate Cognite cad nodes in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for first_iteration in client.cognite_cad_node.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for cognite_cad_nodes in client.cognite_cad_node.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for cognite_cad_node in cognite_cad_nodes:
+                ...         print(cognite_cad_node.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -716,7 +734,7 @@ class CogniteCADNodeAPI(NodeAPI[CogniteCADNode, CogniteCADNodeWrite, CogniteCADN
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input, cursors=cursors)
 
     def list(
         self,

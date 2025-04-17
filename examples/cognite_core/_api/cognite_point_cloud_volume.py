@@ -673,6 +673,7 @@ class CognitePointCloudVolumeAPI(
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[CognitePointCloudVolumeList]:
         """Iterate over Cognite point cloud volumes
 
@@ -701,6 +702,8 @@ class CognitePointCloudVolumeAPI(
             cloud volumes. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only retrieve
             the identifier of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of Cognite point cloud volumes to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of Cognite point cloud volumes
@@ -727,6 +730,21 @@ class CognitePointCloudVolumeAPI(
                 ...     for cognite_point_cloud_volume in cognite_point_cloud_volumes:
                 ...         print(cognite_point_cloud_volume.external_id)
 
+            Iterate Cognite point cloud volumes in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for first_iteration in client.cognite_point_cloud_volume.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for cognite_point_cloud_volumes in client.cognite_point_cloud_volume.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for cognite_point_cloud_volume in cognite_point_cloud_volumes:
+                ...         print(cognite_point_cloud_volume.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -748,7 +766,7 @@ class CognitePointCloudVolumeAPI(
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input, cursors=cursors)
 
     def list(
         self,

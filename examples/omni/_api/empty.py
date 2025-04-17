@@ -542,6 +542,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[EmptyList]:
         """Iterate over empties
 
@@ -572,6 +573,8 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
             limit: Maximum number of empties to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of empties
@@ -594,6 +597,21 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
+                ... ):
+                ...     for empty in empties:
+                ...         print(empty.external_id)
+
+            Iterate empties in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from omni import OmniClient
+                >>> client = OmniClient()
+                >>> for first_iteration in client.empty.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for empties in client.empty.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
                 ... ):
                 ...     for empty in empties:
                 ...         print(empty.external_id)
@@ -624,7 +642,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, "skip", sort_input, cursors=cursors)
 
     def list(
         self,
