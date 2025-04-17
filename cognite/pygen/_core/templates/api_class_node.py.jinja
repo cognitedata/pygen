@@ -530,6 +530,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         {% endif %}
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[{{ data_class.read_list_name }}]:
         """Iterate over {{ data_class.doc_list_name }}
 
@@ -551,6 +552,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {{ retrieve_connections_doc }}
             {% endif %}
             limit: Maximum number of {{ data_class.doc_list_name }} to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of {{ data_class.doc_list_name}}
@@ -577,6 +580,21 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
                 ...     for {{  data_class.variable }} in {{ data_class.variable_list }}:
                 ...         print({{ data_class.variable }}.external_id)
 
+            Iterate {{ data_class.doc_list_name }} in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from {{ top_level_package }} import {{ client_name }}
+                >>> client = {{ client_name }}()
+                >>> for first_iteration in client.{{ api_class.parent_attribute }}.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for {{ data_class.variable_list }} in client.{{ api_class.parent_attribute }}.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for {{  data_class.variable }} in {{ data_class.variable_list }}:
+                ...         print({{ data_class.variable }}.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -591,7 +609,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
         sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         {% endif %}
-        yield from self._iterate(chunk_size, filter_, limit, {% if data_class.has_connection_with_target %}retrieve_connections{% else %}"skip"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort_input{% endif %})
+        yield from self._iterate(chunk_size, filter_, limit, {% if data_class.has_connection_with_target %}retrieve_connections{% else %}"skip"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort_input{% endif %}, cursors=cursors)
 
     def list(
         self,
