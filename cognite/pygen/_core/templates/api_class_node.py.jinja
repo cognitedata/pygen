@@ -433,6 +433,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         limit: int | None,
         retrieve_connections: Literal["skip", "identifier", "full"],
         sort: list[InstanceSort] | None = None,
+        chunk_size: int | None = None,
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
@@ -442,6 +443,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             sort=sort,
             {% endif %}
             limit=limit,
+            max_retrieve_batch_limit=chunk_size,
             {% if data_class.has_container_fields %}
             has_container_fields=True,
             {% else %}
