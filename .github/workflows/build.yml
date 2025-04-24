@@ -12,15 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - uses: actions/setup-python@v5
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      - name: Install dependencies
+      - name: Install required dependencies
         run: |
-          python -m pip install --upgrade pip poetry
-          poetry config virtualenvs.create false
-          # Necessary for running the mypy pre-commit hook
-          poetry install -E all
+          uv sync --all-extras
       - uses: pre-commit/action@v3.0.1
   build-docs:
     runs-on: ubuntu-latest
@@ -52,38 +50,34 @@ jobs:
           - "3.12"
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - uses: actions/setup-python@v5
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip poetry
-          poetry config virtualenvs.create false
-          poetry install -E all
+      - run: uv sync --all-extras
 
       - name: Test
-        run: pytest cognite tests/test_unit -v
+        run: uv run pytest cognite tests/test_unit -v
 
       - name: Test CLI
-        run: pygen --help
+        run: uv run pygen --help
 
       - name: Build package
-        run: poetry build
+        run: uv build
+
   coverage:
     runs-on: ubuntu-latest
     environment: dev
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip poetry
-          poetry config virtualenvs.create false
-          poetry install -E all
+        run: uv sync --all-extras
 
       - name: Test
         env:
@@ -92,7 +86,7 @@ jobs:
           IDP_CLIENT_ID: ${{ vars.IDP_CLIENT_ID }}
           IDP_CLIENT_SECRET: ${{ secrets.IDP_CLIENT_SECRET }}
           IDP_TENANT_ID: ${{ secrets.IDP_TENANT_ID }}
-        run: pytest --cov=cognite/ --cov-config=pyproject.toml --cov-report=xml:coverage.xml tests/
+        run: uv run pytest --cov=cognite/ --cov-config=pyproject.toml --cov-report=xml:coverage.xml tests/
 
       - name: Push coverage report to PR
         uses: orgoro/coverage@v3.2
@@ -100,18 +94,19 @@ jobs:
             coverageFile: coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
             thresholdAll: 0.6
+
   build_and_test_streamlit_pyodide:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-      - name: Build package using poetry
-        run: |
-          pip install poetry
-          poetry build
+
+      - name: Build package using uv
+        run: uv build
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -131,14 +126,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-      - name: Build package using poetry
-        run: |
-            pip install poetry
-            poetry build
+
+      - name: Build package using uv
+        run: uv build
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -159,15 +153,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v5
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip poetry
-          poetry config virtualenvs.create false
-          poetry install -E all
+      - name: Build package using uv
+        run: uv sync --all-extras
+
       - name: Dump description to file
         uses: actions/github-script@v7
         with:
@@ -176,4 +169,4 @@ jobs:
             const description = context.payload.pull_request.body;
             fs.writeFileSync('last_git_message.txt', description);
       - name: Validate Changelog section in PR description
-        run: python dev.py changelog
+        run: uv run python dev.py changelog
