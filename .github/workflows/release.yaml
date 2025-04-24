@@ -21,7 +21,8 @@ jobs:
       - name: Install required dependencies
         run: |
           uv sync --all-extras
-      - uses: pre-commit/action@v3.0.1
+      - name: Linting and static code checks
+        run: pre-commit run --all-files
 
   release:
     runs-on: ubuntu-latest
