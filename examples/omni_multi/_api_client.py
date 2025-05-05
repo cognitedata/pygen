@@ -120,7 +120,7 @@ class OmniMultiClient:
 
     Generated with:
         pygen = 0.0.0
-        cognite-sdk = 7.73.6
+        cognite-sdk = 7.74.5
         pydantic = 2.10.6
 
     """
