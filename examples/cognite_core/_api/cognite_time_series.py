@@ -903,11 +903,9 @@ class CogniteTimeSeriesAPI(
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
-        sort_by: CogniteTimeSeriesFields | Sequence[CogniteTimeSeriesFields] | None = None,
-        direction: Literal["ascending", "descending"] = "ascending",
-        sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[CogniteTimeSeriesList]:
         """Iterate over Cognite time series
 
@@ -941,15 +939,12 @@ class CogniteTimeSeriesAPI(
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            sort_by: The property to sort by.
-            direction: The direction to sort by, either 'ascending' or 'descending'.
-            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
-                specify the direction for each field as well as how to handle null values.
             retrieve_connections: Whether to retrieve `activities`, `assets`, `equipment`, `source` and `unit` for the
             Cognite time series. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
             retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of Cognite time series to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of Cognite time series
@@ -972,6 +967,21 @@ class CogniteTimeSeriesAPI(
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
+                ... ):
+                ...     for cognite_time_series in cognite_time_series_list:
+                ...         print(cognite_time_series.external_id)
+
+            Iterate Cognite time series in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from cognite_core import CogniteCoreClient
+                >>> client = CogniteCoreClient()
+                >>> for first_iteration in client.cognite_time_series.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for cognite_time_series_list in client.cognite_time_series.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
                 ... ):
                 ...     for cognite_time_series in cognite_time_series_list:
                 ...         print(cognite_time_series.external_id)
@@ -1010,8 +1020,7 @@ class CogniteTimeSeriesAPI(
             space,
             filter,
         )
-        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, cursors=cursors)
 
     def list(
         self,

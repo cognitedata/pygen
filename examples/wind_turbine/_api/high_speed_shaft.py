@@ -554,6 +554,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
         filter: dm.Filter | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[HighSpeedShaftList]:
         """Iterate over high speed shafts
 
@@ -570,6 +571,8 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             the high speed shafts. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
             retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
             limit: Maximum number of high speed shafts to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of high speed shafts
@@ -596,6 +599,21 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
                 ...     for high_speed_shaft in high_speed_shafts:
                 ...         print(high_speed_shaft.external_id)
 
+            Iterate high speed shafts in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from wind_turbine import WindTurbineClient
+                >>> client = WindTurbineClient()
+                >>> for first_iteration in client.high_speed_shaft.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for high_speed_shafts in client.high_speed_shaft.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for high_speed_shaft in high_speed_shafts:
+                ...         print(high_speed_shaft.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -609,7 +627,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
             space,
             filter,
         )
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, cursors=cursors)
 
     def list(
         self,
