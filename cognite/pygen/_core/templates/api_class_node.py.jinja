@@ -521,11 +521,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
         {% endfor %}
         filter: dm.Filter | None = None,
-        {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-        sort_by: {{ data_class.field_names }} | Sequence[{{ data_class.field_names }}] | None = None,
-        direction: Literal["ascending", "descending"] = "ascending",
-        sort: InstanceSort | list[InstanceSort] | None = None,
-        {% endif %}
         {% if data_class.has_field_of_type(ft.BaseConnectionField) %}
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         {% endif %}
@@ -541,13 +536,6 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% endfor %}
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-            sort_by: The property to sort by.
-            direction: The direction to sort by, either 'ascending' or 'descending'.
-            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
-                specify the direction for each field as well as how to handle null values.
-            {% endif %}
             {% if data_class.has_connection_with_target %}
             {{ retrieve_connections_doc }}
             {% endif %}
@@ -606,10 +594,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             {% endfor %}
             filter,
         )
-        {% if data_class.has_field_of_type(ft.BasePrimitiveField) %}
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        {% endif %}
-        yield from self._iterate(chunk_size, filter_, limit, {% if data_class.has_connection_with_target %}retrieve_connections{% else %}"skip"{% endif %}{% if data_class.has_field_of_type(ft.BasePrimitiveField) %}, sort_input{% endif %}, cursors=cursors)
+        yield from self._iterate(chunk_size, filter_, limit, {% if data_class.has_connection_with_target %}retrieve_connections{% else %}"skip"{% endif %}, cursors=cursors)
 
     def list(
         self,

@@ -914,9 +914,6 @@ class CogniteEquipmentAPI(
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
-        sort_by: CogniteEquipmentFields | Sequence[CogniteEquipmentFields] | None = None,
-        direction: Literal["ascending", "descending"] = "ascending",
-        sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
         cursors: dict[str, str | None] | None = None,
@@ -953,11 +950,6 @@ class CogniteEquipmentAPI(
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            sort_by: The property to sort by.
-            direction: The direction to sort by, either 'ascending' or 'descending'.
-            sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
-                This will override the sort_by and direction. This allowos you to sort by multiple fields and
-                specify the direction for each field as well as how to handle null values.
             retrieve_connections: Whether to retrieve `activities`, `asset`, `equipment_type`, `files`, `source` and
             `time_series` for the Cognite equipments. Defaults to 'skip'.'skip' will not retrieve any connections,
             'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full
@@ -1040,8 +1032,7 @@ class CogniteEquipmentAPI(
             space,
             filter,
         )
-        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, sort_input, cursors=cursors)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, cursors=cursors)
 
     def list(
         self,
