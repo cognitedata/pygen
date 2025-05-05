@@ -1,14 +1,68 @@
-[tool.poetry]
+[project]
 name = "cognite-pygen"
 version = "0.0.0"
 description = "Cognite Python SDK Generator"
-readme = "README.md"
-authors = ["Cognite <support@cognite.com>"]
+authors = [{name="Cognite", email ="support@cognite.com"}]
+readme="README.md"
+requires-python = ">=3.10"
 license = "Apache-2.0"
-documentation = "https://cognite-pygen.readthedocs-hosted.com/en/latest/"
-homepage = "https://cognite-pygen.readthedocs-hosted.com/en/latest/"
-repository = "https://github.com/cognitedata/pygen"
-packages = [{ include="cognite", from="." }]
+dependencies = [
+    "cognite-sdk>=7.73.6, <8.0.0",
+    "pydantic>=2.7.0, <2.11.0",
+    "Jinja2>=3.1",
+    "inflect>=6.2",
+]
+
+[project.urls]
+Documentation = "https://cognite-pygen.readthedocs-hosted.com/en/latest/"
+Homepage = "https://cognite-pygen.readthedocs-hosted.com/en/latest/"
+Repository = "https://github.com/cognitedata/pygen"
+Changelog = "https://github.com/cognitedata/pygen/releases"
+
+[project.optional-dependencies]
+cli = [
+    "packaging>=21.3",
+    "typer>=0.9",
+    "toml>=0.10",
+    "build>=1.1",
+]
+format = [
+    "black>=24.4.2",
+]
+[dependency-groups]
+dev = [
+    "twine>=6.0.0",
+    "pre-commit>=4.0.0",
+    "python-dotenv>=1.0.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.10.0",
+    "pytest-rerunfailures>=14.0",
+    "toml>=0.10",
+    "pandas>=1.5.3",
+    "mypy>=1.5.0",
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.26",
+    "mkdocs-jupyter>=0.24.7",
+    "mkdocs-glightbox>=0.4.0",
+    "mkdocstrings-python>=1.10.3",
+    "pandas-stubs>=2",
+    "typer>=0.12",
+    "types-PyYAML>=6",
+    "types-toml>=0.10",
+    "IPython>=8.0.0",
+    "matplotlib>=3.5.0",
+    "tabulate>=0.8.9",
+    "pytest-icdiff>=0.8",
+    "Faker>=18.0.0",
+    "hypothesis>=6.0.0",
+    "jupyterlab>=3.0.0",
+    "cognite-toolkit==0.4.5",
+    "marko>=2.1.0, <3.0.0",
+]
+
+[tool.uv]
+package = true
 
 [tool.black]
 line-length = 120
@@ -62,60 +116,8 @@ client_name = "MovieClient"
 output_dir = "docs/examples"
 instance_space = "move_data"
 
-[tool.poetry.scripts]
+[project.scripts]
 pygen = "cognite.pygen.cli:main"
-
-
-[tool.poetry.dependencies]
-python = "^3.10"
-cognite-sdk = {version = "^7.73.6"}
-pydantic = "^2.7.0"
-Jinja2 = ">=3.1"
-inflect = ">=6.2"
-
-toml = {version=">=0.10", optional=true}
-packaging = {version=">=21.3", optional=true}
-typer = {version = ">=0.9", extras = ["rich"], optional=true }
-black = {version=">=24.4.2", optional = true}
-build = {version=">=1.1", optional=true}
-marko = "^2.1.2"
-
-[tool.poetry.extras]
-cli = ["packaging", "typer", "toml", "build"]
-format = ["black"]
-all = ["packaging", "typer", "toml", "black", "build"]
-
-[tool.poetry.dev-dependencies]
-twine = "*"
-pre-commit = "*"
-python-dotenv = "*"
-pytest = "*"
-pytest-cov = "*"
-pytest-mock = "*"
-pytest-rerunfailures = "^14.0"
-toml = "*"
-pandas = "*"
-pyyaml = "*"
-# MyPy 1.14.1 crashes on every other run, waiting for a fix.
-mypy = ">=1.5, <1.14.1"
-mkdocs =  {version="^1.6.0", optional=true}
-mkdocs-material = {version="^9.5.26", optional=true}
-mkdocs-jupyter = {version="^0.24.7", optional=true}
-mkdocs-glightbox = {version="^0.4.0", optional=true}
-mkdocstrings-python = {version="^1.10.3", optional=true}
-pandas-stubs = "^2"
-typer = "^0.12"
-types-PyYAML = "^6"
-types-toml = "^0.10"
-IPython = "*"
-matplotlib = "*"
-tabulate = "*"
-pytest-icdiff = "^0.8"
-Faker = "*"
-hypothesis = "*"
-jupyterlab = "*"
-cognite-toolkit = "0.4.5"
-#cognite-toolkit = { git = "https://github.com/cognitedata/toolkit.git", branch = "linting-contextualization-functions" }
 
 [tool.pytest.ini_options]
 filterwarnings = [
@@ -129,5 +131,8 @@ pythonpath = [".", "examples", "examples-pydantic-v1"]
 testpaths = ["tests", "cognite/pygen"]
 
 [build-system]
-requires = ["poetry-core>=1.3"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cognite"]
