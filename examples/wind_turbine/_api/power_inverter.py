@@ -555,6 +555,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
         filter: dm.Filter | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
+        cursors: dict[str, str | None] | None = None,
     ) -> Iterator[PowerInverterList]:
         """Iterate over power inverters
 
@@ -572,6 +573,8 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full
             connected items.
             limit: Maximum number of power inverters to return. Defaults to None, which will return all items.
+            cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
+                specific point. See example below for more details.
 
         Returns:
             Iteration of power inverters
@@ -598,6 +601,21 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
                 ...     for power_inverter in power_inverters:
                 ...         print(power_inverter.external_id)
 
+            Iterate power inverters in chunks of 100 and use cursors to resume the iteration:
+
+                >>> from wind_turbine import WindTurbineClient
+                >>> client = WindTurbineClient()
+                >>> for first_iteration in client.power_inverter.iterate(chunk_size=100, limit=2000):
+                ...     print(first_iteration)
+                ...     break
+                >>> for power_inverters in client.power_inverter.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
+                ...     for power_inverter in power_inverters:
+                ...         print(power_inverter.external_id)
+
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
@@ -611,7 +629,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
             space,
             filter,
         )
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections)
+        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, cursors=cursors)
 
     def list(
         self,
