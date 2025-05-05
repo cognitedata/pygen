@@ -95,7 +95,8 @@ def build_wheel(
         config=config,
     )
 
-    generate_pyproject_toml(build_dir, top_level_package)
+    version = data_model.version if isinstance(data_model, dm.DataModel) else data_model[0].version
+    generate_pyproject_toml(build_dir, top_level_package, version=version)
 
     output_dir.mkdir(exist_ok=True, parents=True)
     ProjectBuilder(build_dir).build(distribution="wheel", output_directory=str(output_dir))
@@ -103,12 +104,12 @@ def build_wheel(
     print(f"Generated SDK wheel at {output_dir}")
 
 
-def generate_pyproject_toml(build_dir: Path, package_name: str) -> None:
+def generate_pyproject_toml(build_dir: Path, package_name: str, version: str) -> None:
     pyproject_toml = build_dir / "pyproject.toml"
     pyproject_toml.write_text(
         f"""[project]
 name = "{package_name}"
-version = "1.0.0"
+version = "{version}"
 dependencies = [
     "cognite-sdk>={cognite_sdk_version}",
     "pydantic>={PYDANTIC_VERSION}",
