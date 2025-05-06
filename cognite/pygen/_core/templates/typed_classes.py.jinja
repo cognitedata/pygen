@@ -279,10 +279,16 @@ class {{ cls.read_name }}({{ cls.typed_properties_name }}, {{ cls.typed_read_bas
         {{field.name}}: {{ field.as_typed_hint('read') }},
         {% endfor %}
         deleted_time: int | None = None,
-    ) -> None:{% if len(cls.implements) == 0 %}
-        TypedEdge.__init__(self, space, external_id, version, type, last_updated_time, created_time, start_node, end_node, deleted_time){% elif len(cls.implements) == 1 %}
-        super().__init__(space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, deleted_time=deleted_time){% else %}{% for parent in cls.implements %}
-        {{ parent.read_name }}.__init__(self, space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ parent.container_field_variables }}, deleted_time=deleted_time){% endfor %}{% endif %}
+    ) -> None:
+        {% if len(cls.implements) == 0 %}
+        TypedEdge.__init__(self, space, external_id, version, type, last_updated_time, created_time, start_node, end_node, deleted_time)
+        {% elif len(cls.implements) == 1 %}
+        super().__init__(space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ cls.implements[0].container_field_variables }}, deleted_time=deleted_time)
+        {% else %}
+        {% for parent in cls.implements %}
+        {{ parent.read_name }}.__init__(self, space, external_id, type, start_node, end_node, version, last_updated_time, created_time, {{ parent.container_field_variables }}, deleted_time=deleted_time)
+        {% endfor %}
+        {% endif %}
         {% for field in cls.container_fields_sorted('only-self') %}
         self.{{field.name}} = {{field.as_typed_init_set()}}
         {% endfor %}
