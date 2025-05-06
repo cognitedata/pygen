@@ -20,7 +20,7 @@ jobs:
         run: |
           uv sync --all-extras
       - name: Linting and static code checks
-        run: pre-commit run --all-files
+        run: uv run pre-commit run --all-files
 
   build-docs:
     runs-on: ubuntu-latest
