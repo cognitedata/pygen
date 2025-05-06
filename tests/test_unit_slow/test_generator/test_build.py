@@ -15,7 +15,7 @@ def test_build_wheel() -> None:
     data_model = OMNI_SDK.load_data_model()
     local_dir = Path(__file__).parent / "dist"
     build_wheel(data_model, top_level_package="omni_sdk", output_dir=local_dir)
-    expected_file = local_dir / "omni_sdk-1.0.0-py3-none-any.whl"
+    expected_file = local_dir / f"omni_sdk-{data_model.version}-py3-none-any.whl"
     assert expected_file.exists()
 
     # Clean up
