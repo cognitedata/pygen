@@ -566,6 +566,8 @@ def generate_typed(
 
     """
     data_model = _get_data_model(model_id, client, print)
+    config = PygenConfig()
+    config.naming.prefix_class_name_instance_property_collision = True
     generator = SDKGenerator(
         "cognite.pygen.typed",
         "Typed",
@@ -573,7 +575,7 @@ def generate_typed(
         None,
         implements,
         print,
-        PygenConfig(),
+        config,
     )
     typed_classes = generator._multi_api_generator.generate_typed_classes_file(
         include_views, module_by_space, readonly_properties_by_view
