@@ -280,3 +280,20 @@ def test_query_aggregate_edges_group_by(cognite_client: CogniteClient, omni_view
         count = item["count"]["externalId"]
         assert isinstance(count, int)
         assert count > 0, "Count should be greater than 0"
+
+
+def test_query_search_edges(
+    cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client: OmniClient
+) -> None:
+    executor = QueryExecutor(cognite_client)
+    view_id = omni_views["ConnectionEdgeA"].as_id()
+    item = omni_client.connection_item_f.outwards_multi_edge.list(limit=1)
+    assert len(item) == 1
+    name = item[0].name
+
+    selected_properties: SelectedProperties = ["externalId", "name", "startNode"]
+    result = executor.search(view_id, query=name, limit=5)
+
+    assert isinstance(result, list)
+    assert len(result) > 0
+    assert all(all(prop in item for prop in selected_properties) for item in result)
