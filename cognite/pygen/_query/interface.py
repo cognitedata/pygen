@@ -1,4 +1,5 @@
 import itertools
+import json
 from collections import defaultdict
 from collections.abc import Sequence
 from typing import Any, Literal, cast, overload
@@ -227,9 +228,7 @@ class QueryExecutor:
 
         if not factory.connection_properties:
             list_results: list[dict[str, Any]] = []
-            instance_types = cast(
-                list[Literal["node", "edge"]], (["node", "edge"] if view.used_for == "all" else [view.used_for])
-            )
+            instance_types = self._get_instance_types(view)
             for instance_type in instance_types:
                 response = self._client.data_modeling.instances.list(
                     instance_type=instance_type,
@@ -257,6 +256,10 @@ class QueryExecutor:
         return QueryUnpacker(
             results, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
         ).unpack()
+
+    @staticmethod
+    def _get_instance_types(view: dm.View) -> list[Literal["node", "edge"]]:
+        return cast(list[Literal["node", "edge"]], (["node", "edge"] if view.used_for == "all" else [view.used_for]))
 
     @classmethod
     def _prepare_list_result(
@@ -286,28 +289,37 @@ class QueryExecutor:
         if metric_aggregates and histogram_aggregates:
             raise ValueError("Cannot mix metric and histogram aggregations")
 
+        view = self._get_view(view_id)
+        instance_types = self._get_instance_types(view)
         if metric_aggregates and group_by is not None:
-            group_by_result = self._client.data_modeling.instances.aggregate(  # type: ignore[call-overload]
-                view=view_id,
-                group_by=group_by,
-                aggregates=metric_aggregates,
-                query=query,
-                properties=search_properties,
-                filter=filter,
-                limit=limit or AGGREGATION_LIMIT,
-            )
-            return self._grouped_metric_aggregation_to_dict(group_by_result)
+            all_group_results: dict[str, dict[str, Any]] = {}
+            for instance_type in instance_types:
+                group_by_result = self._client.data_modeling.instances.aggregate(  # type: ignore[call-overload]
+                    instance_type=instance_type,
+                    view=view_id,
+                    group_by=group_by,
+                    aggregates=metric_aggregates,
+                    query=query,
+                    properties=search_properties,
+                    filter=filter,
+                    limit=limit or AGGREGATION_LIMIT,
+                )
+                self._update_group_aggregation(group_by_result, all_group_results)
+            return list(all_group_results.values())
         elif metric_aggregates:
-            metric_results = self._client.data_modeling.instances.aggregate(
-                view_id,
-                aggregates=metric_aggregates,
-                query=query,
-                properties=search_properties,
-                filter=filter,
-                limit=limit or AGGREGATION_LIMIT,
-            )
-            return self._metric_aggregation_to_dict(metric_results)
-
+            metric_dict: dict[str, dict[str, float | int | None]] = {}
+            for instance_type in instance_types:
+                metric_results = self._client.data_modeling.instances.aggregate(
+                    view_id,
+                    instance_type=instance_type,
+                    aggregates=metric_aggregates,
+                    query=query,
+                    properties=search_properties,
+                    filter=filter,
+                    limit=limit or AGGREGATION_LIMIT,
+                )
+                self._update_metric_results(metric_results, metric_dict)
+            return metric_dict
         elif histogram_aggregates:
             histogram_results = self._client.data_modeling.instances.histogram(
                 view_id,
@@ -322,22 +334,38 @@ class QueryExecutor:
             raise ValueError("No aggregation found")
 
     @staticmethod
-    def _metric_aggregation_to_dict(aggregation: list[dm.aggregations.AggregatedNumberedValue]) -> dict[str, Any]:
-        values_by_aggregations: dict[str, dict[str, Any]] = defaultdict(dict)
+    def _update_metric_results(
+        aggregation: list[dm.aggregations.AggregatedNumberedValue], existing: dict[str, dict[str, float | int | None]]
+    ) -> None:
         for item in aggregation:
-            values_by_aggregations[item._aggregate][item.property] = item.value
-        return dict(values_by_aggregations)
+            if item._aggregate not in existing:
+                existing[item._aggregate] = {}
+            existing_value = existing[item._aggregate].get(item.property, None)
+            if existing_value is None:
+                existing[item._aggregate][item.property] = item.value
+            elif item.value is not None:
+                if isinstance(item, dm.aggregations.SumValue | dm.aggregations.CountValue):
+                    new_value = existing_value + item.value
+                elif isinstance(item, dm.aggregations.MaxValue):
+                    new_value = max(existing_value, item.value)
+                elif isinstance(item, dm.aggregations.MinValue):
+                    new_value = min(existing_value, item.value)
+                elif isinstance(item, dm.aggregations.AvgValue):
+                    # We will never call this more than twice, so we can just average the two values.
+                    new_value = (existing_value + item.value) / 2
+                else:
+                    raise ValueError(f"Unknown aggregation type: {type(item)}")
+                existing[item._aggregate][item.property] = new_value
 
     @classmethod
-    def _grouped_metric_aggregation_to_dict(cls, aggregations: InstanceAggregationResultList) -> list[dict[str, Any]]:
-        output: list[dict[str, Any]] = []
+    def _update_group_aggregation(
+        cls, aggregations: InstanceAggregationResultList, existing: dict[str, dict[str, Any]]
+    ) -> None:
         for group in aggregations:
-            group_dict = {
-                "group": group.group,
-                **cls._metric_aggregation_to_dict(group.aggregates),
-            }
-            output.append(group_dict)
-        return output
+            key = json.dumps(group.group, sort_keys=True)
+            if key not in existing:
+                existing[key] = {"group": group.group}
+            cls._update_metric_results(group.aggregates, existing[key])
 
     @staticmethod
     def _histogram_aggregation_to_dict(aggregation: list[dm.aggregations.HistogramValue]) -> dict[str, Any]:
