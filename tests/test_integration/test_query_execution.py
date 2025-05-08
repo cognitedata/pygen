@@ -248,3 +248,35 @@ def test_query_list_edges(cognite_client: CogniteClient, omni_views: dict[str, d
     assert isinstance(result, list)
     assert len(result) > 0
     assert all(all(prop in item for prop in selected_properties) for item in result)
+
+
+def test_query_aggregate_edges(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    executor = QueryExecutor(cognite_client)
+    view_id = omni_views["ConnectionEdgeA"].as_id()
+
+    result = executor.aggregate(view_id, aggregates=dm.aggregations.Count(property="externalId"))
+
+    assert isinstance(result, dict)
+    assert "count" in result
+    assert isinstance(result["count"], dict)
+    assert "externalId" in result["count"]
+    count = result["count"]["externalId"]
+    assert isinstance(count, int)
+    assert count > 0, "Count should be greater than 0"
+
+
+def test_query_aggregate_edges_group_by(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    executor = QueryExecutor(cognite_client)
+    view_id = omni_views["ConnectionEdgeA"].as_id()
+
+    result = executor.aggregate(view_id, aggregates=dm.aggregations.Count(property="externalId"), group_by="name")
+
+    assert isinstance(result, list)
+    assert len(result) > 0
+    for item in result:
+        assert "count" in item
+        assert isinstance(item["count"], dict)
+        assert "externalId" in item["count"]
+        count = item["count"]["externalId"]
+        assert isinstance(count, int)
+        assert count > 0, "Count should be greater than 0"
