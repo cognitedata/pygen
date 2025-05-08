@@ -49,6 +49,9 @@ class QueryExecutor:
     ) -> list[dict[str, Any]]:
         """Search for nodes/edges in a view.
 
+        Note if the view supports both nodes and edges the result will be a list of nodes and edges.
+
+        Nested properties are not supported for edges.
 
         Args:
             view: The view in which the nodes/edges have properties.
@@ -61,6 +64,10 @@ class QueryExecutor:
 
         Returns:
             list[dict[str, Any]]: The search results.
+
+        Raises:
+            ValueError: If the view is not an edge view and nested properties are used, e.g. {"property": ["nested"]}.
+            CogniteAPIError: If the view is not found.
 
         """
         filter = self._equals_none_to_not_exists(filter)
@@ -180,6 +187,10 @@ class QueryExecutor:
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Aggregate nodes/edges in a view.
 
+        Note if the view supports both nodes and edges the result will be a list of nodes and edges.
+
+        Nested properties are not supported for edges.
+
         Args:
             view: The view in which the nodes/edges have properties.
             aggregates: The aggregations to perform.
@@ -192,6 +203,9 @@ class QueryExecutor:
 
         Returns:
             dict[str, Any] | list[dict[str, Any]]: The aggregation results.
+
+        Raises:
+            ValueError: If the view is not an edge view and nested properties are used, e.g. {"property": ["nested"]}.
 
         """
         filter = self._equals_none_to_not_exists(filter)
