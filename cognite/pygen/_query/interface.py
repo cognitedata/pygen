@@ -64,22 +64,50 @@ class QueryExecutor:
 
         """
         filter = self._equals_none_to_not_exists(filter)
-        search_result = self._client.data_modeling.instances.search(
-            view,
+        return self._execute_search(view, properties, query, filter, search_properties, sort, limit)
+
+    def _execute_search(
+        self,
+        view_id: dm.ViewId,
+        properties: SelectedProperties | None = None,
+        query: str | None = None,
+        filter: filters.Filter | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        view = self._get_view(view_id)
+        flatten_props = self._as_property_list(properties, "list") if properties else None
+        are_flat_properties = flatten_props == properties
+        if properties is None or are_flat_properties:
+            instance_types = self._get_instance_types(view)
+            all_results: list[dict[str, Any]] = []
+            for instance_type in instance_types:
+                search_instance_result = self._client.data_modeling.instances.search(  # type: ignore[misc]
+                    view_id,
+                    query,
+                    instance_type=instance_type,  # type: ignore[arg-type]
+                    properties=search_properties,  # type: ignore[arg-type]
+                    filter=filter,
+                    limit=limit or SEARCH_LIMIT,
+                    sort=sort,
+                )
+                all_results.extend(
+                    self._prepare_list_result(search_instance_result, set(flatten_props) if flatten_props else None)
+                )
+            return all_results
+        elif view.used_for == "edge":
+            raise ValueError("Nested properties are not supported for edges")
+        search_result = self._client.data_modeling.instances.search(  # type: ignore[call-overload]
+            view_id,
             query,
+            instance_type="node",
             properties=search_properties,  # type: ignore[arg-type]
             filter=filter,
             limit=limit or SEARCH_LIMIT,
             sort=sort,
         )
-
-        flatten_props = self._as_property_list(properties, "list") if properties else None
-        are_flat_properties = flatten_props == properties
-        if properties is None or are_flat_properties:
-            return self._prepare_list_result(search_result, set(flatten_props) if flatten_props else None)
-
         # Lookup nested properties:
-
         order_by_node_ids = {node.as_id(): no for no, node in enumerate(search_result)}
         # If we are sorting, then we need to ensure externalId and space are included in the properties.
         # This is because we need them for the final sorting.
@@ -102,7 +130,7 @@ class QueryExecutor:
                 batch_filter = filters.And(
                     filters.In(["node", "externalId"], [node.external_id for node in chunk]), is_space
                 )
-                batch_result = self.list(view, properties, batch_filter, sort, limit or SEARCH_LIMIT)
+                batch_result = self.list(view_id, properties, batch_filter, sort, limit or SEARCH_LIMIT)
                 result.extend(batch_result)
 
         if sort is not None:
