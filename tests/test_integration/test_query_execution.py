@@ -5,6 +5,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from omni import OmniClient
 
+from cognite.pygen._query.constants import SelectedProperties
 from cognite.pygen._query.interface import QueryExecutor
 
 
@@ -236,3 +237,14 @@ def test_query_list_root_nodes(cognite_client: CogniteClient) -> None:
     assert isinstance(result, list)
     assert len(result) > 0
     assert all(item.get("parent") is None for item in result)
+
+
+def test_query_list_edges(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    executor = QueryExecutor(cognite_client)
+    view_id = omni_views["ConnectionEdgeA"].as_id()
+    selected_properties: SelectedProperties = ["externalId", "name", "startNode"]
+    result = executor.list(view_id, selected_properties, limit=5)
+
+    assert isinstance(result, list)
+    assert len(result) > 0
+    assert all(all(prop in item for prop in selected_properties) for item in result)
