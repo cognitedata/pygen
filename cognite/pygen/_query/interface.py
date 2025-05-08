@@ -1,7 +1,8 @@
 import itertools
+import json
 from collections import defaultdict
 from collections.abc import Sequence
-from typing import Any, Literal, overload
+from typing import Any, Literal, cast, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -48,6 +49,9 @@ class QueryExecutor:
     ) -> list[dict[str, Any]]:
         """Search for nodes/edges in a view.
 
+        Note if the view supports both nodes and edges the result will be a list of nodes and edges.
+
+        Nested properties are not supported for edges.
 
         Args:
             view: The view in which the nodes/edges have properties.
@@ -61,24 +65,56 @@ class QueryExecutor:
         Returns:
             list[dict[str, Any]]: The search results.
 
+        Raises:
+            ValueError: If the view is not an edge view and nested properties are used, e.g. {"property": ["nested"]}.
+            CogniteAPIError: If the view is not found.
+
         """
         filter = self._equals_none_to_not_exists(filter)
-        search_result = self._client.data_modeling.instances.search(
-            view,
+        return self._execute_search(view, properties, query, filter, search_properties, sort, limit)
+
+    def _execute_search(
+        self,
+        view_id: dm.ViewId,
+        properties: SelectedProperties | None = None,
+        query: str | None = None,
+        filter: filters.Filter | None = None,
+        search_properties: str | SequenceNotStr[str] | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        view = self._get_view(view_id)
+        flatten_props = self._as_property_list(properties, "list") if properties else None
+        are_flat_properties = flatten_props == properties
+        if properties is None or are_flat_properties:
+            instance_types = self._get_instance_types(view)
+            all_results: list[dict[str, Any]] = []
+            for instance_type in instance_types:
+                search_instance_result = self._client.data_modeling.instances.search(  # type: ignore[misc]
+                    view_id,
+                    query,
+                    instance_type=instance_type,  # type: ignore[arg-type]
+                    properties=search_properties,  # type: ignore[arg-type]
+                    filter=filter,
+                    limit=limit or SEARCH_LIMIT,
+                    sort=sort,
+                )
+                all_results.extend(
+                    self._prepare_list_result(search_instance_result, set(flatten_props) if flatten_props else None)
+                )
+            return all_results
+        elif view.used_for == "edge":
+            raise ValueError("Nested properties are not supported for edges")
+        search_result = self._client.data_modeling.instances.search(  # type: ignore[call-overload]
+            view_id,
             query,
+            instance_type="node",
             properties=search_properties,  # type: ignore[arg-type]
             filter=filter,
             limit=limit or SEARCH_LIMIT,
             sort=sort,
         )
-
-        flatten_props = self._as_property_list(properties, "list") if properties else None
-        are_flat_properties = flatten_props == properties
-        if properties is None or are_flat_properties:
-            return self._prepare_list_result(search_result, set(flatten_props) if flatten_props else None)
-
         # Lookup nested properties:
-
         order_by_node_ids = {node.as_id(): no for no, node in enumerate(search_result)}
         # If we are sorting, then we need to ensure externalId and space are included in the properties.
         # This is because we need them for the final sorting.
@@ -101,7 +137,7 @@ class QueryExecutor:
                 batch_filter = filters.And(
                     filters.In(["node", "externalId"], [node.external_id for node in chunk]), is_space
                 )
-                batch_result = self.list(view, properties, batch_filter, sort, limit or SEARCH_LIMIT)
+                batch_result = self.list(view_id, properties, batch_filter, sort, limit or SEARCH_LIMIT)
                 result.extend(batch_result)
 
         if sort is not None:
@@ -151,6 +187,10 @@ class QueryExecutor:
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Aggregate nodes/edges in a view.
 
+        Note if the view supports both nodes and edges the result will be a list of nodes and edges.
+
+        Nested properties are not supported for edges.
+
         Args:
             view: The view in which the nodes/edges have properties.
             aggregates: The aggregations to perform.
@@ -163,6 +203,9 @@ class QueryExecutor:
 
         Returns:
             dict[str, Any] | list[dict[str, Any]]: The aggregation results.
+
+        Raises:
+            ValueError: If the view is not an edge view and nested properties are used, e.g. {"property": ["nested"]}.
 
         """
         filter = self._equals_none_to_not_exists(filter)
@@ -226,14 +269,21 @@ class QueryExecutor:
         factory = QueryBuildStepFactory(builder.create_name, view=view, user_selected_properties=properties)
 
         if not factory.connection_properties:
-            result = self._client.data_modeling.instances.list(
-                instance_type="node",
-                sources=[view_id],
-                filter=filter,
-                limit=limit,
-                sort=sort,
-            )
-            return self._prepare_list_result(result, set(root_properties))
+            list_results: list[dict[str, Any]] = []
+            instance_types = self._get_instance_types(view)
+            for instance_type in instance_types:
+                response = self._client.data_modeling.instances.list(
+                    instance_type=instance_type,
+                    sources=[view_id],
+                    filter=filter,
+                    limit=limit,
+                    sort=sort,
+                )
+                list_results.extend(self._prepare_list_result(response, set(root_properties)))
+            return list_results
+
+        if view.used_for == "edge":
+            raise ValueError("Nested properties are not supported for edges")
 
         reverse_views = {
             prop.through.source: self._get_view(prop.through.source)
@@ -249,13 +299,17 @@ class QueryExecutor:
             results, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
         ).unpack()
 
+    @staticmethod
+    def _get_instance_types(view: dm.View) -> list[Literal["node", "edge"]]:
+        return cast(list[Literal["node", "edge"]], (["node", "edge"] if view.used_for == "all" else [view.used_for]))
+
     @classmethod
     def _prepare_list_result(
-        cls, result: dm.NodeList[dm.Node], selected_properties: set[str] | None
+        cls, result: dm.NodeList[dm.Node] | dm.EdgeList[dm.Edge], selected_properties: set[str] | None
     ) -> list[dict[str, Any]]:
         output: list[dict[str, Any]] = []
-        for node in result:
-            item = QueryUnpacker.flatten_dump(node, selected_properties)
+        for instance in result:
+            item = QueryUnpacker.flatten_dump(instance, selected_properties)
             if item:
                 # As long as you have selected properties, you will not get None.
                 output.append(item)  # type: ignore[arg-type]
@@ -277,28 +331,37 @@ class QueryExecutor:
         if metric_aggregates and histogram_aggregates:
             raise ValueError("Cannot mix metric and histogram aggregations")
 
+        view = self._get_view(view_id)
+        instance_types = self._get_instance_types(view)
         if metric_aggregates and group_by is not None:
-            group_by_result = self._client.data_modeling.instances.aggregate(  # type: ignore[call-overload]
-                view=view_id,
-                group_by=group_by,
-                aggregates=metric_aggregates,
-                query=query,
-                properties=search_properties,
-                filter=filter,
-                limit=limit or AGGREGATION_LIMIT,
-            )
-            return self._grouped_metric_aggregation_to_dict(group_by_result)
+            all_group_results: dict[str, dict[str, Any]] = {}
+            for instance_type in instance_types:
+                group_by_result = self._client.data_modeling.instances.aggregate(  # type: ignore[call-overload]
+                    instance_type=instance_type,
+                    view=view_id,
+                    group_by=group_by,
+                    aggregates=metric_aggregates,
+                    query=query,
+                    properties=search_properties,
+                    filter=filter,
+                    limit=limit or AGGREGATION_LIMIT,
+                )
+                self._update_group_aggregation(group_by_result, all_group_results)
+            return list(all_group_results.values())
         elif metric_aggregates:
-            metric_results = self._client.data_modeling.instances.aggregate(
-                view_id,
-                aggregates=metric_aggregates,
-                query=query,
-                properties=search_properties,
-                filter=filter,
-                limit=limit or AGGREGATION_LIMIT,
-            )
-            return self._metric_aggregation_to_dict(metric_results)
-
+            metric_dict: dict[str, dict[str, float | int | None]] = {}
+            for instance_type in instance_types:
+                metric_results = self._client.data_modeling.instances.aggregate(
+                    view_id,
+                    instance_type=instance_type,
+                    aggregates=metric_aggregates,
+                    query=query,
+                    properties=search_properties,
+                    filter=filter,
+                    limit=limit or AGGREGATION_LIMIT,
+                )
+                self._update_metric_results(metric_results, metric_dict)
+            return metric_dict
         elif histogram_aggregates:
             histogram_results = self._client.data_modeling.instances.histogram(
                 view_id,
@@ -313,22 +376,38 @@ class QueryExecutor:
             raise ValueError("No aggregation found")
 
     @staticmethod
-    def _metric_aggregation_to_dict(aggregation: list[dm.aggregations.AggregatedNumberedValue]) -> dict[str, Any]:
-        values_by_aggregations: dict[str, dict[str, Any]] = defaultdict(dict)
+    def _update_metric_results(
+        aggregation: list[dm.aggregations.AggregatedNumberedValue], existing: dict[str, dict[str, float | int | None]]
+    ) -> None:
         for item in aggregation:
-            values_by_aggregations[item._aggregate][item.property] = item.value
-        return dict(values_by_aggregations)
+            if item._aggregate not in existing:
+                existing[item._aggregate] = {}
+            existing_value = existing[item._aggregate].get(item.property, None)
+            if existing_value is None:
+                existing[item._aggregate][item.property] = item.value
+            elif item.value is not None:
+                if isinstance(item, dm.aggregations.SumValue | dm.aggregations.CountValue):
+                    new_value = existing_value + item.value
+                elif isinstance(item, dm.aggregations.MaxValue):
+                    new_value = max(existing_value, item.value)
+                elif isinstance(item, dm.aggregations.MinValue):
+                    new_value = min(existing_value, item.value)
+                elif isinstance(item, dm.aggregations.AvgValue):
+                    # We will never call this more than twice, so we can just average the two values.
+                    new_value = (existing_value + item.value) / 2
+                else:
+                    raise ValueError(f"Unknown aggregation type: {type(item)}")
+                existing[item._aggregate][item.property] = new_value
 
     @classmethod
-    def _grouped_metric_aggregation_to_dict(cls, aggregations: InstanceAggregationResultList) -> list[dict[str, Any]]:
-        output: list[dict[str, Any]] = []
+    def _update_group_aggregation(
+        cls, aggregations: InstanceAggregationResultList, existing: dict[str, dict[str, Any]]
+    ) -> None:
         for group in aggregations:
-            group_dict = {
-                "group": group.group,
-                **cls._metric_aggregation_to_dict(group.aggregates),
-            }
-            output.append(group_dict)
-        return output
+            key = json.dumps(group.group, sort_keys=True)
+            if key not in existing:
+                existing[key] = {"group": group.group}
+            cls._update_metric_results(group.aggregates, existing[key])
 
     @staticmethod
     def _histogram_aggregation_to_dict(aggregation: list[dm.aggregations.HistogramValue]) -> dict[str, Any]:
@@ -350,12 +429,23 @@ class QueryExecutor:
     ) -> list[dict[str, Any]]:
         """List nodes/edges in a view.
 
+        Note if the view supports both nodes and edges the result will be a list of nodes and edges.
+
+        Nested properties are not supported for edges.
+
         Args:
             view: The view in which the nodes/edges have properties.
             properties: The properties to include in the result.
             filter: The filter to apply ahead of the list operation.
             sort: The sort order of the results.
             limit: The maximum number of results to return. Pagination is handled automatically.
+
+        Returns:
+            list[dict[str, Any]]: The list of nodes/edges in the view.
+
+        Raises:
+            ValueError: If the view is not an edge view and nested properties are used, e.g. {"property": ["nested"]}.
+            CogniteAPIError: If the view is not found.
         """
         filter = self._equals_none_to_not_exists(filter)
         return self._execute_list(view, properties, filter, sort, limit)
