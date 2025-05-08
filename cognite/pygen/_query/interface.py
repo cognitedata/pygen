@@ -1,7 +1,7 @@
 import itertools
 from collections import defaultdict
 from collections.abc import Sequence
-from typing import Any, Literal, overload
+from typing import Any, Literal, cast, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -226,14 +226,23 @@ class QueryExecutor:
         factory = QueryBuildStepFactory(builder.create_name, view=view, user_selected_properties=properties)
 
         if not factory.connection_properties:
-            result = self._client.data_modeling.instances.list(
-                instance_type="node",
-                sources=[view_id],
-                filter=filter,
-                limit=limit,
-                sort=sort,
+            list_results: list[dict[str, Any]] = []
+            instance_types = cast(
+                list[Literal["node", "edge"]], (["node", "edge"] if view.used_for == "all" else [view.used_for])
             )
-            return self._prepare_list_result(result, set(root_properties))
+            for instance_type in instance_types:
+                response = self._client.data_modeling.instances.list(
+                    instance_type=instance_type,
+                    sources=[view_id],
+                    filter=filter,
+                    limit=limit,
+                    sort=sort,
+                )
+                list_results.extend(self._prepare_list_result(response, set(root_properties)))
+            return list_results
+
+        if view.used_for == "edge":
+            raise ValueError("Nested properties are not supported for edges")
 
         reverse_views = {
             prop.through.source: self._get_view(prop.through.source)
@@ -251,11 +260,11 @@ class QueryExecutor:
 
     @classmethod
     def _prepare_list_result(
-        cls, result: dm.NodeList[dm.Node], selected_properties: set[str] | None
+        cls, result: dm.NodeList[dm.Node] | dm.EdgeList[dm.Edge], selected_properties: set[str] | None
     ) -> list[dict[str, Any]]:
         output: list[dict[str, Any]] = []
-        for node in result:
-            item = QueryUnpacker.flatten_dump(node, selected_properties)
+        for instance in result:
+            item = QueryUnpacker.flatten_dump(instance, selected_properties)
             if item:
                 # As long as you have selected properties, you will not get None.
                 output.append(item)  # type: ignore[arg-type]
@@ -350,12 +359,23 @@ class QueryExecutor:
     ) -> list[dict[str, Any]]:
         """List nodes/edges in a view.
 
+        Note if the view supports both nodes and edges the result will be a list of nodes and edges.
+
+        Nested properties are not supported for edges.
+
         Args:
             view: The view in which the nodes/edges have properties.
             properties: The properties to include in the result.
             filter: The filter to apply ahead of the list operation.
             sort: The sort order of the results.
             limit: The maximum number of results to return. Pagination is handled automatically.
+
+        Returns:
+            list[dict[str, Any]]: The list of nodes/edges in the view.
+
+        Raises:
+            ValueError: If the view is not an edge view and nested properties are used, e.g. {"property": ["nested"]}.
+            CogniteAPIError: If the view is not found.
         """
         filter = self._equals_none_to_not_exists(filter)
         return self._execute_list(view, properties, filter, sort, limit)
