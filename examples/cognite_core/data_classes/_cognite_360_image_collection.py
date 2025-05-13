@@ -157,6 +157,7 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
 
     node_type: Union[dm.DirectRelationReference, None] = None
+    model_3d: Union[Cognite360ImageModel, str, dm.NodeId, None] = Field(default=None, repr=False, alias="model3D")
 
     @field_validator("model_3d", mode="before")
     @classmethod
@@ -202,6 +203,17 @@ class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevis
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
+    model_3d: Union[Cognite360ImageModelWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="model3D")
+
+    @field_validator("model_3d", mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value
 
 
 class Cognite360ImageCollectionList(DomainModelList[Cognite360ImageCollection]):

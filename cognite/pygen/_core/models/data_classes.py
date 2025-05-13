@@ -346,20 +346,20 @@ class DataClass:
     def __iter__(self) -> Iterator[Field]:
         return iter(self.fields)
 
-    def non_parent_fields(self, fields: Iterator[Field] | None = None) -> Iterator[Field]:
-        """Return all fields that are not inherited from a parent."""
-        parent_fields = {field.prop_name for parent in self.implements for field in parent}
-        return (field for field in fields or self if field.prop_name not in parent_fields)
+    def non_inherited_and_overwritten_fields(self, fields: Iterator[Field] | None = None) -> Iterator[Field]:
+        """Return all fields that are not intherited or overridden from parent classes."""
+        parent_fields = {(field.prop_name, field.as_read_type_hint()) for parent in self.implements for field in parent}
+        return (field for field in fields or self if (field.prop_name, field.as_read_type_hint()) not in parent_fields)
 
     @property
     def read_fields(self) -> Iterator[Field]:
         """These fields are used when creating the read data class."""
-        return self.non_parent_fields()
+        return self.non_inherited_and_overwritten_fields()
 
     @property
     def write_fields(self) -> Iterator[Field]:
         """These fields are used when creating the write data class."""
-        return (field for field in self.non_parent_fields() if field.is_write_field)
+        return (field for field in self.non_inherited_and_overwritten_fields() if field.is_write_field)
 
     @property
     def write_connection_fields(self) -> Iterator[BaseConnectionField]:
