@@ -142,6 +142,7 @@ class CognitePointCloudRevision(Cognite3DRevision, protected_namespaces=()):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudRevision", "v1")
 
     node_type: Union[dm.DirectRelationReference, None] = None
+    model_3d: Union[CognitePointCloudModel, str, dm.NodeId, None] = Field(default=None, repr=False, alias="model3D")
     revision_id: Optional[int] = Field(None, alias="revisionId")
 
     @field_validator("model_3d", mode="before")
@@ -182,7 +183,20 @@ class CognitePointCloudRevisionWrite(Cognite3DRevisionWrite, protected_namespace
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudRevision", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
+    model_3d: Union[CognitePointCloudModelWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="model3D"
+    )
     revision_id: Optional[int] = Field(None, alias="revisionId")
+
+    @field_validator("model_3d", mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value
 
 
 class CognitePointCloudRevisionList(DomainModelList[CognitePointCloudRevision]):
