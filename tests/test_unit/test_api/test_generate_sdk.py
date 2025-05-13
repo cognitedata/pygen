@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from cognite.client import data_modeling as dm
+from pydantic import BaseModel
 
 from cognite.pygen import generate_sdk
 from tests.constants import CORE_SDK
@@ -198,6 +199,30 @@ class TestGenerateSDK:
         with append_to_sys_path(str(tmp_path)):
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
+
+    def test_generate_sdk_overwriting_parent_property(self, tmp_path: Path) -> None:
+        top_level_package = "overwriting_parent_property_model"
+        client_name = "OverwritingParentPropertyClient"
+
+        generate_sdk(
+            DATA_MODEL_WITH_OVERWRITING_PARENT_PROPERTY,
+            top_level_package=top_level_package,
+            output_dir=tmp_path / top_level_package,
+            overwrite=True,
+            client_name=client_name,
+            default_instance_space="my_instances",
+        )
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+            data_class_module = vars(importlib.import_module(f"{top_level_package}.data_classes"))
+            assert "MyAsset" in data_class_module
+            my_asset = data_class_module["MyAsset"]
+            assert issubclass(my_asset, BaseModel)
+            assert "parent" in my_asset.model_fields
+            parent_field = my_asset.model_fields["parent"]
+            assert "MyAsset" in str(parent_field.annotation)
 
 
 DATA_MODEL_WITH_VIEW_PROPERTY_OF_TYPE_FIELD: dm.DataModel = dm.DataModel.load(
@@ -779,6 +804,85 @@ DATA_MODEL_REVERSE_DIRECT_RELATION_IN_EDGE_VIEW = dm.DataModel(
             last_updated_time=0,
             created_time=0,
             used_for="node",
+            writable=True,
+            filter=None,
+        ),
+    ],
+)
+
+DATA_MODEL_WITH_OVERWRITING_PARENT_PROPERTY = dm.DataModel(
+    space="my_space",
+    external_id="MyModel",
+    version="1",
+    is_global=False,
+    last_updated_time=0,
+    created_time=0,
+    description=None,
+    name=None,
+    views=[
+        dm.View(
+            space="my_space",
+            name="Parent",
+            external_id="CogniteAsset",
+            version="1",
+            properties={
+                "name": dm.MappedProperty(
+                    container=dm.ContainerId("my_space", "CogniteAsset"),
+                    container_property_identifier="name",
+                    type=dm.Text(),
+                    nullable=False,
+                    auto_increment=False,
+                    immutable=False,
+                ),
+                "parent": dm.MappedProperty(
+                    container=dm.ContainerId("my_space", "CogniteAsset"),
+                    container_property_identifier="parent",
+                    type=dm.DirectRelation(),
+                    nullable=True,
+                    auto_increment=False,
+                    immutable=False,
+                    source=dm.ViewId("my_space", "CogniteAsset", "1"),
+                ),
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            implements=None,
+            writable=True,
+            filter=None,
+        ),
+        dm.View(
+            space="my_space",
+            name="MyAsset",
+            external_id="MyAsset",
+            version="1",
+            properties={
+                "parent": dm.MappedProperty(
+                    container=dm.ContainerId("my_space", "CogniteAsset"),
+                    container_property_identifier="parent",
+                    type=dm.DirectRelation(),
+                    nullable=True,
+                    auto_increment=False,
+                    immutable=False,
+                    source=dm.ViewId("my_space", "MyAsset", "1"),
+                ),
+                "location": dm.MappedProperty(
+                    container=dm.ContainerId("my_space", "MyAsset"),
+                    container_property_identifier="name",
+                    type=dm.Text(),
+                    nullable=False,
+                    auto_increment=False,
+                    immutable=False,
+                ),
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            implements=[dm.ViewId("my_space", "CogniteAsset", "1")],
             writable=True,
             filter=None,
         ),
