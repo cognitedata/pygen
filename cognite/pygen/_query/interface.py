@@ -89,6 +89,9 @@ class QueryExecutor:
             instance_types = self._get_instance_types(view)
             all_results: list[dict[str, Any]] = []
             for instance_type in instance_types:
+                # The .search has 4 overloads methods and MyPy seems to just give up:
+                # 'Not all union combinations were tried because there are too many union'
+                # Thus adding an ignore here.
                 search_instance_result = self._client.data_modeling.instances.search(  # type: ignore[misc]
                     view_id,
                     query,
