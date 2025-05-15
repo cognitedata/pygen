@@ -84,9 +84,8 @@ class QueryExecutor:
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
         view = self._get_view(view_id)
-        flatten_props = self._as_property_list(properties, "list") if properties else None
-        are_flat_properties = flatten_props == properties
-        if properties is None or are_flat_properties:
+        flatten_props, is_flatten = self._as_property_list(properties, "list") if properties else (None, False)
+        if properties is None or is_flatten:
             instance_types = self._get_instance_types(view)
             all_results: list[dict[str, Any]] = []
             for instance_type in instance_types:
@@ -238,9 +237,10 @@ class QueryExecutor:
         return self._view_by_id[view_id]
 
     @staticmethod
-    def _as_property_list(properties: SelectedProperties, operation: str) -> list[str]:
-        output = []
+    def _as_property_list(properties: SelectedProperties, operation: str) -> tuple[list[str], bool]:
+        output: list[str] = []
         is_nested_supported = operation == "list"
+        are_flat_properties = True
         for prop in properties:
             if isinstance(prop, str):
                 output.append(prop)
@@ -249,11 +249,12 @@ class QueryExecutor:
                     raise ValueError(f"Unexpected nested property: {prop}")
                 key = next(iter(prop.keys()))
                 output.append(key)
+                are_flat_properties = False
             elif isinstance(prop, dict):
                 raise ValueError(f"Nested properties are not supported for operation {operation}")
             else:
                 raise ValueError(f"Unexpected property type: {type(prop)}")
-        return output
+        return output, are_flat_properties
 
     def _execute_list(
         self,
@@ -264,7 +265,7 @@ class QueryExecutor:
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
         view = self._get_view(view_id)
-        root_properties = self._as_property_list(properties, "list")
+        root_properties, _ = self._as_property_list(properties, "list")
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view=view, user_selected_properties=properties)
 
@@ -334,34 +335,36 @@ class QueryExecutor:
         view = self._get_view(view_id)
         instance_types = self._get_instance_types(view)
         if metric_aggregates and group_by is not None:
-            all_group_results: dict[str, dict[str, Any]] = {}
+            group_results: list[InstanceAggregationResultList] = []
             for instance_type in instance_types:
-                group_by_result = self._client.data_modeling.instances.aggregate(  # type: ignore[call-overload]
-                    instance_type=instance_type,
-                    view=view_id,
-                    group_by=group_by,
-                    aggregates=metric_aggregates,
-                    query=query,
-                    properties=search_properties,
-                    filter=filter,
-                    limit=limit or AGGREGATION_LIMIT,
+                group_results.append(
+                    self._client.data_modeling.instances.aggregate(  # type: ignore[call-overload]
+                        instance_type=instance_type,
+                        view=view_id,
+                        group_by=group_by,
+                        aggregates=metric_aggregates,
+                        query=query,
+                        properties=search_properties,
+                        filter=filter,
+                        limit=limit or AGGREGATION_LIMIT,
+                    )
                 )
-                self._update_group_aggregation(group_by_result, all_group_results)
-            return list(all_group_results.values())
+            return self._merge_groupby_aggregate_results(group_results)
         elif metric_aggregates:
-            metric_dict: dict[str, dict[str, float | int | None]] = {}
+            aggregate_results: list[list[dm.aggregations.AggregatedNumberedValue]] = []
             for instance_type in instance_types:
-                metric_results = self._client.data_modeling.instances.aggregate(
-                    view_id,
-                    instance_type=instance_type,
-                    aggregates=metric_aggregates,
-                    query=query,
-                    properties=search_properties,
-                    filter=filter,
-                    limit=limit or AGGREGATION_LIMIT,
+                aggregate_results.append(
+                    self._client.data_modeling.instances.aggregate(
+                        view_id,
+                        instance_type=instance_type,
+                        aggregates=metric_aggregates,
+                        query=query,
+                        properties=search_properties,
+                        filter=filter,
+                        limit=limit or AGGREGATION_LIMIT,
+                    )
                 )
-                self._update_metric_results(metric_results, metric_dict)
-            return metric_dict
+            return self._merge_aggregate_results(aggregate_results)
         elif histogram_aggregates:
             histogram_results = self._client.data_modeling.instances.histogram(
                 view_id,
@@ -376,38 +379,59 @@ class QueryExecutor:
             raise ValueError("No aggregation found")
 
     @staticmethod
-    def _update_metric_results(
-        aggregation: list[dm.aggregations.AggregatedNumberedValue], existing: dict[str, dict[str, float | int | None]]
-    ) -> None:
-        for item in aggregation:
-            if item._aggregate not in existing:
-                existing[item._aggregate] = {}
-            existing_value = existing[item._aggregate].get(item.property, None)
-            if existing_value is None:
-                existing[item._aggregate][item.property] = item.value
-            elif item.value is not None:
-                if isinstance(item, dm.aggregations.SumValue | dm.aggregations.CountValue):
-                    new_value = existing_value + item.value
-                elif isinstance(item, dm.aggregations.MaxValue):
-                    new_value = max(existing_value, item.value)
-                elif isinstance(item, dm.aggregations.MinValue):
-                    new_value = min(existing_value, item.value)
-                elif isinstance(item, dm.aggregations.AvgValue):
-                    # We will never call this more than twice, so we can just average the two values.
-                    new_value = (existing_value + item.value) / 2
-                else:
-                    raise ValueError(f"Unknown aggregation type: {type(item)}")
-                existing[item._aggregate][item.property] = new_value
+    def _merge_aggregate_results(
+        instance_type_results: list[list[dm.aggregations.AggregatedNumberedValue]],
+    ) -> dict[str, dict[str, float | int | None]]:
+        """Merge the results from all instance types into a single result."""
+        if len(instance_type_results) > 2:
+            raise ValueError("Cannot merge more than two instance types")
+
+        merged_results: dict[str, dict[str, float | int | None]] = {}
+        for instance_type_result in instance_type_results:
+            for item in instance_type_result:
+                if item._aggregate not in merged_results:
+                    merged_results[item._aggregate] = {}
+                existing_value = merged_results[item._aggregate].get(item.property, None)
+                if existing_value is None:
+                    merged_results[item._aggregate][item.property] = item.value
+                elif item.value is not None:
+                    if isinstance(item, dm.aggregations.SumValue | dm.aggregations.CountValue):
+                        new_value = existing_value + item.value
+                    elif isinstance(item, dm.aggregations.MaxValue):
+                        new_value = max(existing_value, item.value)
+                    elif isinstance(item, dm.aggregations.MinValue):
+                        new_value = min(existing_value, item.value)
+                    elif isinstance(item, dm.aggregations.AvgValue):
+                        # We check the length of the list to see we will never hit this more than once.
+                        new_value = (existing_value + item.value) / 2
+                    else:
+                        raise ValueError(f"Unknown aggregation type: {type(item)}")
+                    merged_results[item._aggregate][item.property] = new_value
+        return merged_results
 
     @classmethod
-    def _update_group_aggregation(
-        cls, aggregations: InstanceAggregationResultList, existing: dict[str, dict[str, Any]]
-    ) -> None:
-        for group in aggregations:
-            key = json.dumps(group.group, sort_keys=True)
-            if key not in existing:
-                existing[key] = {"group": group.group}
-            cls._update_metric_results(group.aggregates, existing[key])
+    def _merge_groupby_aggregate_results(
+        cls, group_results: list[InstanceAggregationResultList]
+    ) -> list[dict[str, Any]]:
+        """Merge the results from all instance types into a single result."""
+        aggregate_results_by_group: dict[str, list[list[dm.aggregations.AggregatedNumberedValue]]] = defaultdict(list)
+        # The group is a dict and thus not hashable, so we need to use json.dumps to create a unique key.
+        # and then look it up after merging the results from both instance types (node and edge).
+        group_by_key: dict[str, dict[str, str | int | float | bool]] = {}
+        for group_result in group_results:
+            for item in group_result:
+                key = json.dumps(item.group, sort_keys=True)
+                aggregate_results_by_group[key].append(item.aggregates)
+                group_by_key[key] = item.group
+        results: list[dict[str, Any]] = []
+        merged_aggregates: dict[str, Any]
+        for key, aggregates in aggregate_results_by_group.items():
+            merged_aggregates = cls._merge_aggregate_results(aggregates)
+            # Mypy does not understand the merged_aggregates is a dict[str, Any] and
+            # not a dict[str, str | int | float | bool]
+            merged_aggregates["group"] = group_by_key[key]  # type: ignore[assignment]
+            results.append(merged_aggregates)
+        return results
 
     @staticmethod
     def _histogram_aggregation_to_dict(aggregation: list[dm.aggregations.HistogramValue]) -> dict[str, Any]:
