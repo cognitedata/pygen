@@ -7,7 +7,7 @@ from typing import Any, Literal, cast, overload
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
-from cognite.client.data_classes.aggregations import Aggregation
+from cognite.client.data_classes.aggregations import Aggregation, Avg
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
 from cognite.client.exceptions import CogniteAPIError
 from cognite.client.utils.useful_types import SequenceNotStr
@@ -335,6 +335,8 @@ class QueryExecutor:
         view = self._get_view(view_id)
         instance_types = self._get_instance_types(view)
         if metric_aggregates and group_by is not None:
+            if len(instance_types) == 2 and any(isinstance(agg, Avg) for agg in metric_aggregates):
+                raise ValueError("Average aggregation is not supported for views that is used for both nodes and edges")
             group_results: list[InstanceAggregationResultList] = []
             for instance_type in instance_types:
                 group_results.append(
@@ -402,8 +404,8 @@ class QueryExecutor:
                     elif isinstance(item, dm.aggregations.MinValue):
                         new_value = min(existing_value, item.value)
                     elif isinstance(item, dm.aggregations.AvgValue):
-                        # We check the length of the list to see we will never hit this more than once.
-                        new_value = (existing_value + item.value) / 2
+                        # We cannot merge AvgValue results without having the count of the values.
+                        raise ValueError("AvgValue is not supported for merging")
                     else:
                         raise ValueError(f"Unknown aggregation type: {type(item)}")
                     merged_results[item._aggregate][item.property] = new_value
