@@ -336,6 +336,8 @@ class QueryExecutor:
         instance_types = self._get_instance_types(view)
         if metric_aggregates and group_by is not None:
             if len(instance_types) == 2 and any(isinstance(agg, Avg) for agg in metric_aggregates):
+                # This can be supported (need to add the count of the values to the AvgValue, but will postpone
+                # this until we have a use case for it.
                 raise ValueError("Average aggregation is not supported for views that is used for both nodes and edges")
             group_results: list[InstanceAggregationResultList] = []
             for instance_type in instance_types:
@@ -368,9 +370,14 @@ class QueryExecutor:
                 )
             return self._merge_aggregate_results(aggregate_results)
         elif histogram_aggregates:
+            if len(instance_types) == 2:
+                raise ValueError(
+                    "Histogram aggregation is not supported for views that is used for both nodes and edges"
+                )
             histogram_results = self._client.data_modeling.instances.histogram(
                 view_id,
                 histograms=histogram_aggregates,
+                instance_type=instance_types[0],
                 query=query,
                 properties=search_properties,  # type: ignore[arg-type]
                 filter=filter,
