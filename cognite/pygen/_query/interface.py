@@ -84,8 +84,8 @@ class QueryExecutor:
         limit: int | None = None,
     ) -> list[dict[str, Any]]:
         view = self._get_view(view_id)
-        flatten_props, is_flatten = self._as_property_list(properties, "list") if properties else (None, False)
-        if properties is None or is_flatten:
+        flatten_props, are_flat_properties = self._as_property_list(properties, "list") if properties else (None, False)
+        if properties is None or are_flat_properties:
             instance_types = self._get_instance_types(view)
             all_results: list[dict[str, Any]] = []
             for instance_type in instance_types:
