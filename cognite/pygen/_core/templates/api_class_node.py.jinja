@@ -181,7 +181,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
     def search(
         self,
         query: str,
-        properties: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,
+        {{ 'properties' if 'properties' not in list_method.parameters_list else 'parameters_'}}: {{ data_class.text_field_names }} | SequenceNotStr[{{ data_class.text_field_names }}] | None = None,
         {% for parm in list_method.parameters %}
         {{ parm.name }}: {{ parm.annotation }} = {{ parm.default }},
         {% endfor %}

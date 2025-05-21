@@ -171,6 +171,10 @@ class FilterMethod:
     parameters: list[FilterParameter]
     implementations: list[FilterImplementation]
 
+    @property
+    def parameters_list(self):
+        return [p.name for p in self.parameters]
+
     @classmethod
     def from_fields(
         cls,
