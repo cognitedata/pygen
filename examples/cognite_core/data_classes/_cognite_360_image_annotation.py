@@ -203,7 +203,7 @@ class Cognite360ImageAnnotation(CogniteAnnotation):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageAnnotation", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
-    end_node: Union[Cognite360Image, str, dm.NodeId] = Field(alias="endNode") # type: ignore[assignment]
+    end_node: Union[Cognite360Image, str, dm.NodeId] = Field(alias="endNode")
     format_version: Optional[str] = Field(None, alias="formatVersion")
     polygon: Optional[list[float]] = None
 
@@ -284,7 +284,7 @@ class Cognite360ImageAnnotationWrite(CogniteAnnotationWrite):
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageAnnotation", "v1")
-    end_node: Union[Cognite360ImageWrite, str, dm.NodeId] = Field(alias="endNode") # type: ignore[assignment]
+    end_node: Union[Cognite360ImageWrite, str, dm.NodeId] = Field(alias="endNode")
     format_version: Optional[str] = Field(None, alias="formatVersion")
     polygon: Optional[list[float]] = None
 

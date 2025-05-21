@@ -112,7 +112,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     def search(
         self,
         query: str,
-        properties: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
+        parameters_: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         other_direct: (
@@ -129,6 +129,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        properties: str | list[str] | None = None,
+        properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -146,6 +148,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
+            properties: The property to filter on.
+            properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of connection item as to return. Defaults to 25.
@@ -178,6 +182,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
+            properties,
+            properties_prefix,
             external_id_prefix,
             space,
             filter,
@@ -216,6 +222,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        properties: str | list[str] | None = None,
+        properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -246,6 +254,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        properties: str | list[str] | None = None,
+        properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -280,6 +290,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        properties: str | list[str] | None = None,
+        properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -313,6 +325,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        properties: str | list[str] | None = None,
+        properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -334,6 +348,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
+            properties: The property to filter on.
+            properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of connection item as to return. Defaults to 25.
@@ -360,6 +376,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
+            properties,
+            properties_prefix,
             external_id_prefix,
             space,
             filter,
@@ -396,6 +414,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        properties: str | list[str] | None = None,
+        properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -412,6 +432,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
+            properties: The property to filter on.
+            properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of connection item as to return.
@@ -429,6 +451,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
+            properties,
+            properties_prefix,
             external_id_prefix,
             space,
             filter,
@@ -511,6 +535,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        properties: str | list[str] | None = None,
+        properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
@@ -526,6 +552,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
+            properties: The property to filter on.
+            properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
@@ -587,6 +615,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
+            properties,
+            properties_prefix,
             external_id_prefix,
             space,
             filter,
@@ -611,6 +641,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
+        properties: str | list[str] | None = None,
+        properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -627,6 +659,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
+            properties: The property to filter on.
+            properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of connection item as to return.
@@ -660,6 +694,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
+            properties,
+            properties_prefix,
             external_id_prefix,
             space,
             filter,
