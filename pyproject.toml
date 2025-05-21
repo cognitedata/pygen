@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Cognite Python SDK Generator"
 authors = [{name="Cognite", email ="support@cognite.com"}]
 readme="README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<4.0"
 license = "Apache-2.0"
 dependencies = [
     "cognite-sdk>=7.73.6, <8.0.0",
