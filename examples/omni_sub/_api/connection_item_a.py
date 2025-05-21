@@ -143,7 +143,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
         Args:
             query: The search query,
-            properties: The property to search, if nothing is passed all text fields will be searched.
+            properties_: The property to search, if nothing is passed all text fields will be searched.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
@@ -190,7 +190,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         )
         return self._search(
             query=query,
-            properties=properties,
+            properties=properties_,
             filter_=filter_,
             limit=limit,
             sort_by=sort_by,  # type: ignore[arg-type]

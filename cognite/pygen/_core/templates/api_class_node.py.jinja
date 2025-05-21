@@ -195,7 +195,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
 
         Args:
             query: The search query,
-            properties: The property to search, if nothing is passed all text fields will be searched.
+            {{ 'properties' if 'properties' not in list_method.parameters_list else 'properties_'}}: The property to search, if nothing is passed all text fields will be searched.
             {% for parm in list_method.parameters %}
             {{ parm.name }}: {{ parm.description }}
             {% endfor %}
@@ -232,7 +232,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
         )
         return self._search(
             query=query,
-            properties=properties,
+            properties={{ 'properties' if 'properties' not in list_method.parameters_list else 'properties_'}},
             filter_=filter_,
             limit=limit,
             sort_by=sort_by,  # type: ignore[arg-type]
