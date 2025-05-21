@@ -112,7 +112,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     def search(
         self,
         query: str,
-        parameters_: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
+        properties_: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         other_direct: (
