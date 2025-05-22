@@ -1,7 +1,7 @@
 **Prerequisites**
 
 - Access to a CDF Project.
-- Know how to install and setup `Python` using `poetry` and `pyproject.toml`.
+- Know how to install and setup `Python` using `uv` and `pyproject.toml`.
 - Know how to use `git` for version control.
 - Know how to use a terminal, so you can run `pygen` from the command line to
   generate the SDK.
@@ -60,9 +60,10 @@ The following is the recommended project structure for a CDF SDK project:
 
     ...
 
-    [tool.poetry.group.dev.dependencies]
-    cognite-pygen = {version="*", extras=["all"]}
-    ```
+    [dependency-groups]
+    dev = [
+        "cognite-pygen[all]",
+        ```
 
 === ".secret.toml"
 

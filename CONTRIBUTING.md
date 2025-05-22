@@ -15,19 +15,18 @@ git clone https://github.com/cognitedata/pygen.git
 cd pygen
 ```
 
-We use [poetry](https://pypi.org/project/poetry/) for dependency- and virtual environment management.
+We use [uv](https://pypi.org/project/uv/) for dependency- and virtual environment management.
 
-When developing `pygen` use Python `3.9`. To specify the python version with `poetry` you can use the command
+When developing `pygen` use Python `3.10`. To specify the python version with `uv` you can use the command
 ```bash
-poetry env use 3.9
+uv venv --python 3.10
 ```
-See [poetry docs](https://python-poetry.org/docs/managing-environments/) for more information on managing environments.
+See [uv docs](https://docs.astral.sh/uv/pip/environments/#creating-a-virtual-environment) for more information on managing environments.
 
-Install `pygen` with all the extra dependencies and then activate the virtual environment, with these commands:
+Install `pygen` with all the extra and dev dependencies:
 
 ```bash
-poetry install --all-extras
-poetry shell
+uv sync --all-extras --all-groups
 ```
 
 `pygen` is using [pre-commit](https://pre-commit.com/) to run static code checks.
@@ -125,13 +124,7 @@ python dev.py bump --patch
 
 ### Documentation
 
-We use material docs for the documentation. First, ensure that you have installed the `docs` extra dependencies with `poetry`:
-
-```bash
-poetry install --extras docs
-```
-
-You can build and serve the documentation locally with:
+We use material docs for the documentation. You can build and serve the documentation locally with:
 
 ```bash
 mkdocs serve
