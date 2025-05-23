@@ -129,7 +129,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties_: list[str] | None = None,
+        properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -222,7 +222,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties_: list[str] | None = None,
+        properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -254,7 +254,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties_: list[str] | None = None,
+        properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -290,7 +290,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties_: list[str] | None = None,
+        properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -325,7 +325,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties_: list[str] | None = None,
+        properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -414,7 +414,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties_: list[str] | None = None,
+        properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -535,7 +535,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties_: list[str] | None = None,
+        properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -641,7 +641,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties_: list[str] | None = None,
+        properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,

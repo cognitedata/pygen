@@ -45,6 +45,7 @@ FIELD_NAMES = (
         "create_external_id_if_factory",
         "dump",
         "parse_type",
+        "properties",
     }
 )
 PARAMETER_NAMES = {
@@ -54,7 +55,6 @@ PARAMETER_NAMES = {
     "replace",
     "retrieve_edges",
     "property",
-    "properties",
 }
 
 DATA_CLASS_NAMES = {"DomainModel", "DomainModelWrite", "DomainModelList", "DomainModelWriteList"}

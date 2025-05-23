@@ -63,13 +63,13 @@ __all__ = [
 ]
 
 
-ConnectionItemATextFields = Literal["external_id", "name", "properties"]
-ConnectionItemAFields = Literal["external_id", "name", "properties"]
+ConnectionItemATextFields = Literal["external_id", "name", "properties_"]
+ConnectionItemAFields = Literal["external_id", "name", "properties_"]
 
 _CONNECTIONITEMA_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
     "name": "name",
-    "properties": "properties",
+    "properties_": "properties",
 }
 
 
@@ -87,7 +87,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
         other_direct: The other direct field.
         outwards: The outward field.
         self_direct: The self direct field.
-        properties: The property field.
+        properties_: The property field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
@@ -95,7 +95,7 @@ class ConnectionItemAGraphQL(GraphQLCore):
     other_direct: Optional[ConnectionItemCNodeGraphQL] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Optional[list[ConnectionItemBGraphQL]] = Field(default=None, repr=False)
     self_direct: Optional[ConnectionItemAGraphQL] = Field(default=None, repr=False, alias="selfDirect")
-    properties: Optional[str] = None
+    properties_: Optional[str] = Field(None, alias="properties")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -138,7 +138,7 @@ class ConnectionItemA(DomainModel):
         other_direct: The other direct field.
         outwards: The outward field.
         self_direct: The self direct field.
-        properties: The property field.
+        properties_: The property field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemA", "1")
@@ -151,7 +151,7 @@ class ConnectionItemA(DomainModel):
     other_direct: Union[ConnectionItemCNode, dm.NodeId, None] = Field(default=None, repr=False, alias="otherDirect")
     outwards: Optional[list[Union[ConnectionItemB, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemA, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
-    properties: Optional[str] = None
+    properties_: Optional[str] = Field(None, alias="properties")
 
     @field_validator("other_direct", "self_direct", mode="before")
     @classmethod
@@ -183,13 +183,13 @@ class ConnectionItemAWrite(DomainModelWrite):
         other_direct: The other direct field.
         outwards: The outward field.
         self_direct: The self direct field.
-        properties: The property field.
+        properties_: The property field.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (
         "name",
         "other_direct",
-        "properties",
+        "properties_",
         "self_direct",
     )
     _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
@@ -212,7 +212,7 @@ class ConnectionItemAWrite(DomainModelWrite):
     )
     outwards: Optional[list[Union[ConnectionItemBWrite, dm.NodeId]]] = Field(default=None, repr=False)
     self_direct: Union[ConnectionItemAWrite, dm.NodeId, None] = Field(default=None, repr=False, alias="selfDirect")
-    properties: Optional[str] = None
+    properties_: Optional[str] = Field(None, alias="properties")
 
     @field_validator("other_direct", "outwards", "self_direct", mode="before")
     def as_node_id(cls, value: Any) -> Any:
@@ -303,7 +303,7 @@ def _create_connection_item_a_filter(
         | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
         | None
     ) = None,
-    properties_: list[str] | None = None,
+    properties_: str | list[str] | None = None,
     properties_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -441,7 +441,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.other_direct_filter = DirectRelationFilter(self, self._view_id.as_property_ref("otherDirect"))
         self.self_direct_filter = DirectRelationFilter(self, self._view_id.as_property_ref("selfDirect"))
-        self.properties = StringFilter(self, self._view_id.as_property_ref("properties"))
+        self.properties_ = StringFilter(self, self._view_id.as_property_ref("properties"))
         self._filter_classes.extend(
             [
                 self.space,
@@ -449,7 +449,7 @@ class _ConnectionItemAQuery(NodeQueryCore[T_DomainModelList, ConnectionItemAList
                 self.name,
                 self.other_direct_filter,
                 self.self_direct_filter,
-                self.properties,
+                self.properties_,
             ]
         )
 
