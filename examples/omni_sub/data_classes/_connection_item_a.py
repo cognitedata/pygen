@@ -303,7 +303,7 @@ def _create_connection_item_a_filter(
         | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
         | None
     ) = None,
-    properties: str | list[str] | None = None,
+    properties_: list[str] | None = None,
     properties_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -344,10 +344,10 @@ def _create_connection_item_a_filter(
                 view_id.as_property_ref("selfDirect"), values=[as_instance_dict_id(item) for item in self_direct]
             )
         )
-    if isinstance(properties, str):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("properties"), value=properties))
-    if properties and isinstance(properties, list):
-        filters.append(dm.filters.In(view_id.as_property_ref("properties"), values=properties))
+    if isinstance(properties_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("properties"), value=properties_))
+    if properties_ and isinstance(properties_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("properties"), values=properties_))
     if properties_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("properties"), value=properties_prefix))
     if external_id_prefix is not None:

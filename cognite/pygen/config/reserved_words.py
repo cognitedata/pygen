@@ -54,6 +54,7 @@ PARAMETER_NAMES = {
     "replace",
     "retrieve_edges",
     "property",
+    "properties",
 }
 
 DATA_CLASS_NAMES = {"DomainModel", "DomainModelWrite", "DomainModelList", "DomainModelWriteList"}

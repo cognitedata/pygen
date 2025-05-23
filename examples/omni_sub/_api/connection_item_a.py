@@ -112,7 +112,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     def search(
         self,
         query: str,
-        properties_: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
+        properties: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         other_direct: (
@@ -129,7 +129,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties: str | list[str] | None = None,
+        properties_: list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -143,12 +143,12 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
         Args:
             query: The search query,
-            properties_: The property to search, if nothing is passed all text fields will be searched.
+            properties: The property to search, if nothing is passed all text fields will be searched.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
-            properties: The property to filter on.
+            properties_: The property to filter on.
             properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -182,7 +182,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
-            properties,
+            properties_,
             properties_prefix,
             external_id_prefix,
             space,
@@ -190,7 +190,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         )
         return self._search(
             query=query,
-            properties=properties_,
+            properties=properties,
             filter_=filter_,
             limit=limit,
             sort_by=sort_by,  # type: ignore[arg-type]
@@ -222,7 +222,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties: str | list[str] | None = None,
+        properties_: list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -254,7 +254,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties: str | list[str] | None = None,
+        properties_: list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -290,7 +290,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties: str | list[str] | None = None,
+        properties_: list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -325,7 +325,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties: str | list[str] | None = None,
+        properties_: list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -348,7 +348,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
-            properties: The property to filter on.
+            properties_: The property to filter on.
             properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -376,7 +376,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
-            properties,
+            properties_,
             properties_prefix,
             external_id_prefix,
             space,
@@ -414,7 +414,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties: str | list[str] | None = None,
+        properties_: list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -432,7 +432,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
-            properties: The property to filter on.
+            properties_: The property to filter on.
             properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -451,7 +451,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
-            properties,
+            properties_,
             properties_prefix,
             external_id_prefix,
             space,
@@ -535,7 +535,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties: str | list[str] | None = None,
+        properties_: list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -552,7 +552,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
-            properties: The property to filter on.
+            properties_: The property to filter on.
             properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -615,7 +615,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
-            properties,
+            properties_,
             properties_prefix,
             external_id_prefix,
             space,
@@ -641,7 +641,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
             | None
         ) = None,
-        properties: str | list[str] | None = None,
+        properties_: list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -659,7 +659,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix: The prefix of the name to filter on.
             other_direct: The other direct to filter on.
             self_direct: The self direct to filter on.
-            properties: The property to filter on.
+            properties_: The property to filter on.
             properties_prefix: The prefix of the property to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
@@ -694,7 +694,7 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             name_prefix,
             other_direct,
             self_direct,
-            properties,
+            properties_,
             properties_prefix,
             external_id_prefix,
             space,
