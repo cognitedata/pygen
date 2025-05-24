@@ -88,6 +88,22 @@ views:
       defaultValue: null
       name: selfDirect
       description: null
+    properties:
+      container:
+        space: sp_pygen_models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: properties
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
   lastUpdatedTime: 1729345477397
   createdTime: 1729345477397
 - space: sp_pygen_models
