@@ -33,6 +33,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -96,6 +97,8 @@ class Cognite360ImageStationGraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> Cognite360ImageStation:
         """Convert this GraphQL format of Cognite 360 image station to the reading format."""
         return Cognite360ImageStation.model_validate(as_read_args(self))
@@ -126,9 +129,11 @@ class Cognite360ImageStation(CogniteDescribableNode):
     node_type: Union[dm.DirectRelationReference, None] = None
     group_type: Optional[Literal["Station360"]] | str = Field(None, alias="groupType")
 
+
     def as_write(self) -> Cognite360ImageStationWrite:
         """Convert this read version of Cognite 360 image station to the writing version."""
         return Cognite360ImageStationWrite.model_validate(as_write_args(self))
+
 
 
 class Cognite360ImageStationWrite(CogniteDescribableNodeWrite):
@@ -146,14 +151,7 @@ class Cognite360ImageStationWrite(CogniteDescribableNodeWrite):
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "aliases",
-        "description",
-        "group_type",
-        "name",
-        "tags",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "group_type", "name", "tags",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageStation", "v1")
 
@@ -161,14 +159,15 @@ class Cognite360ImageStationWrite(CogniteDescribableNodeWrite):
     group_type: Optional[Literal["Station360"]] = Field(None, alias="groupType")
 
 
+
 class Cognite360ImageStationList(DomainModelList[Cognite360ImageStation]):
     """List of Cognite 360 image stations in the read version."""
 
     _INSTANCE = Cognite360ImageStation
-
     def as_write(self) -> Cognite360ImageStationWriteList:
         """Convert these read versions of Cognite 360 image station to the writing versions."""
         return Cognite360ImageStationWriteList([node.as_write() for node in self.data])
+
 
 
 class Cognite360ImageStationWriteList(DomainModelWriteList[Cognite360ImageStationWrite]):
@@ -251,14 +250,12 @@ class _Cognite360ImageStationQuery(NodeQueryCore[T_DomainModelList, Cognite360Im
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.description,
-                self.name,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.description,
+            self.name,
+        ])
 
     def list_cognite_360_image_station(self, limit: int = DEFAULT_QUERY_LIMIT) -> Cognite360ImageStationList:
         return self._list(limit=limit)

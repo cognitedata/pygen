@@ -48,10 +48,8 @@ __all__ = [
 ]
 
 
-CogniteSchedulableTextFields = Literal["external_id",]
-CogniteSchedulableFields = Literal[
-    "external_id", "end_time", "scheduled_end_time", "scheduled_start_time", "start_time"
-]
+CogniteSchedulableTextFields = Literal["external_id", ]
+CogniteSchedulableFields = Literal["external_id", "end_time", "scheduled_end_time", "scheduled_start_time", "start_time"]
 
 _COGNITESCHEDULABLE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -95,6 +93,8 @@ class CogniteSchedulableGraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> CogniteSchedulable:
         """Convert this GraphQL format of Cognite schedulable to the reading format."""
         return CogniteSchedulable.model_validate(as_read_args(self))
@@ -128,9 +128,11 @@ class CogniteSchedulable(DomainModel):
     scheduled_start_time: Optional[datetime.datetime] = Field(None, alias="scheduledStartTime")
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
+
     def as_write(self) -> CogniteSchedulableWrite:
         """Convert this read version of Cognite schedulable to the writing version."""
         return CogniteSchedulableWrite.model_validate(as_write_args(self))
+
 
 
 class CogniteSchedulableWrite(DomainModelWrite):
@@ -147,13 +149,7 @@ class CogniteSchedulableWrite(DomainModelWrite):
         scheduled_start_time: The planned start time of an activity (or similar that extends this)
         start_time: The actual start time of an activity (or similar that extends this)
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "end_time",
-        "scheduled_end_time",
-        "scheduled_start_time",
-        "start_time",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("end_time", "scheduled_end_time", "scheduled_start_time", "start_time",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSchedulable", "v1")
 
@@ -165,14 +161,15 @@ class CogniteSchedulableWrite(DomainModelWrite):
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
 
+
 class CogniteSchedulableList(DomainModelList[CogniteSchedulable]):
     """List of Cognite schedulables in the read version."""
 
     _INSTANCE = CogniteSchedulable
-
     def as_write(self) -> CogniteSchedulableWriteList:
         """Convert these read versions of Cognite schedulable to the writing versions."""
         return CogniteSchedulableWriteList([node.as_write() for node in self.data])
+
 
 
 class CogniteSchedulableWriteList(DomainModelWriteList[CogniteSchedulableWrite]):
@@ -197,37 +194,13 @@ def _create_cognite_schedulable_filter(
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
     if min_end_time is not None or max_end_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("endTime"),
-                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
-                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("endTime"), gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None, lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None))
     if min_scheduled_end_time is not None or max_scheduled_end_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("scheduledEndTime"),
-                gte=min_scheduled_end_time.isoformat(timespec="milliseconds") if min_scheduled_end_time else None,
-                lte=max_scheduled_end_time.isoformat(timespec="milliseconds") if max_scheduled_end_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("scheduledEndTime"), gte=min_scheduled_end_time.isoformat(timespec="milliseconds") if min_scheduled_end_time else None, lte=max_scheduled_end_time.isoformat(timespec="milliseconds") if max_scheduled_end_time else None))
     if min_scheduled_start_time is not None or max_scheduled_start_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("scheduledStartTime"),
-                gte=min_scheduled_start_time.isoformat(timespec="milliseconds") if min_scheduled_start_time else None,
-                lte=max_scheduled_start_time.isoformat(timespec="milliseconds") if max_scheduled_start_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("scheduledStartTime"), gte=min_scheduled_start_time.isoformat(timespec="milliseconds") if min_scheduled_start_time else None, lte=max_scheduled_start_time.isoformat(timespec="milliseconds") if max_scheduled_start_time else None))
     if min_start_time is not None or max_start_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("startTime"),
-                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
-                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("startTime"), gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None, lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -276,16 +249,14 @@ class _CogniteSchedulableQuery(NodeQueryCore[T_DomainModelList, CogniteSchedulab
         self.scheduled_end_time = TimestampFilter(self, self._view_id.as_property_ref("scheduledEndTime"))
         self.scheduled_start_time = TimestampFilter(self, self._view_id.as_property_ref("scheduledStartTime"))
         self.start_time = TimestampFilter(self, self._view_id.as_property_ref("startTime"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.end_time,
-                self.scheduled_end_time,
-                self.scheduled_start_time,
-                self.start_time,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.end_time,
+            self.scheduled_end_time,
+            self.scheduled_start_time,
+            self.start_time,
+        ])
 
     def list_cognite_schedulable(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteSchedulableList:
         return self._list(limit=limit)

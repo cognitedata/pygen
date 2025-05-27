@@ -36,16 +36,9 @@ from wind_turbine.data_classes._core import (
     DirectRelationFilter,
     FloatFilter,
 )
-
 if TYPE_CHECKING:
     from wind_turbine.data_classes._blade import Blade, BladeList, BladeGraphQL, BladeWrite, BladeWriteList
-    from wind_turbine.data_classes._sensor_time_series import (
-        SensorTimeSeries,
-        SensorTimeSeriesList,
-        SensorTimeSeriesGraphQL,
-        SensorTimeSeriesWrite,
-        SensorTimeSeriesWriteList,
-    )
+    from wind_turbine.data_classes._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList, SensorTimeSeriesGraphQL, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
 
 
 __all__ = [
@@ -58,7 +51,7 @@ __all__ = [
 ]
 
 
-SensorPositionTextFields = Literal["external_id",]
+SensorPositionTextFields = Literal["external_id", ]
 SensorPositionFields = Literal["external_id", "position"]
 
 _SENSORPOSITION_PROPERTIES_BY_FIELD = {
@@ -112,18 +105,8 @@ class SensorPositionGraphQL(GraphQLCore):
             )
         return values
 
-    @field_validator(
-        "blade",
-        "edgewise_bend_mom_crosstalk_corrected",
-        "edgewise_bend_mom_offset",
-        "edgewise_bend_mom_offset_crosstalk_corrected",
-        "edgewisewise_bend_mom",
-        "flapwise_bend_mom",
-        "flapwise_bend_mom_crosstalk_corrected",
-        "flapwise_bend_mom_offset",
-        "flapwise_bend_mom_offset_crosstalk_corrected",
-        mode="before",
-    )
+
+    @field_validator("blade", "edgewise_bend_mom_crosstalk_corrected", "edgewise_bend_mom_offset", "edgewise_bend_mom_offset_crosstalk_corrected", "edgewisewise_bend_mom", "flapwise_bend_mom", "flapwise_bend_mom_crosstalk_corrected", "flapwise_bend_mom_offset", "flapwise_bend_mom_offset_crosstalk_corrected", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -166,43 +149,25 @@ class SensorPosition(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     blade: Union[Blade, str, dm.NodeId, None] = Field(default=None, repr=False)
-    edgewise_bend_mom_crosstalk_corrected: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(
-        default=None, repr=False
-    )
+    edgewise_bend_mom_crosstalk_corrected: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     edgewise_bend_mom_offset: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
-    edgewise_bend_mom_offset_crosstalk_corrected: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(
-        default=None, repr=False
-    )
+    edgewise_bend_mom_offset_crosstalk_corrected: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     edgewisewise_bend_mom: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     flapwise_bend_mom: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
-    flapwise_bend_mom_crosstalk_corrected: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(
-        default=None, repr=False
-    )
+    flapwise_bend_mom_crosstalk_corrected: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     flapwise_bend_mom_offset: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
-    flapwise_bend_mom_offset_crosstalk_corrected: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(
-        default=None, repr=False
-    )
+    flapwise_bend_mom_offset_crosstalk_corrected: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     position: Optional[float] = None
-
-    @field_validator(
-        "blade",
-        "edgewise_bend_mom_crosstalk_corrected",
-        "edgewise_bend_mom_offset",
-        "edgewise_bend_mom_offset_crosstalk_corrected",
-        "edgewisewise_bend_mom",
-        "flapwise_bend_mom",
-        "flapwise_bend_mom_crosstalk_corrected",
-        "flapwise_bend_mom_offset",
-        "flapwise_bend_mom_offset_crosstalk_corrected",
-        mode="before",
-    )
+    @field_validator("blade", "edgewise_bend_mom_crosstalk_corrected", "edgewise_bend_mom_offset", "edgewise_bend_mom_offset_crosstalk_corrected", "edgewisewise_bend_mom", "flapwise_bend_mom", "flapwise_bend_mom_crosstalk_corrected", "flapwise_bend_mom_offset", "flapwise_bend_mom_offset_crosstalk_corrected", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
+
     def as_write(self) -> SensorPositionWrite:
         """Convert this read version of sensor position to the writing version."""
         return SensorPositionWrite.model_validate(as_write_args(self))
+
 
 
 class SensorPositionWrite(DomainModelWrite):
@@ -225,66 +190,25 @@ class SensorPositionWrite(DomainModelWrite):
         flapwise_bend_mom_offset_crosstalk_corrected: The flapwise bend mom offset crosstalk corrected field.
         position: The position field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "blade",
-        "edgewise_bend_mom_crosstalk_corrected",
-        "edgewise_bend_mom_offset",
-        "edgewise_bend_mom_offset_crosstalk_corrected",
-        "edgewisewise_bend_mom",
-        "flapwise_bend_mom",
-        "flapwise_bend_mom_crosstalk_corrected",
-        "flapwise_bend_mom_offset",
-        "flapwise_bend_mom_offset_crosstalk_corrected",
-        "position",
-    )
-    _direct_relations: ClassVar[tuple[str, ...]] = (
-        "blade",
-        "edgewise_bend_mom_crosstalk_corrected",
-        "edgewise_bend_mom_offset",
-        "edgewise_bend_mom_offset_crosstalk_corrected",
-        "edgewisewise_bend_mom",
-        "flapwise_bend_mom",
-        "flapwise_bend_mom_crosstalk_corrected",
-        "flapwise_bend_mom_offset",
-        "flapwise_bend_mom_offset_crosstalk_corrected",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("blade", "edgewise_bend_mom_crosstalk_corrected", "edgewise_bend_mom_offset", "edgewise_bend_mom_offset_crosstalk_corrected", "edgewisewise_bend_mom", "flapwise_bend_mom", "flapwise_bend_mom_crosstalk_corrected", "flapwise_bend_mom_offset", "flapwise_bend_mom_offset_crosstalk_corrected", "position",)
+    _direct_relations: ClassVar[tuple[str, ...]] = ("blade", "edgewise_bend_mom_crosstalk_corrected", "edgewise_bend_mom_offset", "edgewise_bend_mom_offset_crosstalk_corrected", "edgewisewise_bend_mom", "flapwise_bend_mom", "flapwise_bend_mom_crosstalk_corrected", "flapwise_bend_mom_offset", "flapwise_bend_mom_offset_crosstalk_corrected",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "SensorPosition", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     blade: Union[BladeWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    edgewise_bend_mom_crosstalk_corrected: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(
-        default=None, repr=False
-    )
+    edgewise_bend_mom_crosstalk_corrected: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     edgewise_bend_mom_offset: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    edgewise_bend_mom_offset_crosstalk_corrected: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(
-        default=None, repr=False
-    )
+    edgewise_bend_mom_offset_crosstalk_corrected: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     edgewisewise_bend_mom: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     flapwise_bend_mom: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    flapwise_bend_mom_crosstalk_corrected: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(
-        default=None, repr=False
-    )
+    flapwise_bend_mom_crosstalk_corrected: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     flapwise_bend_mom_offset: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    flapwise_bend_mom_offset_crosstalk_corrected: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(
-        default=None, repr=False
-    )
+    flapwise_bend_mom_offset_crosstalk_corrected: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     position: Optional[float] = None
 
-    @field_validator(
-        "blade",
-        "edgewise_bend_mom_crosstalk_corrected",
-        "edgewise_bend_mom_offset",
-        "edgewise_bend_mom_offset_crosstalk_corrected",
-        "edgewisewise_bend_mom",
-        "flapwise_bend_mom",
-        "flapwise_bend_mom_crosstalk_corrected",
-        "flapwise_bend_mom_offset",
-        "flapwise_bend_mom_offset_crosstalk_corrected",
-        mode="before",
-    )
+    @field_validator("blade", "edgewise_bend_mom_crosstalk_corrected", "edgewise_bend_mom_offset", "edgewise_bend_mom_offset_crosstalk_corrected", "edgewisewise_bend_mom", "flapwise_bend_mom", "flapwise_bend_mom_crosstalk_corrected", "flapwise_bend_mom_offset", "flapwise_bend_mom_offset_crosstalk_corrected", mode="before")
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):
             return dm.NodeId(value.space, value.external_id)
@@ -299,288 +223,101 @@ class SensorPositionList(DomainModelList[SensorPosition]):
     """List of sensor positions in the read version."""
 
     _INSTANCE = SensorPosition
-
     def as_write(self) -> SensorPositionWriteList:
         """Convert these read versions of sensor position to the writing versions."""
         return SensorPositionWriteList([node.as_write() for node in self.data])
 
+
     @property
     def blade(self) -> BladeList:
         from ._blade import Blade, BladeList
-
         return BladeList([item.blade for item in self.data if isinstance(item.blade, Blade)])
-
     @property
     def edgewise_bend_mom_crosstalk_corrected(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [
-                item.edgewise_bend_mom_crosstalk_corrected
-                for item in self.data
-                if isinstance(item.edgewise_bend_mom_crosstalk_corrected, SensorTimeSeries)
-            ]
-        )
-
+        return SensorTimeSeriesList([item.edgewise_bend_mom_crosstalk_corrected for item in self.data if isinstance(item.edgewise_bend_mom_crosstalk_corrected, SensorTimeSeries)])
     @property
     def edgewise_bend_mom_offset(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [
-                item.edgewise_bend_mom_offset
-                for item in self.data
-                if isinstance(item.edgewise_bend_mom_offset, SensorTimeSeries)
-            ]
-        )
-
+        return SensorTimeSeriesList([item.edgewise_bend_mom_offset for item in self.data if isinstance(item.edgewise_bend_mom_offset, SensorTimeSeries)])
     @property
     def edgewise_bend_mom_offset_crosstalk_corrected(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [
-                item.edgewise_bend_mom_offset_crosstalk_corrected
-                for item in self.data
-                if isinstance(item.edgewise_bend_mom_offset_crosstalk_corrected, SensorTimeSeries)
-            ]
-        )
-
+        return SensorTimeSeriesList([item.edgewise_bend_mom_offset_crosstalk_corrected for item in self.data if isinstance(item.edgewise_bend_mom_offset_crosstalk_corrected, SensorTimeSeries)])
     @property
     def edgewisewise_bend_mom(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [
-                item.edgewisewise_bend_mom
-                for item in self.data
-                if isinstance(item.edgewisewise_bend_mom, SensorTimeSeries)
-            ]
-        )
-
+        return SensorTimeSeriesList([item.edgewisewise_bend_mom for item in self.data if isinstance(item.edgewisewise_bend_mom, SensorTimeSeries)])
     @property
     def flapwise_bend_mom(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [item.flapwise_bend_mom for item in self.data if isinstance(item.flapwise_bend_mom, SensorTimeSeries)]
-        )
-
+        return SensorTimeSeriesList([item.flapwise_bend_mom for item in self.data if isinstance(item.flapwise_bend_mom, SensorTimeSeries)])
     @property
     def flapwise_bend_mom_crosstalk_corrected(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [
-                item.flapwise_bend_mom_crosstalk_corrected
-                for item in self.data
-                if isinstance(item.flapwise_bend_mom_crosstalk_corrected, SensorTimeSeries)
-            ]
-        )
-
+        return SensorTimeSeriesList([item.flapwise_bend_mom_crosstalk_corrected for item in self.data if isinstance(item.flapwise_bend_mom_crosstalk_corrected, SensorTimeSeries)])
     @property
     def flapwise_bend_mom_offset(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [
-                item.flapwise_bend_mom_offset
-                for item in self.data
-                if isinstance(item.flapwise_bend_mom_offset, SensorTimeSeries)
-            ]
-        )
-
+        return SensorTimeSeriesList([item.flapwise_bend_mom_offset for item in self.data if isinstance(item.flapwise_bend_mom_offset, SensorTimeSeries)])
     @property
     def flapwise_bend_mom_offset_crosstalk_corrected(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [
-                item.flapwise_bend_mom_offset_crosstalk_corrected
-                for item in self.data
-                if isinstance(item.flapwise_bend_mom_offset_crosstalk_corrected, SensorTimeSeries)
-            ]
-        )
-
+        return SensorTimeSeriesList([item.flapwise_bend_mom_offset_crosstalk_corrected for item in self.data if isinstance(item.flapwise_bend_mom_offset_crosstalk_corrected, SensorTimeSeries)])
 
 class SensorPositionWriteList(DomainModelWriteList[SensorPositionWrite]):
     """List of sensor positions in the writing version."""
 
     _INSTANCE = SensorPositionWrite
-
     @property
     def blade(self) -> BladeWriteList:
         from ._blade import BladeWrite, BladeWriteList
-
         return BladeWriteList([item.blade for item in self.data if isinstance(item.blade, BladeWrite)])
-
     @property
     def edgewise_bend_mom_crosstalk_corrected(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [
-                item.edgewise_bend_mom_crosstalk_corrected
-                for item in self.data
-                if isinstance(item.edgewise_bend_mom_crosstalk_corrected, SensorTimeSeriesWrite)
-            ]
-        )
-
+        return SensorTimeSeriesWriteList([item.edgewise_bend_mom_crosstalk_corrected for item in self.data if isinstance(item.edgewise_bend_mom_crosstalk_corrected, SensorTimeSeriesWrite)])
     @property
     def edgewise_bend_mom_offset(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [
-                item.edgewise_bend_mom_offset
-                for item in self.data
-                if isinstance(item.edgewise_bend_mom_offset, SensorTimeSeriesWrite)
-            ]
-        )
-
+        return SensorTimeSeriesWriteList([item.edgewise_bend_mom_offset for item in self.data if isinstance(item.edgewise_bend_mom_offset, SensorTimeSeriesWrite)])
     @property
     def edgewise_bend_mom_offset_crosstalk_corrected(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [
-                item.edgewise_bend_mom_offset_crosstalk_corrected
-                for item in self.data
-                if isinstance(item.edgewise_bend_mom_offset_crosstalk_corrected, SensorTimeSeriesWrite)
-            ]
-        )
-
+        return SensorTimeSeriesWriteList([item.edgewise_bend_mom_offset_crosstalk_corrected for item in self.data if isinstance(item.edgewise_bend_mom_offset_crosstalk_corrected, SensorTimeSeriesWrite)])
     @property
     def edgewisewise_bend_mom(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [
-                item.edgewisewise_bend_mom
-                for item in self.data
-                if isinstance(item.edgewisewise_bend_mom, SensorTimeSeriesWrite)
-            ]
-        )
-
+        return SensorTimeSeriesWriteList([item.edgewisewise_bend_mom for item in self.data if isinstance(item.edgewisewise_bend_mom, SensorTimeSeriesWrite)])
     @property
     def flapwise_bend_mom(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [item.flapwise_bend_mom for item in self.data if isinstance(item.flapwise_bend_mom, SensorTimeSeriesWrite)]
-        )
-
+        return SensorTimeSeriesWriteList([item.flapwise_bend_mom for item in self.data if isinstance(item.flapwise_bend_mom, SensorTimeSeriesWrite)])
     @property
     def flapwise_bend_mom_crosstalk_corrected(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [
-                item.flapwise_bend_mom_crosstalk_corrected
-                for item in self.data
-                if isinstance(item.flapwise_bend_mom_crosstalk_corrected, SensorTimeSeriesWrite)
-            ]
-        )
-
+        return SensorTimeSeriesWriteList([item.flapwise_bend_mom_crosstalk_corrected for item in self.data if isinstance(item.flapwise_bend_mom_crosstalk_corrected, SensorTimeSeriesWrite)])
     @property
     def flapwise_bend_mom_offset(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [
-                item.flapwise_bend_mom_offset
-                for item in self.data
-                if isinstance(item.flapwise_bend_mom_offset, SensorTimeSeriesWrite)
-            ]
-        )
-
+        return SensorTimeSeriesWriteList([item.flapwise_bend_mom_offset for item in self.data if isinstance(item.flapwise_bend_mom_offset, SensorTimeSeriesWrite)])
     @property
     def flapwise_bend_mom_offset_crosstalk_corrected(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [
-                item.flapwise_bend_mom_offset_crosstalk_corrected
-                for item in self.data
-                if isinstance(item.flapwise_bend_mom_offset_crosstalk_corrected, SensorTimeSeriesWrite)
-            ]
-        )
+        return SensorTimeSeriesWriteList([item.flapwise_bend_mom_offset_crosstalk_corrected for item in self.data if isinstance(item.flapwise_bend_mom_offset_crosstalk_corrected, SensorTimeSeriesWrite)])
 
 
 def _create_sensor_position_filter(
     view_id: dm.ViewId,
-    blade: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    edgewise_bend_mom_crosstalk_corrected: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    edgewise_bend_mom_offset: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    edgewise_bend_mom_offset_crosstalk_corrected: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    edgewisewise_bend_mom: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    flapwise_bend_mom: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    flapwise_bend_mom_crosstalk_corrected: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    flapwise_bend_mom_offset: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    flapwise_bend_mom_offset_crosstalk_corrected: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    blade: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    edgewise_bend_mom_crosstalk_corrected: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    edgewise_bend_mom_offset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    edgewise_bend_mom_offset_crosstalk_corrected: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    edgewisewise_bend_mom: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    flapwise_bend_mom: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    flapwise_bend_mom_crosstalk_corrected: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    flapwise_bend_mom_offset: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    flapwise_bend_mom_offset_crosstalk_corrected: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     min_position: float | None = None,
     max_position: float | None = None,
     external_id_prefix: str | None = None,
@@ -591,171 +328,39 @@ def _create_sensor_position_filter(
     if isinstance(blade, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(blade):
         filters.append(dm.filters.Equals(view_id.as_property_ref("blade"), value=as_instance_dict_id(blade)))
     if blade and isinstance(blade, Sequence) and not isinstance(blade, str) and not is_tuple_id(blade):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("blade"), values=[as_instance_dict_id(item) for item in blade])
-        )
-    if isinstance(edgewise_bend_mom_crosstalk_corrected, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
-        edgewise_bend_mom_crosstalk_corrected
-    ):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("edgewise_bend_mom_crosstalk_corrected"),
-                value=as_instance_dict_id(edgewise_bend_mom_crosstalk_corrected),
-            )
-        )
-    if (
-        edgewise_bend_mom_crosstalk_corrected
-        and isinstance(edgewise_bend_mom_crosstalk_corrected, Sequence)
-        and not isinstance(edgewise_bend_mom_crosstalk_corrected, str)
-        and not is_tuple_id(edgewise_bend_mom_crosstalk_corrected)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("edgewise_bend_mom_crosstalk_corrected"),
-                values=[as_instance_dict_id(item) for item in edgewise_bend_mom_crosstalk_corrected],
-            )
-        )
-    if isinstance(edgewise_bend_mom_offset, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
-        edgewise_bend_mom_offset
-    ):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("edgewise_bend_mom_offset"), value=as_instance_dict_id(edgewise_bend_mom_offset)
-            )
-        )
-    if (
-        edgewise_bend_mom_offset
-        and isinstance(edgewise_bend_mom_offset, Sequence)
-        and not isinstance(edgewise_bend_mom_offset, str)
-        and not is_tuple_id(edgewise_bend_mom_offset)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("edgewise_bend_mom_offset"),
-                values=[as_instance_dict_id(item) for item in edgewise_bend_mom_offset],
-            )
-        )
-    if isinstance(
-        edgewise_bend_mom_offset_crosstalk_corrected, str | dm.NodeId | dm.DirectRelationReference
-    ) or is_tuple_id(edgewise_bend_mom_offset_crosstalk_corrected):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("edgewise_bend_mom_offset_crosstalk_corrected"),
-                value=as_instance_dict_id(edgewise_bend_mom_offset_crosstalk_corrected),
-            )
-        )
-    if (
-        edgewise_bend_mom_offset_crosstalk_corrected
-        and isinstance(edgewise_bend_mom_offset_crosstalk_corrected, Sequence)
-        and not isinstance(edgewise_bend_mom_offset_crosstalk_corrected, str)
-        and not is_tuple_id(edgewise_bend_mom_offset_crosstalk_corrected)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("edgewise_bend_mom_offset_crosstalk_corrected"),
-                values=[as_instance_dict_id(item) for item in edgewise_bend_mom_offset_crosstalk_corrected],
-            )
-        )
-    if isinstance(edgewisewise_bend_mom, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
-        edgewisewise_bend_mom
-    ):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("edgewisewise_bend_mom"), value=as_instance_dict_id(edgewisewise_bend_mom)
-            )
-        )
-    if (
-        edgewisewise_bend_mom
-        and isinstance(edgewisewise_bend_mom, Sequence)
-        and not isinstance(edgewisewise_bend_mom, str)
-        and not is_tuple_id(edgewisewise_bend_mom)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("edgewisewise_bend_mom"),
-                values=[as_instance_dict_id(item) for item in edgewisewise_bend_mom],
-            )
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("blade"), values=[as_instance_dict_id(item) for item in blade]))
+    if isinstance(edgewise_bend_mom_crosstalk_corrected, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(edgewise_bend_mom_crosstalk_corrected):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("edgewise_bend_mom_crosstalk_corrected"), value=as_instance_dict_id(edgewise_bend_mom_crosstalk_corrected)))
+    if edgewise_bend_mom_crosstalk_corrected and isinstance(edgewise_bend_mom_crosstalk_corrected, Sequence) and not isinstance(edgewise_bend_mom_crosstalk_corrected, str) and not is_tuple_id(edgewise_bend_mom_crosstalk_corrected):
+        filters.append(dm.filters.In(view_id.as_property_ref("edgewise_bend_mom_crosstalk_corrected"), values=[as_instance_dict_id(item) for item in edgewise_bend_mom_crosstalk_corrected]))
+    if isinstance(edgewise_bend_mom_offset, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(edgewise_bend_mom_offset):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("edgewise_bend_mom_offset"), value=as_instance_dict_id(edgewise_bend_mom_offset)))
+    if edgewise_bend_mom_offset and isinstance(edgewise_bend_mom_offset, Sequence) and not isinstance(edgewise_bend_mom_offset, str) and not is_tuple_id(edgewise_bend_mom_offset):
+        filters.append(dm.filters.In(view_id.as_property_ref("edgewise_bend_mom_offset"), values=[as_instance_dict_id(item) for item in edgewise_bend_mom_offset]))
+    if isinstance(edgewise_bend_mom_offset_crosstalk_corrected, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(edgewise_bend_mom_offset_crosstalk_corrected):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("edgewise_bend_mom_offset_crosstalk_corrected"), value=as_instance_dict_id(edgewise_bend_mom_offset_crosstalk_corrected)))
+    if edgewise_bend_mom_offset_crosstalk_corrected and isinstance(edgewise_bend_mom_offset_crosstalk_corrected, Sequence) and not isinstance(edgewise_bend_mom_offset_crosstalk_corrected, str) and not is_tuple_id(edgewise_bend_mom_offset_crosstalk_corrected):
+        filters.append(dm.filters.In(view_id.as_property_ref("edgewise_bend_mom_offset_crosstalk_corrected"), values=[as_instance_dict_id(item) for item in edgewise_bend_mom_offset_crosstalk_corrected]))
+    if isinstance(edgewisewise_bend_mom, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(edgewisewise_bend_mom):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("edgewisewise_bend_mom"), value=as_instance_dict_id(edgewisewise_bend_mom)))
+    if edgewisewise_bend_mom and isinstance(edgewisewise_bend_mom, Sequence) and not isinstance(edgewisewise_bend_mom, str) and not is_tuple_id(edgewisewise_bend_mom):
+        filters.append(dm.filters.In(view_id.as_property_ref("edgewisewise_bend_mom"), values=[as_instance_dict_id(item) for item in edgewisewise_bend_mom]))
     if isinstance(flapwise_bend_mom, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(flapwise_bend_mom):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("flapwise_bend_mom"), value=as_instance_dict_id(flapwise_bend_mom)
-            )
-        )
-    if (
-        flapwise_bend_mom
-        and isinstance(flapwise_bend_mom, Sequence)
-        and not isinstance(flapwise_bend_mom, str)
-        and not is_tuple_id(flapwise_bend_mom)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("flapwise_bend_mom"),
-                values=[as_instance_dict_id(item) for item in flapwise_bend_mom],
-            )
-        )
-    if isinstance(flapwise_bend_mom_crosstalk_corrected, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
-        flapwise_bend_mom_crosstalk_corrected
-    ):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("flapwise_bend_mom_crosstalk_corrected"),
-                value=as_instance_dict_id(flapwise_bend_mom_crosstalk_corrected),
-            )
-        )
-    if (
-        flapwise_bend_mom_crosstalk_corrected
-        and isinstance(flapwise_bend_mom_crosstalk_corrected, Sequence)
-        and not isinstance(flapwise_bend_mom_crosstalk_corrected, str)
-        and not is_tuple_id(flapwise_bend_mom_crosstalk_corrected)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("flapwise_bend_mom_crosstalk_corrected"),
-                values=[as_instance_dict_id(item) for item in flapwise_bend_mom_crosstalk_corrected],
-            )
-        )
-    if isinstance(flapwise_bend_mom_offset, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
-        flapwise_bend_mom_offset
-    ):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("flapwise_bend_mom_offset"), value=as_instance_dict_id(flapwise_bend_mom_offset)
-            )
-        )
-    if (
-        flapwise_bend_mom_offset
-        and isinstance(flapwise_bend_mom_offset, Sequence)
-        and not isinstance(flapwise_bend_mom_offset, str)
-        and not is_tuple_id(flapwise_bend_mom_offset)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("flapwise_bend_mom_offset"),
-                values=[as_instance_dict_id(item) for item in flapwise_bend_mom_offset],
-            )
-        )
-    if isinstance(
-        flapwise_bend_mom_offset_crosstalk_corrected, str | dm.NodeId | dm.DirectRelationReference
-    ) or is_tuple_id(flapwise_bend_mom_offset_crosstalk_corrected):
-        filters.append(
-            dm.filters.Equals(
-                view_id.as_property_ref("flapwise_bend_mom_offset_crosstalk_corrected"),
-                value=as_instance_dict_id(flapwise_bend_mom_offset_crosstalk_corrected),
-            )
-        )
-    if (
-        flapwise_bend_mom_offset_crosstalk_corrected
-        and isinstance(flapwise_bend_mom_offset_crosstalk_corrected, Sequence)
-        and not isinstance(flapwise_bend_mom_offset_crosstalk_corrected, str)
-        and not is_tuple_id(flapwise_bend_mom_offset_crosstalk_corrected)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("flapwise_bend_mom_offset_crosstalk_corrected"),
-                values=[as_instance_dict_id(item) for item in flapwise_bend_mom_offset_crosstalk_corrected],
-            )
-        )
+        filters.append(dm.filters.Equals(view_id.as_property_ref("flapwise_bend_mom"), value=as_instance_dict_id(flapwise_bend_mom)))
+    if flapwise_bend_mom and isinstance(flapwise_bend_mom, Sequence) and not isinstance(flapwise_bend_mom, str) and not is_tuple_id(flapwise_bend_mom):
+        filters.append(dm.filters.In(view_id.as_property_ref("flapwise_bend_mom"), values=[as_instance_dict_id(item) for item in flapwise_bend_mom]))
+    if isinstance(flapwise_bend_mom_crosstalk_corrected, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(flapwise_bend_mom_crosstalk_corrected):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("flapwise_bend_mom_crosstalk_corrected"), value=as_instance_dict_id(flapwise_bend_mom_crosstalk_corrected)))
+    if flapwise_bend_mom_crosstalk_corrected and isinstance(flapwise_bend_mom_crosstalk_corrected, Sequence) and not isinstance(flapwise_bend_mom_crosstalk_corrected, str) and not is_tuple_id(flapwise_bend_mom_crosstalk_corrected):
+        filters.append(dm.filters.In(view_id.as_property_ref("flapwise_bend_mom_crosstalk_corrected"), values=[as_instance_dict_id(item) for item in flapwise_bend_mom_crosstalk_corrected]))
+    if isinstance(flapwise_bend_mom_offset, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(flapwise_bend_mom_offset):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("flapwise_bend_mom_offset"), value=as_instance_dict_id(flapwise_bend_mom_offset)))
+    if flapwise_bend_mom_offset and isinstance(flapwise_bend_mom_offset, Sequence) and not isinstance(flapwise_bend_mom_offset, str) and not is_tuple_id(flapwise_bend_mom_offset):
+        filters.append(dm.filters.In(view_id.as_property_ref("flapwise_bend_mom_offset"), values=[as_instance_dict_id(item) for item in flapwise_bend_mom_offset]))
+    if isinstance(flapwise_bend_mom_offset_crosstalk_corrected, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(flapwise_bend_mom_offset_crosstalk_corrected):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("flapwise_bend_mom_offset_crosstalk_corrected"), value=as_instance_dict_id(flapwise_bend_mom_offset_crosstalk_corrected)))
+    if flapwise_bend_mom_offset_crosstalk_corrected and isinstance(flapwise_bend_mom_offset_crosstalk_corrected, Sequence) and not isinstance(flapwise_bend_mom_offset_crosstalk_corrected, str) and not is_tuple_id(flapwise_bend_mom_offset_crosstalk_corrected):
+        filters.append(dm.filters.In(view_id.as_property_ref("flapwise_bend_mom_offset_crosstalk_corrected"), values=[as_instance_dict_id(item) for item in flapwise_bend_mom_offset_crosstalk_corrected]))
     if min_position is not None or max_position is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("position"), gte=min_position, lte=max_position))
     if external_id_prefix is not None:
@@ -931,45 +536,29 @@ class _SensorPositionQuery(NodeQueryCore[T_DomainModelList, SensorPositionList])
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.blade_filter = DirectRelationFilter(self, self._view_id.as_property_ref("blade"))
-        self.edgewise_bend_mom_crosstalk_corrected_filter = DirectRelationFilter(
-            self, self._view_id.as_property_ref("edgewise_bend_mom_crosstalk_corrected")
-        )
-        self.edgewise_bend_mom_offset_filter = DirectRelationFilter(
-            self, self._view_id.as_property_ref("edgewise_bend_mom_offset")
-        )
-        self.edgewise_bend_mom_offset_crosstalk_corrected_filter = DirectRelationFilter(
-            self, self._view_id.as_property_ref("edgewise_bend_mom_offset_crosstalk_corrected")
-        )
-        self.edgewisewise_bend_mom_filter = DirectRelationFilter(
-            self, self._view_id.as_property_ref("edgewisewise_bend_mom")
-        )
+        self.edgewise_bend_mom_crosstalk_corrected_filter = DirectRelationFilter(self, self._view_id.as_property_ref("edgewise_bend_mom_crosstalk_corrected"))
+        self.edgewise_bend_mom_offset_filter = DirectRelationFilter(self, self._view_id.as_property_ref("edgewise_bend_mom_offset"))
+        self.edgewise_bend_mom_offset_crosstalk_corrected_filter = DirectRelationFilter(self, self._view_id.as_property_ref("edgewise_bend_mom_offset_crosstalk_corrected"))
+        self.edgewisewise_bend_mom_filter = DirectRelationFilter(self, self._view_id.as_property_ref("edgewisewise_bend_mom"))
         self.flapwise_bend_mom_filter = DirectRelationFilter(self, self._view_id.as_property_ref("flapwise_bend_mom"))
-        self.flapwise_bend_mom_crosstalk_corrected_filter = DirectRelationFilter(
-            self, self._view_id.as_property_ref("flapwise_bend_mom_crosstalk_corrected")
-        )
-        self.flapwise_bend_mom_offset_filter = DirectRelationFilter(
-            self, self._view_id.as_property_ref("flapwise_bend_mom_offset")
-        )
-        self.flapwise_bend_mom_offset_crosstalk_corrected_filter = DirectRelationFilter(
-            self, self._view_id.as_property_ref("flapwise_bend_mom_offset_crosstalk_corrected")
-        )
+        self.flapwise_bend_mom_crosstalk_corrected_filter = DirectRelationFilter(self, self._view_id.as_property_ref("flapwise_bend_mom_crosstalk_corrected"))
+        self.flapwise_bend_mom_offset_filter = DirectRelationFilter(self, self._view_id.as_property_ref("flapwise_bend_mom_offset"))
+        self.flapwise_bend_mom_offset_crosstalk_corrected_filter = DirectRelationFilter(self, self._view_id.as_property_ref("flapwise_bend_mom_offset_crosstalk_corrected"))
         self.position = FloatFilter(self, self._view_id.as_property_ref("position"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.blade_filter,
-                self.edgewise_bend_mom_crosstalk_corrected_filter,
-                self.edgewise_bend_mom_offset_filter,
-                self.edgewise_bend_mom_offset_crosstalk_corrected_filter,
-                self.edgewisewise_bend_mom_filter,
-                self.flapwise_bend_mom_filter,
-                self.flapwise_bend_mom_crosstalk_corrected_filter,
-                self.flapwise_bend_mom_offset_filter,
-                self.flapwise_bend_mom_offset_crosstalk_corrected_filter,
-                self.position,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.blade_filter,
+            self.edgewise_bend_mom_crosstalk_corrected_filter,
+            self.edgewise_bend_mom_offset_filter,
+            self.edgewise_bend_mom_offset_crosstalk_corrected_filter,
+            self.edgewisewise_bend_mom_filter,
+            self.flapwise_bend_mom_filter,
+            self.flapwise_bend_mom_crosstalk_corrected_filter,
+            self.flapwise_bend_mom_offset_filter,
+            self.flapwise_bend_mom_offset_crosstalk_corrected_filter,
+            self.position,
+        ])
 
     def list_sensor_position(self, limit: int = DEFAULT_QUERY_LIMIT) -> SensorPositionList:
         return self._list(limit=limit)

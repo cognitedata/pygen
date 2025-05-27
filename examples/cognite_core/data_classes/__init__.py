@@ -17,331 +17,42 @@ from cognite_core.data_classes._core import (
     SequenceColumnGraphQL,
     SequenceGraphQL,
 )
-from ._cognite_360_image import (
-    Cognite360Image,
-    Cognite360ImageFields,
-    Cognite360ImageGraphQL,
-    Cognite360ImageList,
-    Cognite360ImageTextFields,
-    Cognite360ImageWrite,
-    Cognite360ImageWriteList,
-)
-from ._cognite_360_image_annotation import (
-    Cognite360ImageAnnotation,
-    Cognite360ImageAnnotationFields,
-    Cognite360ImageAnnotationGraphQL,
-    Cognite360ImageAnnotationList,
-    Cognite360ImageAnnotationTextFields,
-    Cognite360ImageAnnotationWrite,
-    Cognite360ImageAnnotationWriteList,
-)
-from ._cognite_360_image_collection import (
-    Cognite360ImageCollection,
-    Cognite360ImageCollectionFields,
-    Cognite360ImageCollectionGraphQL,
-    Cognite360ImageCollectionList,
-    Cognite360ImageCollectionTextFields,
-    Cognite360ImageCollectionWrite,
-    Cognite360ImageCollectionWriteList,
-)
-from ._cognite_360_image_model import (
-    Cognite360ImageModel,
-    Cognite360ImageModelFields,
-    Cognite360ImageModelGraphQL,
-    Cognite360ImageModelList,
-    Cognite360ImageModelTextFields,
-    Cognite360ImageModelWrite,
-    Cognite360ImageModelWriteList,
-)
-from ._cognite_360_image_station import (
-    Cognite360ImageStation,
-    Cognite360ImageStationFields,
-    Cognite360ImageStationGraphQL,
-    Cognite360ImageStationList,
-    Cognite360ImageStationTextFields,
-    Cognite360ImageStationWrite,
-    Cognite360ImageStationWriteList,
-)
-from ._cognite_3_d_model import (
-    Cognite3DModel,
-    Cognite3DModelFields,
-    Cognite3DModelGraphQL,
-    Cognite3DModelList,
-    Cognite3DModelTextFields,
-    Cognite3DModelWrite,
-    Cognite3DModelWriteList,
-)
-from ._cognite_3_d_object import (
-    Cognite3DObject,
-    Cognite3DObjectFields,
-    Cognite3DObjectGraphQL,
-    Cognite3DObjectList,
-    Cognite3DObjectTextFields,
-    Cognite3DObjectWrite,
-    Cognite3DObjectWriteList,
-)
-from ._cognite_3_d_revision import (
-    Cognite3DRevision,
-    Cognite3DRevisionFields,
-    Cognite3DRevisionGraphQL,
-    Cognite3DRevisionList,
-    Cognite3DRevisionTextFields,
-    Cognite3DRevisionWrite,
-    Cognite3DRevisionWriteList,
-)
-from ._cognite_3_d_transformation_edge import (
-    Cognite3DTransformationEdge,
-    Cognite3DTransformationEdgeFields,
-    Cognite3DTransformationEdgeGraphQL,
-    Cognite3DTransformationEdgeList,
-    Cognite3DTransformationEdgeTextFields,
-    Cognite3DTransformationEdgeWrite,
-    Cognite3DTransformationEdgeWriteList,
-)
-from ._cognite_3_d_transformation_node import (
-    Cognite3DTransformationNode,
-    Cognite3DTransformationNodeFields,
-    Cognite3DTransformationNodeGraphQL,
-    Cognite3DTransformationNodeList,
-    Cognite3DTransformationNodeTextFields,
-    Cognite3DTransformationNodeWrite,
-    Cognite3DTransformationNodeWriteList,
-)
-from ._cognite_activity import (
-    CogniteActivity,
-    CogniteActivityFields,
-    CogniteActivityGraphQL,
-    CogniteActivityList,
-    CogniteActivityTextFields,
-    CogniteActivityWrite,
-    CogniteActivityWriteList,
-)
-from ._cognite_annotation import (
-    CogniteAnnotation,
-    CogniteAnnotationFields,
-    CogniteAnnotationGraphQL,
-    CogniteAnnotationList,
-    CogniteAnnotationTextFields,
-    CogniteAnnotationWrite,
-    CogniteAnnotationWriteList,
-)
-from ._cognite_asset import (
-    CogniteAsset,
-    CogniteAssetFields,
-    CogniteAssetGraphQL,
-    CogniteAssetList,
-    CogniteAssetTextFields,
-    CogniteAssetWrite,
-    CogniteAssetWriteList,
-)
-from ._cognite_asset_class import (
-    CogniteAssetClass,
-    CogniteAssetClassFields,
-    CogniteAssetClassGraphQL,
-    CogniteAssetClassList,
-    CogniteAssetClassTextFields,
-    CogniteAssetClassWrite,
-    CogniteAssetClassWriteList,
-)
-from ._cognite_asset_type import (
-    CogniteAssetType,
-    CogniteAssetTypeFields,
-    CogniteAssetTypeGraphQL,
-    CogniteAssetTypeList,
-    CogniteAssetTypeTextFields,
-    CogniteAssetTypeWrite,
-    CogniteAssetTypeWriteList,
-)
-from ._cognite_cad_model import (
-    CogniteCADModel,
-    CogniteCADModelFields,
-    CogniteCADModelGraphQL,
-    CogniteCADModelList,
-    CogniteCADModelTextFields,
-    CogniteCADModelWrite,
-    CogniteCADModelWriteList,
-)
-from ._cognite_cad_node import (
-    CogniteCADNode,
-    CogniteCADNodeFields,
-    CogniteCADNodeGraphQL,
-    CogniteCADNodeList,
-    CogniteCADNodeTextFields,
-    CogniteCADNodeWrite,
-    CogniteCADNodeWriteList,
-)
-from ._cognite_cad_revision import (
-    CogniteCADRevision,
-    CogniteCADRevisionFields,
-    CogniteCADRevisionGraphQL,
-    CogniteCADRevisionList,
-    CogniteCADRevisionTextFields,
-    CogniteCADRevisionWrite,
-    CogniteCADRevisionWriteList,
-)
-from ._cognite_cube_map import (
-    CogniteCubeMap,
-    CogniteCubeMapFields,
-    CogniteCubeMapGraphQL,
-    CogniteCubeMapList,
-    CogniteCubeMapTextFields,
-    CogniteCubeMapWrite,
-    CogniteCubeMapWriteList,
-)
-from ._cognite_describable_edge import (
-    CogniteDescribableEdge,
-    CogniteDescribableEdgeFields,
-    CogniteDescribableEdgeGraphQL,
-    CogniteDescribableEdgeList,
-    CogniteDescribableEdgeTextFields,
-    CogniteDescribableEdgeWrite,
-    CogniteDescribableEdgeWriteList,
-)
-from ._cognite_describable_node import (
-    CogniteDescribableNode,
-    CogniteDescribableNodeFields,
-    CogniteDescribableNodeGraphQL,
-    CogniteDescribableNodeList,
-    CogniteDescribableNodeTextFields,
-    CogniteDescribableNodeWrite,
-    CogniteDescribableNodeWriteList,
-)
-from ._cognite_diagram_annotation import (
-    CogniteDiagramAnnotation,
-    CogniteDiagramAnnotationFields,
-    CogniteDiagramAnnotationGraphQL,
-    CogniteDiagramAnnotationList,
-    CogniteDiagramAnnotationTextFields,
-    CogniteDiagramAnnotationWrite,
-    CogniteDiagramAnnotationWriteList,
-)
-from ._cognite_equipment import (
-    CogniteEquipment,
-    CogniteEquipmentFields,
-    CogniteEquipmentGraphQL,
-    CogniteEquipmentList,
-    CogniteEquipmentTextFields,
-    CogniteEquipmentWrite,
-    CogniteEquipmentWriteList,
-)
-from ._cognite_equipment_type import (
-    CogniteEquipmentType,
-    CogniteEquipmentTypeFields,
-    CogniteEquipmentTypeGraphQL,
-    CogniteEquipmentTypeList,
-    CogniteEquipmentTypeTextFields,
-    CogniteEquipmentTypeWrite,
-    CogniteEquipmentTypeWriteList,
-)
-from ._cognite_file import (
-    CogniteFile,
-    CogniteFileFields,
-    CogniteFileGraphQL,
-    CogniteFileList,
-    CogniteFileTextFields,
-    CogniteFileWrite,
-    CogniteFileWriteList,
-)
-from ._cognite_file_category import (
-    CogniteFileCategory,
-    CogniteFileCategoryFields,
-    CogniteFileCategoryGraphQL,
-    CogniteFileCategoryList,
-    CogniteFileCategoryTextFields,
-    CogniteFileCategoryWrite,
-    CogniteFileCategoryWriteList,
-)
-from ._cognite_point_cloud_model import (
-    CognitePointCloudModel,
-    CognitePointCloudModelFields,
-    CognitePointCloudModelGraphQL,
-    CognitePointCloudModelList,
-    CognitePointCloudModelTextFields,
-    CognitePointCloudModelWrite,
-    CognitePointCloudModelWriteList,
-)
-from ._cognite_point_cloud_revision import (
-    CognitePointCloudRevision,
-    CognitePointCloudRevisionFields,
-    CognitePointCloudRevisionGraphQL,
-    CognitePointCloudRevisionList,
-    CognitePointCloudRevisionTextFields,
-    CognitePointCloudRevisionWrite,
-    CognitePointCloudRevisionWriteList,
-)
-from ._cognite_point_cloud_volume import (
-    CognitePointCloudVolume,
-    CognitePointCloudVolumeFields,
-    CognitePointCloudVolumeGraphQL,
-    CognitePointCloudVolumeList,
-    CognitePointCloudVolumeTextFields,
-    CognitePointCloudVolumeWrite,
-    CognitePointCloudVolumeWriteList,
-)
-from ._cognite_schedulable import (
-    CogniteSchedulable,
-    CogniteSchedulableFields,
-    CogniteSchedulableGraphQL,
-    CogniteSchedulableList,
-    CogniteSchedulableTextFields,
-    CogniteSchedulableWrite,
-    CogniteSchedulableWriteList,
-)
-from ._cognite_source_system import (
-    CogniteSourceSystem,
-    CogniteSourceSystemFields,
-    CogniteSourceSystemGraphQL,
-    CogniteSourceSystemList,
-    CogniteSourceSystemTextFields,
-    CogniteSourceSystemWrite,
-    CogniteSourceSystemWriteList,
-)
-from ._cognite_sourceable_edge import (
-    CogniteSourceableEdge,
-    CogniteSourceableEdgeFields,
-    CogniteSourceableEdgeGraphQL,
-    CogniteSourceableEdgeList,
-    CogniteSourceableEdgeTextFields,
-    CogniteSourceableEdgeWrite,
-    CogniteSourceableEdgeWriteList,
-)
-from ._cognite_sourceable_node import (
-    CogniteSourceableNode,
-    CogniteSourceableNodeFields,
-    CogniteSourceableNodeGraphQL,
-    CogniteSourceableNodeList,
-    CogniteSourceableNodeTextFields,
-    CogniteSourceableNodeWrite,
-    CogniteSourceableNodeWriteList,
-)
-from ._cognite_time_series import (
-    CogniteTimeSeries,
-    CogniteTimeSeriesFields,
-    CogniteTimeSeriesGraphQL,
-    CogniteTimeSeriesList,
-    CogniteTimeSeriesTextFields,
-    CogniteTimeSeriesWrite,
-    CogniteTimeSeriesWriteList,
-)
-from ._cognite_unit import (
-    CogniteUnit,
-    CogniteUnitFields,
-    CogniteUnitGraphQL,
-    CogniteUnitList,
-    CogniteUnitTextFields,
-    CogniteUnitWrite,
-    CogniteUnitWriteList,
-)
-from ._cognite_visualizable import (
-    CogniteVisualizable,
-    CogniteVisualizableFields,
-    CogniteVisualizableGraphQL,
-    CogniteVisualizableList,
-    CogniteVisualizableTextFields,
-    CogniteVisualizableWrite,
-    CogniteVisualizableWriteList,
-)
-
+from ._cognite_360_image import Cognite360Image, Cognite360ImageFields, Cognite360ImageGraphQL, Cognite360ImageList, Cognite360ImageTextFields, Cognite360ImageWrite, Cognite360ImageWriteList
+from ._cognite_360_image_annotation import Cognite360ImageAnnotation, Cognite360ImageAnnotationFields, Cognite360ImageAnnotationGraphQL, Cognite360ImageAnnotationList, Cognite360ImageAnnotationTextFields, Cognite360ImageAnnotationWrite, Cognite360ImageAnnotationWriteList
+from ._cognite_360_image_collection import Cognite360ImageCollection, Cognite360ImageCollectionFields, Cognite360ImageCollectionGraphQL, Cognite360ImageCollectionList, Cognite360ImageCollectionTextFields, Cognite360ImageCollectionWrite, Cognite360ImageCollectionWriteList
+from ._cognite_360_image_model import Cognite360ImageModel, Cognite360ImageModelFields, Cognite360ImageModelGraphQL, Cognite360ImageModelList, Cognite360ImageModelTextFields, Cognite360ImageModelWrite, Cognite360ImageModelWriteList
+from ._cognite_360_image_station import Cognite360ImageStation, Cognite360ImageStationFields, Cognite360ImageStationGraphQL, Cognite360ImageStationList, Cognite360ImageStationTextFields, Cognite360ImageStationWrite, Cognite360ImageStationWriteList
+from ._cognite_3_d_model import Cognite3DModel, Cognite3DModelFields, Cognite3DModelGraphQL, Cognite3DModelList, Cognite3DModelTextFields, Cognite3DModelWrite, Cognite3DModelWriteList
+from ._cognite_3_d_object import Cognite3DObject, Cognite3DObjectFields, Cognite3DObjectGraphQL, Cognite3DObjectList, Cognite3DObjectTextFields, Cognite3DObjectWrite, Cognite3DObjectWriteList
+from ._cognite_3_d_revision import Cognite3DRevision, Cognite3DRevisionFields, Cognite3DRevisionGraphQL, Cognite3DRevisionList, Cognite3DRevisionTextFields, Cognite3DRevisionWrite, Cognite3DRevisionWriteList
+from ._cognite_3_d_transformation_edge import Cognite3DTransformationEdge, Cognite3DTransformationEdgeFields, Cognite3DTransformationEdgeGraphQL, Cognite3DTransformationEdgeList, Cognite3DTransformationEdgeTextFields, Cognite3DTransformationEdgeWrite, Cognite3DTransformationEdgeWriteList
+from ._cognite_3_d_transformation_node import Cognite3DTransformationNode, Cognite3DTransformationNodeFields, Cognite3DTransformationNodeGraphQL, Cognite3DTransformationNodeList, Cognite3DTransformationNodeTextFields, Cognite3DTransformationNodeWrite, Cognite3DTransformationNodeWriteList
+from ._cognite_activity import CogniteActivity, CogniteActivityFields, CogniteActivityGraphQL, CogniteActivityList, CogniteActivityTextFields, CogniteActivityWrite, CogniteActivityWriteList
+from ._cognite_annotation import CogniteAnnotation, CogniteAnnotationFields, CogniteAnnotationGraphQL, CogniteAnnotationList, CogniteAnnotationTextFields, CogniteAnnotationWrite, CogniteAnnotationWriteList
+from ._cognite_asset import CogniteAsset, CogniteAssetFields, CogniteAssetGraphQL, CogniteAssetList, CogniteAssetTextFields, CogniteAssetWrite, CogniteAssetWriteList
+from ._cognite_asset_class import CogniteAssetClass, CogniteAssetClassFields, CogniteAssetClassGraphQL, CogniteAssetClassList, CogniteAssetClassTextFields, CogniteAssetClassWrite, CogniteAssetClassWriteList
+from ._cognite_asset_type import CogniteAssetType, CogniteAssetTypeFields, CogniteAssetTypeGraphQL, CogniteAssetTypeList, CogniteAssetTypeTextFields, CogniteAssetTypeWrite, CogniteAssetTypeWriteList
+from ._cognite_cad_model import CogniteCADModel, CogniteCADModelFields, CogniteCADModelGraphQL, CogniteCADModelList, CogniteCADModelTextFields, CogniteCADModelWrite, CogniteCADModelWriteList
+from ._cognite_cad_node import CogniteCADNode, CogniteCADNodeFields, CogniteCADNodeGraphQL, CogniteCADNodeList, CogniteCADNodeTextFields, CogniteCADNodeWrite, CogniteCADNodeWriteList
+from ._cognite_cad_revision import CogniteCADRevision, CogniteCADRevisionFields, CogniteCADRevisionGraphQL, CogniteCADRevisionList, CogniteCADRevisionTextFields, CogniteCADRevisionWrite, CogniteCADRevisionWriteList
+from ._cognite_cube_map import CogniteCubeMap, CogniteCubeMapFields, CogniteCubeMapGraphQL, CogniteCubeMapList, CogniteCubeMapTextFields, CogniteCubeMapWrite, CogniteCubeMapWriteList
+from ._cognite_describable_edge import CogniteDescribableEdge, CogniteDescribableEdgeFields, CogniteDescribableEdgeGraphQL, CogniteDescribableEdgeList, CogniteDescribableEdgeTextFields, CogniteDescribableEdgeWrite, CogniteDescribableEdgeWriteList
+from ._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeFields, CogniteDescribableNodeGraphQL, CogniteDescribableNodeList, CogniteDescribableNodeTextFields, CogniteDescribableNodeWrite, CogniteDescribableNodeWriteList
+from ._cognite_diagram_annotation import CogniteDiagramAnnotation, CogniteDiagramAnnotationFields, CogniteDiagramAnnotationGraphQL, CogniteDiagramAnnotationList, CogniteDiagramAnnotationTextFields, CogniteDiagramAnnotationWrite, CogniteDiagramAnnotationWriteList
+from ._cognite_equipment import CogniteEquipment, CogniteEquipmentFields, CogniteEquipmentGraphQL, CogniteEquipmentList, CogniteEquipmentTextFields, CogniteEquipmentWrite, CogniteEquipmentWriteList
+from ._cognite_equipment_type import CogniteEquipmentType, CogniteEquipmentTypeFields, CogniteEquipmentTypeGraphQL, CogniteEquipmentTypeList, CogniteEquipmentTypeTextFields, CogniteEquipmentTypeWrite, CogniteEquipmentTypeWriteList
+from ._cognite_file import CogniteFile, CogniteFileFields, CogniteFileGraphQL, CogniteFileList, CogniteFileTextFields, CogniteFileWrite, CogniteFileWriteList
+from ._cognite_file_category import CogniteFileCategory, CogniteFileCategoryFields, CogniteFileCategoryGraphQL, CogniteFileCategoryList, CogniteFileCategoryTextFields, CogniteFileCategoryWrite, CogniteFileCategoryWriteList
+from ._cognite_point_cloud_model import CognitePointCloudModel, CognitePointCloudModelFields, CognitePointCloudModelGraphQL, CognitePointCloudModelList, CognitePointCloudModelTextFields, CognitePointCloudModelWrite, CognitePointCloudModelWriteList
+from ._cognite_point_cloud_revision import CognitePointCloudRevision, CognitePointCloudRevisionFields, CognitePointCloudRevisionGraphQL, CognitePointCloudRevisionList, CognitePointCloudRevisionTextFields, CognitePointCloudRevisionWrite, CognitePointCloudRevisionWriteList
+from ._cognite_point_cloud_volume import CognitePointCloudVolume, CognitePointCloudVolumeFields, CognitePointCloudVolumeGraphQL, CognitePointCloudVolumeList, CognitePointCloudVolumeTextFields, CognitePointCloudVolumeWrite, CognitePointCloudVolumeWriteList
+from ._cognite_schedulable import CogniteSchedulable, CogniteSchedulableFields, CogniteSchedulableGraphQL, CogniteSchedulableList, CogniteSchedulableTextFields, CogniteSchedulableWrite, CogniteSchedulableWriteList
+from ._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemFields, CogniteSourceSystemGraphQL, CogniteSourceSystemList, CogniteSourceSystemTextFields, CogniteSourceSystemWrite, CogniteSourceSystemWriteList
+from ._cognite_sourceable_edge import CogniteSourceableEdge, CogniteSourceableEdgeFields, CogniteSourceableEdgeGraphQL, CogniteSourceableEdgeList, CogniteSourceableEdgeTextFields, CogniteSourceableEdgeWrite, CogniteSourceableEdgeWriteList
+from ._cognite_sourceable_node import CogniteSourceableNode, CogniteSourceableNodeFields, CogniteSourceableNodeGraphQL, CogniteSourceableNodeList, CogniteSourceableNodeTextFields, CogniteSourceableNodeWrite, CogniteSourceableNodeWriteList
+from ._cognite_time_series import CogniteTimeSeries, CogniteTimeSeriesFields, CogniteTimeSeriesGraphQL, CogniteTimeSeriesList, CogniteTimeSeriesTextFields, CogniteTimeSeriesWrite, CogniteTimeSeriesWriteList
+from ._cognite_unit import CogniteUnit, CogniteUnitFields, CogniteUnitGraphQL, CogniteUnitList, CogniteUnitTextFields, CogniteUnitWrite, CogniteUnitWriteList
+from ._cognite_visualizable import CogniteVisualizable, CogniteVisualizableFields, CogniteVisualizableGraphQL, CogniteVisualizableList, CogniteVisualizableTextFields, CogniteVisualizableWrite, CogniteVisualizableWriteList
 Cognite360Image.model_rebuild()
 Cognite360ImageGraphQL.model_rebuild()
 Cognite360ImageWrite.model_rebuild()

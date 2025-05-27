@@ -18,134 +18,21 @@ from wind_turbine.data_classes._core import (
     SequenceGraphQL,
 )
 from ._blade import Blade, BladeFields, BladeGraphQL, BladeList, BladeTextFields, BladeWrite, BladeWriteList
-from ._data_sheet import (
-    DataSheet,
-    DataSheetFields,
-    DataSheetGraphQL,
-    DataSheetList,
-    DataSheetTextFields,
-    DataSheetWrite,
-    DataSheetWriteList,
-)
-from ._distance import (
-    Distance,
-    DistanceFields,
-    DistanceGraphQL,
-    DistanceList,
-    DistanceTextFields,
-    DistanceWrite,
-    DistanceWriteList,
-)
-from ._gearbox import (
-    Gearbox,
-    GearboxFields,
-    GearboxGraphQL,
-    GearboxList,
-    GearboxTextFields,
-    GearboxWrite,
-    GearboxWriteList,
-)
-from ._generating_unit import (
-    GeneratingUnit,
-    GeneratingUnitFields,
-    GeneratingUnitGraphQL,
-    GeneratingUnitList,
-    GeneratingUnitTextFields,
-    GeneratingUnitWrite,
-    GeneratingUnitWriteList,
-)
-from ._generator import (
-    Generator,
-    GeneratorFields,
-    GeneratorGraphQL,
-    GeneratorList,
-    GeneratorTextFields,
-    GeneratorWrite,
-    GeneratorWriteList,
-)
-from ._high_speed_shaft import (
-    HighSpeedShaft,
-    HighSpeedShaftFields,
-    HighSpeedShaftGraphQL,
-    HighSpeedShaftList,
-    HighSpeedShaftTextFields,
-    HighSpeedShaftWrite,
-    HighSpeedShaftWriteList,
-)
-from ._main_shaft import (
-    MainShaft,
-    MainShaftFields,
-    MainShaftGraphQL,
-    MainShaftList,
-    MainShaftTextFields,
-    MainShaftWrite,
-    MainShaftWriteList,
-)
-from ._metmast import (
-    Metmast,
-    MetmastFields,
-    MetmastGraphQL,
-    MetmastList,
-    MetmastTextFields,
-    MetmastWrite,
-    MetmastWriteList,
-)
-from ._nacelle import (
-    Nacelle,
-    NacelleFields,
-    NacelleGraphQL,
-    NacelleList,
-    NacelleTextFields,
-    NacelleWrite,
-    NacelleWriteList,
-)
-from ._power_inverter import (
-    PowerInverter,
-    PowerInverterFields,
-    PowerInverterGraphQL,
-    PowerInverterList,
-    PowerInverterTextFields,
-    PowerInverterWrite,
-    PowerInverterWriteList,
-)
+from ._data_sheet import DataSheet, DataSheetFields, DataSheetGraphQL, DataSheetList, DataSheetTextFields, DataSheetWrite, DataSheetWriteList
+from ._distance import Distance, DistanceFields, DistanceGraphQL, DistanceList, DistanceTextFields, DistanceWrite, DistanceWriteList
+from ._gearbox import Gearbox, GearboxFields, GearboxGraphQL, GearboxList, GearboxTextFields, GearboxWrite, GearboxWriteList
+from ._generating_unit import GeneratingUnit, GeneratingUnitFields, GeneratingUnitGraphQL, GeneratingUnitList, GeneratingUnitTextFields, GeneratingUnitWrite, GeneratingUnitWriteList
+from ._generator import Generator, GeneratorFields, GeneratorGraphQL, GeneratorList, GeneratorTextFields, GeneratorWrite, GeneratorWriteList
+from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftFields, HighSpeedShaftGraphQL, HighSpeedShaftList, HighSpeedShaftTextFields, HighSpeedShaftWrite, HighSpeedShaftWriteList
+from ._main_shaft import MainShaft, MainShaftFields, MainShaftGraphQL, MainShaftList, MainShaftTextFields, MainShaftWrite, MainShaftWriteList
+from ._metmast import Metmast, MetmastFields, MetmastGraphQL, MetmastList, MetmastTextFields, MetmastWrite, MetmastWriteList
+from ._nacelle import Nacelle, NacelleFields, NacelleGraphQL, NacelleList, NacelleTextFields, NacelleWrite, NacelleWriteList
+from ._power_inverter import PowerInverter, PowerInverterFields, PowerInverterGraphQL, PowerInverterList, PowerInverterTextFields, PowerInverterWrite, PowerInverterWriteList
 from ._rotor import Rotor, RotorFields, RotorGraphQL, RotorList, RotorTextFields, RotorWrite, RotorWriteList
-from ._sensor_position import (
-    SensorPosition,
-    SensorPositionFields,
-    SensorPositionGraphQL,
-    SensorPositionList,
-    SensorPositionTextFields,
-    SensorPositionWrite,
-    SensorPositionWriteList,
-)
-from ._sensor_time_series import (
-    SensorTimeSeries,
-    SensorTimeSeriesFields,
-    SensorTimeSeriesGraphQL,
-    SensorTimeSeriesList,
-    SensorTimeSeriesTextFields,
-    SensorTimeSeriesWrite,
-    SensorTimeSeriesWriteList,
-)
-from ._solar_panel import (
-    SolarPanel,
-    SolarPanelFields,
-    SolarPanelGraphQL,
-    SolarPanelList,
-    SolarPanelTextFields,
-    SolarPanelWrite,
-    SolarPanelWriteList,
-)
-from ._wind_turbine import (
-    WindTurbine,
-    WindTurbineFields,
-    WindTurbineGraphQL,
-    WindTurbineList,
-    WindTurbineTextFields,
-    WindTurbineWrite,
-    WindTurbineWriteList,
-)
-
+from ._sensor_position import SensorPosition, SensorPositionFields, SensorPositionGraphQL, SensorPositionList, SensorPositionTextFields, SensorPositionWrite, SensorPositionWriteList
+from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesFields, SensorTimeSeriesGraphQL, SensorTimeSeriesList, SensorTimeSeriesTextFields, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
+from ._solar_panel import SolarPanel, SolarPanelFields, SolarPanelGraphQL, SolarPanelList, SolarPanelTextFields, SolarPanelWrite, SolarPanelWriteList
+from ._wind_turbine import WindTurbine, WindTurbineFields, WindTurbineGraphQL, WindTurbineList, WindTurbineTextFields, WindTurbineWrite, WindTurbineWriteList
 Blade.model_rebuild()
 BladeGraphQL.model_rebuild()
 BladeWrite.model_rebuild()

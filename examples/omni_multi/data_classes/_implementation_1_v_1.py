@@ -32,6 +32,7 @@ from omni_multi.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    
 )
 
 
@@ -88,6 +89,8 @@ class Implementation1v1GraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> Implementation1v1:
         """Convert this GraphQL format of implementation 1 v 1 to the reading format."""
         return Implementation1v1.model_validate(as_read_args(self))
@@ -119,9 +122,11 @@ class Implementation1v1(DomainModel):
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
+
     def as_write(self) -> Implementation1v1Write:
         """Convert this read version of implementation 1 v 1 to the writing version."""
         return Implementation1v1Write.model_validate(as_write_args(self))
+
 
 
 class Implementation1v1Write(DomainModelWrite):
@@ -137,32 +142,26 @@ class Implementation1v1Write(DomainModelWrite):
         value_1: The value 1 field.
         value_2: The value 2 field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "main_value",
-        "value_1",
-        "value_2",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("main_value", "value_1", "value_2",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models-other", "Implementation1", "1")
 
     space: str
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "Implementation1"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("pygen-models", "Implementation1")
     main_value: Optional[str] = Field(None, alias="mainValue")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
+
 
 
 class Implementation1v1List(DomainModelList[Implementation1v1]):
     """List of implementation 1 v 1 in the read version."""
 
     _INSTANCE = Implementation1v1
-
     def as_write(self) -> Implementation1v1WriteList:
         """Convert these read versions of implementation 1 v 1 to the writing versions."""
         return Implementation1v1WriteList([node.as_write() for node in self.data])
+
 
 
 class Implementation1v1WriteList(DomainModelWriteList[Implementation1v1Write]):
@@ -249,15 +248,13 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
         self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.main_value,
-                self.value_1,
-                self.value_2,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.main_value,
+            self.value_1,
+            self.value_2,
+        ])
 
     def list_implementation_1_v_1(self, limit: int = DEFAULT_QUERY_LIMIT) -> Implementation1v1List:
         return self._list(limit=limit)

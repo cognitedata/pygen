@@ -46,15 +46,8 @@ from wind_turbine.data_classes._core import (
     ViewPropertyId,
     FloatFilter,
 )
-
 if TYPE_CHECKING:
-    from wind_turbine.data_classes._distance import (
-        Distance,
-        DistanceList,
-        DistanceGraphQL,
-        DistanceWrite,
-        DistanceWriteList,
-    )
+    from wind_turbine.data_classes._distance import Distance, DistanceList, DistanceGraphQL, DistanceWrite, DistanceWriteList
 
 
 __all__ = [
@@ -115,6 +108,7 @@ class MetmastGraphQL(GraphQLCore):
             )
         return values
 
+
     @field_validator("wind_turbines", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -170,6 +164,7 @@ class Metmast(DomainModel):
         return MetmastWrite.model_validate(as_write_args(self))
 
 
+
 class MetmastWrite(DomainModelWrite):
     """This represents the writing version of metmast.
 
@@ -185,16 +180,8 @@ class MetmastWrite(DomainModelWrite):
         wind_speed: The wind speed field.
         wind_turbines: The wind turbine field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "position",
-        "temperature",
-        "tilt_angle",
-        "wind_speed",
-    )
-    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
-        ("wind_turbines", dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance")),
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("position", "temperature", "tilt_angle", "wind_speed",)
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (("wind_turbines", dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance")),)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Metmast", "1")
 
@@ -221,32 +208,26 @@ class MetmastList(DomainModelList[Metmast]):
     """List of metmasts in the read version."""
 
     _INSTANCE = Metmast
-
     def as_write(self) -> MetmastWriteList:
         """Convert these read versions of metmast to the writing versions."""
         return MetmastWriteList([node.as_write() for node in self.data])
 
+
     @property
     def wind_turbines(self) -> DistanceList:
         from ._distance import Distance, DistanceList
-
-        return DistanceList(
-            [item for items in self.data for item in items.wind_turbines or [] if isinstance(item, Distance)]
-        )
+        return DistanceList([item for items in self.data for item in items.wind_turbines or [] if isinstance(item, Distance)])
 
 
 class MetmastWriteList(DomainModelWriteList[MetmastWrite]):
     """List of metmasts in the writing version."""
 
     _INSTANCE = MetmastWrite
-
     @property
     def wind_turbines(self) -> DistanceWriteList:
         from ._distance import DistanceWrite, DistanceWriteList
+        return DistanceWriteList([item for items in self.data for item in items.wind_turbines or [] if isinstance(item, DistanceWrite)])
 
-        return DistanceWriteList(
-            [item for items in self.data for item in items.wind_turbines or [] if isinstance(item, DistanceWrite)]
-        )
 
 
 def _create_metmast_filter(
@@ -322,40 +303,29 @@ class _MetmastQuery(NodeQueryCore[T_DomainModelList, MetmastList]):
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.position = FloatFilter(self, self._view_id.as_property_ref("position"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.position,
-            ]
-        )
-        self.temperature = TimeSeriesReferenceAPI(
-            client,
-            lambda limit: [
-                item.temperature if isinstance(item.temperature, str) else item.temperature.external_id  # type: ignore[misc]
-                for item in self._list(limit=limit)
-                if item.temperature is not None
-                and (isinstance(item.temperature, str) or item.temperature.external_id is not None)
-            ],
-        )
-        self.tilt_angle = TimeSeriesReferenceAPI(
-            client,
-            lambda limit: [
-                item.tilt_angle if isinstance(item.tilt_angle, str) else item.tilt_angle.external_id  # type: ignore[misc]
-                for item in self._list(limit=limit)
-                if item.tilt_angle is not None
-                and (isinstance(item.tilt_angle, str) or item.tilt_angle.external_id is not None)
-            ],
-        )
-        self.wind_speed = TimeSeriesReferenceAPI(
-            client,
-            lambda limit: [
-                item.wind_speed if isinstance(item.wind_speed, str) else item.wind_speed.external_id  # type: ignore[misc]
-                for item in self._list(limit=limit)
-                if item.wind_speed is not None
-                and (isinstance(item.wind_speed, str) or item.wind_speed.external_id is not None)
-            ],
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.position,
+        ])
+        self.temperature = TimeSeriesReferenceAPI(client,  lambda limit: [
+            item.temperature if isinstance(item.temperature, str) else item.temperature.external_id #type: ignore[misc]
+            for item in self._list(limit=limit)
+            if item.temperature is not None and
+               (isinstance(item.temperature, str) or item.temperature.external_id is not None)
+        ])
+        self.tilt_angle = TimeSeriesReferenceAPI(client,  lambda limit: [
+            item.tilt_angle if isinstance(item.tilt_angle, str) else item.tilt_angle.external_id #type: ignore[misc]
+            for item in self._list(limit=limit)
+            if item.tilt_angle is not None and
+               (isinstance(item.tilt_angle, str) or item.tilt_angle.external_id is not None)
+        ])
+        self.wind_speed = TimeSeriesReferenceAPI(client,  lambda limit: [
+            item.wind_speed if isinstance(item.wind_speed, str) else item.wind_speed.external_id #type: ignore[misc]
+            for item in self._list(limit=limit)
+            if item.wind_speed is not None and
+               (isinstance(item.wind_speed, str) or item.wind_speed.external_id is not None)
+        ])
 
     def list_metmast(self, limit: int = DEFAULT_QUERY_LIMIT) -> MetmastList:
         return self._list(limit=limit)

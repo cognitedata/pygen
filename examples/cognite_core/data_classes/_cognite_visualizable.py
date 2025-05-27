@@ -35,15 +35,8 @@ from cognite_core.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
-
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_3_d_object import (
-        Cognite3DObject,
-        Cognite3DObjectList,
-        Cognite3DObjectGraphQL,
-        Cognite3DObjectWrite,
-        Cognite3DObjectWriteList,
-    )
+    from cognite_core.data_classes._cognite_3_d_object import Cognite3DObject, Cognite3DObjectList, Cognite3DObjectGraphQL, Cognite3DObjectWrite, Cognite3DObjectWriteList
 
 
 __all__ = [
@@ -55,8 +48,8 @@ __all__ = [
 ]
 
 
-CogniteVisualizableTextFields = Literal["external_id",]
-CogniteVisualizableFields = Literal["external_id",]
+CogniteVisualizableTextFields = Literal["external_id", ]
+CogniteVisualizableFields = Literal["external_id", ]
 
 _COGNITEVISUALIZABLE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -89,6 +82,7 @@ class CogniteVisualizableGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
 
     @field_validator("object_3d", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
@@ -124,15 +118,16 @@ class CogniteVisualizable(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     object_3d: Union[Cognite3DObject, str, dm.NodeId, None] = Field(default=None, repr=False, alias="object3D")
-
     @field_validator("object_3d", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
+
     def as_write(self) -> CogniteVisualizableWrite:
         """Convert this read version of Cognite visualizable to the writing version."""
         return CogniteVisualizableWrite.model_validate(as_write_args(self))
+
 
 
 class CogniteVisualizableWrite(DomainModelWrite):
@@ -146,7 +141,6 @@ class CogniteVisualizableWrite(DomainModelWrite):
         data_record: The data record of the Cognite visualizable node.
         object_3d: Direct relation to an Object3D instance representing the 3D resource
     """
-
     _container_fields: ClassVar[tuple[str, ...]] = ("object_3d",)
     _direct_relations: ClassVar[tuple[str, ...]] = ("object_3d",)
 
@@ -171,44 +165,29 @@ class CogniteVisualizableList(DomainModelList[CogniteVisualizable]):
     """List of Cognite visualizables in the read version."""
 
     _INSTANCE = CogniteVisualizable
-
     def as_write(self) -> CogniteVisualizableWriteList:
         """Convert these read versions of Cognite visualizable to the writing versions."""
         return CogniteVisualizableWriteList([node.as_write() for node in self.data])
 
+
     @property
     def object_3d(self) -> Cognite3DObjectList:
         from ._cognite_3_d_object import Cognite3DObject, Cognite3DObjectList
-
-        return Cognite3DObjectList(
-            [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObject)]
-        )
-
+        return Cognite3DObjectList([item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObject)])
 
 class CogniteVisualizableWriteList(DomainModelWriteList[CogniteVisualizableWrite]):
     """List of Cognite visualizables in the writing version."""
 
     _INSTANCE = CogniteVisualizableWrite
-
     @property
     def object_3d(self) -> Cognite3DObjectWriteList:
         from ._cognite_3_d_object import Cognite3DObjectWrite, Cognite3DObjectWriteList
-
-        return Cognite3DObjectWriteList(
-            [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)]
-        )
+        return Cognite3DObjectWriteList([item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)])
 
 
 def _create_cognite_visualizable_filter(
     view_id: dm.ViewId,
-    object_3d: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -217,9 +196,7 @@ def _create_cognite_visualizable_filter(
     if isinstance(object_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(object_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("object3D"), value=as_instance_dict_id(object_3d)))
     if object_3d and isinstance(object_3d, Sequence) and not isinstance(object_3d, str) and not is_tuple_id(object_3d):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("object3D"), values=[as_instance_dict_id(item) for item in object_3d])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("object3D"), values=[as_instance_dict_id(item) for item in object_3d]))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -280,13 +257,11 @@ class _CogniteVisualizableQuery(NodeQueryCore[T_DomainModelList, CogniteVisualiz
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.object_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("object3D"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.object_3d_filter,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.object_3d_filter,
+        ])
 
     def list_cognite_visualizable(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteVisualizableList:
         return self._list(limit=limit)

@@ -115,20 +115,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         properties: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        self_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        other_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        self_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -208,20 +196,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         search_property: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        self_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        other_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        self_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -240,20 +216,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         search_property: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        self_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        other_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        self_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -265,31 +229,17 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields],
         property: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        self_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        other_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        self_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -300,31 +250,17 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields] | None = None,
         property: ConnectionItemAFields | SequenceNotStr[ConnectionItemAFields] | None = None,
         query: str | None = None,
         search_property: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        self_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        other_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        self_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -400,20 +336,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         search_property: ConnectionItemATextFields | SequenceNotStr[ConnectionItemATextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        self_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        other_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        self_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -480,15 +404,13 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=sort,
-                limit=limit,
-                max_retrieve_batch_limit=chunk_size,
-                has_container_fields=True,
-            )
-        )
+        builder.append(factory.root(
+            filter=filter_,
+            sort=sort,
+            limit=limit,
+            max_retrieve_batch_limit=chunk_size,
+            has_container_fields=True,
+        ))
         if retrieve_connections == "identifier" or retrieve_connections == "full":
             builder.extend(
                 factory.from_edge(
@@ -521,20 +443,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         chunk_size: int = DEFAULT_CHUNK_SIZE,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        self_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        other_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        self_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -627,20 +537,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
         self,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        other_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        self_direct: (
-            tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        other_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        self_direct: tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
         properties_: str | list[str] | None = None,
         properties_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -700,7 +598,8 @@ class ConnectionItemAAPI(NodeAPI[ConnectionItemA, ConnectionItemAWrite, Connecti
             space,
             filter,
         )
-        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(limit=limit, filter=filter_, sort=sort_input)
+            return self._list(limit=limit,  filter=filter_, sort=sort_input)
         return self._query(filter_, limit, retrieve_connections, sort_input, "list")
+

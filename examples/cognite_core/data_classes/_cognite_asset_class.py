@@ -32,6 +32,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -98,6 +99,8 @@ class CogniteAssetClassGraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> CogniteAssetClass:
         """Convert this GraphQL format of Cognite asset clas to the reading format."""
         return CogniteAssetClass.model_validate(as_read_args(self))
@@ -130,9 +133,11 @@ class CogniteAssetClass(CogniteDescribableNode):
     code: Optional[str] = None
     standard: Optional[str] = None
 
+
     def as_write(self) -> CogniteAssetClassWrite:
         """Convert this read version of Cognite asset clas to the writing version."""
         return CogniteAssetClassWrite.model_validate(as_write_args(self))
+
 
 
 class CogniteAssetClassWrite(CogniteDescribableNodeWrite):
@@ -151,15 +156,7 @@ class CogniteAssetClassWrite(CogniteDescribableNodeWrite):
         standard: A text string to specify which standard the class is from.
         tags: Text based labels for generic use, limited to 1000
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "aliases",
-        "code",
-        "description",
-        "name",
-        "standard",
-        "tags",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "code", "description", "name", "standard", "tags",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAssetClass", "v1")
 
@@ -168,14 +165,15 @@ class CogniteAssetClassWrite(CogniteDescribableNodeWrite):
     standard: Optional[str] = None
 
 
+
 class CogniteAssetClassList(DomainModelList[CogniteAssetClass]):
     """List of Cognite asset class in the read version."""
 
     _INSTANCE = CogniteAssetClass
-
     def as_write(self) -> CogniteAssetClassWriteList:
         """Convert these read versions of Cognite asset clas to the writing versions."""
         return CogniteAssetClassWriteList([node.as_write() for node in self.data])
+
 
 
 class CogniteAssetClassWriteList(DomainModelWriteList[CogniteAssetClassWrite]):
@@ -271,16 +269,14 @@ class _CogniteAssetClassQuery(NodeQueryCore[T_DomainModelList, CogniteAssetClass
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.standard = StringFilter(self, self._view_id.as_property_ref("standard"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.code,
-                self.description,
-                self.name,
-                self.standard,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.code,
+            self.description,
+            self.name,
+            self.standard,
+        ])
 
     def list_cognite_asset_clas(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteAssetClassList:
         return self._list(limit=limit)

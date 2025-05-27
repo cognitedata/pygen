@@ -37,39 +37,17 @@ from cognite_core.data_classes._core import (
     DirectRelationFilter,
     TimestampFilter,
 )
-
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_source_system import (
-        CogniteSourceSystem,
-        CogniteSourceSystemGraphQL,
-        CogniteSourceSystemWrite,
-    )
+    from cognite_core.data_classes._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemGraphQL, CogniteSourceSystemWrite
 
 
 __all__ = [
-    "CogniteSourceableEdge",
-    "CogniteSourceableEdgeWrite",
-    "CogniteSourceableEdgeList",
-    "CogniteSourceableEdgeWriteList",
-    "CogniteSourceableEdgeFields",
-    "CogniteSourceableEdgeTextFields",
-]
+    "CogniteSourceableEdge",    "CogniteSourceableEdgeWrite",    "CogniteSourceableEdgeList",    "CogniteSourceableEdgeWriteList",    "CogniteSourceableEdgeFields",    "CogniteSourceableEdgeTextFields",]
 
 
-CogniteSourceableEdgeTextFields = Literal[
-    "external_id", "source_context", "source_created_user", "source_id", "source_updated_user"
-]
-CogniteSourceableEdgeFields = Literal[
-    "external_id",
-    "source_context",
-    "source_created_time",
-    "source_created_user",
-    "source_id",
-    "source_updated_time",
-    "source_updated_user",
-]
-_COGNITESOURCEABLEEDGE_PROPERTIES_BY_FIELD = {
-    "external_id": "externalId",
+CogniteSourceableEdgeTextFields = Literal["external_id", "source_context", "source_created_user", "source_id", "source_updated_user"]
+CogniteSourceableEdgeFields = Literal["external_id", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user"]
+_COGNITESOURCEABLEEDGE_PROPERTIES_BY_FIELD = {    "external_id": "externalId",
     "source_context": "sourceContext",
     "source_created_time": "sourceCreatedTime",
     "source_created_user": "sourceCreatedUser",
@@ -77,7 +55,6 @@ _COGNITESOURCEABLEEDGE_PROPERTIES_BY_FIELD = {
     "source_updated_time": "sourceUpdatedTime",
     "source_updated_user": "sourceUpdatedUser",
 }
-
 
 class CogniteSourceableEdgeGraphQL(GraphQLCore):
     """This represents the reading version of Cognite sourceable edge, used
@@ -101,7 +78,6 @@ class CogniteSourceableEdgeGraphQL(GraphQLCore):
         source_updated_user: User identifier from the source system on who last updated the source data. This
             identifier is not guaranteed to match the user identifiers in CDF
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
     end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     source: Optional[CogniteSourceSystemGraphQL] = Field(default=None, repr=False)
@@ -142,7 +118,6 @@ class CogniteSourceableEdge(DomainRelation):
         source_updated_user: User identifier from the source system on who last updated the source data. This
             identifier is not guaranteed to match the user identifiers in CDF
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId] = Field(alias="endNode")
@@ -154,6 +129,7 @@ class CogniteSourceableEdge(DomainRelation):
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
 
+
     def as_write(self) -> CogniteSourceableEdgeWrite:
         """Convert this read version of Cognite sourceable edge to the writing version."""
         return CogniteSourceableEdgeWrite.model_validate(as_write_args(self))
@@ -161,8 +137,9 @@ class CogniteSourceableEdge(DomainRelation):
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
-
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
+def _validate_end_node(
+    start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]
+) -> None:
     if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
@@ -199,16 +176,7 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
         source_updated_user: User identifier from the source system on who last updated the source data. This
             identifier is not guaranteed to match the user identifiers in CDF
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "source",
-        "source_context",
-        "source_created_time",
-        "source_created_user",
-        "source_id",
-        "source_updated_time",
-        "source_updated_user",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("source", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user",)
     _direct_relations: ClassVar[tuple[str, ...]] = ("source",)
     _validate_end_node = _validate_end_node
 
@@ -227,10 +195,10 @@ class CogniteSourceableEdgeList(DomainRelationList[CogniteSourceableEdge]):
     """List of Cognite sourceable edges in the reading version."""
 
     _INSTANCE = CogniteSourceableEdge
-
     def as_write(self) -> CogniteSourceableEdgeWriteList:
         """Convert this read version of Cognite sourceable edge list to the writing version."""
         return CogniteSourceableEdgeWriteList([edge.as_write() for edge in self])
+
 
 
 class CogniteSourceableEdgeWriteList(DomainRelationWriteList[CogniteSourceableEdgeWrite]):
@@ -246,14 +214,7 @@ def _create_cognite_sourceable_edge_filter(
     start_node_space: str = DEFAULT_INSTANCE_SPACE,
     end_node: str | list[str] | dm.NodeId | list[dm.NodeId] | None = None,
     space_end_node: str = DEFAULT_INSTANCE_SPACE,
-    source: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     source_context: str | list[str] | None = None,
     source_context_prefix: str | None = None,
     min_source_created_time: datetime.datetime | None = None,
@@ -290,12 +251,9 @@ def _create_cognite_sourceable_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[
-                    (
-                        {"space": start_node_space, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                values=[                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in start_node
                 ],
             )
@@ -310,12 +268,9 @@ def _create_cognite_sourceable_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[
-                    (
-                        {"space": space_end_node, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                values=[                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in end_node
                 ],
             )
@@ -323,9 +278,7 @@ def _create_cognite_sourceable_edge_filter(
     if isinstance(source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(source):
         filters.append(dm.filters.Equals(view_id.as_property_ref("source"), value=as_instance_dict_id(source)))
     if source and isinstance(source, Sequence) and not isinstance(source, str) and not is_tuple_id(source):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source]))
     if isinstance(source_context, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceContext"), value=source_context))
     if source_context and isinstance(source_context, list):
@@ -333,21 +286,13 @@ def _create_cognite_sourceable_edge_filter(
     if source_context_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceContext"), value=source_context_prefix))
     if min_source_created_time is not None or max_source_created_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceCreatedTime"),
-                gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None,
-                lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceCreatedTime"), gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None, lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None))
     if isinstance(source_created_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user))
     if source_created_user and isinstance(source_created_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceCreatedUser"), values=source_created_user))
     if source_created_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix))
     if isinstance(source_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceId"), value=source_id))
     if source_id and isinstance(source_id, list):
@@ -355,21 +300,13 @@ def _create_cognite_sourceable_edge_filter(
     if source_id_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceId"), value=source_id_prefix))
     if min_source_updated_time is not None or max_source_updated_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceUpdatedTime"),
-                gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None,
-                lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceUpdatedTime"), gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None, lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None))
     if isinstance(source_updated_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user))
     if source_updated_user and isinstance(source_updated_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceUpdatedUser"), values=source_updated_user))
     if source_updated_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -399,16 +336,7 @@ class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableE
     ):
         from ._cognite_source_system import _CogniteSourceSystemQuery
 
-        super().__init__(
-            created_types,
-            creation_path,
-            client,
-            result_list_cls,
-            expression,
-            None,
-            connection_name,
-            connection_property,
-        )
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -416,7 +344,7 @@ class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableE
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
-                connection_property=ViewPropertyId(self._view_id, "end_node"),
+                connection_property=ViewPropertyId(self._view_id, "end_node")
             )
 
         if _CogniteSourceSystemQuery not in created_types:
@@ -442,16 +370,14 @@ class _CogniteSourceableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteSourceableE
         self.source_id = StringFilter(self, self._view_id.as_property_ref("sourceId"))
         self.source_updated_time = TimestampFilter(self, self._view_id.as_property_ref("sourceUpdatedTime"))
         self.source_updated_user = StringFilter(self, self._view_id.as_property_ref("sourceUpdatedUser"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.source_filter,
-                self.source_context,
-                self.source_created_time,
-                self.source_created_user,
-                self.source_id,
-                self.source_updated_time,
-                self.source_updated_user,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.source_filter,
+            self.source_context,
+            self.source_created_time,
+            self.source_created_user,
+            self.source_id,
+            self.source_updated_time,
+            self.source_updated_user,
+        ])

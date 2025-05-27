@@ -64,11 +64,7 @@ from cognite_core.data_classes import (
 )
 
 
-class CogniteDescribableNodeAPI(
-    NodeAPI[
-        CogniteDescribableNode, CogniteDescribableNodeWrite, CogniteDescribableNodeList, CogniteDescribableNodeWriteList
-    ]
-):
+class CogniteDescribableNodeAPI(NodeAPI[CogniteDescribableNode, CogniteDescribableNodeWrite, CogniteDescribableNodeList, CogniteDescribableNodeWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITEDESCRIBABLENODE_PROPERTIES_BY_FIELD
     _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
@@ -100,38 +96,13 @@ class CogniteDescribableNodeAPI(
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
+
     @overload
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: (
-            SequenceNotStr[
-                Literal[
-                    "Cognite360ImageCollection",
-                    "Cognite360ImageModel",
-                    "Cognite360ImageStation",
-                    "Cognite3DModel",
-                    "Cognite3DObject",
-                    "CogniteActivity",
-                    "CogniteAsset",
-                    "CogniteAssetClass",
-                    "CogniteAssetType",
-                    "CogniteCADModel",
-                    "CogniteCADNode",
-                    "CogniteEquipment",
-                    "CogniteEquipmentType",
-                    "CogniteFile",
-                    "CogniteFileCategory",
-                    "CognitePointCloudModel",
-                    "CognitePointCloudVolume",
-                    "CogniteSourceSystem",
-                    "CogniteTimeSeries",
-                    "CogniteUnit",
-                ]
-            ]
-            | None
-        ) = None,
+        as_child_class: SequenceNotStr[Literal["Cognite360ImageCollection", "Cognite360ImageModel", "Cognite360ImageStation", "Cognite3DModel", "Cognite3DObject", "CogniteActivity", "CogniteAsset", "CogniteAssetClass", "CogniteAssetType", "CogniteCADModel", "CogniteCADNode", "CogniteEquipment", "CogniteEquipmentType", "CogniteFile", "CogniteFileCategory", "CognitePointCloudModel", "CognitePointCloudVolume", "CogniteSourceSystem", "CogniteTimeSeries", "CogniteUnit"]] | None = None,
     ) -> CogniteDescribableNode | None: ...
 
     @overload
@@ -139,66 +110,14 @@ class CogniteDescribableNodeAPI(
         self,
         external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: (
-            SequenceNotStr[
-                Literal[
-                    "Cognite360ImageCollection",
-                    "Cognite360ImageModel",
-                    "Cognite360ImageStation",
-                    "Cognite3DModel",
-                    "Cognite3DObject",
-                    "CogniteActivity",
-                    "CogniteAsset",
-                    "CogniteAssetClass",
-                    "CogniteAssetType",
-                    "CogniteCADModel",
-                    "CogniteCADNode",
-                    "CogniteEquipment",
-                    "CogniteEquipmentType",
-                    "CogniteFile",
-                    "CogniteFileCategory",
-                    "CognitePointCloudModel",
-                    "CognitePointCloudVolume",
-                    "CogniteSourceSystem",
-                    "CogniteTimeSeries",
-                    "CogniteUnit",
-                ]
-            ]
-            | None
-        ) = None,
+        as_child_class: SequenceNotStr[Literal["Cognite360ImageCollection", "Cognite360ImageModel", "Cognite360ImageStation", "Cognite3DModel", "Cognite3DObject", "CogniteActivity", "CogniteAsset", "CogniteAssetClass", "CogniteAssetType", "CogniteCADModel", "CogniteCADNode", "CogniteEquipment", "CogniteEquipmentType", "CogniteFile", "CogniteFileCategory", "CognitePointCloudModel", "CognitePointCloudVolume", "CogniteSourceSystem", "CogniteTimeSeries", "CogniteUnit"]] | None = None,
     ) -> CogniteDescribableNodeList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: (
-            SequenceNotStr[
-                Literal[
-                    "Cognite360ImageCollection",
-                    "Cognite360ImageModel",
-                    "Cognite360ImageStation",
-                    "Cognite3DModel",
-                    "Cognite3DObject",
-                    "CogniteActivity",
-                    "CogniteAsset",
-                    "CogniteAssetClass",
-                    "CogniteAssetType",
-                    "CogniteCADModel",
-                    "CogniteCADNode",
-                    "CogniteEquipment",
-                    "CogniteEquipmentType",
-                    "CogniteFile",
-                    "CogniteFileCategory",
-                    "CognitePointCloudModel",
-                    "CognitePointCloudVolume",
-                    "CogniteSourceSystem",
-                    "CogniteTimeSeries",
-                    "CogniteUnit",
-                ]
-            ]
-            | None
-        ) = None,
+        as_child_class: SequenceNotStr[Literal["Cognite360ImageCollection", "Cognite360ImageModel", "Cognite360ImageStation", "Cognite3DModel", "Cognite3DObject", "CogniteActivity", "CogniteAsset", "CogniteAssetClass", "CogniteAssetType", "CogniteCADModel", "CogniteCADNode", "CogniteEquipment", "CogniteEquipmentType", "CogniteFile", "CogniteFileCategory", "CognitePointCloudModel", "CognitePointCloudVolume", "CogniteSourceSystem", "CogniteTimeSeries", "CogniteUnit"]] | None = None,
     ) -> CogniteDescribableNode | CogniteDescribableNodeList | None:
         """Retrieve one or more Cognite describable nodes by id(s).
 
@@ -223,7 +142,11 @@ class CogniteDescribableNodeAPI(
                 ... )
 
         """
-        return self._retrieve(external_id, space, as_child_class=as_child_class)
+        return self._retrieve(
+            external_id,
+            space,
+            as_child_class=as_child_class
+        )
 
     def search(
         self,
@@ -303,9 +226,7 @@ class CogniteDescribableNodeAPI(
         group_by: None = None,
         property: CogniteDescribableNodeFields | SequenceNotStr[CogniteDescribableNodeFields] | None = None,
         query: str | None = None,
-        search_property: (
-            CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None
-        ) = None,
+        search_property: CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -323,9 +244,7 @@ class CogniteDescribableNodeAPI(
         group_by: None = None,
         property: CogniteDescribableNodeFields | SequenceNotStr[CogniteDescribableNodeFields] | None = None,
         query: str | None = None,
-        search_property: (
-            CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None
-        ) = None,
+        search_property: CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -339,17 +258,13 @@ class CogniteDescribableNodeAPI(
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: CogniteDescribableNodeFields | SequenceNotStr[CogniteDescribableNodeFields],
         property: CogniteDescribableNodeFields | SequenceNotStr[CogniteDescribableNodeFields] | None = None,
         query: str | None = None,
-        search_property: (
-            CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None
-        ) = None,
+        search_property: CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -362,17 +277,13 @@ class CogniteDescribableNodeAPI(
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: CogniteDescribableNodeFields | SequenceNotStr[CogniteDescribableNodeFields] | None = None,
         property: CogniteDescribableNodeFields | SequenceNotStr[CogniteDescribableNodeFields] | None = None,
         query: str | None = None,
-        search_property: (
-            CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None
-        ) = None,
+        search_property: CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -443,9 +354,7 @@ class CogniteDescribableNodeAPI(
         property: CogniteDescribableNodeFields,
         interval: float,
         query: str | None = None,
-        search_property: (
-            CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None
-        ) = None,
+        search_property: CogniteDescribableNodeTextFields | SequenceNotStr[CogniteDescribableNodeTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         name: str | list[str] | None = None,
@@ -510,15 +419,13 @@ class CogniteDescribableNodeAPI(
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=sort,
-                limit=limit,
-                max_retrieve_batch_limit=chunk_size,
-                has_container_fields=True,
-            )
-        )
+        builder.append(factory.root(
+            filter=filter_,
+            sort=sort,
+            limit=limit,
+            max_retrieve_batch_limit=chunk_size,
+            has_container_fields=True,
+        ))
         return builder.build()
 
     def iterate(
@@ -661,5 +568,6 @@ class CogniteDescribableNodeAPI(
             space,
             filter,
         )
-        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit, filter=filter_, sort=sort_input)
+        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit,  filter=filter_, sort=sort_input)
+

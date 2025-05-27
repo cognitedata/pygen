@@ -37,15 +37,8 @@ from wind_turbine.data_classes._core import (
     FloatFilter,
 )
 from wind_turbine.data_classes._generating_unit import GeneratingUnit, GeneratingUnitWrite
-
 if TYPE_CHECKING:
-    from wind_turbine.data_classes._sensor_time_series import (
-        SensorTimeSeries,
-        SensorTimeSeriesList,
-        SensorTimeSeriesGraphQL,
-        SensorTimeSeriesWrite,
-        SensorTimeSeriesWriteList,
-    )
+    from wind_turbine.data_classes._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList, SensorTimeSeriesGraphQL, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
 
 
 __all__ = [
@@ -105,6 +98,7 @@ class SolarPanelGraphQL(GraphQLCore):
             )
         return values
 
+
     @field_validator("efficiency", "orientation", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -143,15 +137,16 @@ class SolarPanel(GeneratingUnit):
     node_type: Union[dm.DirectRelationReference, None] = None
     efficiency: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     orientation: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
-
     @field_validator("efficiency", "orientation", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
+
     def as_write(self) -> SolarPanelWrite:
         """Convert this read version of solar panel to the writing version."""
         return SolarPanelWrite.model_validate(as_write_args(self))
+
 
 
 class SolarPanelWrite(GeneratingUnitWrite):
@@ -169,18 +164,8 @@ class SolarPanelWrite(GeneratingUnitWrite):
         name: Name of the instance
         orientation: The orientation field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "capacity",
-        "description",
-        "efficiency",
-        "name",
-        "orientation",
-    )
-    _direct_relations: ClassVar[tuple[str, ...]] = (
-        "efficiency",
-        "orientation",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("capacity", "description", "efficiency", "name", "orientation",)
+    _direct_relations: ClassVar[tuple[str, ...]] = ("efficiency", "orientation",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "SolarPanel", "1")
 
@@ -203,48 +188,32 @@ class SolarPanelList(DomainModelList[SolarPanel]):
     """List of solar panels in the read version."""
 
     _INSTANCE = SolarPanel
-
     def as_write(self) -> SolarPanelWriteList:
         """Convert these read versions of solar panel to the writing versions."""
         return SolarPanelWriteList([node.as_write() for node in self.data])
 
+
     @property
     def efficiency(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [item.efficiency for item in self.data if isinstance(item.efficiency, SensorTimeSeries)]
-        )
-
+        return SensorTimeSeriesList([item.efficiency for item in self.data if isinstance(item.efficiency, SensorTimeSeries)])
     @property
     def orientation(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [item.orientation for item in self.data if isinstance(item.orientation, SensorTimeSeries)]
-        )
-
+        return SensorTimeSeriesList([item.orientation for item in self.data if isinstance(item.orientation, SensorTimeSeries)])
 
 class SolarPanelWriteList(DomainModelWriteList[SolarPanelWrite]):
     """List of solar panels in the writing version."""
 
     _INSTANCE = SolarPanelWrite
-
     @property
     def efficiency(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [item.efficiency for item in self.data if isinstance(item.efficiency, SensorTimeSeriesWrite)]
-        )
-
+        return SensorTimeSeriesWriteList([item.efficiency for item in self.data if isinstance(item.efficiency, SensorTimeSeriesWrite)])
     @property
     def orientation(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [item.orientation for item in self.data if isinstance(item.orientation, SensorTimeSeriesWrite)]
-        )
+        return SensorTimeSeriesWriteList([item.orientation for item in self.data if isinstance(item.orientation, SensorTimeSeriesWrite)])
 
 
 def _create_solar_panel_filter(
@@ -253,24 +222,10 @@ def _create_solar_panel_filter(
     max_capacity: float | None = None,
     description: str | list[str] | None = None,
     description_prefix: str | None = None,
-    efficiency: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    efficiency: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    orientation: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    orientation: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -286,17 +241,8 @@ def _create_solar_panel_filter(
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
     if isinstance(efficiency, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(efficiency):
         filters.append(dm.filters.Equals(view_id.as_property_ref("efficiency"), value=as_instance_dict_id(efficiency)))
-    if (
-        efficiency
-        and isinstance(efficiency, Sequence)
-        and not isinstance(efficiency, str)
-        and not is_tuple_id(efficiency)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("efficiency"), values=[as_instance_dict_id(item) for item in efficiency]
-            )
-        )
+    if efficiency and isinstance(efficiency, Sequence) and not isinstance(efficiency, str) and not is_tuple_id(efficiency):
+        filters.append(dm.filters.In(view_id.as_property_ref("efficiency"), values=[as_instance_dict_id(item) for item in efficiency]))
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -304,20 +250,9 @@ def _create_solar_panel_filter(
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if isinstance(orientation, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(orientation):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("orientation"), value=as_instance_dict_id(orientation))
-        )
-    if (
-        orientation
-        and isinstance(orientation, Sequence)
-        and not isinstance(orientation, str)
-        and not is_tuple_id(orientation)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("orientation"), values=[as_instance_dict_id(item) for item in orientation]
-            )
-        )
+        filters.append(dm.filters.Equals(view_id.as_property_ref("orientation"), value=as_instance_dict_id(orientation)))
+    if orientation and isinstance(orientation, Sequence) and not isinstance(orientation, str) and not is_tuple_id(orientation):
+        filters.append(dm.filters.In(view_id.as_property_ref("orientation"), values=[as_instance_dict_id(item) for item in orientation]))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -396,17 +331,15 @@ class _SolarPanelQuery(NodeQueryCore[T_DomainModelList, SolarPanelList]):
         self.efficiency_filter = DirectRelationFilter(self, self._view_id.as_property_ref("efficiency"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.orientation_filter = DirectRelationFilter(self, self._view_id.as_property_ref("orientation"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.capacity,
-                self.description,
-                self.efficiency_filter,
-                self.name,
-                self.orientation_filter,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.capacity,
+            self.description,
+            self.efficiency_filter,
+            self.name,
+            self.orientation_filter,
+        ])
 
     def list_solar_panel(self, limit: int = DEFAULT_QUERY_LIMIT) -> SolarPanelList:
         return self._list(limit=limit)

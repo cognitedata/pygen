@@ -33,16 +33,10 @@ from omni.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    
 )
-
 if TYPE_CHECKING:
-    from omni.data_classes._connection_edge_a import (
-        ConnectionEdgeA,
-        ConnectionEdgeAList,
-        ConnectionEdgeAGraphQL,
-        ConnectionEdgeAWrite,
-        ConnectionEdgeAWriteList,
-    )
+    from omni.data_classes._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite, ConnectionEdgeAWriteList
 
 
 __all__ = [
@@ -80,9 +74,7 @@ class ConnectionItemGGraphQL(GraphQLCore):
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
-    inwards_multi_property: Optional[list[ConnectionEdgeAGraphQL]] = Field(
-        default=None, repr=False, alias="inwardsMultiProperty"
-    )
+    inwards_multi_property: Optional[list[ConnectionEdgeAGraphQL]] = Field(default=None, repr=False, alias="inwardsMultiProperty")
     name: Optional[str] = None
 
     @model_validator(mode="before")
@@ -95,6 +87,7 @@ class ConnectionItemGGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
 
     @field_validator("inwards_multi_property", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
@@ -129,12 +122,8 @@ class ConnectionItemG(DomainModel):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
-        "sp_pygen_models", "ConnectionItemG"
-    )
-    inwards_multi_property: Optional[list[ConnectionEdgeA]] = Field(
-        default=None, repr=False, alias="inwardsMultiProperty"
-    )
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemG")
+    inwards_multi_property: Optional[list[ConnectionEdgeA]] = Field(default=None, repr=False, alias="inwardsMultiProperty")
     name: Optional[str] = None
 
     @field_validator("inwards_multi_property", mode="before")
@@ -149,6 +138,7 @@ class ConnectionItemG(DomainModel):
         return ConnectionItemGWrite.model_validate(as_write_args(self))
 
 
+
 class ConnectionItemGWrite(DomainModelWrite):
     """This represents the writing version of connection item g.
 
@@ -161,21 +151,14 @@ class ConnectionItemGWrite(DomainModelWrite):
         inwards_multi_property: The inwards multi property field.
         name: The name field.
     """
-
     _container_fields: ClassVar[tuple[str, ...]] = ("name",)
-    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
-        ("inwards_multi_property", dm.DirectRelationReference("sp_pygen_models", "multiProperty")),
-    )
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (("inwards_multi_property", dm.DirectRelationReference("sp_pygen_models", "multiProperty")),)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemG", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "sp_pygen_models", "ConnectionItemG"
-    )
-    inwards_multi_property: Optional[list[ConnectionEdgeAWrite]] = Field(
-        default=None, repr=False, alias="inwardsMultiProperty"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemG")
+    inwards_multi_property: Optional[list[ConnectionEdgeAWrite]] = Field(default=None, repr=False, alias="inwardsMultiProperty")
     name: Optional[str] = None
 
     @field_validator("inwards_multi_property", mode="before")
@@ -193,42 +176,26 @@ class ConnectionItemGList(DomainModelList[ConnectionItemG]):
     """List of connection item gs in the read version."""
 
     _INSTANCE = ConnectionItemG
-
     def as_write(self) -> ConnectionItemGWriteList:
         """Convert these read versions of connection item g to the writing versions."""
         return ConnectionItemGWriteList([node.as_write() for node in self.data])
 
+
     @property
     def inwards_multi_property(self) -> ConnectionEdgeAList:
         from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
-
-        return ConnectionEdgeAList(
-            [
-                item
-                for items in self.data
-                for item in items.inwards_multi_property or []
-                if isinstance(item, ConnectionEdgeA)
-            ]
-        )
+        return ConnectionEdgeAList([item for items in self.data for item in items.inwards_multi_property or [] if isinstance(item, ConnectionEdgeA)])
 
 
 class ConnectionItemGWriteList(DomainModelWriteList[ConnectionItemGWrite]):
     """List of connection item gs in the writing version."""
 
     _INSTANCE = ConnectionItemGWrite
-
     @property
     def inwards_multi_property(self) -> ConnectionEdgeAWriteList:
         from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
+        return ConnectionEdgeAWriteList([item for items in self.data for item in items.inwards_multi_property or [] if isinstance(item, ConnectionEdgeAWrite)])
 
-        return ConnectionEdgeAWriteList(
-            [
-                item
-                for items in self.data
-                for item in items.inwards_multi_property or []
-                if isinstance(item, ConnectionEdgeAWrite)
-            ]
-        )
 
 
 def _create_connection_item_g_filter(
@@ -308,13 +275,11 @@ class _ConnectionItemGQuery(NodeQueryCore[T_DomainModelList, ConnectionItemGList
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.name,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.name,
+        ])
 
     def list_connection_item_g(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemGList:
         return self._list(limit=limit)

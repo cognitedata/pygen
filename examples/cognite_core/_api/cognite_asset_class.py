@@ -44,9 +44,7 @@ from cognite_core.data_classes import (
 )
 
 
-class CogniteAssetClassAPI(
-    NodeAPI[CogniteAssetClass, CogniteAssetClassWrite, CogniteAssetClassList, CogniteAssetClassWriteList]
-):
+class CogniteAssetClassAPI(NodeAPI[CogniteAssetClass, CogniteAssetClassWrite, CogniteAssetClassList, CogniteAssetClassWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "CogniteAssetClass", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITEASSETCLASS_PROPERTIES_BY_FIELD
     _class_type = CogniteAssetClass
@@ -55,6 +53,7 @@ class CogniteAssetClassAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
+
 
     @overload
     def retrieve(
@@ -230,11 +229,9 @@ class CogniteAssetClassAPI(
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: CogniteAssetClassFields | SequenceNotStr[CogniteAssetClassFields],
         property: CogniteAssetClassFields | SequenceNotStr[CogniteAssetClassFields] | None = None,
         query: str | None = None,
@@ -255,11 +252,9 @@ class CogniteAssetClassAPI(
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: CogniteAssetClassFields | SequenceNotStr[CogniteAssetClassFields] | None = None,
         property: CogniteAssetClassFields | SequenceNotStr[CogniteAssetClassFields] | None = None,
         query: str | None = None,
@@ -423,15 +418,13 @@ class CogniteAssetClassAPI(
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=sort,
-                limit=limit,
-                max_retrieve_batch_limit=chunk_size,
-                has_container_fields=True,
-            )
-        )
+        builder.append(factory.root(
+            filter=filter_,
+            sort=sort,
+            limit=limit,
+            max_retrieve_batch_limit=chunk_size,
+            has_container_fields=True,
+        ))
         return builder.build()
 
     def iterate(
@@ -598,5 +591,6 @@ class CogniteAssetClassAPI(
             space,
             filter,
         )
-        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit, filter=filter_, sort=sort_input)
+        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit,  filter=filter_, sort=sort_input)
+

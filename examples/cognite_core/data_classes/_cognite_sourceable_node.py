@@ -37,15 +37,8 @@ from cognite_core.data_classes._core import (
     DirectRelationFilter,
     TimestampFilter,
 )
-
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_source_system import (
-        CogniteSourceSystem,
-        CogniteSourceSystemList,
-        CogniteSourceSystemGraphQL,
-        CogniteSourceSystemWrite,
-        CogniteSourceSystemWriteList,
-    )
+    from cognite_core.data_classes._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemList, CogniteSourceSystemGraphQL, CogniteSourceSystemWrite, CogniteSourceSystemWriteList
 
 
 __all__ = [
@@ -59,18 +52,8 @@ __all__ = [
 ]
 
 
-CogniteSourceableNodeTextFields = Literal[
-    "external_id", "source_context", "source_created_user", "source_id", "source_updated_user"
-]
-CogniteSourceableNodeFields = Literal[
-    "external_id",
-    "source_context",
-    "source_created_time",
-    "source_created_user",
-    "source_id",
-    "source_updated_time",
-    "source_updated_user",
-]
+CogniteSourceableNodeTextFields = Literal["external_id", "source_context", "source_created_user", "source_id", "source_updated_user"]
+CogniteSourceableNodeFields = Literal["external_id", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user"]
 
 _COGNITESOURCEABLENODE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -125,6 +108,7 @@ class CogniteSourceableNodeGraphQL(GraphQLCore):
             )
         return values
 
+
     @field_validator("source", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -174,15 +158,16 @@ class CogniteSourceableNode(DomainModel):
     source_id: Optional[str] = Field(None, alias="sourceId")
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
-
     @field_validator("source", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
+
     def as_write(self) -> CogniteSourceableNodeWrite:
         """Convert this read version of Cognite sourceable node to the writing version."""
         return CogniteSourceableNodeWrite.model_validate(as_write_args(self))
+
 
 
 class CogniteSourceableNodeWrite(DomainModelWrite):
@@ -205,16 +190,7 @@ class CogniteSourceableNodeWrite(DomainModelWrite):
         source_updated_user: User identifier from the source system on who last updated the source data. This
             identifier is not guaranteed to match the user identifiers in CDF
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "source",
-        "source_context",
-        "source_created_time",
-        "source_created_user",
-        "source_id",
-        "source_updated_time",
-        "source_updated_user",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("source", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user",)
     _direct_relations: ClassVar[tuple[str, ...]] = ("source",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
@@ -244,44 +220,29 @@ class CogniteSourceableNodeList(DomainModelList[CogniteSourceableNode]):
     """List of Cognite sourceable nodes in the read version."""
 
     _INSTANCE = CogniteSourceableNode
-
     def as_write(self) -> CogniteSourceableNodeWriteList:
         """Convert these read versions of Cognite sourceable node to the writing versions."""
         return CogniteSourceableNodeWriteList([node.as_write() for node in self.data])
 
+
     @property
     def source(self) -> CogniteSourceSystemList:
         from ._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemList
-
-        return CogniteSourceSystemList(
-            [item.source for item in self.data if isinstance(item.source, CogniteSourceSystem)]
-        )
-
+        return CogniteSourceSystemList([item.source for item in self.data if isinstance(item.source, CogniteSourceSystem)])
 
 class CogniteSourceableNodeWriteList(DomainModelWriteList[CogniteSourceableNodeWrite]):
     """List of Cognite sourceable nodes in the writing version."""
 
     _INSTANCE = CogniteSourceableNodeWrite
-
     @property
     def source(self) -> CogniteSourceSystemWriteList:
         from ._cognite_source_system import CogniteSourceSystemWrite, CogniteSourceSystemWriteList
-
-        return CogniteSourceSystemWriteList(
-            [item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)]
-        )
+        return CogniteSourceSystemWriteList([item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)])
 
 
 def _create_cognite_sourceable_node_filter(
     view_id: dm.ViewId,
-    source: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     source_context: str | list[str] | None = None,
     source_context_prefix: str | None = None,
     min_source_created_time: datetime.datetime | None = None,
@@ -302,9 +263,7 @@ def _create_cognite_sourceable_node_filter(
     if isinstance(source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(source):
         filters.append(dm.filters.Equals(view_id.as_property_ref("source"), value=as_instance_dict_id(source)))
     if source and isinstance(source, Sequence) and not isinstance(source, str) and not is_tuple_id(source):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source]))
     if isinstance(source_context, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceContext"), value=source_context))
     if source_context and isinstance(source_context, list):
@@ -312,21 +271,13 @@ def _create_cognite_sourceable_node_filter(
     if source_context_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceContext"), value=source_context_prefix))
     if min_source_created_time is not None or max_source_created_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceCreatedTime"),
-                gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None,
-                lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceCreatedTime"), gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None, lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None))
     if isinstance(source_created_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user))
     if source_created_user and isinstance(source_created_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceCreatedUser"), values=source_created_user))
     if source_created_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix))
     if isinstance(source_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceId"), value=source_id))
     if source_id and isinstance(source_id, list):
@@ -334,21 +285,13 @@ def _create_cognite_sourceable_node_filter(
     if source_id_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceId"), value=source_id_prefix))
     if min_source_updated_time is not None or max_source_updated_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceUpdatedTime"),
-                gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None,
-                lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceUpdatedTime"), gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None, lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None))
     if isinstance(source_updated_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user))
     if source_updated_user and isinstance(source_updated_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceUpdatedUser"), values=source_updated_user))
     if source_updated_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -415,19 +358,17 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
         self.source_id = StringFilter(self, self._view_id.as_property_ref("sourceId"))
         self.source_updated_time = TimestampFilter(self, self._view_id.as_property_ref("sourceUpdatedTime"))
         self.source_updated_user = StringFilter(self, self._view_id.as_property_ref("sourceUpdatedUser"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.source_filter,
-                self.source_context,
-                self.source_created_time,
-                self.source_created_user,
-                self.source_id,
-                self.source_updated_time,
-                self.source_updated_user,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.source_filter,
+            self.source_context,
+            self.source_created_time,
+            self.source_created_user,
+            self.source_id,
+            self.source_updated_time,
+            self.source_updated_user,
+        ])
 
     def list_cognite_sourceable_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteSourceableNodeList:
         return self._list(limit=limit)

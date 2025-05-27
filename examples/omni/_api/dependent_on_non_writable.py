@@ -46,11 +46,7 @@ from omni.data_classes import (
 from omni._api.dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
 
 
-class DependentOnNonWritableAPI(
-    NodeAPI[
-        DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList, DependentOnNonWritableWriteList
-    ]
-):
+class DependentOnNonWritableAPI(NodeAPI[DependentOnNonWritable, DependentOnNonWritableWrite, DependentOnNonWritableList, DependentOnNonWritableWriteList]):
     _view_id = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
     _properties_by_field: ClassVar[dict[str, str]] = _DEPENDENTONNONWRITABLE_PROPERTIES_BY_FIELD
     _class_type = DependentOnNonWritable
@@ -185,9 +181,7 @@ class DependentOnNonWritableAPI(
         group_by: None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -203,9 +197,7 @@ class DependentOnNonWritableAPI(
         group_by: None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -217,17 +209,13 @@ class DependentOnNonWritableAPI(
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields],
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -238,17 +226,13 @@ class DependentOnNonWritableAPI(
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         property: DependentOnNonWritableFields | SequenceNotStr[DependentOnNonWritableFields] | None = None,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -313,9 +297,7 @@ class DependentOnNonWritableAPI(
         property: DependentOnNonWritableFields,
         interval: float,
         query: str | None = None,
-        search_property: (
-            DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None
-        ) = None,
+        search_property: DependentOnNonWritableTextFields | SequenceNotStr[DependentOnNonWritableTextFields] | None = None,
         a_value: str | list[str] | None = None,
         a_value_prefix: str | None = None,
         external_id_prefix: str | None = None,
@@ -374,15 +356,13 @@ class DependentOnNonWritableAPI(
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=sort,
-                limit=limit,
-                max_retrieve_batch_limit=chunk_size,
-                has_container_fields=True,
-            )
-        )
+        builder.append(factory.root(
+            filter=filter_,
+            sort=sort,
+            limit=limit,
+            max_retrieve_batch_limit=chunk_size,
+            has_container_fields=True,
+        ))
         if retrieve_connections == "identifier" or retrieve_connections == "full":
             builder.extend(
                 factory.from_edge(
@@ -531,7 +511,8 @@ class DependentOnNonWritableAPI(
             space,
             filter,
         )
-        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(limit=limit, filter=filter_, sort=sort_input)
+            return self._list(limit=limit,  filter=filter_, sort=sort_input)
         return self._query(filter_, limit, retrieve_connections, sort_input, "list")
+

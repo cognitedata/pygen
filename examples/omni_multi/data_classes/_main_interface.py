@@ -32,6 +32,7 @@ from omni_multi.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    
 )
 
 
@@ -82,6 +83,8 @@ class MainInterfaceGraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> MainInterface:
         """Convert this GraphQL format of main interface to the reading format."""
         return MainInterface.model_validate(as_read_args(self))
@@ -109,9 +112,11 @@ class MainInterface(DomainModel):
     node_type: Union[dm.DirectRelationReference, None] = None
     main_value: Optional[str] = Field(None, alias="mainValue")
 
+
     def as_write(self) -> MainInterfaceWrite:
         """Convert this read version of main interface to the writing version."""
         return MainInterfaceWrite.model_validate(as_write_args(self))
+
 
 
 class MainInterfaceWrite(DomainModelWrite):
@@ -125,7 +130,6 @@ class MainInterfaceWrite(DomainModelWrite):
         data_record: The data record of the main interface node.
         main_value: The main value field.
     """
-
     _container_fields: ClassVar[tuple[str, ...]] = ("main_value",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models", "MainInterface", "1")
@@ -135,14 +139,15 @@ class MainInterfaceWrite(DomainModelWrite):
     main_value: Optional[str] = Field(None, alias="mainValue")
 
 
+
 class MainInterfaceList(DomainModelList[MainInterface]):
     """List of main interfaces in the read version."""
 
     _INSTANCE = MainInterface
-
     def as_write(self) -> MainInterfaceWriteList:
         """Convert these read versions of main interface to the writing versions."""
         return MainInterfaceWriteList([node.as_write() for node in self.data])
+
 
 
 class MainInterfaceWriteList(DomainModelWriteList[MainInterfaceWrite]):
@@ -211,13 +216,11 @@ class _MainInterfaceQuery(NodeQueryCore[T_DomainModelList, MainInterfaceList]):
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.main_value,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.main_value,
+        ])
 
     def list_main_interface(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainInterfaceList:
         return self._list(limit=limit)

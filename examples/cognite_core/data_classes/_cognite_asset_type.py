@@ -36,15 +36,8 @@ from cognite_core.data_classes._core import (
     DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
-
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_asset_class import (
-        CogniteAssetClass,
-        CogniteAssetClassList,
-        CogniteAssetClassGraphQL,
-        CogniteAssetClassWrite,
-        CogniteAssetClassWriteList,
-    )
+    from cognite_core.data_classes._cognite_asset_class import CogniteAssetClass, CogniteAssetClassList, CogniteAssetClassGraphQL, CogniteAssetClassWrite, CogniteAssetClassWriteList
 
 
 __all__ = [
@@ -111,6 +104,7 @@ class CogniteAssetTypeGraphQL(GraphQLCore):
             )
         return values
 
+
     @field_validator("asset_class", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -152,15 +146,16 @@ class CogniteAssetType(CogniteDescribableNode):
     asset_class: Union[CogniteAssetClass, str, dm.NodeId, None] = Field(default=None, repr=False, alias="assetClass")
     code: Optional[str] = None
     standard: Optional[str] = None
-
     @field_validator("asset_class", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
+
     def as_write(self) -> CogniteAssetTypeWrite:
         """Convert this read version of Cognite asset type to the writing version."""
         return CogniteAssetTypeWrite.model_validate(as_write_args(self))
+
 
 
 class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
@@ -180,24 +175,13 @@ class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
         standard: A text string to specify which standard the type is from.
         tags: Text based labels for generic use, limited to 1000
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "aliases",
-        "asset_class",
-        "code",
-        "description",
-        "name",
-        "standard",
-        "tags",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "asset_class", "code", "description", "name", "standard", "tags",)
     _direct_relations: ClassVar[tuple[str, ...]] = ("asset_class",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAssetType", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    asset_class: Union[CogniteAssetClassWrite, str, dm.NodeId, None] = Field(
-        default=None, repr=False, alias="assetClass"
-    )
+    asset_class: Union[CogniteAssetClassWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="assetClass")
     code: Optional[str] = None
     standard: Optional[str] = None
 
@@ -216,44 +200,29 @@ class CogniteAssetTypeList(DomainModelList[CogniteAssetType]):
     """List of Cognite asset types in the read version."""
 
     _INSTANCE = CogniteAssetType
-
     def as_write(self) -> CogniteAssetTypeWriteList:
         """Convert these read versions of Cognite asset type to the writing versions."""
         return CogniteAssetTypeWriteList([node.as_write() for node in self.data])
 
+
     @property
     def asset_class(self) -> CogniteAssetClassList:
         from ._cognite_asset_class import CogniteAssetClass, CogniteAssetClassList
-
-        return CogniteAssetClassList(
-            [item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClass)]
-        )
-
+        return CogniteAssetClassList([item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClass)])
 
 class CogniteAssetTypeWriteList(DomainModelWriteList[CogniteAssetTypeWrite]):
     """List of Cognite asset types in the writing version."""
 
     _INSTANCE = CogniteAssetTypeWrite
-
     @property
     def asset_class(self) -> CogniteAssetClassWriteList:
         from ._cognite_asset_class import CogniteAssetClassWrite, CogniteAssetClassWriteList
-
-        return CogniteAssetClassWriteList(
-            [item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClassWrite)]
-        )
+        return CogniteAssetClassWriteList([item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClassWrite)])
 
 
 def _create_cognite_asset_type_filter(
     view_id: dm.ViewId,
-    asset_class: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    asset_class: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     code: str | list[str] | None = None,
     code_prefix: str | None = None,
     description: str | list[str] | None = None,
@@ -269,17 +238,8 @@ def _create_cognite_asset_type_filter(
     filters: list[dm.Filter] = []
     if isinstance(asset_class, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(asset_class):
         filters.append(dm.filters.Equals(view_id.as_property_ref("assetClass"), value=as_instance_dict_id(asset_class)))
-    if (
-        asset_class
-        and isinstance(asset_class, Sequence)
-        and not isinstance(asset_class, str)
-        and not is_tuple_id(asset_class)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("assetClass"), values=[as_instance_dict_id(item) for item in asset_class]
-            )
-        )
+    if asset_class and isinstance(asset_class, Sequence) and not isinstance(asset_class, str) and not is_tuple_id(asset_class):
+        filters.append(dm.filters.In(view_id.as_property_ref("assetClass"), values=[as_instance_dict_id(item) for item in asset_class]))
     if isinstance(code, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("code"), value=code))
     if code and isinstance(code, list):
@@ -368,17 +328,15 @@ class _CogniteAssetTypeQuery(NodeQueryCore[T_DomainModelList, CogniteAssetTypeLi
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.standard = StringFilter(self, self._view_id.as_property_ref("standard"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.asset_class_filter,
-                self.code,
-                self.description,
-                self.name,
-                self.standard,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.asset_class_filter,
+            self.code,
+            self.description,
+            self.name,
+            self.standard,
+        ])
 
     def list_cognite_asset_type(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteAssetTypeList:
         return self._list(limit=limit)

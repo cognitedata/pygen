@@ -35,16 +35,9 @@ from wind_turbine.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
-
 if TYPE_CHECKING:
     from wind_turbine.data_classes._nacelle import Nacelle, NacelleList, NacelleGraphQL, NacelleWrite, NacelleWriteList
-    from wind_turbine.data_classes._sensor_time_series import (
-        SensorTimeSeries,
-        SensorTimeSeriesList,
-        SensorTimeSeriesGraphQL,
-        SensorTimeSeriesWrite,
-        SensorTimeSeriesWriteList,
-    )
+    from wind_turbine.data_classes._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList, SensorTimeSeriesGraphQL, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
 
 
 __all__ = [
@@ -56,8 +49,8 @@ __all__ = [
 ]
 
 
-HighSpeedShaftTextFields = Literal["external_id",]
-HighSpeedShaftFields = Literal["external_id",]
+HighSpeedShaftTextFields = Literal["external_id", ]
+HighSpeedShaftFields = Literal["external_id", ]
 
 _HIGHSPEEDSHAFT_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -96,6 +89,7 @@ class HighSpeedShaftGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
 
     @field_validator("bending_moment_y", "bending_monent_x", "nacelle", "torque", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
@@ -137,15 +131,16 @@ class HighSpeedShaft(DomainModel):
     bending_monent_x: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
     torque: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
-
     @field_validator("bending_moment_y", "bending_monent_x", "nacelle", "torque", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
+
     def as_write(self) -> HighSpeedShaftWrite:
         """Convert this read version of high speed shaft to the writing version."""
         return HighSpeedShaftWrite.model_validate(as_write_args(self))
+
 
 
 class HighSpeedShaftWrite(DomainModelWrite):
@@ -161,17 +156,8 @@ class HighSpeedShaftWrite(DomainModelWrite):
         bending_monent_x: The bending monent x field.
         torque: The torque field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "bending_moment_y",
-        "bending_monent_x",
-        "torque",
-    )
-    _direct_relations: ClassVar[tuple[str, ...]] = (
-        "bending_moment_y",
-        "bending_monent_x",
-        "torque",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("bending_moment_y", "bending_monent_x", "torque",)
+    _direct_relations: ClassVar[tuple[str, ...]] = ("bending_moment_y", "bending_monent_x", "torque",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "HighSpeedShaft", "1")
 
@@ -196,139 +182,68 @@ class HighSpeedShaftList(DomainModelList[HighSpeedShaft]):
     """List of high speed shafts in the read version."""
 
     _INSTANCE = HighSpeedShaft
-
     def as_write(self) -> HighSpeedShaftWriteList:
         """Convert these read versions of high speed shaft to the writing versions."""
         return HighSpeedShaftWriteList([node.as_write() for node in self.data])
 
+
     @property
     def bending_moment_y(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [item.bending_moment_y for item in self.data if isinstance(item.bending_moment_y, SensorTimeSeries)]
-        )
-
+        return SensorTimeSeriesList([item.bending_moment_y for item in self.data if isinstance(item.bending_moment_y, SensorTimeSeries)])
     @property
     def bending_monent_x(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
-        return SensorTimeSeriesList(
-            [item.bending_monent_x for item in self.data if isinstance(item.bending_monent_x, SensorTimeSeries)]
-        )
-
+        return SensorTimeSeriesList([item.bending_monent_x for item in self.data if isinstance(item.bending_monent_x, SensorTimeSeries)])
     @property
     def nacelle(self) -> NacelleList:
         from ._nacelle import Nacelle, NacelleList
-
         return NacelleList([item.nacelle for item in self.data if isinstance(item.nacelle, Nacelle)])
-
     @property
     def torque(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-
         return SensorTimeSeriesList([item.torque for item in self.data if isinstance(item.torque, SensorTimeSeries)])
-
 
 class HighSpeedShaftWriteList(DomainModelWriteList[HighSpeedShaftWrite]):
     """List of high speed shafts in the writing version."""
 
     _INSTANCE = HighSpeedShaftWrite
-
     @property
     def bending_moment_y(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [item.bending_moment_y for item in self.data if isinstance(item.bending_moment_y, SensorTimeSeriesWrite)]
-        )
-
+        return SensorTimeSeriesWriteList([item.bending_moment_y for item in self.data if isinstance(item.bending_moment_y, SensorTimeSeriesWrite)])
     @property
     def bending_monent_x(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [item.bending_monent_x for item in self.data if isinstance(item.bending_monent_x, SensorTimeSeriesWrite)]
-        )
-
+        return SensorTimeSeriesWriteList([item.bending_monent_x for item in self.data if isinstance(item.bending_monent_x, SensorTimeSeriesWrite)])
     @property
     def torque(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-
-        return SensorTimeSeriesWriteList(
-            [item.torque for item in self.data if isinstance(item.torque, SensorTimeSeriesWrite)]
-        )
+        return SensorTimeSeriesWriteList([item.torque for item in self.data if isinstance(item.torque, SensorTimeSeriesWrite)])
 
 
 def _create_high_speed_shaft_filter(
     view_id: dm.ViewId,
-    bending_moment_y: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    bending_monent_x: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    torque: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    bending_moment_y: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    bending_monent_x: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    torque: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
     if isinstance(bending_moment_y, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(bending_moment_y):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("bending_moment_y"), value=as_instance_dict_id(bending_moment_y))
-        )
-    if (
-        bending_moment_y
-        and isinstance(bending_moment_y, Sequence)
-        and not isinstance(bending_moment_y, str)
-        and not is_tuple_id(bending_moment_y)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("bending_moment_y"),
-                values=[as_instance_dict_id(item) for item in bending_moment_y],
-            )
-        )
+        filters.append(dm.filters.Equals(view_id.as_property_ref("bending_moment_y"), value=as_instance_dict_id(bending_moment_y)))
+    if bending_moment_y and isinstance(bending_moment_y, Sequence) and not isinstance(bending_moment_y, str) and not is_tuple_id(bending_moment_y):
+        filters.append(dm.filters.In(view_id.as_property_ref("bending_moment_y"), values=[as_instance_dict_id(item) for item in bending_moment_y]))
     if isinstance(bending_monent_x, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(bending_monent_x):
-        filters.append(
-            dm.filters.Equals(view_id.as_property_ref("bending_monent_x"), value=as_instance_dict_id(bending_monent_x))
-        )
-    if (
-        bending_monent_x
-        and isinstance(bending_monent_x, Sequence)
-        and not isinstance(bending_monent_x, str)
-        and not is_tuple_id(bending_monent_x)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("bending_monent_x"),
-                values=[as_instance_dict_id(item) for item in bending_monent_x],
-            )
-        )
+        filters.append(dm.filters.Equals(view_id.as_property_ref("bending_monent_x"), value=as_instance_dict_id(bending_monent_x)))
+    if bending_monent_x and isinstance(bending_monent_x, Sequence) and not isinstance(bending_monent_x, str) and not is_tuple_id(bending_monent_x):
+        filters.append(dm.filters.In(view_id.as_property_ref("bending_monent_x"), values=[as_instance_dict_id(item) for item in bending_monent_x]))
     if isinstance(torque, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(torque):
         filters.append(dm.filters.Equals(view_id.as_property_ref("torque"), value=as_instance_dict_id(torque)))
     if torque and isinstance(torque, Sequence) and not isinstance(torque, str) and not is_tuple_id(torque):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("torque"), values=[as_instance_dict_id(item) for item in torque])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("torque"), values=[as_instance_dict_id(item) for item in torque]))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -434,15 +349,13 @@ class _HighSpeedShaftQuery(NodeQueryCore[T_DomainModelList, HighSpeedShaftList])
         self.bending_moment_y_filter = DirectRelationFilter(self, self._view_id.as_property_ref("bending_moment_y"))
         self.bending_monent_x_filter = DirectRelationFilter(self, self._view_id.as_property_ref("bending_monent_x"))
         self.torque_filter = DirectRelationFilter(self, self._view_id.as_property_ref("torque"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.bending_moment_y_filter,
-                self.bending_monent_x_filter,
-                self.torque_filter,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.bending_moment_y_filter,
+            self.bending_monent_x_filter,
+            self.torque_filter,
+        ])
 
     def list_high_speed_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> HighSpeedShaftList:
         return self._list(limit=limit)

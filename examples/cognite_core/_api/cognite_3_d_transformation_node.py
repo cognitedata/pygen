@@ -45,14 +45,7 @@ from cognite_core.data_classes import (
 )
 
 
-class Cognite3DTransformationNodeAPI(
-    NodeAPI[
-        Cognite3DTransformationNode,
-        Cognite3DTransformationNodeWrite,
-        Cognite3DTransformationNodeList,
-        Cognite3DTransformationNodeWriteList,
-    ]
-):
+class Cognite3DTransformationNodeAPI(NodeAPI[Cognite3DTransformationNode, Cognite3DTransformationNodeWrite, Cognite3DTransformationNodeList, Cognite3DTransformationNodeWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITE3DTRANSFORMATIONNODE_PROPERTIES_BY_FIELD
     _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
@@ -64,6 +57,7 @@ class Cognite3DTransformationNodeAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
+
 
     @overload
     def retrieve(
@@ -110,14 +104,16 @@ class Cognite3DTransformationNodeAPI(
                 ... )
 
         """
-        return self._retrieve(external_id, space, as_child_class=as_child_class)
+        return self._retrieve(
+            external_id,
+            space,
+            as_child_class=as_child_class
+        )
 
     def search(
         self,
         query: str,
-        properties: (
-            Cognite3DTransformationNodeTextFields | SequenceNotStr[Cognite3DTransformationNodeTextFields] | None
-        ) = None,
+        properties: Cognite3DTransformationNodeTextFields | SequenceNotStr[Cognite3DTransformationNodeTextFields] | None = None,
         min_euler_rotation_x: float | None = None,
         max_euler_rotation_x: float | None = None,
         min_euler_rotation_y: float | None = None,
@@ -290,11 +286,9 @@ class Cognite3DTransformationNodeAPI(
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: Cognite3DTransformationNodeFields | SequenceNotStr[Cognite3DTransformationNodeFields],
         property: Cognite3DTransformationNodeFields | SequenceNotStr[Cognite3DTransformationNodeFields] | None = None,
         min_euler_rotation_x: float | None = None,
@@ -323,11 +317,9 @@ class Cognite3DTransformationNodeAPI(
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: Cognite3DTransformationNodeFields | SequenceNotStr[Cognite3DTransformationNodeFields] | None = None,
         property: Cognite3DTransformationNodeFields | SequenceNotStr[Cognite3DTransformationNodeFields] | None = None,
         min_euler_rotation_x: float | None = None,
@@ -543,15 +535,13 @@ class Cognite3DTransformationNodeAPI(
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=sort,
-                limit=limit,
-                max_retrieve_batch_limit=chunk_size,
-                has_container_fields=True,
-            )
-        )
+        builder.append(factory.root(
+            filter=filter_,
+            sort=sort,
+            limit=limit,
+            max_retrieve_batch_limit=chunk_size,
+            has_container_fields=True,
+        ))
         return builder.build()
 
     def iterate(
@@ -778,5 +768,6 @@ class Cognite3DTransformationNodeAPI(
             space,
             filter,
         )
-        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit, filter=filter_, sort=sort_input)
+        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit,  filter=filter_, sort=sort_input)
+

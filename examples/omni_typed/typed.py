@@ -10,7 +10,6 @@ from cognite.client.data_classes.data_modeling.instances import (
     TypedNodeApply,
 )
 
-
 class _CDFExternalReferencesListedProperties:
 
     @classmethod
@@ -36,7 +35,6 @@ class CDFExternalReferencesListedApply(_CDFExternalReferencesListedProperties, T
             request, then the item will be skipped instead of failing the ingestion request.
         type: Direct relation pointing to the type node.
     """
-
     def __init__(
         self,
         space: str,
@@ -75,7 +73,6 @@ class CDFExternalReferencesListed(_CDFExternalReferencesListedProperties, TypedN
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
     """
-
     def __init__(
         self,
         space: str,
@@ -105,8 +102,6 @@ class CDFExternalReferencesListed(_CDFExternalReferencesListedProperties, TypedN
             existing_version=self.version,
             type=self.type,
         )
-
-
 class _DependentOnNonWritableProperties:
     a_value = PropertyOptions("aValue")
 
@@ -131,7 +126,6 @@ class DependentOnNonWritableApply(_DependentOnNonWritableProperties, TypedNodeAp
             request, then the item will be skipped instead of failing the ingestion request.
         type: Direct relation pointing to the type node.
     """
-
     def __init__(
         self,
         space: str,
@@ -164,7 +158,6 @@ class DependentOnNonWritable(_DependentOnNonWritableProperties, TypedNode):
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
     """
-
     def __init__(
         self,
         space: str,
@@ -188,8 +181,6 @@ class DependentOnNonWritable(_DependentOnNonWritableProperties, TypedNode):
             existing_version=self.version,
             type=self.type,
         )
-
-
 class _Implementation1Properties:
     value_2 = PropertyOptions("value2")
     main_value = PropertyOptions("mainValue")
@@ -220,7 +211,6 @@ class Implementation1Apply(_Implementation1Properties, TypedNodeApply):
             request, then the item will be skipped instead of failing the ingestion request.
         type: Direct relation pointing to the type node.
     """
-
     def __init__(
         self,
         space: str,
@@ -262,7 +252,6 @@ class Implementation1(_Implementation1Properties, TypedNode):
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
     """
-
     def __init__(
         self,
         space: str,
@@ -295,8 +284,6 @@ class Implementation1(_Implementation1Properties, TypedNode):
             existing_version=self.version,
             type=self.type,
         )
-
-
 class _Implementation2Properties:
     main_value = PropertyOptions("mainValue")
     sub_value = PropertyOptions("subValue")
@@ -323,7 +310,6 @@ class Implementation2Apply(_Implementation2Properties, TypedNodeApply):
             request, then the item will be skipped instead of failing the ingestion request.
         type: Direct relation pointing to the type node.
     """
-
     def __init__(
         self,
         space: str,
@@ -359,7 +345,6 @@ class Implementation2(_Implementation2Properties, TypedNode):
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
     """
-
     def __init__(
         self,
         space: str,
@@ -386,8 +371,6 @@ class Implementation2(_Implementation2Properties, TypedNode):
             existing_version=self.version,
             type=self.type,
         )
-
-
 class _MainInterfaceProperties:
     main_value = PropertyOptions("mainValue")
 
@@ -412,7 +395,6 @@ class MainInterfaceApply(_MainInterfaceProperties, TypedNodeApply):
             request, then the item will be skipped instead of failing the ingestion request.
         type: Direct relation pointing to the type node.
     """
-
     def __init__(
         self,
         space: str,
@@ -445,7 +427,6 @@ class MainInterface(_MainInterfaceProperties, TypedNode):
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
     """
-
     def __init__(
         self,
         space: str,
@@ -469,8 +450,6 @@ class MainInterface(_MainInterfaceProperties, TypedNode):
             existing_version=self.version,
             type=self.type,
         )
-
-
 class _PrimitiveNullableProperties:
     float_32 = PropertyOptions("float32")
     float_64 = PropertyOptions("float64")
@@ -507,7 +486,6 @@ class PrimitiveNullableApply(_PrimitiveNullableProperties, TypedNodeApply):
             request, then the item will be skipped instead of failing the ingestion request.
         type: Direct relation pointing to the type node.
     """
-
     def __init__(
         self,
         space: str,
@@ -564,7 +542,6 @@ class PrimitiveNullable(_PrimitiveNullableProperties, TypedNode):
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
     """
-
     def __init__(
         self,
         space: str,
@@ -612,8 +589,6 @@ class PrimitiveNullable(_PrimitiveNullableProperties, TypedNode):
             existing_version=self.version,
             type=self.type,
         )
-
-
 class _PrimitiveRequiredListedProperties:
     float_32 = PropertyOptions("float32")
     float_64 = PropertyOptions("float64")
@@ -650,7 +625,6 @@ class PrimitiveRequiredListedApply(_PrimitiveRequiredListedProperties, TypedNode
             request, then the item will be skipped instead of failing the ingestion request.
         type: Direct relation pointing to the type node.
     """
-
     def __init__(
         self,
         space: str,
@@ -707,7 +681,6 @@ class PrimitiveRequiredListed(_PrimitiveRequiredListedProperties, TypedNode):
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
     """
-
     def __init__(
         self,
         space: str,
@@ -755,8 +728,6 @@ class PrimitiveRequiredListed(_PrimitiveRequiredListedProperties, TypedNode):
             existing_version=self.version,
             type=self.type,
         )
-
-
 class _SubInterfaceProperties:
     main_value = PropertyOptions("mainValue")
     sub_value = PropertyOptions("subValue")
@@ -783,7 +754,6 @@ class SubInterfaceApply(_SubInterfaceProperties, TypedNodeApply):
             request, then the item will be skipped instead of failing the ingestion request.
         type: Direct relation pointing to the type node.
     """
-
     def __init__(
         self,
         space: str,
@@ -819,7 +789,6 @@ class SubInterface(_SubInterfaceProperties, TypedNode):
             (UTC), minus leap seconds. Timestamp when the instance was soft deleted. Note that deleted instances
             are filtered out of query results, but present in sync results
     """
-
     def __init__(
         self,
         space: str,
@@ -846,3 +815,4 @@ class SubInterface(_SubInterfaceProperties, TypedNode):
             existing_version=self.version,
             type=self.type,
         )
+

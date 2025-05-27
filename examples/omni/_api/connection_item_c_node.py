@@ -47,9 +47,7 @@ from omni._api.connection_item_c_node_connection_item_a import ConnectionItemCNo
 from omni._api.connection_item_c_node_connection_item_b import ConnectionItemCNodeConnectionItemBAPI
 
 
-class ConnectionItemCNodeAPI(
-    NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]
-):
+class ConnectionItemCNodeAPI(NodeAPI[ConnectionItemCNode, ConnectionItemCNodeWrite, ConnectionItemCNodeList, ConnectionItemCNodeWriteList]):
     _view_id = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
     _properties_by_field: ClassVar[dict[str, str]] = {}
     _class_type = ConnectionItemCNode
@@ -199,11 +197,9 @@ class ConnectionItemCNodeAPI(
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields],
         property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         external_id_prefix: str | None = None,
@@ -214,11 +210,9 @@ class ConnectionItemCNodeAPI(
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         property: ConnectionItemCNodeFields | SequenceNotStr[ConnectionItemCNodeFields] | None = None,
         external_id_prefix: str | None = None,
@@ -326,14 +320,12 @@ class ConnectionItemCNodeAPI(
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                limit=limit,
-                max_retrieve_batch_limit=chunk_size,
-                has_container_fields=False,
-            )
-        )
+        builder.append(factory.root(
+            filter=filter_,
+            limit=limit,
+            max_retrieve_batch_limit=chunk_size,
+            has_container_fields=False,
+        ))
         if retrieve_connections == "identifier" or retrieve_connections == "full":
             builder.extend(
                 factory.from_edge(
@@ -472,5 +464,6 @@ class ConnectionItemCNodeAPI(
             filter,
         )
         if retrieve_connections == "skip":
-            return self._list(limit=limit, filter=filter_)
+            return self._list(limit=limit,  filter=filter_)
         return self._query(filter_, limit, retrieve_connections, None, "list")
+

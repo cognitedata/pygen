@@ -106,6 +106,8 @@ class CDFExternalReferencesGraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> CDFExternalReferences:
         """Convert this GraphQL format of cdf external reference to the reading format."""
         return CDFExternalReferences.model_validate(as_read_args(self))
@@ -137,9 +139,11 @@ class CDFExternalReferences(DomainModel):
     sequence: Union[SequenceRead, str, None] = None
     timeseries: Union[TimeSeries, str, None] = None
 
+
     def as_write(self) -> CDFExternalReferencesWrite:
         """Convert this read version of cdf external reference to the writing version."""
         return CDFExternalReferencesWrite.model_validate(as_write_args(self))
+
 
 
 class CDFExternalReferencesWrite(DomainModelWrite):
@@ -155,12 +159,7 @@ class CDFExternalReferencesWrite(DomainModelWrite):
         sequence: The sequence field.
         timeseries: The timesery field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "file",
-        "sequence",
-        "timeseries",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("file", "sequence", "timeseries",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferences", "1")
 
@@ -171,14 +170,15 @@ class CDFExternalReferencesWrite(DomainModelWrite):
     timeseries: Union[TimeSeriesWrite, str, None] = None
 
 
+
 class CDFExternalReferencesList(DomainModelList[CDFExternalReferences]):
     """List of cdf external references in the read version."""
 
     _INSTANCE = CDFExternalReferences
-
     def as_write(self) -> CDFExternalReferencesWriteList:
         """Convert these read versions of cdf external reference to the writing versions."""
         return CDFExternalReferencesWriteList([node.as_write() for node in self.data])
+
 
 
 class CDFExternalReferencesWriteList(DomainModelWriteList[CDFExternalReferencesWrite]):
@@ -238,21 +238,16 @@ class _CDFExternalReferencesQuery(NodeQueryCore[T_DomainModelList, CDFExternalRe
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-            ]
-        )
-        self.timeseries = TimeSeriesReferenceAPI(
-            client,
-            lambda limit: [
-                item.timeseries if isinstance(item.timeseries, str) else item.timeseries.external_id  # type: ignore[misc]
-                for item in self._list(limit=limit)
-                if item.timeseries is not None
-                and (isinstance(item.timeseries, str) or item.timeseries.external_id is not None)
-            ],
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+        ])
+        self.timeseries = TimeSeriesReferenceAPI(client,  lambda limit: [
+            item.timeseries if isinstance(item.timeseries, str) else item.timeseries.external_id #type: ignore[misc]
+            for item in self._list(limit=limit)
+            if item.timeseries is not None and
+               (isinstance(item.timeseries, str) or item.timeseries.external_id is not None)
+        ])
 
     def list_cdf_external_reference(self, limit: int = DEFAULT_QUERY_LIMIT) -> CDFExternalReferencesList:
         return self._list(limit=limit)

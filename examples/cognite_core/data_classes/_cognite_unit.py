@@ -33,6 +33,7 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -48,12 +49,8 @@ __all__ = [
 ]
 
 
-CogniteUnitTextFields = Literal[
-    "external_id", "aliases", "description", "name", "quantity", "source", "source_reference", "symbol", "tags"
-]
-CogniteUnitFields = Literal[
-    "external_id", "aliases", "description", "name", "quantity", "source", "source_reference", "symbol", "tags"
-]
+CogniteUnitTextFields = Literal["external_id", "aliases", "description", "name", "quantity", "source", "source_reference", "symbol", "tags"]
+CogniteUnitFields = Literal["external_id", "aliases", "description", "name", "quantity", "source", "source_reference", "symbol", "tags"]
 
 _COGNITEUNIT_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -109,6 +106,8 @@ class CogniteUnitGraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> CogniteUnit:
         """Convert this GraphQL format of Cognite unit to the reading format."""
         return CogniteUnit.model_validate(as_read_args(self))
@@ -145,9 +144,11 @@ class CogniteUnit(CogniteDescribableNode):
     source_reference: Optional[str] = Field(None, alias="sourceReference")
     symbol: Optional[str] = None
 
+
     def as_write(self) -> CogniteUnitWrite:
         """Convert this read version of Cognite unit to the writing version."""
         return CogniteUnitWrite.model_validate(as_write_args(self))
+
 
 
 class CogniteUnitWrite(CogniteDescribableNodeWrite):
@@ -168,17 +169,7 @@ class CogniteUnitWrite(CogniteDescribableNodeWrite):
         symbol: The symbol for the unit of measurement
         tags: Text based labels for generic use, limited to 1000
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "aliases",
-        "description",
-        "name",
-        "quantity",
-        "source",
-        "source_reference",
-        "symbol",
-        "tags",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "name", "quantity", "source", "source_reference", "symbol", "tags",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteUnit", "v1")
 
@@ -189,14 +180,15 @@ class CogniteUnitWrite(CogniteDescribableNodeWrite):
     symbol: Optional[str] = None
 
 
+
 class CogniteUnitList(DomainModelList[CogniteUnit]):
     """List of Cognite units in the read version."""
 
     _INSTANCE = CogniteUnit
-
     def as_write(self) -> CogniteUnitWriteList:
         """Convert these read versions of Cognite unit to the writing versions."""
         return CogniteUnitWriteList([node.as_write() for node in self.data])
+
 
 
 class CogniteUnitWriteList(DomainModelWriteList[CogniteUnitWrite]):
@@ -310,18 +302,16 @@ class _CogniteUnitQuery(NodeQueryCore[T_DomainModelList, CogniteUnitList]):
         self.source = StringFilter(self, self._view_id.as_property_ref("source"))
         self.source_reference = StringFilter(self, self._view_id.as_property_ref("sourceReference"))
         self.symbol = StringFilter(self, self._view_id.as_property_ref("symbol"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.description,
-                self.name,
-                self.quantity,
-                self.source,
-                self.source_reference,
-                self.symbol,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.description,
+            self.name,
+            self.quantity,
+            self.source,
+            self.source_reference,
+            self.symbol,
+        ])
 
     def list_cognite_unit(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteUnitList:
         return self._list(limit=limit)

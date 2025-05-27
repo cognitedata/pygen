@@ -44,11 +44,7 @@ from cognite_core.data_classes import (
 )
 
 
-class Cognite360ImageStationAPI(
-    NodeAPI[
-        Cognite360ImageStation, Cognite360ImageStationWrite, Cognite360ImageStationList, Cognite360ImageStationWriteList
-    ]
-):
+class Cognite360ImageStationAPI(NodeAPI[Cognite360ImageStation, Cognite360ImageStationWrite, Cognite360ImageStationList, Cognite360ImageStationWriteList]):
     _view_id = dm.ViewId("cdf_cdm", "Cognite360ImageStation", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITE360IMAGESTATION_PROPERTIES_BY_FIELD
     _class_type = Cognite360ImageStation
@@ -57,6 +53,7 @@ class Cognite360ImageStationAPI(
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
+
 
     @overload
     def retrieve(
@@ -183,9 +180,7 @@ class Cognite360ImageStationAPI(
         group_by: None = None,
         property: Cognite360ImageStationFields | SequenceNotStr[Cognite360ImageStationFields] | None = None,
         query: str | None = None,
-        search_property: (
-            Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None
-        ) = None,
+        search_property: Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
@@ -204,9 +199,7 @@ class Cognite360ImageStationAPI(
         group_by: None = None,
         property: Cognite360ImageStationFields | SequenceNotStr[Cognite360ImageStationFields] | None = None,
         query: str | None = None,
-        search_property: (
-            Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None
-        ) = None,
+        search_property: Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
@@ -221,17 +214,13 @@ class Cognite360ImageStationAPI(
     @overload
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: Cognite360ImageStationFields | SequenceNotStr[Cognite360ImageStationFields],
         property: Cognite360ImageStationFields | SequenceNotStr[Cognite360ImageStationFields] | None = None,
         query: str | None = None,
-        search_property: (
-            Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None
-        ) = None,
+        search_property: Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
@@ -245,17 +234,13 @@ class Cognite360ImageStationAPI(
 
     def aggregate(
         self,
-        aggregate: (
-            Aggregations
-            | dm.aggregations.MetricAggregation
-            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
-        ),
+        aggregate: Aggregations
+        | dm.aggregations.MetricAggregation
+        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: Cognite360ImageStationFields | SequenceNotStr[Cognite360ImageStationFields] | None = None,
         property: Cognite360ImageStationFields | SequenceNotStr[Cognite360ImageStationFields] | None = None,
         query: str | None = None,
-        search_property: (
-            Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None
-        ) = None,
+        search_property: Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
@@ -329,9 +314,7 @@ class Cognite360ImageStationAPI(
         property: Cognite360ImageStationFields,
         interval: float,
         query: str | None = None,
-        search_property: (
-            Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None
-        ) = None,
+        search_property: Cognite360ImageStationTextFields | SequenceNotStr[Cognite360ImageStationTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         group_type: Literal["Station360"] | list[Literal["Station360"]] | None = None,
@@ -399,15 +382,13 @@ class Cognite360ImageStationAPI(
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(
-            factory.root(
-                filter=filter_,
-                sort=sort,
-                limit=limit,
-                max_retrieve_batch_limit=chunk_size,
-                has_container_fields=True,
-            )
-        )
+        builder.append(factory.root(
+            filter=filter_,
+            sort=sort,
+            limit=limit,
+            max_retrieve_batch_limit=chunk_size,
+            has_container_fields=True,
+        ))
         return builder.build()
 
     def iterate(
@@ -556,5 +537,6 @@ class Cognite360ImageStationAPI(
             space,
             filter,
         )
-        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit, filter=filter_, sort=sort_input)
+        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit,  filter=filter_, sort=sort_input)
+

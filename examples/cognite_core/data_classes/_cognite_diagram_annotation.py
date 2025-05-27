@@ -40,67 +40,17 @@ from cognite_core.data_classes._core import (
     TimestampFilter,
 )
 from cognite_core.data_classes._cognite_annotation import CogniteAnnotation, CogniteAnnotationWrite
-
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_source_system import (
-        CogniteSourceSystem,
-        CogniteSourceSystemGraphQL,
-        CogniteSourceSystemWrite,
-    )
+    from cognite_core.data_classes._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemGraphQL, CogniteSourceSystemWrite
 
 
 __all__ = [
-    "CogniteDiagramAnnotation",
-    "CogniteDiagramAnnotationWrite",
-    "CogniteDiagramAnnotationList",
-    "CogniteDiagramAnnotationWriteList",
-    "CogniteDiagramAnnotationFields",
-    "CogniteDiagramAnnotationTextFields",
-]
+    "CogniteDiagramAnnotation",    "CogniteDiagramAnnotationWrite",    "CogniteDiagramAnnotationList",    "CogniteDiagramAnnotationWriteList",    "CogniteDiagramAnnotationFields",    "CogniteDiagramAnnotationTextFields",]
 
 
-CogniteDiagramAnnotationTextFields = Literal[
-    "external_id",
-    "aliases",
-    "description",
-    "end_node_text",
-    "name",
-    "source_context",
-    "source_created_user",
-    "source_id",
-    "source_updated_user",
-    "start_node_text",
-    "tags",
-]
-CogniteDiagramAnnotationFields = Literal[
-    "external_id",
-    "aliases",
-    "confidence",
-    "description",
-    "end_node_page_number",
-    "end_node_text",
-    "end_node_x_max",
-    "end_node_x_min",
-    "end_node_y_max",
-    "end_node_y_min",
-    "name",
-    "source_context",
-    "source_created_time",
-    "source_created_user",
-    "source_id",
-    "source_updated_time",
-    "source_updated_user",
-    "start_node_page_number",
-    "start_node_text",
-    "start_node_x_max",
-    "start_node_x_min",
-    "start_node_y_max",
-    "start_node_y_min",
-    "status",
-    "tags",
-]
-_COGNITEDIAGRAMANNOTATION_PROPERTIES_BY_FIELD = {
-    "external_id": "externalId",
+CogniteDiagramAnnotationTextFields = Literal["external_id", "aliases", "description", "end_node_text", "name", "source_context", "source_created_user", "source_id", "source_updated_user", "start_node_text", "tags"]
+CogniteDiagramAnnotationFields = Literal["external_id", "aliases", "confidence", "description", "end_node_page_number", "end_node_text", "end_node_x_max", "end_node_x_min", "end_node_y_max", "end_node_y_min", "name", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user", "start_node_page_number", "start_node_text", "start_node_x_max", "start_node_x_min", "start_node_y_max", "start_node_y_min", "status", "tags"]
+_COGNITEDIAGRAMANNOTATION_PROPERTIES_BY_FIELD = {    "external_id": "externalId",
     "aliases": "aliases",
     "confidence": "confidence",
     "description": "description",
@@ -126,7 +76,6 @@ _COGNITEDIAGRAMANNOTATION_PROPERTIES_BY_FIELD = {
     "status": "status",
     "tags": "tags",
 }
-
 
 class CogniteDiagramAnnotationGraphQL(GraphQLCore):
     """This represents the reading version of Cognite diagram annotation, used
@@ -179,7 +128,6 @@ class CogniteDiagramAnnotationGraphQL(GraphQLCore):
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDiagramAnnotation", "v1")
     end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     aliases: Optional[list[str]] = None
@@ -267,7 +215,6 @@ class CogniteDiagramAnnotation(CogniteAnnotation):
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDiagramAnnotation", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node_page_number: Optional[int] = Field(None, alias="endNodePageNumber")
@@ -283,6 +230,7 @@ class CogniteDiagramAnnotation(CogniteAnnotation):
     start_node_y_max: Optional[float] = Field(None, alias="startNodeYMax")
     start_node_y_min: Optional[float] = Field(None, alias="startNodeYMin")
 
+
     def as_write(self) -> CogniteDiagramAnnotationWrite:
         """Convert this read version of Cognite diagram annotation to the writing version."""
         return CogniteDiagramAnnotationWrite.model_validate(as_write_args(self))
@@ -290,8 +238,9 @@ class CogniteDiagramAnnotation(CogniteAnnotation):
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
-
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
+def _validate_end_node(
+    start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]
+) -> None:
     if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
@@ -357,34 +306,7 @@ class CogniteDiagramAnnotationWrite(CogniteAnnotationWrite):
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "aliases",
-        "confidence",
-        "description",
-        "end_node_page_number",
-        "end_node_text",
-        "end_node_x_max",
-        "end_node_x_min",
-        "end_node_y_max",
-        "end_node_y_min",
-        "name",
-        "source",
-        "source_context",
-        "source_created_time",
-        "source_created_user",
-        "source_id",
-        "source_updated_time",
-        "source_updated_user",
-        "start_node_page_number",
-        "start_node_text",
-        "start_node_x_max",
-        "start_node_x_min",
-        "start_node_y_max",
-        "start_node_y_min",
-        "status",
-        "tags",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "confidence", "description", "end_node_page_number", "end_node_text", "end_node_x_max", "end_node_x_min", "end_node_y_max", "end_node_y_min", "name", "source", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user", "start_node_page_number", "start_node_text", "start_node_x_max", "start_node_x_min", "start_node_y_max", "start_node_y_min", "status", "tags",)
     _direct_relations: ClassVar[tuple[str, ...]] = ("source",)
     _validate_end_node = _validate_end_node
 
@@ -407,10 +329,10 @@ class CogniteDiagramAnnotationList(DomainRelationList[CogniteDiagramAnnotation])
     """List of Cognite diagram annotations in the reading version."""
 
     _INSTANCE = CogniteDiagramAnnotation
-
     def as_write(self) -> CogniteDiagramAnnotationWriteList:
         """Convert this read version of Cognite diagram annotation list to the writing version."""
         return CogniteDiagramAnnotationWriteList([edge.as_write() for edge in self])
+
 
 
 class CogniteDiagramAnnotationWriteList(DomainRelationWriteList[CogniteDiagramAnnotationWrite]):
@@ -444,14 +366,7 @@ def _create_cognite_diagram_annotation_filter(
     max_end_node_y_min: float | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    source: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     source_context: str | list[str] | None = None,
     source_context_prefix: str | None = None,
     min_source_created_time: datetime.datetime | None = None,
@@ -476,9 +391,7 @@ def _create_cognite_diagram_annotation_filter(
     max_start_node_y_max: float | None = None,
     min_start_node_y_min: float | None = None,
     max_start_node_y_min: float | None = None,
-    status: (
-        Literal["Approved", "Rejected", "Suggested"] | list[Literal["Approved", "Rejected", "Suggested"]] | None
-    ) = None,
+    status: Literal["Approved", "Rejected", "Suggested"] | list[Literal["Approved", "Rejected", "Suggested"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -503,12 +416,9 @@ def _create_cognite_diagram_annotation_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[
-                    (
-                        {"space": start_node_space, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                values=[                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in start_node
                 ],
             )
@@ -523,12 +433,9 @@ def _create_cognite_diagram_annotation_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[
-                    (
-                        {"space": space_end_node, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                values=[                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in end_node
                 ],
             )
@@ -542,11 +449,7 @@ def _create_cognite_diagram_annotation_filter(
     if description_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
     if min_end_node_page_number is not None or max_end_node_page_number is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("endNodePageNumber"), gte=min_end_node_page_number, lte=max_end_node_page_number
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("endNodePageNumber"), gte=min_end_node_page_number, lte=max_end_node_page_number))
     if isinstance(end_node_text, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("endNodeText"), value=end_node_text))
     if end_node_text and isinstance(end_node_text, list):
@@ -554,21 +457,13 @@ def _create_cognite_diagram_annotation_filter(
     if end_node_text_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("endNodeText"), value=end_node_text_prefix))
     if min_end_node_x_max is not None or max_end_node_x_max is not None:
-        filters.append(
-            dm.filters.Range(view_id.as_property_ref("endNodeXMax"), gte=min_end_node_x_max, lte=max_end_node_x_max)
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("endNodeXMax"), gte=min_end_node_x_max, lte=max_end_node_x_max))
     if min_end_node_x_min is not None or max_end_node_x_min is not None:
-        filters.append(
-            dm.filters.Range(view_id.as_property_ref("endNodeXMin"), gte=min_end_node_x_min, lte=max_end_node_x_min)
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("endNodeXMin"), gte=min_end_node_x_min, lte=max_end_node_x_min))
     if min_end_node_y_max is not None or max_end_node_y_max is not None:
-        filters.append(
-            dm.filters.Range(view_id.as_property_ref("endNodeYMax"), gte=min_end_node_y_max, lte=max_end_node_y_max)
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("endNodeYMax"), gte=min_end_node_y_max, lte=max_end_node_y_max))
     if min_end_node_y_min is not None or max_end_node_y_min is not None:
-        filters.append(
-            dm.filters.Range(view_id.as_property_ref("endNodeYMin"), gte=min_end_node_y_min, lte=max_end_node_y_min)
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("endNodeYMin"), gte=min_end_node_y_min, lte=max_end_node_y_min))
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -578,9 +473,7 @@ def _create_cognite_diagram_annotation_filter(
     if isinstance(source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(source):
         filters.append(dm.filters.Equals(view_id.as_property_ref("source"), value=as_instance_dict_id(source)))
     if source and isinstance(source, Sequence) and not isinstance(source, str) and not is_tuple_id(source):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source]))
     if isinstance(source_context, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceContext"), value=source_context))
     if source_context and isinstance(source_context, list):
@@ -588,21 +481,13 @@ def _create_cognite_diagram_annotation_filter(
     if source_context_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceContext"), value=source_context_prefix))
     if min_source_created_time is not None or max_source_created_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceCreatedTime"),
-                gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None,
-                lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceCreatedTime"), gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None, lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None))
     if isinstance(source_created_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user))
     if source_created_user and isinstance(source_created_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceCreatedUser"), values=source_created_user))
     if source_created_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix))
     if isinstance(source_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceId"), value=source_id))
     if source_id and isinstance(source_id, list):
@@ -610,29 +495,15 @@ def _create_cognite_diagram_annotation_filter(
     if source_id_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceId"), value=source_id_prefix))
     if min_source_updated_time is not None or max_source_updated_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceUpdatedTime"),
-                gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None,
-                lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceUpdatedTime"), gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None, lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None))
     if isinstance(source_updated_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user))
     if source_updated_user and isinstance(source_updated_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceUpdatedUser"), values=source_updated_user))
     if source_updated_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix))
     if min_start_node_page_number is not None or max_start_node_page_number is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("startNodePageNumber"),
-                gte=min_start_node_page_number,
-                lte=max_start_node_page_number,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("startNodePageNumber"), gte=min_start_node_page_number, lte=max_start_node_page_number))
     if isinstance(start_node_text, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("startNodeText"), value=start_node_text))
     if start_node_text and isinstance(start_node_text, list):
@@ -640,29 +511,13 @@ def _create_cognite_diagram_annotation_filter(
     if start_node_text_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("startNodeText"), value=start_node_text_prefix))
     if min_start_node_x_max is not None or max_start_node_x_max is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("startNodeXMax"), gte=min_start_node_x_max, lte=max_start_node_x_max
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("startNodeXMax"), gte=min_start_node_x_max, lte=max_start_node_x_max))
     if min_start_node_x_min is not None or max_start_node_x_min is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("startNodeXMin"), gte=min_start_node_x_min, lte=max_start_node_x_min
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("startNodeXMin"), gte=min_start_node_x_min, lte=max_start_node_x_min))
     if min_start_node_y_max is not None or max_start_node_y_max is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("startNodeYMax"), gte=min_start_node_y_max, lte=max_start_node_y_max
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("startNodeYMax"), gte=min_start_node_y_max, lte=max_start_node_y_max))
     if min_start_node_y_min is not None or max_start_node_y_min is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("startNodeYMin"), gte=min_start_node_y_min, lte=max_start_node_y_min
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("startNodeYMin"), gte=min_start_node_y_min, lte=max_start_node_y_min))
     if isinstance(status, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
     if status and isinstance(status, list):
@@ -696,16 +551,7 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
     ):
         from ._cognite_source_system import _CogniteSourceSystemQuery
 
-        super().__init__(
-            created_types,
-            creation_path,
-            client,
-            result_list_cls,
-            expression,
-            None,
-            connection_name,
-            connection_property,
-        )
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -713,7 +559,7 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
-                connection_property=ViewPropertyId(self._view_id, "end_node"),
+                connection_property=ViewPropertyId(self._view_id, "end_node")
             )
 
         if _CogniteSourceSystemQuery not in created_types:
@@ -754,31 +600,29 @@ class _CogniteDiagramAnnotationQuery(EdgeQueryCore[T_DomainList, CogniteDiagramA
         self.start_node_x_min = FloatFilter(self, self._view_id.as_property_ref("startNodeXMin"))
         self.start_node_y_max = FloatFilter(self, self._view_id.as_property_ref("startNodeYMax"))
         self.start_node_y_min = FloatFilter(self, self._view_id.as_property_ref("startNodeYMin"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.confidence,
-                self.description,
-                self.end_node_page_number,
-                self.end_node_text,
-                self.end_node_x_max,
-                self.end_node_x_min,
-                self.end_node_y_max,
-                self.end_node_y_min,
-                self.name,
-                self.source_filter,
-                self.source_context,
-                self.source_created_time,
-                self.source_created_user,
-                self.source_id,
-                self.source_updated_time,
-                self.source_updated_user,
-                self.start_node_page_number,
-                self.start_node_text,
-                self.start_node_x_max,
-                self.start_node_x_min,
-                self.start_node_y_max,
-                self.start_node_y_min,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.confidence,
+            self.description,
+            self.end_node_page_number,
+            self.end_node_text,
+            self.end_node_x_max,
+            self.end_node_x_min,
+            self.end_node_y_max,
+            self.end_node_y_min,
+            self.name,
+            self.source_filter,
+            self.source_context,
+            self.source_created_time,
+            self.source_created_user,
+            self.source_id,
+            self.source_updated_time,
+            self.source_updated_user,
+            self.start_node_page_number,
+            self.start_node_text,
+            self.start_node_x_max,
+            self.start_node_x_min,
+            self.start_node_y_max,
+            self.start_node_y_min,
+        ])

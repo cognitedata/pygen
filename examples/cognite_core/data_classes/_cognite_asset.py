@@ -40,64 +40,15 @@ from cognite_core.data_classes._core import (
 from cognite_core.data_classes._cognite_visualizable import CogniteVisualizable, CogniteVisualizableWrite
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 from cognite_core.data_classes._cognite_sourceable_node import CogniteSourceableNode, CogniteSourceableNodeWrite
-
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_3_d_object import (
-        Cognite3DObject,
-        Cognite3DObjectList,
-        Cognite3DObjectGraphQL,
-        Cognite3DObjectWrite,
-        Cognite3DObjectWriteList,
-    )
-    from cognite_core.data_classes._cognite_activity import (
-        CogniteActivity,
-        CogniteActivityList,
-        CogniteActivityGraphQL,
-        CogniteActivityWrite,
-        CogniteActivityWriteList,
-    )
-    from cognite_core.data_classes._cognite_asset_class import (
-        CogniteAssetClass,
-        CogniteAssetClassList,
-        CogniteAssetClassGraphQL,
-        CogniteAssetClassWrite,
-        CogniteAssetClassWriteList,
-    )
-    from cognite_core.data_classes._cognite_asset_type import (
-        CogniteAssetType,
-        CogniteAssetTypeList,
-        CogniteAssetTypeGraphQL,
-        CogniteAssetTypeWrite,
-        CogniteAssetTypeWriteList,
-    )
-    from cognite_core.data_classes._cognite_equipment import (
-        CogniteEquipment,
-        CogniteEquipmentList,
-        CogniteEquipmentGraphQL,
-        CogniteEquipmentWrite,
-        CogniteEquipmentWriteList,
-    )
-    from cognite_core.data_classes._cognite_file import (
-        CogniteFile,
-        CogniteFileList,
-        CogniteFileGraphQL,
-        CogniteFileWrite,
-        CogniteFileWriteList,
-    )
-    from cognite_core.data_classes._cognite_source_system import (
-        CogniteSourceSystem,
-        CogniteSourceSystemList,
-        CogniteSourceSystemGraphQL,
-        CogniteSourceSystemWrite,
-        CogniteSourceSystemWriteList,
-    )
-    from cognite_core.data_classes._cognite_time_series import (
-        CogniteTimeSeries,
-        CogniteTimeSeriesList,
-        CogniteTimeSeriesGraphQL,
-        CogniteTimeSeriesWrite,
-        CogniteTimeSeriesWriteList,
-    )
+    from cognite_core.data_classes._cognite_3_d_object import Cognite3DObject, Cognite3DObjectList, Cognite3DObjectGraphQL, Cognite3DObjectWrite, Cognite3DObjectWriteList
+    from cognite_core.data_classes._cognite_activity import CogniteActivity, CogniteActivityList, CogniteActivityGraphQL, CogniteActivityWrite, CogniteActivityWriteList
+    from cognite_core.data_classes._cognite_asset_class import CogniteAssetClass, CogniteAssetClassList, CogniteAssetClassGraphQL, CogniteAssetClassWrite, CogniteAssetClassWriteList
+    from cognite_core.data_classes._cognite_asset_type import CogniteAssetType, CogniteAssetTypeList, CogniteAssetTypeGraphQL, CogniteAssetTypeWrite, CogniteAssetTypeWriteList
+    from cognite_core.data_classes._cognite_equipment import CogniteEquipment, CogniteEquipmentList, CogniteEquipmentGraphQL, CogniteEquipmentWrite, CogniteEquipmentWriteList
+    from cognite_core.data_classes._cognite_file import CogniteFile, CogniteFileList, CogniteFileGraphQL, CogniteFileWrite, CogniteFileWriteList
+    from cognite_core.data_classes._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemList, CogniteSourceSystemGraphQL, CogniteSourceSystemWrite, CogniteSourceSystemWriteList
+    from cognite_core.data_classes._cognite_time_series import CogniteTimeSeries, CogniteTimeSeriesList, CogniteTimeSeriesGraphQL, CogniteTimeSeriesWrite, CogniteTimeSeriesWriteList
 
 
 __all__ = [
@@ -111,31 +62,8 @@ __all__ = [
 ]
 
 
-CogniteAssetTextFields = Literal[
-    "external_id",
-    "aliases",
-    "description",
-    "name",
-    "source_context",
-    "source_created_user",
-    "source_id",
-    "source_updated_user",
-    "tags",
-]
-CogniteAssetFields = Literal[
-    "external_id",
-    "aliases",
-    "description",
-    "name",
-    "path_last_updated_time",
-    "source_context",
-    "source_created_time",
-    "source_created_user",
-    "source_id",
-    "source_updated_time",
-    "source_updated_user",
-    "tags",
-]
+CogniteAssetTextFields = Literal["external_id", "aliases", "description", "name", "source_context", "source_created_user", "source_id", "source_updated_user", "tags"]
+CogniteAssetFields = Literal["external_id", "aliases", "description", "name", "path_last_updated_time", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user", "tags"]
 
 _COGNITEASSET_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -228,21 +156,8 @@ class CogniteAssetGraphQL(GraphQLCore):
             )
         return values
 
-    @field_validator(
-        "activities",
-        "asset_class",
-        "children",
-        "equipment",
-        "files",
-        "object_3d",
-        "parent",
-        "path",
-        "root",
-        "source",
-        "time_series",
-        "type_",
-        mode="before",
-    )
+
+    @field_validator("activities", "asset_class", "children", "equipment", "files", "object_3d", "parent", "path", "root", "source", "time_series", "type_", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -311,7 +226,6 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
     root: Union[CogniteAsset, str, dm.NodeId, None] = Field(default=None, repr=False)
     time_series: Optional[list[CogniteTimeSeries]] = Field(default=None, repr=False, alias="timeSeries")
     type_: Union[CogniteAssetType, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
-
     @field_validator("asset_class", "object_3d", "parent", "root", "source", "type_", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
@@ -327,6 +241,7 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
     def as_write(self) -> CogniteAssetWrite:
         """Convert this read version of Cognite asset to the writing version."""
         return CogniteAssetWrite.model_validate(as_write_args(self))
+
 
 
 class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
@@ -357,40 +272,13 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         tags: Text based labels for generic use, limited to 1000
         type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "aliases",
-        "asset_class",
-        "description",
-        "name",
-        "object_3d",
-        "parent",
-        "source",
-        "source_context",
-        "source_created_time",
-        "source_created_user",
-        "source_id",
-        "source_updated_time",
-        "source_updated_user",
-        "tags",
-        "type_",
-    )
-    _direct_relations: ClassVar[tuple[str, ...]] = (
-        "asset_class",
-        "object_3d",
-        "parent",
-        "path",
-        "root",
-        "source",
-        "type_",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "asset_class", "description", "name", "object_3d", "parent", "source", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user", "tags", "type_",)
+    _direct_relations: ClassVar[tuple[str, ...]] = ("asset_class", "object_3d", "parent", "path", "root", "source", "type_",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    asset_class: Union[CogniteAssetClassWrite, str, dm.NodeId, None] = Field(
-        default=None, repr=False, alias="assetClass"
-    )
+    asset_class: Union[CogniteAssetClassWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="assetClass")
     parent: Union[CogniteAssetWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     type_: Union[CogniteAssetTypeWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="type")
 
@@ -409,192 +297,101 @@ class CogniteAssetList(DomainModelList[CogniteAsset]):
     """List of Cognite assets in the read version."""
 
     _INSTANCE = CogniteAsset
-
     def as_write(self) -> CogniteAssetWriteList:
         """Convert these read versions of Cognite asset to the writing versions."""
         return CogniteAssetWriteList([node.as_write() for node in self.data])
 
+
     @property
     def activities(self) -> CogniteActivityList:
         from ._cognite_activity import CogniteActivity, CogniteActivityList
-
-        return CogniteActivityList(
-            [item for items in self.data for item in items.activities or [] if isinstance(item, CogniteActivity)]
-        )
+        return CogniteActivityList([item for items in self.data for item in items.activities or [] if isinstance(item, CogniteActivity)])
 
     @property
     def asset_class(self) -> CogniteAssetClassList:
         from ._cognite_asset_class import CogniteAssetClass, CogniteAssetClassList
-
-        return CogniteAssetClassList(
-            [item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClass)]
-        )
-
+        return CogniteAssetClassList([item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClass)])
     @property
     def children(self) -> CogniteAssetList:
-        return CogniteAssetList(
-            [item for items in self.data for item in items.children or [] if isinstance(item, CogniteAsset)]
-        )
+        return CogniteAssetList([item for items in self.data for item in items.children or [] if isinstance(item, CogniteAsset)])
 
     @property
     def equipment(self) -> CogniteEquipmentList:
         from ._cognite_equipment import CogniteEquipment, CogniteEquipmentList
-
-        return CogniteEquipmentList(
-            [item for items in self.data for item in items.equipment or [] if isinstance(item, CogniteEquipment)]
-        )
+        return CogniteEquipmentList([item for items in self.data for item in items.equipment or [] if isinstance(item, CogniteEquipment)])
 
     @property
     def files(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
-
-        return CogniteFileList(
-            [item for items in self.data for item in items.files or [] if isinstance(item, CogniteFile)]
-        )
+        return CogniteFileList([item for items in self.data for item in items.files or [] if isinstance(item, CogniteFile)])
 
     @property
     def object_3d(self) -> Cognite3DObjectList:
         from ._cognite_3_d_object import Cognite3DObject, Cognite3DObjectList
-
-        return Cognite3DObjectList(
-            [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObject)]
-        )
-
+        return Cognite3DObjectList([item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObject)])
     @property
     def parent(self) -> CogniteAssetList:
         return CogniteAssetList([item.parent for item in self.data if isinstance(item.parent, CogniteAsset)])
-
     @property
     def path(self) -> CogniteAssetList:
-        return CogniteAssetList(
-            [item for items in self.data for item in items.path or [] if isinstance(item, CogniteAsset)]
-        )
+        return CogniteAssetList([item for items in self.data for item in items.path or [] if isinstance(item, CogniteAsset)])
 
     @property
     def root(self) -> CogniteAssetList:
         return CogniteAssetList([item.root for item in self.data if isinstance(item.root, CogniteAsset)])
-
     @property
     def source(self) -> CogniteSourceSystemList:
         from ._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemList
-
-        return CogniteSourceSystemList(
-            [item.source for item in self.data if isinstance(item.source, CogniteSourceSystem)]
-        )
-
+        return CogniteSourceSystemList([item.source for item in self.data if isinstance(item.source, CogniteSourceSystem)])
     @property
     def time_series(self) -> CogniteTimeSeriesList:
         from ._cognite_time_series import CogniteTimeSeries, CogniteTimeSeriesList
-
-        return CogniteTimeSeriesList(
-            [item for items in self.data for item in items.time_series or [] if isinstance(item, CogniteTimeSeries)]
-        )
+        return CogniteTimeSeriesList([item for items in self.data for item in items.time_series or [] if isinstance(item, CogniteTimeSeries)])
 
     @property
     def type_(self) -> CogniteAssetTypeList:
         from ._cognite_asset_type import CogniteAssetType, CogniteAssetTypeList
-
         return CogniteAssetTypeList([item.type_ for item in self.data if isinstance(item.type_, CogniteAssetType)])
-
 
 class CogniteAssetWriteList(DomainModelWriteList[CogniteAssetWrite]):
     """List of Cognite assets in the writing version."""
 
     _INSTANCE = CogniteAssetWrite
-
     @property
     def asset_class(self) -> CogniteAssetClassWriteList:
         from ._cognite_asset_class import CogniteAssetClassWrite, CogniteAssetClassWriteList
-
-        return CogniteAssetClassWriteList(
-            [item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClassWrite)]
-        )
-
+        return CogniteAssetClassWriteList([item.asset_class for item in self.data if isinstance(item.asset_class, CogniteAssetClassWrite)])
     @property
     def object_3d(self) -> Cognite3DObjectWriteList:
         from ._cognite_3_d_object import Cognite3DObjectWrite, Cognite3DObjectWriteList
-
-        return Cognite3DObjectWriteList(
-            [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)]
-        )
-
+        return Cognite3DObjectWriteList([item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)])
     @property
     def parent(self) -> CogniteAssetWriteList:
         return CogniteAssetWriteList([item.parent for item in self.data if isinstance(item.parent, CogniteAssetWrite)])
-
     @property
     def source(self) -> CogniteSourceSystemWriteList:
         from ._cognite_source_system import CogniteSourceSystemWrite, CogniteSourceSystemWriteList
-
-        return CogniteSourceSystemWriteList(
-            [item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)]
-        )
-
+        return CogniteSourceSystemWriteList([item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)])
     @property
     def type_(self) -> CogniteAssetTypeWriteList:
         from ._cognite_asset_type import CogniteAssetTypeWrite, CogniteAssetTypeWriteList
-
-        return CogniteAssetTypeWriteList(
-            [item.type_ for item in self.data if isinstance(item.type_, CogniteAssetTypeWrite)]
-        )
+        return CogniteAssetTypeWriteList([item.type_ for item in self.data if isinstance(item.type_, CogniteAssetTypeWrite)])
 
 
 def _create_cognite_asset_filter(
     view_id: dm.ViewId,
-    asset_class: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    asset_class: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     description: str | list[str] | None = None,
     description_prefix: str | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    object_3d: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    parent: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    path: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    parent: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    path: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     min_path_last_updated_time: datetime.datetime | None = None,
     max_path_last_updated_time: datetime.datetime | None = None,
-    root: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    source: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    root: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     source_context: str | list[str] | None = None,
     source_context_prefix: str | None = None,
     min_source_created_time: datetime.datetime | None = None,
@@ -607,14 +404,7 @@ def _create_cognite_asset_filter(
     max_source_updated_time: datetime.datetime | None = None,
     source_updated_user: str | list[str] | None = None,
     source_updated_user_prefix: str | None = None,
-    type_: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    type_: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -622,17 +412,8 @@ def _create_cognite_asset_filter(
     filters: list[dm.Filter] = []
     if isinstance(asset_class, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(asset_class):
         filters.append(dm.filters.Equals(view_id.as_property_ref("assetClass"), value=as_instance_dict_id(asset_class)))
-    if (
-        asset_class
-        and isinstance(asset_class, Sequence)
-        and not isinstance(asset_class, str)
-        and not is_tuple_id(asset_class)
-    ):
-        filters.append(
-            dm.filters.In(
-                view_id.as_property_ref("assetClass"), values=[as_instance_dict_id(item) for item in asset_class]
-            )
-        )
+    if asset_class and isinstance(asset_class, Sequence) and not isinstance(asset_class, str) and not is_tuple_id(asset_class):
+        filters.append(dm.filters.In(view_id.as_property_ref("assetClass"), values=[as_instance_dict_id(item) for item in asset_class]))
     if isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):
@@ -648,49 +429,25 @@ def _create_cognite_asset_filter(
     if isinstance(object_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(object_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("object3D"), value=as_instance_dict_id(object_3d)))
     if object_3d and isinstance(object_3d, Sequence) and not isinstance(object_3d, str) and not is_tuple_id(object_3d):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("object3D"), values=[as_instance_dict_id(item) for item in object_3d])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("object3D"), values=[as_instance_dict_id(item) for item in object_3d]))
     if isinstance(parent, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(parent):
         filters.append(dm.filters.Equals(view_id.as_property_ref("parent"), value=as_instance_dict_id(parent)))
     if parent and isinstance(parent, Sequence) and not isinstance(parent, str) and not is_tuple_id(parent):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("parent"), values=[as_instance_dict_id(item) for item in parent])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("parent"), values=[as_instance_dict_id(item) for item in parent]))
     if isinstance(path, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(path):
         filters.append(dm.filters.Equals(view_id.as_property_ref("path"), value=as_instance_dict_id(path)))
     if path and isinstance(path, Sequence) and not isinstance(path, str) and not is_tuple_id(path):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("path"), values=[as_instance_dict_id(item) for item in path])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("path"), values=[as_instance_dict_id(item) for item in path]))
     if min_path_last_updated_time is not None or max_path_last_updated_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("pathLastUpdatedTime"),
-                gte=(
-                    min_path_last_updated_time.isoformat(timespec="milliseconds")
-                    if min_path_last_updated_time
-                    else None
-                ),
-                lte=(
-                    max_path_last_updated_time.isoformat(timespec="milliseconds")
-                    if max_path_last_updated_time
-                    else None
-                ),
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("pathLastUpdatedTime"), gte=min_path_last_updated_time.isoformat(timespec="milliseconds") if min_path_last_updated_time else None, lte=max_path_last_updated_time.isoformat(timespec="milliseconds") if max_path_last_updated_time else None))
     if isinstance(root, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(root):
         filters.append(dm.filters.Equals(view_id.as_property_ref("root"), value=as_instance_dict_id(root)))
     if root and isinstance(root, Sequence) and not isinstance(root, str) and not is_tuple_id(root):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("root"), values=[as_instance_dict_id(item) for item in root])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("root"), values=[as_instance_dict_id(item) for item in root]))
     if isinstance(source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(source):
         filters.append(dm.filters.Equals(view_id.as_property_ref("source"), value=as_instance_dict_id(source)))
     if source and isinstance(source, Sequence) and not isinstance(source, str) and not is_tuple_id(source):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source]))
     if isinstance(source_context, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceContext"), value=source_context))
     if source_context and isinstance(source_context, list):
@@ -698,21 +455,13 @@ def _create_cognite_asset_filter(
     if source_context_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceContext"), value=source_context_prefix))
     if min_source_created_time is not None or max_source_created_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceCreatedTime"),
-                gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None,
-                lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceCreatedTime"), gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None, lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None))
     if isinstance(source_created_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user))
     if source_created_user and isinstance(source_created_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceCreatedUser"), values=source_created_user))
     if source_created_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix))
     if isinstance(source_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceId"), value=source_id))
     if source_id and isinstance(source_id, list):
@@ -720,27 +469,17 @@ def _create_cognite_asset_filter(
     if source_id_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceId"), value=source_id_prefix))
     if min_source_updated_time is not None or max_source_updated_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceUpdatedTime"),
-                gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None,
-                lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceUpdatedTime"), gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None, lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None))
     if isinstance(source_updated_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user))
     if source_updated_user and isinstance(source_updated_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceUpdatedUser"), values=source_updated_user))
     if source_updated_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix))
     if isinstance(type_, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(type_):
         filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=as_instance_dict_id(type_)))
     if type_ and isinstance(type_, Sequence) and not isinstance(type_, str) and not is_tuple_id(type_):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("type"), values=[as_instance_dict_id(item) for item in type_])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=[as_instance_dict_id(item) for item in type_]))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -979,27 +718,25 @@ class _CogniteAssetQuery(NodeQueryCore[T_DomainModelList, CogniteAssetList]):
         self.source_updated_time = TimestampFilter(self, self._view_id.as_property_ref("sourceUpdatedTime"))
         self.source_updated_user = StringFilter(self, self._view_id.as_property_ref("sourceUpdatedUser"))
         self.type__filter = DirectRelationFilter(self, self._view_id.as_property_ref("type"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.asset_class_filter,
-                self.description,
-                self.name,
-                self.object_3d_filter,
-                self.parent_filter,
-                self.path_last_updated_time,
-                self.root_filter,
-                self.source_filter,
-                self.source_context,
-                self.source_created_time,
-                self.source_created_user,
-                self.source_id,
-                self.source_updated_time,
-                self.source_updated_user,
-                self.type__filter,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.asset_class_filter,
+            self.description,
+            self.name,
+            self.object_3d_filter,
+            self.parent_filter,
+            self.path_last_updated_time,
+            self.root_filter,
+            self.source_filter,
+            self.source_context,
+            self.source_created_time,
+            self.source_created_user,
+            self.source_id,
+            self.source_updated_time,
+            self.source_updated_user,
+            self.type__filter,
+        ])
 
     def list_cognite_asset(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteAssetList:
         return self._list(limit=limit)

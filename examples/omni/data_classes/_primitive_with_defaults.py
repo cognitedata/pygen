@@ -51,9 +51,7 @@ __all__ = [
 
 
 PrimitiveWithDefaultsTextFields = Literal["external_id", "default_string"]
-PrimitiveWithDefaultsFields = Literal[
-    "external_id", "auto_increment_int_32", "default_boolean", "default_float_32", "default_object", "default_string"
-]
+PrimitiveWithDefaultsFields = Literal["external_id", "auto_increment_int_32", "default_boolean", "default_float_32", "default_object", "default_string"]
 
 _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -100,6 +98,8 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> PrimitiveWithDefaults:
         """Convert this GraphQL format of primitive with default to the reading format."""
         return PrimitiveWithDefaults.model_validate(as_read_args(self))
@@ -135,9 +135,11 @@ class PrimitiveWithDefaults(DomainModel):
     default_object: Optional[dict] = Field(None, alias="defaultObject")
     default_string: Optional[str] = Field(None, alias="defaultString")
 
+
     def as_write(self) -> PrimitiveWithDefaultsWrite:
         """Convert this read version of primitive with default to the writing version."""
         return PrimitiveWithDefaultsWrite.model_validate(as_write_args(self))
+
 
 
 class PrimitiveWithDefaultsWrite(DomainModelWrite):
@@ -155,14 +157,7 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
         default_object: The default object field.
         default_string: The default string field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "auto_increment_int_32",
-        "default_boolean",
-        "default_float_32",
-        "default_object",
-        "default_string",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("auto_increment_int_32", "default_boolean", "default_float_32", "default_object", "default_string",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
 
@@ -171,18 +166,19 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
     auto_increment_int_32: int = Field(alias="autoIncrementInt32")
     default_boolean: Optional[bool] = Field(True, alias="defaultBoolean")
     default_float_32: Optional[float] = Field(0.42, alias="defaultFloat32")
-    default_object: Optional[dict] = Field({"foo": "bar"}, alias="defaultObject")
+    default_object: Optional[dict] = Field({'foo': 'bar'}, alias="defaultObject")
     default_string: Optional[str] = Field("my default text", alias="defaultString")
+
 
 
 class PrimitiveWithDefaultsList(DomainModelList[PrimitiveWithDefaults]):
     """List of primitive with defaults in the read version."""
 
     _INSTANCE = PrimitiveWithDefaults
-
     def as_write(self) -> PrimitiveWithDefaultsWriteList:
         """Convert these read versions of primitive with default to the writing versions."""
         return PrimitiveWithDefaultsWriteList([node.as_write() for node in self.data])
+
 
 
 class PrimitiveWithDefaultsWriteList(DomainModelWriteList[PrimitiveWithDefaultsWrite]):
@@ -206,21 +202,11 @@ def _create_primitive_with_default_filter(
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
     if min_auto_increment_int_32 is not None or max_auto_increment_int_32 is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("autoIncrementInt32"),
-                gte=min_auto_increment_int_32,
-                lte=max_auto_increment_int_32,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("autoIncrementInt32"), gte=min_auto_increment_int_32, lte=max_auto_increment_int_32))
     if isinstance(default_boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("defaultBoolean"), value=default_boolean))
     if min_default_float_32 is not None or max_default_float_32 is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("defaultFloat32"), gte=min_default_float_32, lte=max_default_float_32
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("defaultFloat32"), gte=min_default_float_32, lte=max_default_float_32))
     if isinstance(default_string, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("defaultString"), value=default_string))
     if default_string and isinstance(default_string, list):
@@ -275,16 +261,14 @@ class _PrimitiveWithDefaultsQuery(NodeQueryCore[T_DomainModelList, PrimitiveWith
         self.default_boolean = BooleanFilter(self, self._view_id.as_property_ref("defaultBoolean"))
         self.default_float_32 = FloatFilter(self, self._view_id.as_property_ref("defaultFloat32"))
         self.default_string = StringFilter(self, self._view_id.as_property_ref("defaultString"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.auto_increment_int_32,
-                self.default_boolean,
-                self.default_float_32,
-                self.default_string,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.auto_increment_int_32,
+            self.default_boolean,
+            self.default_float_32,
+            self.default_string,
+        ])
 
     def list_primitive_with_default(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveWithDefaultsList:
         return self._list(limit=limit)

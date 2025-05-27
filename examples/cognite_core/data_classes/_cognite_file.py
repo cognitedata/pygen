@@ -41,36 +41,11 @@ from cognite_core.data_classes._core import (
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 from cognite_core.data_classes._cognite_sourceable_node import CogniteSourceableNode, CogniteSourceableNodeWrite
-
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_asset import (
-        CogniteAsset,
-        CogniteAssetList,
-        CogniteAssetGraphQL,
-        CogniteAssetWrite,
-        CogniteAssetWriteList,
-    )
-    from cognite_core.data_classes._cognite_equipment import (
-        CogniteEquipment,
-        CogniteEquipmentList,
-        CogniteEquipmentGraphQL,
-        CogniteEquipmentWrite,
-        CogniteEquipmentWriteList,
-    )
-    from cognite_core.data_classes._cognite_file_category import (
-        CogniteFileCategory,
-        CogniteFileCategoryList,
-        CogniteFileCategoryGraphQL,
-        CogniteFileCategoryWrite,
-        CogniteFileCategoryWriteList,
-    )
-    from cognite_core.data_classes._cognite_source_system import (
-        CogniteSourceSystem,
-        CogniteSourceSystemList,
-        CogniteSourceSystemGraphQL,
-        CogniteSourceSystemWrite,
-        CogniteSourceSystemWriteList,
-    )
+    from cognite_core.data_classes._cognite_asset import CogniteAsset, CogniteAssetList, CogniteAssetGraphQL, CogniteAssetWrite, CogniteAssetWriteList
+    from cognite_core.data_classes._cognite_equipment import CogniteEquipment, CogniteEquipmentList, CogniteEquipmentGraphQL, CogniteEquipmentWrite, CogniteEquipmentWriteList
+    from cognite_core.data_classes._cognite_file_category import CogniteFileCategory, CogniteFileCategoryList, CogniteFileCategoryGraphQL, CogniteFileCategoryWrite, CogniteFileCategoryWriteList
+    from cognite_core.data_classes._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemList, CogniteSourceSystemGraphQL, CogniteSourceSystemWrite, CogniteSourceSystemWriteList
 
 
 __all__ = [
@@ -84,36 +59,8 @@ __all__ = [
 ]
 
 
-CogniteFileTextFields = Literal[
-    "external_id",
-    "aliases",
-    "description",
-    "directory",
-    "mime_type",
-    "name",
-    "source_context",
-    "source_created_user",
-    "source_id",
-    "source_updated_user",
-    "tags",
-]
-CogniteFileFields = Literal[
-    "external_id",
-    "aliases",
-    "description",
-    "directory",
-    "is_uploaded",
-    "mime_type",
-    "name",
-    "source_context",
-    "source_created_time",
-    "source_created_user",
-    "source_id",
-    "source_updated_time",
-    "source_updated_user",
-    "tags",
-    "uploaded_time",
-]
+CogniteFileTextFields = Literal["external_id", "aliases", "description", "directory", "mime_type", "name", "source_context", "source_created_user", "source_id", "source_updated_user", "tags"]
+CogniteFileFields = Literal["external_id", "aliases", "description", "directory", "is_uploaded", "mime_type", "name", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user", "tags", "uploaded_time"]
 
 _COGNITEFILE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -200,6 +147,7 @@ class CogniteFileGraphQL(GraphQLCore):
             )
         return values
 
+
     @field_validator("assets", "category", "equipment", "source", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -261,7 +209,6 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
     is_uploaded: Optional[bool] = Field(None, alias="isUploaded")
     mime_type: Optional[str] = Field(None, alias="mimeType")
     uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
-
     @field_validator("category", "source", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
@@ -277,6 +224,7 @@ class CogniteFile(CogniteDescribableNode, CogniteSourceableNode):
     def as_write(self) -> CogniteFileWrite:
         """Convert this read version of Cognite file to the writing version."""
         return CogniteFileWrite.model_validate(as_write_args(self))
+
 
 
 class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
@@ -309,29 +257,8 @@ class CogniteFileWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
             identifier is not guaranteed to match the user identifiers in CDF
         tags: Text based labels for generic use, limited to 1000
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "aliases",
-        "assets",
-        "category",
-        "description",
-        "directory",
-        "mime_type",
-        "name",
-        "source",
-        "source_context",
-        "source_created_time",
-        "source_created_user",
-        "source_id",
-        "source_updated_time",
-        "source_updated_user",
-        "tags",
-    )
-    _direct_relations: ClassVar[tuple[str, ...]] = (
-        "assets",
-        "category",
-        "source",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "assets", "category", "description", "directory", "mime_type", "name", "source", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user", "tags",)
+    _direct_relations: ClassVar[tuple[str, ...]] = ("assets", "category", "source",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteFile", "v1")
 
@@ -356,92 +283,53 @@ class CogniteFileList(DomainModelList[CogniteFile]):
     """List of Cognite files in the read version."""
 
     _INSTANCE = CogniteFile
-
     def as_write(self) -> CogniteFileWriteList:
         """Convert these read versions of Cognite file to the writing versions."""
         return CogniteFileWriteList([node.as_write() for node in self.data])
 
+
     @property
     def assets(self) -> CogniteAssetList:
         from ._cognite_asset import CogniteAsset, CogniteAssetList
-
-        return CogniteAssetList(
-            [item for items in self.data for item in items.assets or [] if isinstance(item, CogniteAsset)]
-        )
+        return CogniteAssetList([item for items in self.data for item in items.assets or [] if isinstance(item, CogniteAsset)])
 
     @property
     def category(self) -> CogniteFileCategoryList:
         from ._cognite_file_category import CogniteFileCategory, CogniteFileCategoryList
-
-        return CogniteFileCategoryList(
-            [item.category for item in self.data if isinstance(item.category, CogniteFileCategory)]
-        )
-
+        return CogniteFileCategoryList([item.category for item in self.data if isinstance(item.category, CogniteFileCategory)])
     @property
     def equipment(self) -> CogniteEquipmentList:
         from ._cognite_equipment import CogniteEquipment, CogniteEquipmentList
-
-        return CogniteEquipmentList(
-            [item for items in self.data for item in items.equipment or [] if isinstance(item, CogniteEquipment)]
-        )
+        return CogniteEquipmentList([item for items in self.data for item in items.equipment or [] if isinstance(item, CogniteEquipment)])
 
     @property
     def source(self) -> CogniteSourceSystemList:
         from ._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemList
-
-        return CogniteSourceSystemList(
-            [item.source for item in self.data if isinstance(item.source, CogniteSourceSystem)]
-        )
-
+        return CogniteSourceSystemList([item.source for item in self.data if isinstance(item.source, CogniteSourceSystem)])
 
 class CogniteFileWriteList(DomainModelWriteList[CogniteFileWrite]):
     """List of Cognite files in the writing version."""
 
     _INSTANCE = CogniteFileWrite
-
     @property
     def assets(self) -> CogniteAssetWriteList:
         from ._cognite_asset import CogniteAssetWrite, CogniteAssetWriteList
-
-        return CogniteAssetWriteList(
-            [item for items in self.data for item in items.assets or [] if isinstance(item, CogniteAssetWrite)]
-        )
+        return CogniteAssetWriteList([item for items in self.data for item in items.assets or [] if isinstance(item, CogniteAssetWrite)])
 
     @property
     def category(self) -> CogniteFileCategoryWriteList:
         from ._cognite_file_category import CogniteFileCategoryWrite, CogniteFileCategoryWriteList
-
-        return CogniteFileCategoryWriteList(
-            [item.category for item in self.data if isinstance(item.category, CogniteFileCategoryWrite)]
-        )
-
+        return CogniteFileCategoryWriteList([item.category for item in self.data if isinstance(item.category, CogniteFileCategoryWrite)])
     @property
     def source(self) -> CogniteSourceSystemWriteList:
         from ._cognite_source_system import CogniteSourceSystemWrite, CogniteSourceSystemWriteList
-
-        return CogniteSourceSystemWriteList(
-            [item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)]
-        )
+        return CogniteSourceSystemWriteList([item.source for item in self.data if isinstance(item.source, CogniteSourceSystemWrite)])
 
 
 def _create_cognite_file_filter(
     view_id: dm.ViewId,
-    assets: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
-    category: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    category: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     description: str | list[str] | None = None,
     description_prefix: str | None = None,
     directory: str | list[str] | None = None,
@@ -451,14 +339,7 @@ def _create_cognite_file_filter(
     mime_type_prefix: str | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    source: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     source_context: str | list[str] | None = None,
     source_context_prefix: str | None = None,
     min_source_created_time: datetime.datetime | None = None,
@@ -481,15 +362,11 @@ def _create_cognite_file_filter(
     if isinstance(assets, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(assets):
         filters.append(dm.filters.Equals(view_id.as_property_ref("assets"), value=as_instance_dict_id(assets)))
     if assets and isinstance(assets, Sequence) and not isinstance(assets, str) and not is_tuple_id(assets):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("assets"), values=[as_instance_dict_id(item) for item in assets])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("assets"), values=[as_instance_dict_id(item) for item in assets]))
     if isinstance(category, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(category):
         filters.append(dm.filters.Equals(view_id.as_property_ref("category"), value=as_instance_dict_id(category)))
     if category and isinstance(category, Sequence) and not isinstance(category, str) and not is_tuple_id(category):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("category"), values=[as_instance_dict_id(item) for item in category])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("category"), values=[as_instance_dict_id(item) for item in category]))
     if isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):
@@ -519,9 +396,7 @@ def _create_cognite_file_filter(
     if isinstance(source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(source):
         filters.append(dm.filters.Equals(view_id.as_property_ref("source"), value=as_instance_dict_id(source)))
     if source and isinstance(source, Sequence) and not isinstance(source, str) and not is_tuple_id(source):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source]))
     if isinstance(source_context, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceContext"), value=source_context))
     if source_context and isinstance(source_context, list):
@@ -529,21 +404,13 @@ def _create_cognite_file_filter(
     if source_context_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceContext"), value=source_context_prefix))
     if min_source_created_time is not None or max_source_created_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceCreatedTime"),
-                gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None,
-                lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceCreatedTime"), gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None, lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None))
     if isinstance(source_created_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user))
     if source_created_user and isinstance(source_created_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceCreatedUser"), values=source_created_user))
     if source_created_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix))
     if isinstance(source_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceId"), value=source_id))
     if source_id and isinstance(source_id, list):
@@ -551,29 +418,15 @@ def _create_cognite_file_filter(
     if source_id_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceId"), value=source_id_prefix))
     if min_source_updated_time is not None or max_source_updated_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceUpdatedTime"),
-                gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None,
-                lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceUpdatedTime"), gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None, lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None))
     if isinstance(source_updated_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user))
     if source_updated_user and isinstance(source_updated_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceUpdatedUser"), values=source_updated_user))
     if source_updated_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix))
     if min_uploaded_time is not None or max_uploaded_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("uploadedTime"),
-                gte=min_uploaded_time.isoformat(timespec="milliseconds") if min_uploaded_time else None,
-                lte=max_uploaded_time.isoformat(timespec="milliseconds") if max_uploaded_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("uploadedTime"), gte=min_uploaded_time.isoformat(timespec="milliseconds") if min_uploaded_time else None, lte=max_uploaded_time.isoformat(timespec="milliseconds") if max_uploaded_time else None))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -693,26 +546,24 @@ class _CogniteFileQuery(NodeQueryCore[T_DomainModelList, CogniteFileList]):
         self.source_updated_time = TimestampFilter(self, self._view_id.as_property_ref("sourceUpdatedTime"))
         self.source_updated_user = StringFilter(self, self._view_id.as_property_ref("sourceUpdatedUser"))
         self.uploaded_time = TimestampFilter(self, self._view_id.as_property_ref("uploadedTime"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.category_filter,
-                self.description,
-                self.directory,
-                self.is_uploaded,
-                self.mime_type,
-                self.name,
-                self.source_filter,
-                self.source_context,
-                self.source_created_time,
-                self.source_created_user,
-                self.source_id,
-                self.source_updated_time,
-                self.source_updated_user,
-                self.uploaded_time,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.category_filter,
+            self.description,
+            self.directory,
+            self.is_uploaded,
+            self.mime_type,
+            self.name,
+            self.source_filter,
+            self.source_context,
+            self.source_created_time,
+            self.source_created_user,
+            self.source_id,
+            self.source_updated_time,
+            self.source_updated_user,
+            self.uploaded_time,
+        ])
         self.content = FileContentAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
 
     def list_cognite_file(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteFileList:

@@ -38,29 +38,12 @@ from cognite_core.data_classes._core import (
 
 
 __all__ = [
-    "Cognite3DTransformationEdge",
-    "Cognite3DTransformationEdgeWrite",
-    "Cognite3DTransformationEdgeList",
-    "Cognite3DTransformationEdgeWriteList",
-    "Cognite3DTransformationEdgeFields",
-]
+    "Cognite3DTransformationEdge",    "Cognite3DTransformationEdgeWrite",    "Cognite3DTransformationEdgeList",    "Cognite3DTransformationEdgeWriteList",    "Cognite3DTransformationEdgeFields",]
 
 
-Cognite3DTransformationEdgeTextFields = Literal["external_id",]
-Cognite3DTransformationEdgeFields = Literal[
-    "external_id",
-    "euler_rotation_x",
-    "euler_rotation_y",
-    "euler_rotation_z",
-    "scale_x",
-    "scale_y",
-    "scale_z",
-    "translation_x",
-    "translation_y",
-    "translation_z",
-]
-_COGNITE3DTRANSFORMATIONEDGE_PROPERTIES_BY_FIELD = {
-    "external_id": "externalId",
+Cognite3DTransformationEdgeTextFields = Literal["external_id", ]
+Cognite3DTransformationEdgeFields = Literal["external_id", "euler_rotation_x", "euler_rotation_y", "euler_rotation_z", "scale_x", "scale_y", "scale_z", "translation_x", "translation_y", "translation_z"]
+_COGNITE3DTRANSFORMATIONEDGE_PROPERTIES_BY_FIELD = {    "external_id": "externalId",
     "euler_rotation_x": "eulerRotationX",
     "euler_rotation_y": "eulerRotationY",
     "euler_rotation_z": "eulerRotationZ",
@@ -71,7 +54,6 @@ _COGNITE3DTRANSFORMATIONEDGE_PROPERTIES_BY_FIELD = {
     "translation_y": "translationY",
     "translation_z": "translationZ",
 }
-
 
 class Cognite3DTransformationEdgeGraphQL(GraphQLCore):
     """This represents the reading version of Cognite 3D transformation edge, used
@@ -94,7 +76,6 @@ class Cognite3DTransformationEdgeGraphQL(GraphQLCore):
         translation_y: The displacement of the object along the Y-axis in the 3D coordinate system
         translation_z: The displacement of the object along the Z-axis in the 3D coordinate system
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
     end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     euler_rotation_x: Optional[float] = Field(None, alias="eulerRotationX")
@@ -136,7 +117,6 @@ class Cognite3DTransformationEdge(DomainRelation):
         translation_y: The displacement of the object along the Y-axis in the 3D coordinate system
         translation_z: The displacement of the object along the Z-axis in the 3D coordinate system
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId] = Field(alias="endNode")
@@ -150,6 +130,7 @@ class Cognite3DTransformationEdge(DomainRelation):
     translation_y: Optional[float] = Field(None, alias="translationY")
     translation_z: Optional[float] = Field(None, alias="translationZ")
 
+
     def as_write(self) -> Cognite3DTransformationEdgeWrite:
         """Convert this read version of Cognite 3D transformation edge to the writing version."""
         return Cognite3DTransformationEdgeWrite.model_validate(as_write_args(self))
@@ -157,8 +138,9 @@ class Cognite3DTransformationEdge(DomainRelation):
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
-
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
+def _validate_end_node(
+    start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]
+) -> None:
     if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
@@ -194,18 +176,7 @@ class Cognite3DTransformationEdgeWrite(DomainRelationWrite):
         translation_y: The displacement of the object along the Y-axis in the 3D coordinate system
         translation_z: The displacement of the object along the Z-axis in the 3D coordinate system
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "euler_rotation_x",
-        "euler_rotation_y",
-        "euler_rotation_z",
-        "scale_x",
-        "scale_y",
-        "scale_z",
-        "translation_x",
-        "translation_y",
-        "translation_z",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("euler_rotation_x", "euler_rotation_y", "euler_rotation_z", "scale_x", "scale_y", "scale_z", "translation_x", "translation_y", "translation_z",)
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DTransformation", "v1")
@@ -225,10 +196,10 @@ class Cognite3DTransformationEdgeList(DomainRelationList[Cognite3DTransformation
     """List of Cognite 3D transformation edges in the reading version."""
 
     _INSTANCE = Cognite3DTransformationEdge
-
     def as_write(self) -> Cognite3DTransformationEdgeWriteList:
         """Convert this read version of Cognite 3D transformation edge list to the writing version."""
         return Cognite3DTransformationEdgeWriteList([edge.as_write() for edge in self])
+
 
 
 class Cognite3DTransformationEdgeWriteList(DomainRelationWriteList[Cognite3DTransformationEdgeWrite]):
@@ -286,12 +257,9 @@ def _create_cognite_3_d_transformation_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[
-                    (
-                        {"space": start_node_space, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                values=[                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in start_node
                 ],
             )
@@ -306,34 +274,19 @@ def _create_cognite_3_d_transformation_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[
-                    (
-                        {"space": space_end_node, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                values=[                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in end_node
                 ],
             )
         )
     if min_euler_rotation_x is not None or max_euler_rotation_x is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("eulerRotationX"), gte=min_euler_rotation_x, lte=max_euler_rotation_x
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("eulerRotationX"), gte=min_euler_rotation_x, lte=max_euler_rotation_x))
     if min_euler_rotation_y is not None or max_euler_rotation_y is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("eulerRotationY"), gte=min_euler_rotation_y, lte=max_euler_rotation_y
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("eulerRotationY"), gte=min_euler_rotation_y, lte=max_euler_rotation_y))
     if min_euler_rotation_z is not None or max_euler_rotation_z is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("eulerRotationZ"), gte=min_euler_rotation_z, lte=max_euler_rotation_z
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("eulerRotationZ"), gte=min_euler_rotation_z, lte=max_euler_rotation_z))
     if min_scale_x is not None or max_scale_x is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("scaleX"), gte=min_scale_x, lte=max_scale_x))
     if min_scale_y is not None or max_scale_y is not None:
@@ -341,17 +294,11 @@ def _create_cognite_3_d_transformation_edge_filter(
     if min_scale_z is not None or max_scale_z is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("scaleZ"), gte=min_scale_z, lte=max_scale_z))
     if min_translation_x is not None or max_translation_x is not None:
-        filters.append(
-            dm.filters.Range(view_id.as_property_ref("translationX"), gte=min_translation_x, lte=max_translation_x)
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("translationX"), gte=min_translation_x, lte=max_translation_x))
     if min_translation_y is not None or max_translation_y is not None:
-        filters.append(
-            dm.filters.Range(view_id.as_property_ref("translationY"), gte=min_translation_y, lte=max_translation_y)
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("translationY"), gte=min_translation_y, lte=max_translation_y))
     if min_translation_z is not None or max_translation_z is not None:
-        filters.append(
-            dm.filters.Range(view_id.as_property_ref("translationZ"), gte=min_translation_z, lte=max_translation_z)
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("translationZ"), gte=min_translation_z, lte=max_translation_z))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -380,16 +327,7 @@ class _Cognite3DTransformationEdgeQuery(EdgeQueryCore[T_DomainList, Cognite3DTra
         connection_property: ViewPropertyId | None = None,
     ):
 
-        super().__init__(
-            created_types,
-            creation_path,
-            client,
-            result_list_cls,
-            expression,
-            None,
-            connection_name,
-            connection_property,
-        )
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -397,7 +335,7 @@ class _Cognite3DTransformationEdgeQuery(EdgeQueryCore[T_DomainList, Cognite3DTra
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
-                connection_property=ViewPropertyId(self._view_id, "end_node"),
+                connection_property=ViewPropertyId(self._view_id, "end_node")
             )
 
         self.space = StringFilter(self, ["node", "space"])
@@ -411,18 +349,16 @@ class _Cognite3DTransformationEdgeQuery(EdgeQueryCore[T_DomainList, Cognite3DTra
         self.translation_x = FloatFilter(self, self._view_id.as_property_ref("translationX"))
         self.translation_y = FloatFilter(self, self._view_id.as_property_ref("translationY"))
         self.translation_z = FloatFilter(self, self._view_id.as_property_ref("translationZ"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.euler_rotation_x,
-                self.euler_rotation_y,
-                self.euler_rotation_z,
-                self.scale_x,
-                self.scale_y,
-                self.scale_z,
-                self.translation_x,
-                self.translation_y,
-                self.translation_z,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.euler_rotation_x,
+            self.euler_rotation_y,
+            self.euler_rotation_z,
+            self.scale_x,
+            self.scale_y,
+            self.scale_z,
+            self.translation_x,
+            self.translation_y,
+            self.translation_z,
+        ])

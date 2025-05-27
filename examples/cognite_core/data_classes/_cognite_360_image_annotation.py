@@ -41,61 +41,18 @@ from cognite_core.data_classes._core import (
 from cognite_core.data_classes._cognite_annotation import CogniteAnnotation, CogniteAnnotationWrite
 from cognite_core.data_classes._cognite_3_d_object import Cognite3DObjectWrite
 from cognite_core.data_classes._cognite_360_image import Cognite360Image, Cognite360ImageGraphQL, Cognite360ImageWrite
-
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_360_image import (
-        Cognite360Image,
-        Cognite360ImageGraphQL,
-        Cognite360ImageWrite,
-    )
-    from cognite_core.data_classes._cognite_source_system import (
-        CogniteSourceSystem,
-        CogniteSourceSystemGraphQL,
-        CogniteSourceSystemWrite,
-    )
+    from cognite_core.data_classes._cognite_360_image import Cognite360Image, Cognite360ImageGraphQL, Cognite360ImageWrite
+    from cognite_core.data_classes._cognite_source_system import CogniteSourceSystem, CogniteSourceSystemGraphQL, CogniteSourceSystemWrite
 
 
 __all__ = [
-    "Cognite360ImageAnnotation",
-    "Cognite360ImageAnnotationWrite",
-    "Cognite360ImageAnnotationList",
-    "Cognite360ImageAnnotationWriteList",
-    "Cognite360ImageAnnotationFields",
-    "Cognite360ImageAnnotationTextFields",
-]
+    "Cognite360ImageAnnotation",    "Cognite360ImageAnnotationWrite",    "Cognite360ImageAnnotationList",    "Cognite360ImageAnnotationWriteList",    "Cognite360ImageAnnotationFields",    "Cognite360ImageAnnotationTextFields",]
 
 
-Cognite360ImageAnnotationTextFields = Literal[
-    "external_id",
-    "aliases",
-    "description",
-    "format_version",
-    "name",
-    "source_context",
-    "source_created_user",
-    "source_id",
-    "source_updated_user",
-    "tags",
-]
-Cognite360ImageAnnotationFields = Literal[
-    "external_id",
-    "aliases",
-    "confidence",
-    "description",
-    "format_version",
-    "name",
-    "polygon",
-    "source_context",
-    "source_created_time",
-    "source_created_user",
-    "source_id",
-    "source_updated_time",
-    "source_updated_user",
-    "status",
-    "tags",
-]
-_COGNITE360IMAGEANNOTATION_PROPERTIES_BY_FIELD = {
-    "external_id": "externalId",
+Cognite360ImageAnnotationTextFields = Literal["external_id", "aliases", "description", "format_version", "name", "source_context", "source_created_user", "source_id", "source_updated_user", "tags"]
+Cognite360ImageAnnotationFields = Literal["external_id", "aliases", "confidence", "description", "format_version", "name", "polygon", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user", "status", "tags"]
+_COGNITE360IMAGEANNOTATION_PROPERTIES_BY_FIELD = {    "external_id": "externalId",
     "aliases": "aliases",
     "confidence": "confidence",
     "description": "description",
@@ -111,7 +68,6 @@ _COGNITE360IMAGEANNOTATION_PROPERTIES_BY_FIELD = {
     "status": "status",
     "tags": "tags",
 }
-
 
 class Cognite360ImageAnnotationGraphQL(GraphQLCore):
     """This represents the reading version of Cognite 360 image annotation, used
@@ -143,7 +99,6 @@ class Cognite360ImageAnnotationGraphQL(GraphQLCore):
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
-
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageAnnotation", "v1")
     end_node: Union[Cognite360ImageGraphQL, None] = Field(None, alias="endNode")
     aliases: Optional[list[str]] = None
@@ -200,24 +155,23 @@ class Cognite360ImageAnnotation(CogniteAnnotation):
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
-
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageAnnotation", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[Cognite360Image, str, dm.NodeId] = Field(alias="endNode") # type: ignore[assignment]
     format_version: Optional[str] = Field(None, alias="formatVersion")
     polygon: Optional[list[float]] = None
 
+
     def as_write(self) -> Cognite360ImageAnnotationWrite:
         """Convert this read version of Cognite 360 image annotation to the writing version."""
         return Cognite360ImageAnnotationWrite.model_validate(as_write_args(self))
 
 
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
-    Cognite360ImageWrite: {Cognite3DObjectWrite},
-}
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {    Cognite360ImageWrite: {Cognite3DObjectWrite},}
 
-
-def _validate_end_node(start_node: DomainModelWrite, end_node: Union[Cognite360ImageWrite, str, dm.NodeId]) -> None:
+def _validate_end_node(
+    start_node: DomainModelWrite, end_node: Union[Cognite360ImageWrite, str, dm.NodeId]
+) -> None:
     if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
@@ -262,24 +216,7 @@ class Cognite360ImageAnnotationWrite(CogniteAnnotationWrite):
         status: The status of the annotation
         tags: Text based labels for generic use, limited to 1000
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "aliases",
-        "confidence",
-        "description",
-        "format_version",
-        "name",
-        "polygon",
-        "source",
-        "source_context",
-        "source_created_time",
-        "source_created_user",
-        "source_id",
-        "source_updated_time",
-        "source_updated_user",
-        "status",
-        "tags",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "confidence", "description", "format_version", "name", "polygon", "source", "source_context", "source_created_time", "source_created_user", "source_id", "source_updated_time", "source_updated_user", "status", "tags",)
     _direct_relations: ClassVar[tuple[str, ...]] = ("source",)
     _validate_end_node = _validate_end_node
 
@@ -293,10 +230,10 @@ class Cognite360ImageAnnotationList(DomainRelationList[Cognite360ImageAnnotation
     """List of Cognite 360 image annotations in the reading version."""
 
     _INSTANCE = Cognite360ImageAnnotation
-
     def as_write(self) -> Cognite360ImageAnnotationWriteList:
         """Convert this read version of Cognite 360 image annotation list to the writing version."""
         return Cognite360ImageAnnotationWriteList([edge.as_write() for edge in self])
+
 
 
 class Cognite360ImageAnnotationWriteList(DomainRelationWriteList[Cognite360ImageAnnotationWrite]):
@@ -320,14 +257,7 @@ def _create_cognite_360_image_annotation_filter(
     format_version_prefix: str | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    source: (
-        str
-        | tuple[str, str]
-        | dm.NodeId
-        | dm.DirectRelationReference
-        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-        | None
-    ) = None,
+    source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
     source_context: str | list[str] | None = None,
     source_context_prefix: str | None = None,
     min_source_created_time: datetime.datetime | None = None,
@@ -340,9 +270,7 @@ def _create_cognite_360_image_annotation_filter(
     max_source_updated_time: datetime.datetime | None = None,
     source_updated_user: str | list[str] | None = None,
     source_updated_user_prefix: str | None = None,
-    status: (
-        Literal["Approved", "Rejected", "Suggested"] | list[Literal["Approved", "Rejected", "Suggested"]] | None
-    ) = None,
+    status: Literal["Approved", "Rejected", "Suggested"] | list[Literal["Approved", "Rejected", "Suggested"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -367,12 +295,9 @@ def _create_cognite_360_image_annotation_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[
-                    (
-                        {"space": start_node_space, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                values=[                    {"space": start_node_space, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in start_node
                 ],
             )
@@ -387,12 +312,9 @@ def _create_cognite_360_image_annotation_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[
-                    (
-                        {"space": space_end_node, "externalId": ext_id}
-                        if isinstance(ext_id, str)
-                        else ext_id.dump(camel_case=True, include_instance_type=False)
-                    )
+                values=[                    {"space": space_end_node, "externalId": ext_id}
+                    if isinstance(ext_id, str)
+                    else ext_id.dump(camel_case=True, include_instance_type=False)
                     for ext_id in end_node
                 ],
             )
@@ -420,9 +342,7 @@ def _create_cognite_360_image_annotation_filter(
     if isinstance(source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(source):
         filters.append(dm.filters.Equals(view_id.as_property_ref("source"), value=as_instance_dict_id(source)))
     if source and isinstance(source, Sequence) and not isinstance(source, str) and not is_tuple_id(source):
-        filters.append(
-            dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source])
-        )
+        filters.append(dm.filters.In(view_id.as_property_ref("source"), values=[as_instance_dict_id(item) for item in source]))
     if isinstance(source_context, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceContext"), value=source_context))
     if source_context and isinstance(source_context, list):
@@ -430,21 +350,13 @@ def _create_cognite_360_image_annotation_filter(
     if source_context_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceContext"), value=source_context_prefix))
     if min_source_created_time is not None or max_source_created_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceCreatedTime"),
-                gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None,
-                lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceCreatedTime"), gte=min_source_created_time.isoformat(timespec="milliseconds") if min_source_created_time else None, lte=max_source_created_time.isoformat(timespec="milliseconds") if max_source_created_time else None))
     if isinstance(source_created_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user))
     if source_created_user and isinstance(source_created_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceCreatedUser"), values=source_created_user))
     if source_created_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceCreatedUser"), value=source_created_user_prefix))
     if isinstance(source_id, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceId"), value=source_id))
     if source_id and isinstance(source_id, list):
@@ -452,21 +364,13 @@ def _create_cognite_360_image_annotation_filter(
     if source_id_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceId"), value=source_id_prefix))
     if min_source_updated_time is not None or max_source_updated_time is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("sourceUpdatedTime"),
-                gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None,
-                lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("sourceUpdatedTime"), gte=min_source_updated_time.isoformat(timespec="milliseconds") if min_source_updated_time else None, lte=max_source_updated_time.isoformat(timespec="milliseconds") if max_source_updated_time else None))
     if isinstance(source_updated_user, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user))
     if source_updated_user and isinstance(source_updated_user, list):
         filters.append(dm.filters.In(view_id.as_property_ref("sourceUpdatedUser"), values=source_updated_user))
     if source_updated_user_prefix is not None:
-        filters.append(
-            dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
-        )
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix))
     if isinstance(status, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
     if status and isinstance(status, list):
@@ -501,16 +405,7 @@ class _Cognite360ImageAnnotationQuery(EdgeQueryCore[T_DomainList, Cognite360Imag
         from ._cognite_360_image import _Cognite360ImageQuery
         from ._cognite_source_system import _CogniteSourceSystemQuery
 
-        super().__init__(
-            created_types,
-            creation_path,
-            client,
-            result_list_cls,
-            expression,
-            None,
-            connection_name,
-            connection_property,
-        )
+        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -518,7 +413,7 @@ class _Cognite360ImageAnnotationQuery(EdgeQueryCore[T_DomainList, Cognite360Imag
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
-                connection_property=ViewPropertyId(self._view_id, "end_node"),
+                connection_property=ViewPropertyId(self._view_id, "end_node")
             )
 
         if _CogniteSourceSystemQuery not in created_types:
@@ -548,20 +443,18 @@ class _Cognite360ImageAnnotationQuery(EdgeQueryCore[T_DomainList, Cognite360Imag
         self.source_id = StringFilter(self, self._view_id.as_property_ref("sourceId"))
         self.source_updated_time = TimestampFilter(self, self._view_id.as_property_ref("sourceUpdatedTime"))
         self.source_updated_user = StringFilter(self, self._view_id.as_property_ref("sourceUpdatedUser"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.confidence,
-                self.description,
-                self.format_version,
-                self.name,
-                self.source_filter,
-                self.source_context,
-                self.source_created_time,
-                self.source_created_user,
-                self.source_id,
-                self.source_updated_time,
-                self.source_updated_user,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.confidence,
+            self.description,
+            self.format_version,
+            self.name,
+            self.source_filter,
+            self.source_context,
+            self.source_created_time,
+            self.source_created_user,
+            self.source_id,
+            self.source_updated_time,
+            self.source_updated_user,
+        ])

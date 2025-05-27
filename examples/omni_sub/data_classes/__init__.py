@@ -17,41 +17,10 @@ from omni_sub.data_classes._core import (
     SequenceColumnGraphQL,
     SequenceGraphQL,
 )
-from ._connection_item_a import (
-    ConnectionItemA,
-    ConnectionItemAFields,
-    ConnectionItemAGraphQL,
-    ConnectionItemAList,
-    ConnectionItemATextFields,
-    ConnectionItemAWrite,
-    ConnectionItemAWriteList,
-)
-from ._connection_item_b import (
-    ConnectionItemB,
-    ConnectionItemBFields,
-    ConnectionItemBGraphQL,
-    ConnectionItemBList,
-    ConnectionItemBTextFields,
-    ConnectionItemBWrite,
-    ConnectionItemBWriteList,
-)
-from ._connection_item_c_edge import (
-    ConnectionItemCEdge,
-    ConnectionItemCEdgeFields,
-    ConnectionItemCEdgeGraphQL,
-    ConnectionItemCEdgeList,
-    ConnectionItemCEdgeTextFields,
-)
-from ._connection_item_c_node import (
-    ConnectionItemCNode,
-    ConnectionItemCNodeFields,
-    ConnectionItemCNodeGraphQL,
-    ConnectionItemCNodeList,
-    ConnectionItemCNodeTextFields,
-    ConnectionItemCNodeWrite,
-    ConnectionItemCNodeWriteList,
-)
-
+from ._connection_item_a import ConnectionItemA, ConnectionItemAFields, ConnectionItemAGraphQL, ConnectionItemAList, ConnectionItemATextFields, ConnectionItemAWrite, ConnectionItemAWriteList
+from ._connection_item_b import ConnectionItemB, ConnectionItemBFields, ConnectionItemBGraphQL, ConnectionItemBList, ConnectionItemBTextFields, ConnectionItemBWrite, ConnectionItemBWriteList
+from ._connection_item_c_edge import ConnectionItemCEdge, ConnectionItemCEdgeFields, ConnectionItemCEdgeGraphQL, ConnectionItemCEdgeList, ConnectionItemCEdgeTextFields
+from ._connection_item_c_node import ConnectionItemCNode, ConnectionItemCNodeFields, ConnectionItemCNodeGraphQL, ConnectionItemCNodeList, ConnectionItemCNodeTextFields, ConnectionItemCNodeWrite, ConnectionItemCNodeWriteList
 ConnectionItemA.model_rebuild()
 ConnectionItemAGraphQL.model_rebuild()
 ConnectionItemAWrite.model_rebuild()

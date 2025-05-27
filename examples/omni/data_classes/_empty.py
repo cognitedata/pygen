@@ -54,9 +54,7 @@ __all__ = [
 
 
 EmptyTextFields = Literal["external_id", "text"]
-EmptyFields = Literal[
-    "external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
-]
+EmptyFields = Literal["external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"]
 
 _EMPTY_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -115,6 +113,8 @@ class EmptyGraphQL(GraphQLCore):
             )
         return values
 
+
+
     def as_read(self) -> Empty:
         """Convert this GraphQL format of empty to the reading format."""
         return Empty.model_validate(as_read_args(self))
@@ -158,9 +158,11 @@ class Empty(DomainModel):
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
+
     def as_write(self) -> EmptyWrite:
         """Convert this read version of empty to the writing version."""
         return EmptyWrite.model_validate(as_write_args(self))
+
 
 
 class EmptyWrite(DomainModelWrite):
@@ -182,25 +184,12 @@ class EmptyWrite(DomainModelWrite):
         text: The text field.
         timestamp: The timestamp field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "boolean",
-        "date",
-        "float_32",
-        "float_64",
-        "int_32",
-        "int_64",
-        "json_",
-        "text",
-        "timestamp",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Empty", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "sp_pygen_models", "Empty"
-    )
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("sp_pygen_models", "Empty")
     boolean: Optional[bool] = None
     date: Optional[datetime.date] = None
     float_32: Optional[float] = Field(None, alias="float32")
@@ -212,14 +201,15 @@ class EmptyWrite(DomainModelWrite):
     timestamp: Optional[datetime.datetime] = None
 
 
+
 class EmptyList(DomainModelList[Empty]):
     """List of empties in the read version."""
 
     _INSTANCE = Empty
-
     def as_write(self) -> EmptyWriteList:
         """Convert these read versions of empty to the writing versions."""
         return EmptyWriteList([node.as_write() for node in self.data])
+
 
 
 class EmptyWriteList(DomainModelWriteList[EmptyWrite]):
@@ -253,13 +243,7 @@ def _create_empty_filter(
     if isinstance(boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("boolean"), value=boolean))
     if min_date is not None or max_date is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("date"),
-                gte=min_date.isoformat() if min_date else None,
-                lte=max_date.isoformat() if max_date else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("date"), gte=min_date.isoformat() if min_date else None, lte=max_date.isoformat() if max_date else None))
     if min_float_32 is not None or max_float_32 is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("float32"), gte=min_float_32, lte=max_float_32))
     if min_float_64 is not None or max_float_64 is not None:
@@ -275,13 +259,7 @@ def _create_empty_filter(
     if text_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("text"), value=text_prefix))
     if min_timestamp is not None or max_timestamp is not None:
-        filters.append(
-            dm.filters.Range(
-                view_id.as_property_ref("timestamp"),
-                gte=min_timestamp.isoformat(timespec="milliseconds") if min_timestamp else None,
-                lte=max_timestamp.isoformat(timespec="milliseconds") if max_timestamp else None,
-            )
-        )
+        filters.append(dm.filters.Range(view_id.as_property_ref("timestamp"), gte=min_timestamp.isoformat(timespec="milliseconds") if min_timestamp else None, lte=max_timestamp.isoformat(timespec="milliseconds") if max_timestamp else None))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -334,20 +312,18 @@ class _EmptyQuery(NodeQueryCore[T_DomainModelList, EmptyList]):
         self.int_64 = IntFilter(self, self._view_id.as_property_ref("int64"))
         self.text = StringFilter(self, self._view_id.as_property_ref("text"))
         self.timestamp = TimestampFilter(self, self._view_id.as_property_ref("timestamp"))
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-                self.boolean,
-                self.date,
-                self.float_32,
-                self.float_64,
-                self.int_32,
-                self.int_64,
-                self.text,
-                self.timestamp,
-            ]
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+            self.boolean,
+            self.date,
+            self.float_32,
+            self.float_64,
+            self.int_32,
+            self.int_64,
+            self.text,
+            self.timestamp,
+        ])
 
     def list_empty(self, limit: int = DEFAULT_QUERY_LIMIT) -> EmptyList:
         return self._list(limit=limit)

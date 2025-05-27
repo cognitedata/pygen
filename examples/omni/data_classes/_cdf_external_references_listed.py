@@ -112,6 +112,7 @@ class CDFExternalReferencesListedGraphQL(GraphQLCore):
             return [v for v in value if v is not None] or None
         return value
 
+
     def as_read(self) -> CDFExternalReferencesListed:
         """Convert this GraphQL format of cdf external references listed to the reading format."""
         return CDFExternalReferencesListed.model_validate(as_read_args(self))
@@ -143,9 +144,11 @@ class CDFExternalReferencesListed(DomainModel):
     sequences: Optional[list[Union[SequenceRead, str]]] = None
     timeseries: Optional[list[Union[TimeSeries, str]]] = None
 
+
     def as_write(self) -> CDFExternalReferencesListedWrite:
         """Convert this read version of cdf external references listed to the writing version."""
         return CDFExternalReferencesListedWrite.model_validate(as_write_args(self))
+
 
 
 class CDFExternalReferencesListedWrite(DomainModelWrite):
@@ -161,12 +164,7 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
         sequences: The sequence field.
         timeseries: The timesery field.
     """
-
-    _container_fields: ClassVar[tuple[str, ...]] = (
-        "files",
-        "sequences",
-        "timeseries",
-    )
+    _container_fields: ClassVar[tuple[str, ...]] = ("files", "sequences", "timeseries",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
 
@@ -177,14 +175,15 @@ class CDFExternalReferencesListedWrite(DomainModelWrite):
     timeseries: Optional[list[Union[TimeSeriesWrite, str]]] = None
 
 
+
 class CDFExternalReferencesListedList(DomainModelList[CDFExternalReferencesListed]):
     """List of cdf external references listeds in the read version."""
 
     _INSTANCE = CDFExternalReferencesListed
-
     def as_write(self) -> CDFExternalReferencesListedWriteList:
         """Convert these read versions of cdf external references listed to the writing versions."""
         return CDFExternalReferencesListedWriteList([node.as_write() for node in self.data])
+
 
 
 class CDFExternalReferencesListedWriteList(DomainModelWriteList[CDFExternalReferencesListedWrite]):
@@ -244,22 +243,18 @@ class _CDFExternalReferencesListedQuery(NodeQueryCore[T_DomainModelList, CDFExte
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self._filter_classes.extend(
-            [
-                self.space,
-                self.external_id,
-            ]
-        )
-        self.timeseries = TimeSeriesReferenceAPI(
-            client,
-            lambda limit: [
-                ts if isinstance(ts, str) else ts.external_id  # type: ignore[misc]
-                for item in self._list(limit=limit)
-                if item.timeseries is not None
-                for ts in item.timeseries
-                if ts is not None and (isinstance(ts, str) or ts.external_id is not None)
-            ],
-        )
+        self._filter_classes.extend([
+            self.space,
+            self.external_id,
+        ])
+        self.timeseries = TimeSeriesReferenceAPI(client,  lambda limit: [
+            ts if isinstance(ts, str) else ts.external_id #type: ignore[misc]
+            for item in self._list(limit=limit)
+            if item.timeseries is not None
+            for ts in item.timeseries
+            if ts is not None and
+               (isinstance(ts, str) or ts.external_id is not None)
+        ]) 
 
     def list_cdf_external_references_listed(self, limit: int = DEFAULT_QUERY_LIMIT) -> CDFExternalReferencesListedList:
         return self._list(limit=limit)

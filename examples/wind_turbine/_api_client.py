@@ -46,7 +46,6 @@ class WindTurbineClient:
         externalId: WindTurbine
         version: 1
     """
-
     _data_model_id = dm.DataModelId("sp_pygen_power", "WindTurbine", "1")
 
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
@@ -146,10 +145,7 @@ class WindTurbineClient:
     def delete(
         self,
         external_id: (
-            str
-            | dm.NodeId
-            | data_classes.DomainModelWrite
-            | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
+            str | dm.NodeId | data_classes.DomainModelWrite | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
         ),
         space: str = DEFAULT_INSTANCE_SPACE,
     ) -> dm.InstancesDeleteResult:
@@ -208,9 +204,9 @@ class WindTurbineClient:
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the WindTurbine data model.
 
-        Args:
-            query (str): The GraphQL query to issue.
-            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+            Args:
+                query (str): The GraphQL query to issue.
+                variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
         data_model_id = dm.DataModelId("sp_pygen_power", "WindTurbine", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
