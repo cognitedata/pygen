@@ -35,9 +35,22 @@ from wind_turbine.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
+
 if TYPE_CHECKING:
-    from wind_turbine.data_classes._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList, SensorTimeSeriesGraphQL, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-    from wind_turbine.data_classes._wind_turbine import WindTurbine, WindTurbineList, WindTurbineGraphQL, WindTurbineWrite, WindTurbineWriteList
+    from wind_turbine.data_classes._sensor_time_series import (
+        SensorTimeSeries,
+        SensorTimeSeriesList,
+        SensorTimeSeriesGraphQL,
+        SensorTimeSeriesWrite,
+        SensorTimeSeriesWriteList,
+    )
+    from wind_turbine.data_classes._wind_turbine import (
+        WindTurbine,
+        WindTurbineList,
+        WindTurbineGraphQL,
+        WindTurbineWrite,
+        WindTurbineWriteList,
+    )
 
 
 __all__ = [
@@ -49,8 +62,8 @@ __all__ = [
 ]
 
 
-RotorTextFields = Literal["external_id", ]
-RotorFields = Literal["external_id", ]
+RotorTextFields = Literal["external_id",]
+RotorFields = Literal["external_id",]
 
 _ROTOR_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -87,7 +100,6 @@ class RotorGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
 
     @field_validator("rotor_speed_controller", "rpm_low_speed_shaft", "wind_turbine", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
@@ -127,16 +139,15 @@ class Rotor(DomainModel):
     rotor_speed_controller: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     rpm_low_speed_shaft: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     wind_turbine: Optional[WindTurbine] = Field(default=None, repr=False)
+
     @field_validator("rotor_speed_controller", "rpm_low_speed_shaft", "wind_turbine", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> RotorWrite:
         """Convert this read version of rotor to the writing version."""
         return RotorWrite.model_validate(as_write_args(self))
-
 
 
 class RotorWrite(DomainModelWrite):
@@ -151,8 +162,15 @@ class RotorWrite(DomainModelWrite):
         rotor_speed_controller: The rotor speed controller field.
         rpm_low_speed_shaft: The rpm low speed shaft field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("rotor_speed_controller", "rpm_low_speed_shaft",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("rotor_speed_controller", "rpm_low_speed_shaft",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "rotor_speed_controller",
+        "rpm_low_speed_shaft",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "rotor_speed_controller",
+        "rpm_low_speed_shaft",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Rotor", "1")
 
@@ -176,55 +194,131 @@ class RotorList(DomainModelList[Rotor]):
     """List of rotors in the read version."""
 
     _INSTANCE = Rotor
+
     def as_write(self) -> RotorWriteList:
         """Convert these read versions of rotor to the writing versions."""
         return RotorWriteList([node.as_write() for node in self.data])
 
-
     @property
     def rotor_speed_controller(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.rotor_speed_controller for item in self.data if isinstance(item.rotor_speed_controller, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [
+                item.rotor_speed_controller
+                for item in self.data
+                if isinstance(item.rotor_speed_controller, SensorTimeSeries)
+            ]
+        )
+
     @property
     def rpm_low_speed_shaft(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.rpm_low_speed_shaft for item in self.data if isinstance(item.rpm_low_speed_shaft, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.rpm_low_speed_shaft for item in self.data if isinstance(item.rpm_low_speed_shaft, SensorTimeSeries)]
+        )
+
     @property
     def wind_turbine(self) -> WindTurbineList:
         from ._wind_turbine import WindTurbine, WindTurbineList
+
         return WindTurbineList([item.wind_turbine for item in self.data if isinstance(item.wind_turbine, WindTurbine)])
+
 
 class RotorWriteList(DomainModelWriteList[RotorWrite]):
     """List of rotors in the writing version."""
 
     _INSTANCE = RotorWrite
+
     @property
     def rotor_speed_controller(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.rotor_speed_controller for item in self.data if isinstance(item.rotor_speed_controller, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [
+                item.rotor_speed_controller
+                for item in self.data
+                if isinstance(item.rotor_speed_controller, SensorTimeSeriesWrite)
+            ]
+        )
+
     @property
     def rpm_low_speed_shaft(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.rpm_low_speed_shaft for item in self.data if isinstance(item.rpm_low_speed_shaft, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [
+                item.rpm_low_speed_shaft
+                for item in self.data
+                if isinstance(item.rpm_low_speed_shaft, SensorTimeSeriesWrite)
+            ]
+        )
 
 
 def _create_rotor_filter(
     view_id: dm.ViewId,
-    rotor_speed_controller: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    rpm_low_speed_shaft: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    rotor_speed_controller: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    rpm_low_speed_shaft: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if isinstance(rotor_speed_controller, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(rotor_speed_controller):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("rotor_speed_controller"), value=as_instance_dict_id(rotor_speed_controller)))
-    if rotor_speed_controller and isinstance(rotor_speed_controller, Sequence) and not isinstance(rotor_speed_controller, str) and not is_tuple_id(rotor_speed_controller):
-        filters.append(dm.filters.In(view_id.as_property_ref("rotor_speed_controller"), values=[as_instance_dict_id(item) for item in rotor_speed_controller]))
-    if isinstance(rpm_low_speed_shaft, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(rpm_low_speed_shaft):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("rpm_low_speed_shaft"), value=as_instance_dict_id(rpm_low_speed_shaft)))
-    if rpm_low_speed_shaft and isinstance(rpm_low_speed_shaft, Sequence) and not isinstance(rpm_low_speed_shaft, str) and not is_tuple_id(rpm_low_speed_shaft):
-        filters.append(dm.filters.In(view_id.as_property_ref("rpm_low_speed_shaft"), values=[as_instance_dict_id(item) for item in rpm_low_speed_shaft]))
+    if isinstance(rotor_speed_controller, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        rotor_speed_controller
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("rotor_speed_controller"), value=as_instance_dict_id(rotor_speed_controller)
+            )
+        )
+    if (
+        rotor_speed_controller
+        and isinstance(rotor_speed_controller, Sequence)
+        and not isinstance(rotor_speed_controller, str)
+        and not is_tuple_id(rotor_speed_controller)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("rotor_speed_controller"),
+                values=[as_instance_dict_id(item) for item in rotor_speed_controller],
+            )
+        )
+    if isinstance(rpm_low_speed_shaft, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        rpm_low_speed_shaft
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("rpm_low_speed_shaft"), value=as_instance_dict_id(rpm_low_speed_shaft)
+            )
+        )
+    if (
+        rpm_low_speed_shaft
+        and isinstance(rpm_low_speed_shaft, Sequence)
+        and not isinstance(rpm_low_speed_shaft, str)
+        and not is_tuple_id(rpm_low_speed_shaft)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("rpm_low_speed_shaft"),
+                values=[as_instance_dict_id(item) for item in rpm_low_speed_shaft],
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -247,11 +341,11 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._sensor_time_series import _SensorTimeSeriesQuery
         from ._wind_turbine import _WindTurbineQuery
@@ -313,14 +407,20 @@ class _RotorQuery(NodeQueryCore[T_DomainModelList, RotorList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self.rotor_speed_controller_filter = DirectRelationFilter(self, self._view_id.as_property_ref("rotor_speed_controller"))
-        self.rpm_low_speed_shaft_filter = DirectRelationFilter(self, self._view_id.as_property_ref("rpm_low_speed_shaft"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.rotor_speed_controller_filter,
-            self.rpm_low_speed_shaft_filter,
-        ])
+        self.rotor_speed_controller_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("rotor_speed_controller")
+        )
+        self.rpm_low_speed_shaft_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("rpm_low_speed_shaft")
+        )
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.rotor_speed_controller_filter,
+                self.rpm_low_speed_shaft_filter,
+            ]
+        )
 
     def list_rotor(self, limit: int = DEFAULT_QUERY_LIMIT) -> RotorList:
         return self._list(limit=limit)

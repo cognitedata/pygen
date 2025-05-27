@@ -34,9 +34,22 @@ from omni.data_classes._core import (
     StringFilter,
     ViewPropertyId,
 )
+
 if TYPE_CHECKING:
-    from omni.data_classes._connection_item_a import ConnectionItemA, ConnectionItemAList, ConnectionItemAGraphQL, ConnectionItemAWrite, ConnectionItemAWriteList
-    from omni.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBList, ConnectionItemBGraphQL, ConnectionItemBWrite, ConnectionItemBWriteList
+    from omni.data_classes._connection_item_a import (
+        ConnectionItemA,
+        ConnectionItemAList,
+        ConnectionItemAGraphQL,
+        ConnectionItemAWrite,
+        ConnectionItemAWriteList,
+    )
+    from omni.data_classes._connection_item_b import (
+        ConnectionItemB,
+        ConnectionItemBList,
+        ConnectionItemBGraphQL,
+        ConnectionItemBWrite,
+        ConnectionItemBWriteList,
+    )
 
 
 __all__ = [
@@ -48,8 +61,8 @@ __all__ = [
 ]
 
 
-ConnectionItemCNodeTextFields = Literal["external_id", ]
-ConnectionItemCNodeFields = Literal["external_id", ]
+ConnectionItemCNodeTextFields = Literal["external_id",]
+ConnectionItemCNodeFields = Literal["external_id",]
 
 _CONNECTIONITEMCNODE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -85,7 +98,6 @@ class ConnectionItemCNodeGraphQL(GraphQLCore):
             )
         return values
 
-
     @field_validator("connection_item_a", "connection_item_b", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -119,9 +131,15 @@ class ConnectionItemCNode(DomainModel):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemC")
-    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemA")
-    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemB")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemC"
+    )
+    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemA"
+    )
+    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemB"
+    )
 
     @field_validator("connection_item_a", "connection_item_b", mode="before")
     @classmethod
@@ -133,7 +151,6 @@ class ConnectionItemCNode(DomainModel):
     def as_write(self) -> ConnectionItemCNodeWrite:
         """Convert this read version of connection item c node to the writing version."""
         return ConnectionItemCNodeWrite.model_validate(as_write_args(self))
-
 
 
 class ConnectionItemCNodeWrite(DomainModelWrite):
@@ -148,14 +165,24 @@ class ConnectionItemCNodeWrite(DomainModelWrite):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
-    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (("connection_item_a", dm.DirectRelationReference("sp_pygen_models", "unidirectional")), ("connection_item_b", dm.DirectRelationReference("sp_pygen_models", "unidirectional")),)
+
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("connection_item_a", dm.DirectRelationReference("sp_pygen_models", "unidirectional")),
+        ("connection_item_b", dm.DirectRelationReference("sp_pygen_models", "unidirectional")),
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemC")
-    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemA")
-    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemB")
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemC"
+    )
+    connection_item_a: Optional[list[Union[ConnectionItemAWrite, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemA"
+    )
+    connection_item_b: Optional[list[Union[ConnectionItemBWrite, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemB"
+    )
 
     @field_validator("connection_item_a", "connection_item_b", mode="before")
     def as_node_id(cls, value: Any) -> Any:
@@ -172,36 +199,58 @@ class ConnectionItemCNodeList(DomainModelList[ConnectionItemCNode]):
     """List of connection item c nodes in the read version."""
 
     _INSTANCE = ConnectionItemCNode
+
     def as_write(self) -> ConnectionItemCNodeWriteList:
         """Convert these read versions of connection item c node to the writing versions."""
         return ConnectionItemCNodeWriteList([node.as_write() for node in self.data])
 
-
     @property
     def connection_item_a(self) -> ConnectionItemAList:
         from ._connection_item_a import ConnectionItemA, ConnectionItemAList
-        return ConnectionItemAList([item for items in self.data for item in items.connection_item_a or [] if isinstance(item, ConnectionItemA)])
+
+        return ConnectionItemAList(
+            [item for items in self.data for item in items.connection_item_a or [] if isinstance(item, ConnectionItemA)]
+        )
 
     @property
     def connection_item_b(self) -> ConnectionItemBList:
         from ._connection_item_b import ConnectionItemB, ConnectionItemBList
-        return ConnectionItemBList([item for items in self.data for item in items.connection_item_b or [] if isinstance(item, ConnectionItemB)])
+
+        return ConnectionItemBList(
+            [item for items in self.data for item in items.connection_item_b or [] if isinstance(item, ConnectionItemB)]
+        )
 
 
 class ConnectionItemCNodeWriteList(DomainModelWriteList[ConnectionItemCNodeWrite]):
     """List of connection item c nodes in the writing version."""
 
     _INSTANCE = ConnectionItemCNodeWrite
+
     @property
     def connection_item_a(self) -> ConnectionItemAWriteList:
         from ._connection_item_a import ConnectionItemAWrite, ConnectionItemAWriteList
-        return ConnectionItemAWriteList([item for items in self.data for item in items.connection_item_a or [] if isinstance(item, ConnectionItemAWrite)])
+
+        return ConnectionItemAWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.connection_item_a or []
+                if isinstance(item, ConnectionItemAWrite)
+            ]
+        )
 
     @property
     def connection_item_b(self) -> ConnectionItemBWriteList:
         from ._connection_item_b import ConnectionItemBWrite, ConnectionItemBWriteList
-        return ConnectionItemBWriteList([item for items in self.data for item in items.connection_item_b or [] if isinstance(item, ConnectionItemBWrite)])
 
+        return ConnectionItemBWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.connection_item_b or []
+                if isinstance(item, ConnectionItemBWrite)
+            ]
+        )
 
 
 def _create_connection_item_c_node_filter(
@@ -233,11 +282,11 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._connection_item_a import _ConnectionItemAQuery
         from ._connection_item_b import _ConnectionItemBQuery
@@ -285,10 +334,12 @@ class _ConnectionItemCNodeQuery(NodeQueryCore[T_DomainModelList, ConnectionItemC
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
 
     def list_connection_item_c_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemCNodeList:
         return self._list(limit=limit)

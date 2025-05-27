@@ -36,8 +36,15 @@ from cognite_core.data_classes._core import (
     DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_file import CogniteFile, CogniteFileList, CogniteFileGraphQL, CogniteFileWrite, CogniteFileWriteList
+    from cognite_core.data_classes._cognite_file import (
+        CogniteFile,
+        CogniteFileList,
+        CogniteFileGraphQL,
+        CogniteFileWrite,
+        CogniteFileWriteList,
+    )
 
 
 __all__ = [
@@ -101,7 +108,6 @@ class Cognite3DModelGraphQL(GraphQLCore):
             )
         return values
 
-
     @field_validator("thumbnail", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -141,16 +147,15 @@ class Cognite3DModel(CogniteDescribableNode):
     node_type: Union[dm.DirectRelationReference, None] = None
     thumbnail: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
     type_: Optional[Literal["CAD", "Image360", "PointCloud"]] | str = Field(None, alias="type")
+
     @field_validator("thumbnail", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> Cognite3DModelWrite:
         """Convert this read version of Cognite 3D model to the writing version."""
         return Cognite3DModelWrite.model_validate(as_write_args(self))
-
 
 
 class Cognite3DModelWrite(CogniteDescribableNodeWrite):
@@ -169,7 +174,15 @@ class Cognite3DModelWrite(CogniteDescribableNodeWrite):
         thumbnail: Thumbnail of the 3D model
         type_: CAD, PointCloud or Image360
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "name", "tags", "thumbnail", "type_",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+        "thumbnail",
+        "type_",
+    )
     _direct_relations: ClassVar[tuple[str, ...]] = ("thumbnail",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DModel", "v1")
@@ -193,24 +206,30 @@ class Cognite3DModelList(DomainModelList[Cognite3DModel]):
     """List of Cognite 3D models in the read version."""
 
     _INSTANCE = Cognite3DModel
+
     def as_write(self) -> Cognite3DModelWriteList:
         """Convert these read versions of Cognite 3D model to the writing versions."""
         return Cognite3DModelWriteList([node.as_write() for node in self.data])
 
-
     @property
     def thumbnail(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.thumbnail for item in self.data if isinstance(item.thumbnail, CogniteFile)])
+
 
 class Cognite3DModelWriteList(DomainModelWriteList[Cognite3DModelWrite]):
     """List of Cognite 3D models in the writing version."""
 
     _INSTANCE = Cognite3DModelWrite
+
     @property
     def thumbnail(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
-        return CogniteFileWriteList([item.thumbnail for item in self.data if isinstance(item.thumbnail, CogniteFileWrite)])
+
+        return CogniteFileWriteList(
+            [item.thumbnail for item in self.data if isinstance(item.thumbnail, CogniteFileWrite)]
+        )
 
 
 def _create_cognite_3_d_model_filter(
@@ -219,7 +238,14 @@ def _create_cognite_3_d_model_filter(
     description_prefix: str | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    thumbnail: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -241,7 +267,11 @@ def _create_cognite_3_d_model_filter(
     if isinstance(thumbnail, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(thumbnail):
         filters.append(dm.filters.Equals(view_id.as_property_ref("thumbnail"), value=as_instance_dict_id(thumbnail)))
     if thumbnail and isinstance(thumbnail, Sequence) and not isinstance(thumbnail, str) and not is_tuple_id(thumbnail):
-        filters.append(dm.filters.In(view_id.as_property_ref("thumbnail"), values=[as_instance_dict_id(item) for item in thumbnail]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("thumbnail"), values=[as_instance_dict_id(item) for item in thumbnail]
+            )
+        )
     if isinstance(type_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
     if type_ and isinstance(type_, list):
@@ -268,11 +298,11 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_file import _CogniteFileQuery
 
@@ -308,13 +338,15 @@ class _Cognite3DModelQuery(NodeQueryCore[T_DomainModelList, Cognite3DModelList])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.thumbnail_filter = DirectRelationFilter(self, self._view_id.as_property_ref("thumbnail"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.name,
-            self.thumbnail_filter,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.name,
+                self.thumbnail_filter,
+            ]
+        )
 
     def list_cognite_3_d_model(self, limit: int = DEFAULT_QUERY_LIMIT) -> Cognite3DModelList:
         return self._list(limit=limit)

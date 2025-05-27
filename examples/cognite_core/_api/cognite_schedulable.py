@@ -46,7 +46,9 @@ from cognite_core.data_classes import (
 )
 
 
-class CogniteSchedulableAPI(NodeAPI[CogniteSchedulable, CogniteSchedulableWrite, CogniteSchedulableList, CogniteSchedulableWriteList]):
+class CogniteSchedulableAPI(
+    NodeAPI[CogniteSchedulable, CogniteSchedulableWrite, CogniteSchedulableList, CogniteSchedulableWriteList]
+):
     _view_id = dm.ViewId("cdf_cdm", "CogniteSchedulable", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITESCHEDULABLE_PROPERTIES_BY_FIELD
     _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
@@ -58,7 +60,6 @@ class CogniteSchedulableAPI(NodeAPI[CogniteSchedulable, CogniteSchedulableWrite,
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -105,11 +106,7 @@ class CogniteSchedulableAPI(NodeAPI[CogniteSchedulable, CogniteSchedulableWrite,
                 ... )
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            as_child_class=as_child_class
-        )
+        return self._retrieve(external_id, space, as_child_class=as_child_class)
 
     def search(
         self,
@@ -237,9 +234,11 @@ class CogniteSchedulableAPI(NodeAPI[CogniteSchedulable, CogniteSchedulableWrite,
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteSchedulableFields | SequenceNotStr[CogniteSchedulableFields],
         property: CogniteSchedulableFields | SequenceNotStr[CogniteSchedulableFields] | None = None,
         min_end_time: datetime.datetime | None = None,
@@ -258,9 +257,11 @@ class CogniteSchedulableAPI(NodeAPI[CogniteSchedulable, CogniteSchedulableWrite,
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteSchedulableFields | SequenceNotStr[CogniteSchedulableFields] | None = None,
         property: CogniteSchedulableFields | SequenceNotStr[CogniteSchedulableFields] | None = None,
         min_end_time: datetime.datetime | None = None,
@@ -416,13 +417,15 @@ class CogniteSchedulableAPI(NodeAPI[CogniteSchedulable, CogniteSchedulableWrite,
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         return builder.build()
 
     def iterate(
@@ -589,6 +592,5 @@ class CogniteSchedulableAPI(NodeAPI[CogniteSchedulable, CogniteSchedulableWrite,
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit,  filter=filter_, sort=sort_input)
-
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

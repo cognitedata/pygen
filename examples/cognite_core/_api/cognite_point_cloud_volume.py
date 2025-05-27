@@ -47,7 +47,14 @@ from cognite_core.data_classes import (
 )
 
 
-class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCloudVolumeWrite, CognitePointCloudVolumeList, CognitePointCloudVolumeWriteList]):
+class CognitePointCloudVolumeAPI(
+    NodeAPI[
+        CognitePointCloudVolume,
+        CognitePointCloudVolumeWrite,
+        CognitePointCloudVolumeList,
+        CognitePointCloudVolumeWriteList,
+    ]
+):
     _view_id = dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITEPOINTCLOUDVOLUME_PROPERTIES_BY_FIELD
     _class_type = CognitePointCloudVolume
@@ -56,7 +63,6 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -117,11 +123,32 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
         description_prefix: str | None = None,
         format_version: str | list[str] | None = None,
         format_version_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        revisions: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -205,16 +232,39 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
         group_by: None = None,
         property: CognitePointCloudVolumeFields | SequenceNotStr[CognitePointCloudVolumeFields] | None = None,
         query: str | None = None,
-        search_property: CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None = None,
+        search_property: (
+            CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         format_version: str | list[str] | None = None,
         format_version_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        revisions: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -229,16 +279,39 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
         group_by: None = None,
         property: CognitePointCloudVolumeFields | SequenceNotStr[CognitePointCloudVolumeFields] | None = None,
         query: str | None = None,
-        search_property: CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None = None,
+        search_property: (
+            CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         format_version: str | list[str] | None = None,
         format_version_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        revisions: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -249,22 +322,47 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CognitePointCloudVolumeFields | SequenceNotStr[CognitePointCloudVolumeFields],
         property: CognitePointCloudVolumeFields | SequenceNotStr[CognitePointCloudVolumeFields] | None = None,
         query: str | None = None,
-        search_property: CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None = None,
+        search_property: (
+            CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         format_version: str | list[str] | None = None,
         format_version_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        revisions: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -274,22 +372,47 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CognitePointCloudVolumeFields | SequenceNotStr[CognitePointCloudVolumeFields] | None = None,
         property: CognitePointCloudVolumeFields | SequenceNotStr[CognitePointCloudVolumeFields] | None = None,
         query: str | None = None,
-        search_property: CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None = None,
+        search_property: (
+            CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         format_version: str | list[str] | None = None,
         format_version_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        revisions: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -369,16 +492,39 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
         property: CognitePointCloudVolumeFields,
         interval: float,
         query: str | None = None,
-        search_property: CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None = None,
+        search_property: (
+            CognitePointCloudVolumeTextFields | SequenceNotStr[CognitePointCloudVolumeTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         format_version: str | list[str] | None = None,
         format_version_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        revisions: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -452,13 +598,15 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
@@ -490,11 +638,32 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
         description_prefix: str | None = None,
         format_version: str | list[str] | None = None,
         format_version_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        revisions: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -596,11 +765,32 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
         description_prefix: str | None = None,
         format_version: str | list[str] | None = None,
         format_version_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-        revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
+        revisions: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -667,8 +857,7 @@ class CognitePointCloudVolumeAPI(NodeAPI[CognitePointCloudVolume, CognitePointCl
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(limit=limit,  filter=filter_, sort=sort_input)
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
         return self._query(filter_, limit, retrieve_connections, sort_input, "list")
-

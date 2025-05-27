@@ -44,7 +44,9 @@ from cognite_core.data_classes import (
 )
 
 
-class CogniteSourceSystemAPI(NodeAPI[CogniteSourceSystem, CogniteSourceSystemWrite, CogniteSourceSystemList, CogniteSourceSystemWriteList]):
+class CogniteSourceSystemAPI(
+    NodeAPI[CogniteSourceSystem, CogniteSourceSystemWrite, CogniteSourceSystemList, CogniteSourceSystemWriteList]
+):
     _view_id = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD
     _class_type = CogniteSourceSystem
@@ -53,7 +55,6 @@ class CogniteSourceSystemAPI(NodeAPI[CogniteSourceSystem, CogniteSourceSystemWri
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -229,9 +230,11 @@ class CogniteSourceSystemAPI(NodeAPI[CogniteSourceSystem, CogniteSourceSystemWri
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteSourceSystemFields | SequenceNotStr[CogniteSourceSystemFields],
         property: CogniteSourceSystemFields | SequenceNotStr[CogniteSourceSystemFields] | None = None,
         query: str | None = None,
@@ -252,9 +255,11 @@ class CogniteSourceSystemAPI(NodeAPI[CogniteSourceSystem, CogniteSourceSystemWri
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteSourceSystemFields | SequenceNotStr[CogniteSourceSystemFields] | None = None,
         property: CogniteSourceSystemFields | SequenceNotStr[CogniteSourceSystemFields] | None = None,
         query: str | None = None,
@@ -418,13 +423,15 @@ class CogniteSourceSystemAPI(NodeAPI[CogniteSourceSystem, CogniteSourceSystemWri
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         return builder.build()
 
     def iterate(
@@ -591,6 +598,5 @@ class CogniteSourceSystemAPI(NodeAPI[CogniteSourceSystem, CogniteSourceSystemWri
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit,  filter=filter_, sort=sort_input)
-
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

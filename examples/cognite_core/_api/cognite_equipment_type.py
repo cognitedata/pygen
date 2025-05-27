@@ -44,7 +44,9 @@ from cognite_core.data_classes import (
 )
 
 
-class CogniteEquipmentTypeAPI(NodeAPI[CogniteEquipmentType, CogniteEquipmentTypeWrite, CogniteEquipmentTypeList, CogniteEquipmentTypeWriteList]):
+class CogniteEquipmentTypeAPI(
+    NodeAPI[CogniteEquipmentType, CogniteEquipmentTypeWrite, CogniteEquipmentTypeList, CogniteEquipmentTypeWriteList]
+):
     _view_id = dm.ViewId("cdf_cdm", "CogniteEquipmentType", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITEEQUIPMENTTYPE_PROPERTIES_BY_FIELD
     _class_type = CogniteEquipmentType
@@ -53,7 +55,6 @@ class CogniteEquipmentTypeAPI(NodeAPI[CogniteEquipmentType, CogniteEquipmentType
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -249,9 +250,11 @@ class CogniteEquipmentTypeAPI(NodeAPI[CogniteEquipmentType, CogniteEquipmentType
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteEquipmentTypeFields | SequenceNotStr[CogniteEquipmentTypeFields],
         property: CogniteEquipmentTypeFields | SequenceNotStr[CogniteEquipmentTypeFields] | None = None,
         query: str | None = None,
@@ -276,9 +279,11 @@ class CogniteEquipmentTypeAPI(NodeAPI[CogniteEquipmentType, CogniteEquipmentType
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteEquipmentTypeFields | SequenceNotStr[CogniteEquipmentTypeFields] | None = None,
         property: CogniteEquipmentTypeFields | SequenceNotStr[CogniteEquipmentTypeFields] | None = None,
         query: str | None = None,
@@ -466,13 +471,15 @@ class CogniteEquipmentTypeAPI(NodeAPI[CogniteEquipmentType, CogniteEquipmentType
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         return builder.build()
 
     def iterate(
@@ -663,6 +670,5 @@ class CogniteEquipmentTypeAPI(NodeAPI[CogniteEquipmentType, CogniteEquipmentType
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit,  filter=filter_, sort=sort_input)
-
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

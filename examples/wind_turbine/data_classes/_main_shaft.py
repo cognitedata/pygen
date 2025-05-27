@@ -35,9 +35,16 @@ from wind_turbine.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
+
 if TYPE_CHECKING:
     from wind_turbine.data_classes._nacelle import Nacelle, NacelleList, NacelleGraphQL, NacelleWrite, NacelleWriteList
-    from wind_turbine.data_classes._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList, SensorTimeSeriesGraphQL, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
+    from wind_turbine.data_classes._sensor_time_series import (
+        SensorTimeSeries,
+        SensorTimeSeriesList,
+        SensorTimeSeriesGraphQL,
+        SensorTimeSeriesWrite,
+        SensorTimeSeriesWriteList,
+    )
 
 
 __all__ = [
@@ -49,8 +56,8 @@ __all__ = [
 ]
 
 
-MainShaftTextFields = Literal["external_id", ]
-MainShaftFields = Literal["external_id", ]
+MainShaftTextFields = Literal["external_id",]
+MainShaftFields = Literal["external_id",]
 
 _MAINSHAFT_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -94,8 +101,9 @@ class MainShaftGraphQL(GraphQLCore):
             )
         return values
 
-
-    @field_validator("bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "nacelle", "torque", mode="before")
+    @field_validator(
+        "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "nacelle", "torque", mode="before"
+    )
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -139,16 +147,17 @@ class MainShaft(DomainModel):
     calculated_yaw_moment: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
     torque: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
-    @field_validator("bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "nacelle", "torque", mode="before")
+
+    @field_validator(
+        "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "nacelle", "torque", mode="before"
+    )
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> MainShaftWrite:
         """Convert this read version of main shaft to the writing version."""
         return MainShaftWrite.model_validate(as_write_args(self))
-
 
 
 class MainShaftWrite(DomainModelWrite):
@@ -166,8 +175,21 @@ class MainShaftWrite(DomainModelWrite):
         calculated_yaw_moment: The calculated yaw moment field.
         torque: The torque field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "bending_x",
+        "bending_y",
+        "calculated_tilt_moment",
+        "calculated_yaw_moment",
+        "torque",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "bending_x",
+        "bending_y",
+        "calculated_tilt_moment",
+        "calculated_yaw_moment",
+        "torque",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "MainShaft", "1")
 
@@ -179,7 +201,9 @@ class MainShaftWrite(DomainModelWrite):
     calculated_yaw_moment: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     torque: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
 
-    @field_validator("bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque", mode="before")
+    @field_validator(
+        "bending_x", "bending_y", "calculated_tilt_moment", "calculated_yaw_moment", "torque", mode="before"
+    )
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):
             return dm.NodeId(value.space, value.external_id)
@@ -194,69 +218,160 @@ class MainShaftList(DomainModelList[MainShaft]):
     """List of main shafts in the read version."""
 
     _INSTANCE = MainShaft
+
     def as_write(self) -> MainShaftWriteList:
         """Convert these read versions of main shaft to the writing versions."""
         return MainShaftWriteList([node.as_write() for node in self.data])
 
-
     @property
     def bending_x(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.bending_x for item in self.data if isinstance(item.bending_x, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.bending_x for item in self.data if isinstance(item.bending_x, SensorTimeSeries)]
+        )
+
     @property
     def bending_y(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.bending_y for item in self.data if isinstance(item.bending_y, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.bending_y for item in self.data if isinstance(item.bending_y, SensorTimeSeries)]
+        )
+
     @property
     def calculated_tilt_moment(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.calculated_tilt_moment for item in self.data if isinstance(item.calculated_tilt_moment, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [
+                item.calculated_tilt_moment
+                for item in self.data
+                if isinstance(item.calculated_tilt_moment, SensorTimeSeries)
+            ]
+        )
+
     @property
     def calculated_yaw_moment(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.calculated_yaw_moment for item in self.data if isinstance(item.calculated_yaw_moment, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [
+                item.calculated_yaw_moment
+                for item in self.data
+                if isinstance(item.calculated_yaw_moment, SensorTimeSeries)
+            ]
+        )
+
     @property
     def nacelle(self) -> NacelleList:
         from ._nacelle import Nacelle, NacelleList
+
         return NacelleList([item.nacelle for item in self.data if isinstance(item.nacelle, Nacelle)])
+
     @property
     def torque(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
+
         return SensorTimeSeriesList([item.torque for item in self.data if isinstance(item.torque, SensorTimeSeries)])
+
 
 class MainShaftWriteList(DomainModelWriteList[MainShaftWrite]):
     """List of main shafts in the writing version."""
 
     _INSTANCE = MainShaftWrite
+
     @property
     def bending_x(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.bending_x for item in self.data if isinstance(item.bending_x, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [item.bending_x for item in self.data if isinstance(item.bending_x, SensorTimeSeriesWrite)]
+        )
+
     @property
     def bending_y(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.bending_y for item in self.data if isinstance(item.bending_y, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [item.bending_y for item in self.data if isinstance(item.bending_y, SensorTimeSeriesWrite)]
+        )
+
     @property
     def calculated_tilt_moment(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.calculated_tilt_moment for item in self.data if isinstance(item.calculated_tilt_moment, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [
+                item.calculated_tilt_moment
+                for item in self.data
+                if isinstance(item.calculated_tilt_moment, SensorTimeSeriesWrite)
+            ]
+        )
+
     @property
     def calculated_yaw_moment(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.calculated_yaw_moment for item in self.data if isinstance(item.calculated_yaw_moment, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [
+                item.calculated_yaw_moment
+                for item in self.data
+                if isinstance(item.calculated_yaw_moment, SensorTimeSeriesWrite)
+            ]
+        )
+
     @property
     def torque(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.torque for item in self.data if isinstance(item.torque, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [item.torque for item in self.data if isinstance(item.torque, SensorTimeSeriesWrite)]
+        )
 
 
 def _create_main_shaft_filter(
     view_id: dm.ViewId,
-    bending_x: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    bending_y: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    calculated_tilt_moment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    calculated_yaw_moment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    torque: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    bending_x: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    bending_y: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    calculated_tilt_moment: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    calculated_yaw_moment: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    torque: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -265,23 +380,65 @@ def _create_main_shaft_filter(
     if isinstance(bending_x, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(bending_x):
         filters.append(dm.filters.Equals(view_id.as_property_ref("bending_x"), value=as_instance_dict_id(bending_x)))
     if bending_x and isinstance(bending_x, Sequence) and not isinstance(bending_x, str) and not is_tuple_id(bending_x):
-        filters.append(dm.filters.In(view_id.as_property_ref("bending_x"), values=[as_instance_dict_id(item) for item in bending_x]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("bending_x"), values=[as_instance_dict_id(item) for item in bending_x]
+            )
+        )
     if isinstance(bending_y, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(bending_y):
         filters.append(dm.filters.Equals(view_id.as_property_ref("bending_y"), value=as_instance_dict_id(bending_y)))
     if bending_y and isinstance(bending_y, Sequence) and not isinstance(bending_y, str) and not is_tuple_id(bending_y):
-        filters.append(dm.filters.In(view_id.as_property_ref("bending_y"), values=[as_instance_dict_id(item) for item in bending_y]))
-    if isinstance(calculated_tilt_moment, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(calculated_tilt_moment):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("calculated_tilt_moment"), value=as_instance_dict_id(calculated_tilt_moment)))
-    if calculated_tilt_moment and isinstance(calculated_tilt_moment, Sequence) and not isinstance(calculated_tilt_moment, str) and not is_tuple_id(calculated_tilt_moment):
-        filters.append(dm.filters.In(view_id.as_property_ref("calculated_tilt_moment"), values=[as_instance_dict_id(item) for item in calculated_tilt_moment]))
-    if isinstance(calculated_yaw_moment, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(calculated_yaw_moment):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("calculated_yaw_moment"), value=as_instance_dict_id(calculated_yaw_moment)))
-    if calculated_yaw_moment and isinstance(calculated_yaw_moment, Sequence) and not isinstance(calculated_yaw_moment, str) and not is_tuple_id(calculated_yaw_moment):
-        filters.append(dm.filters.In(view_id.as_property_ref("calculated_yaw_moment"), values=[as_instance_dict_id(item) for item in calculated_yaw_moment]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("bending_y"), values=[as_instance_dict_id(item) for item in bending_y]
+            )
+        )
+    if isinstance(calculated_tilt_moment, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        calculated_tilt_moment
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("calculated_tilt_moment"), value=as_instance_dict_id(calculated_tilt_moment)
+            )
+        )
+    if (
+        calculated_tilt_moment
+        and isinstance(calculated_tilt_moment, Sequence)
+        and not isinstance(calculated_tilt_moment, str)
+        and not is_tuple_id(calculated_tilt_moment)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("calculated_tilt_moment"),
+                values=[as_instance_dict_id(item) for item in calculated_tilt_moment],
+            )
+        )
+    if isinstance(calculated_yaw_moment, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        calculated_yaw_moment
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("calculated_yaw_moment"), value=as_instance_dict_id(calculated_yaw_moment)
+            )
+        )
+    if (
+        calculated_yaw_moment
+        and isinstance(calculated_yaw_moment, Sequence)
+        and not isinstance(calculated_yaw_moment, str)
+        and not is_tuple_id(calculated_yaw_moment)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("calculated_yaw_moment"),
+                values=[as_instance_dict_id(item) for item in calculated_yaw_moment],
+            )
+        )
     if isinstance(torque, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(torque):
         filters.append(dm.filters.Equals(view_id.as_property_ref("torque"), value=as_instance_dict_id(torque)))
     if torque and isinstance(torque, Sequence) and not isinstance(torque, str) and not is_tuple_id(torque):
-        filters.append(dm.filters.In(view_id.as_property_ref("torque"), values=[as_instance_dict_id(item) for item in torque]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("torque"), values=[as_instance_dict_id(item) for item in torque])
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -304,11 +461,11 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._nacelle import _NacelleQuery
         from ._sensor_time_series import _SensorTimeSeriesQuery
@@ -414,18 +571,24 @@ class _MainShaftQuery(NodeQueryCore[T_DomainModelList, MainShaftList]):
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.bending_x_filter = DirectRelationFilter(self, self._view_id.as_property_ref("bending_x"))
         self.bending_y_filter = DirectRelationFilter(self, self._view_id.as_property_ref("bending_y"))
-        self.calculated_tilt_moment_filter = DirectRelationFilter(self, self._view_id.as_property_ref("calculated_tilt_moment"))
-        self.calculated_yaw_moment_filter = DirectRelationFilter(self, self._view_id.as_property_ref("calculated_yaw_moment"))
+        self.calculated_tilt_moment_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("calculated_tilt_moment")
+        )
+        self.calculated_yaw_moment_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("calculated_yaw_moment")
+        )
         self.torque_filter = DirectRelationFilter(self, self._view_id.as_property_ref("torque"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.bending_x_filter,
-            self.bending_y_filter,
-            self.calculated_tilt_moment_filter,
-            self.calculated_yaw_moment_filter,
-            self.torque_filter,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.bending_x_filter,
+                self.bending_y_filter,
+                self.calculated_tilt_moment_filter,
+                self.calculated_yaw_moment_filter,
+                self.torque_filter,
+            ]
+        )
 
     def list_main_shaft(self, limit: int = DEFAULT_QUERY_LIMIT) -> MainShaftList:
         return self._list(limit=limit)

@@ -35,9 +35,16 @@ from wind_turbine.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
+
 if TYPE_CHECKING:
     from wind_turbine.data_classes._nacelle import Nacelle, NacelleList, NacelleGraphQL, NacelleWrite, NacelleWriteList
-    from wind_turbine.data_classes._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList, SensorTimeSeriesGraphQL, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
+    from wind_turbine.data_classes._sensor_time_series import (
+        SensorTimeSeries,
+        SensorTimeSeriesList,
+        SensorTimeSeriesGraphQL,
+        SensorTimeSeriesWrite,
+        SensorTimeSeriesWriteList,
+    )
 
 
 __all__ = [
@@ -49,8 +56,8 @@ __all__ = [
 ]
 
 
-GearboxTextFields = Literal["external_id", ]
-GearboxFields = Literal["external_id", ]
+GearboxTextFields = Literal["external_id",]
+GearboxFields = Literal["external_id",]
 
 _GEARBOX_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -89,7 +96,6 @@ class GearboxGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
 
     @field_validator("displacement_x", "displacement_y", "displacement_z", "nacelle", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
@@ -131,16 +137,15 @@ class Gearbox(DomainModel):
     displacement_y: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     displacement_z: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
+
     @field_validator("displacement_x", "displacement_y", "displacement_z", "nacelle", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> GearboxWrite:
         """Convert this read version of gearbox to the writing version."""
         return GearboxWrite.model_validate(as_write_args(self))
-
 
 
 class GearboxWrite(DomainModelWrite):
@@ -156,8 +161,17 @@ class GearboxWrite(DomainModelWrite):
         displacement_y: The displacement y field.
         displacement_z: The displacement z field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("displacement_x", "displacement_y", "displacement_z",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("displacement_x", "displacement_y", "displacement_z",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "displacement_x",
+        "displacement_y",
+        "displacement_z",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "displacement_x",
+        "displacement_y",
+        "displacement_z",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Gearbox", "1")
 
@@ -182,68 +196,148 @@ class GearboxList(DomainModelList[Gearbox]):
     """List of gearboxes in the read version."""
 
     _INSTANCE = Gearbox
+
     def as_write(self) -> GearboxWriteList:
         """Convert these read versions of gearbox to the writing versions."""
         return GearboxWriteList([node.as_write() for node in self.data])
 
-
     @property
     def displacement_x(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.displacement_x for item in self.data if isinstance(item.displacement_x, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.displacement_x for item in self.data if isinstance(item.displacement_x, SensorTimeSeries)]
+        )
+
     @property
     def displacement_y(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.displacement_y for item in self.data if isinstance(item.displacement_y, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.displacement_y for item in self.data if isinstance(item.displacement_y, SensorTimeSeries)]
+        )
+
     @property
     def displacement_z(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.displacement_z for item in self.data if isinstance(item.displacement_z, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.displacement_z for item in self.data if isinstance(item.displacement_z, SensorTimeSeries)]
+        )
+
     @property
     def nacelle(self) -> NacelleList:
         from ._nacelle import Nacelle, NacelleList
+
         return NacelleList([item.nacelle for item in self.data if isinstance(item.nacelle, Nacelle)])
+
 
 class GearboxWriteList(DomainModelWriteList[GearboxWrite]):
     """List of gearboxes in the writing version."""
 
     _INSTANCE = GearboxWrite
+
     @property
     def displacement_x(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.displacement_x for item in self.data if isinstance(item.displacement_x, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [item.displacement_x for item in self.data if isinstance(item.displacement_x, SensorTimeSeriesWrite)]
+        )
+
     @property
     def displacement_y(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.displacement_y for item in self.data if isinstance(item.displacement_y, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [item.displacement_y for item in self.data if isinstance(item.displacement_y, SensorTimeSeriesWrite)]
+        )
+
     @property
     def displacement_z(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.displacement_z for item in self.data if isinstance(item.displacement_z, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [item.displacement_z for item in self.data if isinstance(item.displacement_z, SensorTimeSeriesWrite)]
+        )
 
 
 def _create_gearbox_filter(
     view_id: dm.ViewId,
-    displacement_x: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    displacement_y: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    displacement_z: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    displacement_x: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    displacement_y: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    displacement_z: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
     if isinstance(displacement_x, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(displacement_x):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("displacement_x"), value=as_instance_dict_id(displacement_x)))
-    if displacement_x and isinstance(displacement_x, Sequence) and not isinstance(displacement_x, str) and not is_tuple_id(displacement_x):
-        filters.append(dm.filters.In(view_id.as_property_ref("displacement_x"), values=[as_instance_dict_id(item) for item in displacement_x]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("displacement_x"), value=as_instance_dict_id(displacement_x))
+        )
+    if (
+        displacement_x
+        and isinstance(displacement_x, Sequence)
+        and not isinstance(displacement_x, str)
+        and not is_tuple_id(displacement_x)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("displacement_x"), values=[as_instance_dict_id(item) for item in displacement_x]
+            )
+        )
     if isinstance(displacement_y, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(displacement_y):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("displacement_y"), value=as_instance_dict_id(displacement_y)))
-    if displacement_y and isinstance(displacement_y, Sequence) and not isinstance(displacement_y, str) and not is_tuple_id(displacement_y):
-        filters.append(dm.filters.In(view_id.as_property_ref("displacement_y"), values=[as_instance_dict_id(item) for item in displacement_y]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("displacement_y"), value=as_instance_dict_id(displacement_y))
+        )
+    if (
+        displacement_y
+        and isinstance(displacement_y, Sequence)
+        and not isinstance(displacement_y, str)
+        and not is_tuple_id(displacement_y)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("displacement_y"), values=[as_instance_dict_id(item) for item in displacement_y]
+            )
+        )
     if isinstance(displacement_z, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(displacement_z):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("displacement_z"), value=as_instance_dict_id(displacement_z)))
-    if displacement_z and isinstance(displacement_z, Sequence) and not isinstance(displacement_z, str) and not is_tuple_id(displacement_z):
-        filters.append(dm.filters.In(view_id.as_property_ref("displacement_z"), values=[as_instance_dict_id(item) for item in displacement_z]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("displacement_z"), value=as_instance_dict_id(displacement_z))
+        )
+    if (
+        displacement_z
+        and isinstance(displacement_z, Sequence)
+        and not isinstance(displacement_z, str)
+        and not is_tuple_id(displacement_z)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("displacement_z"), values=[as_instance_dict_id(item) for item in displacement_z]
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -266,11 +360,11 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._nacelle import _NacelleQuery
         from ._sensor_time_series import _SensorTimeSeriesQuery
@@ -349,13 +443,15 @@ class _GearboxQuery(NodeQueryCore[T_DomainModelList, GearboxList]):
         self.displacement_x_filter = DirectRelationFilter(self, self._view_id.as_property_ref("displacement_x"))
         self.displacement_y_filter = DirectRelationFilter(self, self._view_id.as_property_ref("displacement_y"))
         self.displacement_z_filter = DirectRelationFilter(self, self._view_id.as_property_ref("displacement_z"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.displacement_x_filter,
-            self.displacement_y_filter,
-            self.displacement_z_filter,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.displacement_x_filter,
+                self.displacement_y_filter,
+                self.displacement_z_filter,
+            ]
+        )
 
     def list_gearbox(self, limit: int = DEFAULT_QUERY_LIMIT) -> GearboxList:
         return self._list(limit=limit)

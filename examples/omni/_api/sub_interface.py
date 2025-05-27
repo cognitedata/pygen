@@ -62,13 +62,14 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     @overload
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None = None,
+        as_child_class: (
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None
+        ) = None,
     ) -> SubInterface | None: ...
 
     @overload
@@ -76,14 +77,18 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
         self,
         external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None = None,
+        as_child_class: (
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None
+        ) = None,
     ) -> SubInterfaceList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None = None,
+        as_child_class: (
+            SequenceNotStr[Literal["Implementation1", "Implementation1NonWriteable", "Implementation2"]] | None
+        ) = None,
     ) -> SubInterface | SubInterfaceList | None:
         """Retrieve one or more sub interfaces by id(s).
 
@@ -108,11 +113,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
                 ... )
 
         """
-        return self._retrieve(
-            external_id,
-            space,
-            as_child_class=as_child_class
-        )
+        return self._retrieve(external_id, space, as_child_class=as_child_class)
 
     def search(
         self,
@@ -224,9 +225,11 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: SubInterfaceFields | SequenceNotStr[SubInterfaceFields],
         property: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
         query: str | None = None,
@@ -243,9 +246,11 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
         property: SubInterfaceFields | SequenceNotStr[SubInterfaceFields] | None = None,
         query: str | None = None,
@@ -385,13 +390,15 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         return builder.build()
 
     def iterate(
@@ -534,6 +541,5 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit,  filter=filter_, sort=sort_input)
-
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

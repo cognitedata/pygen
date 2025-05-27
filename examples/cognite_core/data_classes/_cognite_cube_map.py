@@ -35,8 +35,15 @@ from cognite_core.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_file import CogniteFile, CogniteFileList, CogniteFileGraphQL, CogniteFileWrite, CogniteFileWriteList
+    from cognite_core.data_classes._cognite_file import (
+        CogniteFile,
+        CogniteFileList,
+        CogniteFileGraphQL,
+        CogniteFileWrite,
+        CogniteFileWriteList,
+    )
 
 
 __all__ = [
@@ -48,8 +55,8 @@ __all__ = [
 ]
 
 
-CogniteCubeMapTextFields = Literal["external_id", ]
-CogniteCubeMapFields = Literal["external_id", ]
+CogniteCubeMapTextFields = Literal["external_id",]
+CogniteCubeMapFields = Literal["external_id",]
 
 _COGNITECUBEMAP_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -92,7 +99,6 @@ class CogniteCubeMapGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
 
     @field_validator("back", "bottom", "front", "left", "right", "top", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
@@ -138,16 +144,15 @@ class CogniteCubeMap(DomainModel):
     left: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
     right: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
     top: Union[CogniteFile, str, dm.NodeId, None] = Field(default=None, repr=False)
+
     @field_validator("back", "bottom", "front", "left", "right", "top", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> CogniteCubeMapWrite:
         """Convert this read version of Cognite cube map to the writing version."""
         return CogniteCubeMapWrite.model_validate(as_write_args(self))
-
 
 
 class CogniteCubeMapWrite(DomainModelWrite):
@@ -166,8 +171,23 @@ class CogniteCubeMapWrite(DomainModelWrite):
         right: Direct relation to a file holding the right projection of the cube map
         top: Direct relation to a file holding the top projection of the cube map
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("back", "bottom", "front", "left", "right", "top",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("back", "bottom", "front", "left", "right", "top",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "front",
+        "left",
+        "right",
+        "top",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "front",
+        "left",
+        "right",
+        "top",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCubeMap", "v1")
 
@@ -195,74 +215,140 @@ class CogniteCubeMapList(DomainModelList[CogniteCubeMap]):
     """List of Cognite cube maps in the read version."""
 
     _INSTANCE = CogniteCubeMap
+
     def as_write(self) -> CogniteCubeMapWriteList:
         """Convert these read versions of Cognite cube map to the writing versions."""
         return CogniteCubeMapWriteList([node.as_write() for node in self.data])
 
-
     @property
     def back(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.back for item in self.data if isinstance(item.back, CogniteFile)])
+
     @property
     def bottom(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.bottom for item in self.data if isinstance(item.bottom, CogniteFile)])
+
     @property
     def front(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.front for item in self.data if isinstance(item.front, CogniteFile)])
+
     @property
     def left(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.left for item in self.data if isinstance(item.left, CogniteFile)])
+
     @property
     def right(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.right for item in self.data if isinstance(item.right, CogniteFile)])
+
     @property
     def top(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.top for item in self.data if isinstance(item.top, CogniteFile)])
+
 
 class CogniteCubeMapWriteList(DomainModelWriteList[CogniteCubeMapWrite]):
     """List of Cognite cube maps in the writing version."""
 
     _INSTANCE = CogniteCubeMapWrite
+
     @property
     def back(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.back for item in self.data if isinstance(item.back, CogniteFileWrite)])
+
     @property
     def bottom(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.bottom for item in self.data if isinstance(item.bottom, CogniteFileWrite)])
+
     @property
     def front(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.front for item in self.data if isinstance(item.front, CogniteFileWrite)])
+
     @property
     def left(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.left for item in self.data if isinstance(item.left, CogniteFileWrite)])
+
     @property
     def right(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.right for item in self.data if isinstance(item.right, CogniteFileWrite)])
+
     @property
     def top(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.top for item in self.data if isinstance(item.top, CogniteFileWrite)])
 
 
 def _create_cognite_cube_map_filter(
     view_id: dm.ViewId,
-    back: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    bottom: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    front: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    left: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    right: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    top: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    back: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    bottom: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    front: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    left: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    right: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    top: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -271,27 +357,39 @@ def _create_cognite_cube_map_filter(
     if isinstance(back, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(back):
         filters.append(dm.filters.Equals(view_id.as_property_ref("back"), value=as_instance_dict_id(back)))
     if back and isinstance(back, Sequence) and not isinstance(back, str) and not is_tuple_id(back):
-        filters.append(dm.filters.In(view_id.as_property_ref("back"), values=[as_instance_dict_id(item) for item in back]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("back"), values=[as_instance_dict_id(item) for item in back])
+        )
     if isinstance(bottom, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(bottom):
         filters.append(dm.filters.Equals(view_id.as_property_ref("bottom"), value=as_instance_dict_id(bottom)))
     if bottom and isinstance(bottom, Sequence) and not isinstance(bottom, str) and not is_tuple_id(bottom):
-        filters.append(dm.filters.In(view_id.as_property_ref("bottom"), values=[as_instance_dict_id(item) for item in bottom]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("bottom"), values=[as_instance_dict_id(item) for item in bottom])
+        )
     if isinstance(front, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(front):
         filters.append(dm.filters.Equals(view_id.as_property_ref("front"), value=as_instance_dict_id(front)))
     if front and isinstance(front, Sequence) and not isinstance(front, str) and not is_tuple_id(front):
-        filters.append(dm.filters.In(view_id.as_property_ref("front"), values=[as_instance_dict_id(item) for item in front]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("front"), values=[as_instance_dict_id(item) for item in front])
+        )
     if isinstance(left, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(left):
         filters.append(dm.filters.Equals(view_id.as_property_ref("left"), value=as_instance_dict_id(left)))
     if left and isinstance(left, Sequence) and not isinstance(left, str) and not is_tuple_id(left):
-        filters.append(dm.filters.In(view_id.as_property_ref("left"), values=[as_instance_dict_id(item) for item in left]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("left"), values=[as_instance_dict_id(item) for item in left])
+        )
     if isinstance(right, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(right):
         filters.append(dm.filters.Equals(view_id.as_property_ref("right"), value=as_instance_dict_id(right)))
     if right and isinstance(right, Sequence) and not isinstance(right, str) and not is_tuple_id(right):
-        filters.append(dm.filters.In(view_id.as_property_ref("right"), values=[as_instance_dict_id(item) for item in right]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("right"), values=[as_instance_dict_id(item) for item in right])
+        )
     if isinstance(top, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(top):
         filters.append(dm.filters.Equals(view_id.as_property_ref("top"), value=as_instance_dict_id(top)))
     if top and isinstance(top, Sequence) and not isinstance(top, str) and not is_tuple_id(top):
-        filters.append(dm.filters.In(view_id.as_property_ref("top"), values=[as_instance_dict_id(item) for item in top]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("top"), values=[as_instance_dict_id(item) for item in top])
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -314,11 +412,11 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_file import _CogniteFileQuery
 
@@ -427,16 +525,18 @@ class _CogniteCubeMapQuery(NodeQueryCore[T_DomainModelList, CogniteCubeMapList])
         self.left_filter = DirectRelationFilter(self, self._view_id.as_property_ref("left"))
         self.right_filter = DirectRelationFilter(self, self._view_id.as_property_ref("right"))
         self.top_filter = DirectRelationFilter(self, self._view_id.as_property_ref("top"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.back_filter,
-            self.bottom_filter,
-            self.front_filter,
-            self.left_filter,
-            self.right_filter,
-            self.top_filter,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.back_filter,
+                self.bottom_filter,
+                self.front_filter,
+                self.left_filter,
+                self.right_filter,
+                self.top_filter,
+            ]
+        )
 
     def list_cognite_cube_map(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteCubeMapList:
         return self._list(limit=limit)

@@ -38,8 +38,15 @@ from cognite_core.data_classes._core import (
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 from cognite_core.data_classes._cognite_3_d_revision import Cognite3DRevision, Cognite3DRevisionWrite
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_360_image_model import Cognite360ImageModel, Cognite360ImageModelList, Cognite360ImageModelGraphQL, Cognite360ImageModelWrite, Cognite360ImageModelWriteList
+    from cognite_core.data_classes._cognite_360_image_model import (
+        Cognite360ImageModel,
+        Cognite360ImageModelList,
+        Cognite360ImageModelGraphQL,
+        Cognite360ImageModelWrite,
+        Cognite360ImageModelWriteList,
+    )
 
 
 __all__ = [
@@ -54,7 +61,9 @@ __all__ = [
 
 
 Cognite360ImageCollectionTextFields = Literal["external_id", "aliases", "description", "name", "tags"]
-Cognite360ImageCollectionFields = Literal["external_id", "aliases", "description", "name", "published", "status", "tags", "type_"]
+Cognite360ImageCollectionFields = Literal[
+    "external_id", "aliases", "description", "name", "published", "status", "tags", "type_"
+]
 
 _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -109,7 +118,6 @@ class Cognite360ImageCollectionGraphQL(GraphQLCore, protected_namespaces=()):
             )
         return values
 
-
     @field_validator("model_3d", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -150,16 +158,15 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
 
     node_type: Union[dm.DirectRelationReference, None] = None
     model_3d: Union[Cognite360ImageModel, str, dm.NodeId, None] = Field(default=None, repr=False, alias="model3D")
+
     @field_validator("model_3d", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> Cognite360ImageCollectionWrite:
         """Convert this read version of Cognite 360 image collection to the writing version."""
         return Cognite360ImageCollectionWrite.model_validate(as_write_args(self))
-
 
 
 class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevisionWrite, protected_namespaces=()):
@@ -180,7 +187,17 @@ class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevis
         tags: Text based labels for generic use, limited to 1000
         type_: The type field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "model_3d", "name", "published", "status", "tags", "type_",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "model_3d",
+        "name",
+        "published",
+        "status",
+        "tags",
+        "type_",
+    )
     _direct_relations: ClassVar[tuple[str, ...]] = ("model_3d",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
@@ -203,35 +220,54 @@ class Cognite360ImageCollectionList(DomainModelList[Cognite360ImageCollection]):
     """List of Cognite 360 image collections in the read version."""
 
     _INSTANCE = Cognite360ImageCollection
+
     def as_write(self) -> Cognite360ImageCollectionWriteList:
         """Convert these read versions of Cognite 360 image collection to the writing versions."""
         return Cognite360ImageCollectionWriteList([node.as_write() for node in self.data])
 
-
     @property
     def model_3d(self) -> Cognite360ImageModelList:
         from ._cognite_360_image_model import Cognite360ImageModel, Cognite360ImageModelList
-        return Cognite360ImageModelList([item.model_3d for item in self.data if isinstance(item.model_3d, Cognite360ImageModel)])
+
+        return Cognite360ImageModelList(
+            [item.model_3d for item in self.data if isinstance(item.model_3d, Cognite360ImageModel)]
+        )
+
 
 class Cognite360ImageCollectionWriteList(DomainModelWriteList[Cognite360ImageCollectionWrite]):
     """List of Cognite 360 image collections in the writing version."""
 
     _INSTANCE = Cognite360ImageCollectionWrite
+
     @property
     def model_3d(self) -> Cognite360ImageModelWriteList:
         from ._cognite_360_image_model import Cognite360ImageModelWrite, Cognite360ImageModelWriteList
-        return Cognite360ImageModelWriteList([item.model_3d for item in self.data if isinstance(item.model_3d, Cognite360ImageModelWrite)])
+
+        return Cognite360ImageModelWriteList(
+            [item.model_3d for item in self.data if isinstance(item.model_3d, Cognite360ImageModelWrite)]
+        )
 
 
 def _create_cognite_360_image_collection_filter(
     view_id: dm.ViewId,
     description: str | list[str] | None = None,
     description_prefix: str | None = None,
-    model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    model_3d: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     published: bool | None = None,
-    status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+    status: (
+        Literal["Done", "Failed", "Processing", "Queued"]
+        | list[Literal["Done", "Failed", "Processing", "Queued"]]
+        | None
+    ) = None,
     type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -247,7 +283,9 @@ def _create_cognite_360_image_collection_filter(
     if isinstance(model_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(model_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("model3D"), value=as_instance_dict_id(model_3d)))
     if model_3d and isinstance(model_3d, Sequence) and not isinstance(model_3d, str) and not is_tuple_id(model_3d):
-        filters.append(dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d])
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -286,11 +324,11 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_360_image_model import _Cognite360ImageModelQuery
 
@@ -327,14 +365,16 @@ class _Cognite360ImageCollectionQuery(NodeQueryCore[T_DomainModelList, Cognite36
         self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.published = BooleanFilter(self, self._view_id.as_property_ref("published"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.model_3d_filter,
-            self.name,
-            self.published,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.model_3d_filter,
+                self.name,
+                self.published,
+            ]
+        )
 
     def list_cognite_360_image_collection(self, limit: int = DEFAULT_QUERY_LIMIT) -> Cognite360ImageCollectionList:
         return self._list(limit=limit)

@@ -36,11 +36,36 @@ from cognite_core.data_classes._core import (
     FloatFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_360_image_annotation import Cognite360ImageAnnotation, Cognite360ImageAnnotationList, Cognite360ImageAnnotationGraphQL, Cognite360ImageAnnotationWrite, Cognite360ImageAnnotationWriteList
-    from cognite_core.data_classes._cognite_asset import CogniteAsset, CogniteAssetList, CogniteAssetGraphQL, CogniteAssetWrite, CogniteAssetWriteList
-    from cognite_core.data_classes._cognite_cad_node import CogniteCADNode, CogniteCADNodeList, CogniteCADNodeGraphQL, CogniteCADNodeWrite, CogniteCADNodeWriteList
-    from cognite_core.data_classes._cognite_point_cloud_volume import CognitePointCloudVolume, CognitePointCloudVolumeList, CognitePointCloudVolumeGraphQL, CognitePointCloudVolumeWrite, CognitePointCloudVolumeWriteList
+    from cognite_core.data_classes._cognite_360_image_annotation import (
+        Cognite360ImageAnnotation,
+        Cognite360ImageAnnotationList,
+        Cognite360ImageAnnotationGraphQL,
+        Cognite360ImageAnnotationWrite,
+        Cognite360ImageAnnotationWriteList,
+    )
+    from cognite_core.data_classes._cognite_asset import (
+        CogniteAsset,
+        CogniteAssetList,
+        CogniteAssetGraphQL,
+        CogniteAssetWrite,
+        CogniteAssetWriteList,
+    )
+    from cognite_core.data_classes._cognite_cad_node import (
+        CogniteCADNode,
+        CogniteCADNodeList,
+        CogniteCADNodeGraphQL,
+        CogniteCADNodeWrite,
+        CogniteCADNodeWriteList,
+    )
+    from cognite_core.data_classes._cognite_point_cloud_volume import (
+        CognitePointCloudVolume,
+        CognitePointCloudVolumeList,
+        CognitePointCloudVolumeGraphQL,
+        CognitePointCloudVolumeWrite,
+        CognitePointCloudVolumeWriteList,
+    )
 
 
 __all__ = [
@@ -55,7 +80,9 @@ __all__ = [
 
 
 Cognite3DObjectTextFields = Literal["external_id", "aliases", "description", "name", "tags"]
-Cognite3DObjectFields = Literal["external_id", "aliases", "description", "name", "tags", "x_max", "x_min", "y_max", "y_min", "z_max", "z_min"]
+Cognite3DObjectFields = Literal[
+    "external_id", "aliases", "description", "name", "tags", "x_max", "x_min", "y_max", "y_min", "z_max", "z_min"
+]
 
 _COGNITE3DOBJECT_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -105,7 +132,9 @@ class Cognite3DObjectGraphQL(GraphQLCore):
     description: Optional[str] = None
     images_360: Optional[list[Cognite360ImageAnnotationGraphQL]] = Field(default=None, repr=False, alias="images360")
     name: Optional[str] = None
-    point_cloud_volumes: Optional[list[CognitePointCloudVolumeGraphQL]] = Field(default=None, repr=False, alias="pointCloudVolumes")
+    point_cloud_volumes: Optional[list[CognitePointCloudVolumeGraphQL]] = Field(
+        default=None, repr=False, alias="pointCloudVolumes"
+    )
     tags: Optional[list[str]] = None
     x_max: Optional[float] = Field(None, alias="xMax")
     x_min: Optional[float] = Field(None, alias="xMin")
@@ -124,7 +153,6 @@ class Cognite3DObjectGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
 
     @field_validator("asset", "cad_nodes", "images_360", "point_cloud_volumes", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
@@ -174,13 +202,16 @@ class Cognite3DObject(CogniteDescribableNode):
     asset: Optional[CogniteAsset] = Field(default=None, repr=False)
     cad_nodes: Optional[list[CogniteCADNode]] = Field(default=None, repr=False, alias="cadNodes")
     images_360: Optional[list[Cognite360ImageAnnotation]] = Field(default=None, repr=False, alias="images360")
-    point_cloud_volumes: Optional[list[CognitePointCloudVolume]] = Field(default=None, repr=False, alias="pointCloudVolumes")
+    point_cloud_volumes: Optional[list[CognitePointCloudVolume]] = Field(
+        default=None, repr=False, alias="pointCloudVolumes"
+    )
     x_max: Optional[float] = Field(None, alias="xMax")
     x_min: Optional[float] = Field(None, alias="xMin")
     y_max: Optional[float] = Field(None, alias="yMax")
     y_min: Optional[float] = Field(None, alias="yMin")
     z_max: Optional[float] = Field(None, alias="zMax")
     z_min: Optional[float] = Field(None, alias="zMin")
+
     @field_validator("asset", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
@@ -196,7 +227,6 @@ class Cognite3DObject(CogniteDescribableNode):
     def as_write(self) -> Cognite3DObjectWrite:
         """Convert this read version of Cognite 3D object to the writing version."""
         return Cognite3DObjectWrite.model_validate(as_write_args(self))
-
 
 
 class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
@@ -220,8 +250,22 @@ class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
         z_max: Highest Z value in bounding box
         z_min: Lowest Z value in bounding box
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "name", "tags", "x_max", "x_min", "y_max", "y_min", "z_max", "z_min",)
-    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (("images_360", dm.DirectRelationReference("cdf_cdm", "image-360-annotation")),)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+        "x_max",
+        "x_min",
+        "y_max",
+        "y_min",
+        "z_max",
+        "z_min",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("images_360", dm.DirectRelationReference("cdf_cdm", "image-360-annotation")),
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DObject", "v1")
 
@@ -249,40 +293,69 @@ class Cognite3DObjectList(DomainModelList[Cognite3DObject]):
     """List of Cognite 3D objects in the read version."""
 
     _INSTANCE = Cognite3DObject
+
     def as_write(self) -> Cognite3DObjectWriteList:
         """Convert these read versions of Cognite 3D object to the writing versions."""
         return Cognite3DObjectWriteList([node.as_write() for node in self.data])
 
-
     @property
     def asset(self) -> CogniteAssetList:
         from ._cognite_asset import CogniteAsset, CogniteAssetList
+
         return CogniteAssetList([item.asset for item in self.data if isinstance(item.asset, CogniteAsset)])
+
     @property
     def cad_nodes(self) -> CogniteCADNodeList:
         from ._cognite_cad_node import CogniteCADNode, CogniteCADNodeList
-        return CogniteCADNodeList([item for items in self.data for item in items.cad_nodes or [] if isinstance(item, CogniteCADNode)])
+
+        return CogniteCADNodeList(
+            [item for items in self.data for item in items.cad_nodes or [] if isinstance(item, CogniteCADNode)]
+        )
 
     @property
     def images_360(self) -> Cognite360ImageAnnotationList:
         from ._cognite_360_image_annotation import Cognite360ImageAnnotation, Cognite360ImageAnnotationList
-        return Cognite360ImageAnnotationList([item for items in self.data for item in items.images_360 or [] if isinstance(item, Cognite360ImageAnnotation)])
+
+        return Cognite360ImageAnnotationList(
+            [
+                item
+                for items in self.data
+                for item in items.images_360 or []
+                if isinstance(item, Cognite360ImageAnnotation)
+            ]
+        )
 
     @property
     def point_cloud_volumes(self) -> CognitePointCloudVolumeList:
         from ._cognite_point_cloud_volume import CognitePointCloudVolume, CognitePointCloudVolumeList
-        return CognitePointCloudVolumeList([item for items in self.data for item in items.point_cloud_volumes or [] if isinstance(item, CognitePointCloudVolume)])
+
+        return CognitePointCloudVolumeList(
+            [
+                item
+                for items in self.data
+                for item in items.point_cloud_volumes or []
+                if isinstance(item, CognitePointCloudVolume)
+            ]
+        )
 
 
 class Cognite3DObjectWriteList(DomainModelWriteList[Cognite3DObjectWrite]):
     """List of Cognite 3D objects in the writing version."""
 
     _INSTANCE = Cognite3DObjectWrite
+
     @property
     def images_360(self) -> Cognite360ImageAnnotationWriteList:
         from ._cognite_360_image_annotation import Cognite360ImageAnnotationWrite, Cognite360ImageAnnotationWriteList
-        return Cognite360ImageAnnotationWriteList([item for items in self.data for item in items.images_360 or [] if isinstance(item, Cognite360ImageAnnotationWrite)])
 
+        return Cognite360ImageAnnotationWriteList(
+            [
+                item
+                for items in self.data
+                for item in items.images_360 or []
+                if isinstance(item, Cognite360ImageAnnotationWrite)
+            ]
+        )
 
 
 def _create_cognite_3_d_object_filter(
@@ -354,11 +427,11 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_360_image import _Cognite360ImageQuery
         from ._cognite_360_image_annotation import _Cognite360ImageAnnotationQuery
@@ -407,7 +480,10 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                 connection_property=ViewPropertyId(self._view_id, "cadNodes"),
             )
 
-        if _Cognite360ImageAnnotationQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
+        if (
+            _Cognite360ImageAnnotationQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.images_360 = _Cognite360ImageAnnotationQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -422,7 +498,10 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
                 connection_property=ViewPropertyId(self._view_id, "images360"),
             )
 
-        if _CognitePointCloudVolumeQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
+        if (
+            _CognitePointCloudVolumeQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.point_cloud_volumes = _CognitePointCloudVolumeQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -446,18 +525,20 @@ class _Cognite3DObjectQuery(NodeQueryCore[T_DomainModelList, Cognite3DObjectList
         self.y_min = FloatFilter(self, self._view_id.as_property_ref("yMin"))
         self.z_max = FloatFilter(self, self._view_id.as_property_ref("zMax"))
         self.z_min = FloatFilter(self, self._view_id.as_property_ref("zMin"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.name,
-            self.x_max,
-            self.x_min,
-            self.y_max,
-            self.y_min,
-            self.z_max,
-            self.z_min,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.name,
+                self.x_max,
+                self.x_min,
+                self.y_max,
+                self.y_min,
+                self.z_max,
+                self.z_min,
+            ]
+        )
 
     def list_cognite_3_d_object(self, limit: int = DEFAULT_QUERY_LIMIT) -> Cognite3DObjectList:
         return self._list(limit=limit)

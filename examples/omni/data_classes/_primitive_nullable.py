@@ -54,7 +54,9 @@ __all__ = [
 
 
 PrimitiveNullableTextFields = Literal["external_id", "text"]
-PrimitiveNullableFields = Literal["external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"]
+PrimitiveNullableFields = Literal[
+    "external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
+]
 
 _PRIMITIVENULLABLE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -113,8 +115,6 @@ class PrimitiveNullableGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> PrimitiveNullable:
         """Convert this GraphQL format of primitive nullable to the reading format."""
         return PrimitiveNullable.model_validate(as_read_args(self))
@@ -158,11 +158,9 @@ class PrimitiveNullable(DomainModel):
     text: Optional[str] = None
     timestamp: Optional[datetime.datetime] = None
 
-
     def as_write(self) -> PrimitiveNullableWrite:
         """Convert this read version of primitive nullable to the writing version."""
         return PrimitiveNullableWrite.model_validate(as_write_args(self))
-
 
 
 class PrimitiveNullableWrite(DomainModelWrite):
@@ -184,7 +182,18 @@ class PrimitiveNullableWrite(DomainModelWrite):
         text: The text field.
         timestamp: The timestamp field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "boolean",
+        "date",
+        "float_32",
+        "float_64",
+        "int_32",
+        "int_64",
+        "json_",
+        "text",
+        "timestamp",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveNullable", "1")
 
@@ -201,15 +210,14 @@ class PrimitiveNullableWrite(DomainModelWrite):
     timestamp: Optional[datetime.datetime] = None
 
 
-
 class PrimitiveNullableList(DomainModelList[PrimitiveNullable]):
     """List of primitive nullables in the read version."""
 
     _INSTANCE = PrimitiveNullable
+
     def as_write(self) -> PrimitiveNullableWriteList:
         """Convert these read versions of primitive nullable to the writing versions."""
         return PrimitiveNullableWriteList([node.as_write() for node in self.data])
-
 
 
 class PrimitiveNullableWriteList(DomainModelWriteList[PrimitiveNullableWrite]):
@@ -243,7 +251,13 @@ def _create_primitive_nullable_filter(
     if isinstance(boolean, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("boolean"), value=boolean))
     if min_date is not None or max_date is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("date"), gte=min_date.isoformat() if min_date else None, lte=max_date.isoformat() if max_date else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("date"),
+                gte=min_date.isoformat() if min_date else None,
+                lte=max_date.isoformat() if max_date else None,
+            )
+        )
     if min_float_32 is not None or max_float_32 is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("float32"), gte=min_float_32, lte=max_float_32))
     if min_float_64 is not None or max_float_64 is not None:
@@ -259,7 +273,13 @@ def _create_primitive_nullable_filter(
     if text_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("text"), value=text_prefix))
     if min_timestamp is not None or max_timestamp is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("timestamp"), gte=min_timestamp.isoformat(timespec="milliseconds") if min_timestamp else None, lte=max_timestamp.isoformat(timespec="milliseconds") if max_timestamp else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("timestamp"),
+                gte=min_timestamp.isoformat(timespec="milliseconds") if min_timestamp else None,
+                lte=max_timestamp.isoformat(timespec="milliseconds") if max_timestamp else None,
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -282,11 +302,11 @@ class _PrimitiveNullableQuery(NodeQueryCore[T_DomainModelList, PrimitiveNullable
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -312,18 +332,20 @@ class _PrimitiveNullableQuery(NodeQueryCore[T_DomainModelList, PrimitiveNullable
         self.int_64 = IntFilter(self, self._view_id.as_property_ref("int64"))
         self.text = StringFilter(self, self._view_id.as_property_ref("text"))
         self.timestamp = TimestampFilter(self, self._view_id.as_property_ref("timestamp"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.boolean,
-            self.date,
-            self.float_32,
-            self.float_64,
-            self.int_32,
-            self.int_64,
-            self.text,
-            self.timestamp,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.boolean,
+                self.date,
+                self.float_32,
+                self.float_64,
+                self.int_32,
+                self.int_64,
+                self.text,
+                self.timestamp,
+            ]
+        )
 
     def list_primitive_nullable(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveNullableList:
         return self._list(limit=limit)

@@ -33,7 +33,6 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
-    
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -49,8 +48,12 @@ __all__ = [
 ]
 
 
-CogniteFileCategoryTextFields = Literal["external_id", "aliases", "code", "description", "name", "standard", "standard_reference", "tags"]
-CogniteFileCategoryFields = Literal["external_id", "aliases", "code", "description", "name", "standard", "standard_reference", "tags"]
+CogniteFileCategoryTextFields = Literal[
+    "external_id", "aliases", "code", "description", "name", "standard", "standard_reference", "tags"
+]
+CogniteFileCategoryFields = Literal[
+    "external_id", "aliases", "code", "description", "name", "standard", "standard_reference", "tags"
+]
 
 _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -103,8 +106,6 @@ class CogniteFileCategoryGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> CogniteFileCategory:
         """Convert this GraphQL format of Cognite file category to the reading format."""
         return CogniteFileCategory.model_validate(as_read_args(self))
@@ -139,11 +140,9 @@ class CogniteFileCategory(CogniteDescribableNode):
     standard: Optional[str] = None
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
-
     def as_write(self) -> CogniteFileCategoryWrite:
         """Convert this read version of Cognite file category to the writing version."""
         return CogniteFileCategoryWrite.model_validate(as_write_args(self))
-
 
 
 class CogniteFileCategoryWrite(CogniteDescribableNodeWrite):
@@ -163,7 +162,16 @@ class CogniteFileCategoryWrite(CogniteDescribableNodeWrite):
         standard_reference: A reference to the source of the category standard.
         tags: Text based labels for generic use, limited to 1000
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "code", "description", "name", "standard", "standard_reference", "tags",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "code",
+        "description",
+        "name",
+        "standard",
+        "standard_reference",
+        "tags",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteFileCategory", "v1")
 
@@ -173,15 +181,14 @@ class CogniteFileCategoryWrite(CogniteDescribableNodeWrite):
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
 
-
 class CogniteFileCategoryList(DomainModelList[CogniteFileCategory]):
     """List of Cognite file categories in the read version."""
 
     _INSTANCE = CogniteFileCategory
+
     def as_write(self) -> CogniteFileCategoryWriteList:
         """Convert these read versions of Cognite file category to the writing versions."""
         return CogniteFileCategoryWriteList([node.as_write() for node in self.data])
-
 
 
 class CogniteFileCategoryWriteList(DomainModelWriteList[CogniteFileCategoryWrite]):
@@ -259,11 +266,11 @@ class _CogniteFileCategoryQuery(NodeQueryCore[T_DomainModelList, CogniteFileCate
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -286,15 +293,17 @@ class _CogniteFileCategoryQuery(NodeQueryCore[T_DomainModelList, CogniteFileCate
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.standard = StringFilter(self, self._view_id.as_property_ref("standard"))
         self.standard_reference = StringFilter(self, self._view_id.as_property_ref("standardReference"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.code,
-            self.description,
-            self.name,
-            self.standard,
-            self.standard_reference,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.code,
+                self.description,
+                self.name,
+                self.standard,
+                self.standard_reference,
+            ]
+        )
 
     def list_cognite_file_category(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteFileCategoryList:
         return self._list(limit=limit)

@@ -36,8 +36,15 @@ from omni.data_classes._core import (
     DirectRelationFilter,
 )
 from omni.data_classes._sub_interface import SubInterface
+
 if TYPE_CHECKING:
-    from omni.data_classes._implementation_1 import Implementation1, Implementation1List, Implementation1GraphQL, Implementation1Write, Implementation1WriteList
+    from omni.data_classes._implementation_1 import (
+        Implementation1,
+        Implementation1List,
+        Implementation1GraphQL,
+        Implementation1Write,
+        Implementation1WriteList,
+    )
 
 
 __all__ = [
@@ -93,7 +100,6 @@ class Implementation1NonWriteableGraphQL(GraphQLCore):
             )
         return values
 
-
     @field_validator("connection_value", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -105,7 +111,6 @@ class Implementation1NonWriteableGraphQL(GraphQLCore):
     def as_read(self) -> Implementation1NonWriteable:
         """Convert this GraphQL format of implementation 1 non writeable to the reading format."""
         return Implementation1NonWriteable.model_validate(as_read_args(self))
-
 
 
 class Implementation1NonWriteable(SubInterface):
@@ -125,9 +130,14 @@ class Implementation1NonWriteable(SubInterface):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1NonWriteable", "1")
 
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Implementation1")
-    connection_value: Union[Implementation1, str, dm.NodeId, None] = Field(default=None, repr=False, alias="connectionValue")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "Implementation1"
+    )
+    connection_value: Union[Implementation1, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="connectionValue"
+    )
     value_1: Optional[str] = Field(None, alias="value1")
+
     @field_validator("connection_value", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
@@ -139,9 +149,17 @@ class Implementation1NonWriteableList(DomainModelList[Implementation1NonWriteabl
 
     _INSTANCE = Implementation1NonWriteable
 
+
 def _create_implementation_1_non_writeable_filter(
     view_id: dm.ViewId,
-    connection_value: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    connection_value: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     main_value: str | list[str] | None = None,
     main_value_prefix: str | None = None,
     sub_value: str | list[str] | None = None,
@@ -154,9 +172,21 @@ def _create_implementation_1_non_writeable_filter(
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
     if isinstance(connection_value, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(connection_value):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("connectionValue"), value=as_instance_dict_id(connection_value)))
-    if connection_value and isinstance(connection_value, Sequence) and not isinstance(connection_value, str) and not is_tuple_id(connection_value):
-        filters.append(dm.filters.In(view_id.as_property_ref("connectionValue"), values=[as_instance_dict_id(item) for item in connection_value]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("connectionValue"), value=as_instance_dict_id(connection_value))
+        )
+    if (
+        connection_value
+        and isinstance(connection_value, Sequence)
+        and not isinstance(connection_value, str)
+        and not is_tuple_id(connection_value)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("connectionValue"),
+                values=[as_instance_dict_id(item) for item in connection_value],
+            )
+        )
     if isinstance(main_value, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("mainValue"), value=main_value))
     if main_value and isinstance(main_value, list):
@@ -197,11 +227,11 @@ class _Implementation1NonWriteableQuery(NodeQueryCore[T_DomainModelList, Impleme
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._implementation_1 import _Implementation1Query
 
@@ -238,14 +268,16 @@ class _Implementation1NonWriteableQuery(NodeQueryCore[T_DomainModelList, Impleme
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.connection_value_filter,
-            self.main_value,
-            self.sub_value,
-            self.value_1,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.connection_value_filter,
+                self.main_value,
+                self.sub_value,
+                self.value_1,
+            ]
+        )
 
     def list_implementation_1_non_writeable(self, limit: int = DEFAULT_QUERY_LIMIT) -> Implementation1NonWriteableList:
         return self._list(limit=limit)

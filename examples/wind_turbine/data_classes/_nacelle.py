@@ -35,14 +35,51 @@ from wind_turbine.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
+
 if TYPE_CHECKING:
     from wind_turbine.data_classes._gearbox import Gearbox, GearboxList, GearboxGraphQL, GearboxWrite, GearboxWriteList
-    from wind_turbine.data_classes._generator import Generator, GeneratorList, GeneratorGraphQL, GeneratorWrite, GeneratorWriteList
-    from wind_turbine.data_classes._high_speed_shaft import HighSpeedShaft, HighSpeedShaftList, HighSpeedShaftGraphQL, HighSpeedShaftWrite, HighSpeedShaftWriteList
-    from wind_turbine.data_classes._main_shaft import MainShaft, MainShaftList, MainShaftGraphQL, MainShaftWrite, MainShaftWriteList
-    from wind_turbine.data_classes._power_inverter import PowerInverter, PowerInverterList, PowerInverterGraphQL, PowerInverterWrite, PowerInverterWriteList
-    from wind_turbine.data_classes._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList, SensorTimeSeriesGraphQL, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-    from wind_turbine.data_classes._wind_turbine import WindTurbine, WindTurbineList, WindTurbineGraphQL, WindTurbineWrite, WindTurbineWriteList
+    from wind_turbine.data_classes._generator import (
+        Generator,
+        GeneratorList,
+        GeneratorGraphQL,
+        GeneratorWrite,
+        GeneratorWriteList,
+    )
+    from wind_turbine.data_classes._high_speed_shaft import (
+        HighSpeedShaft,
+        HighSpeedShaftList,
+        HighSpeedShaftGraphQL,
+        HighSpeedShaftWrite,
+        HighSpeedShaftWriteList,
+    )
+    from wind_turbine.data_classes._main_shaft import (
+        MainShaft,
+        MainShaftList,
+        MainShaftGraphQL,
+        MainShaftWrite,
+        MainShaftWriteList,
+    )
+    from wind_turbine.data_classes._power_inverter import (
+        PowerInverter,
+        PowerInverterList,
+        PowerInverterGraphQL,
+        PowerInverterWrite,
+        PowerInverterWriteList,
+    )
+    from wind_turbine.data_classes._sensor_time_series import (
+        SensorTimeSeries,
+        SensorTimeSeriesList,
+        SensorTimeSeriesGraphQL,
+        SensorTimeSeriesWrite,
+        SensorTimeSeriesWriteList,
+    )
+    from wind_turbine.data_classes._wind_turbine import (
+        WindTurbine,
+        WindTurbineList,
+        WindTurbineGraphQL,
+        WindTurbineWrite,
+        WindTurbineWriteList,
+    )
 
 
 __all__ = [
@@ -54,8 +91,8 @@ __all__ = [
 ]
 
 
-NacelleTextFields = Literal["external_id", ]
-NacelleFields = Literal["external_id", ]
+NacelleTextFields = Literal["external_id",]
+NacelleFields = Literal["external_id",]
 
 _NACELLE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -109,8 +146,20 @@ class NacelleGraphQL(GraphQLCore):
             )
         return values
 
-
-    @field_validator("acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", "wind_turbine", "yaw_direction", "yaw_error", mode="before")
+    @field_validator(
+        "acc_from_back_side_x",
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "wind_turbine",
+        "yaw_direction",
+        "yaw_error",
+        mode="before",
+    )
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -164,16 +213,28 @@ class Nacelle(DomainModel):
     wind_turbine: Optional[WindTurbine] = Field(default=None, repr=False)
     yaw_direction: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
     yaw_error: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
-    @field_validator("acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", "wind_turbine", "yaw_direction", "yaw_error", mode="before")
+
+    @field_validator(
+        "acc_from_back_side_x",
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "wind_turbine",
+        "yaw_direction",
+        "yaw_error",
+        mode="before",
+    )
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> NacelleWrite:
         """Convert this read version of nacelle to the writing version."""
         return NacelleWrite.model_validate(as_write_args(self))
-
 
 
 class NacelleWrite(DomainModelWrite):
@@ -196,8 +257,30 @@ class NacelleWrite(DomainModelWrite):
         yaw_direction: The yaw direction field.
         yaw_error: The yaw error field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("acc_from_back_side_x", "acc_from_back_side_y", "acc_from_back_side_z", "gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", "yaw_direction", "yaw_error",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("acc_from_back_side_y", "acc_from_back_side_z", "gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", "yaw_direction", "yaw_error",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "acc_from_back_side_x",
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "yaw_direction",
+        "yaw_error",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "yaw_direction",
+        "yaw_error",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Nacelle", "1")
 
@@ -214,7 +297,18 @@ class NacelleWrite(DomainModelWrite):
     yaw_direction: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     yaw_error: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
 
-    @field_validator("acc_from_back_side_y", "acc_from_back_side_z", "gearbox", "generator", "high_speed_shaft", "main_shaft", "power_inverter", "yaw_direction", "yaw_error", mode="before")
+    @field_validator(
+        "acc_from_back_side_y",
+        "acc_from_back_side_z",
+        "gearbox",
+        "generator",
+        "high_speed_shaft",
+        "main_shaft",
+        "power_inverter",
+        "yaw_direction",
+        "yaw_error",
+        mode="before",
+    )
     def as_node_id(cls, value: Any) -> Any:
         if isinstance(value, dm.DirectRelationReference):
             return dm.NodeId(value.space, value.external_id)
@@ -229,151 +323,394 @@ class NacelleList(DomainModelList[Nacelle]):
     """List of nacelles in the read version."""
 
     _INSTANCE = Nacelle
+
     def as_write(self) -> NacelleWriteList:
         """Convert these read versions of nacelle to the writing versions."""
         return NacelleWriteList([node.as_write() for node in self.data])
 
-
     @property
     def acc_from_back_side_y(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.acc_from_back_side_y for item in self.data if isinstance(item.acc_from_back_side_y, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.acc_from_back_side_y for item in self.data if isinstance(item.acc_from_back_side_y, SensorTimeSeries)]
+        )
+
     @property
     def acc_from_back_side_z(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.acc_from_back_side_z for item in self.data if isinstance(item.acc_from_back_side_z, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.acc_from_back_side_z for item in self.data if isinstance(item.acc_from_back_side_z, SensorTimeSeries)]
+        )
+
     @property
     def gearbox(self) -> GearboxList:
         from ._gearbox import Gearbox, GearboxList
+
         return GearboxList([item.gearbox for item in self.data if isinstance(item.gearbox, Gearbox)])
+
     @property
     def generator(self) -> GeneratorList:
         from ._generator import Generator, GeneratorList
+
         return GeneratorList([item.generator for item in self.data if isinstance(item.generator, Generator)])
+
     @property
     def high_speed_shaft(self) -> HighSpeedShaftList:
         from ._high_speed_shaft import HighSpeedShaft, HighSpeedShaftList
-        return HighSpeedShaftList([item.high_speed_shaft for item in self.data if isinstance(item.high_speed_shaft, HighSpeedShaft)])
+
+        return HighSpeedShaftList(
+            [item.high_speed_shaft for item in self.data if isinstance(item.high_speed_shaft, HighSpeedShaft)]
+        )
+
     @property
     def main_shaft(self) -> MainShaftList:
         from ._main_shaft import MainShaft, MainShaftList
+
         return MainShaftList([item.main_shaft for item in self.data if isinstance(item.main_shaft, MainShaft)])
+
     @property
     def power_inverter(self) -> PowerInverterList:
         from ._power_inverter import PowerInverter, PowerInverterList
-        return PowerInverterList([item.power_inverter for item in self.data if isinstance(item.power_inverter, PowerInverter)])
+
+        return PowerInverterList(
+            [item.power_inverter for item in self.data if isinstance(item.power_inverter, PowerInverter)]
+        )
+
     @property
     def wind_turbine(self) -> WindTurbineList:
         from ._wind_turbine import WindTurbine, WindTurbineList
+
         return WindTurbineList([item.wind_turbine for item in self.data if isinstance(item.wind_turbine, WindTurbine)])
+
     @property
     def yaw_direction(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.yaw_direction for item in self.data if isinstance(item.yaw_direction, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.yaw_direction for item in self.data if isinstance(item.yaw_direction, SensorTimeSeries)]
+        )
+
     @property
     def yaw_error(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.yaw_error for item in self.data if isinstance(item.yaw_error, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [item.yaw_error for item in self.data if isinstance(item.yaw_error, SensorTimeSeries)]
+        )
+
 
 class NacelleWriteList(DomainModelWriteList[NacelleWrite]):
     """List of nacelles in the writing version."""
 
     _INSTANCE = NacelleWrite
+
     @property
     def acc_from_back_side_y(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.acc_from_back_side_y for item in self.data if isinstance(item.acc_from_back_side_y, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [
+                item.acc_from_back_side_y
+                for item in self.data
+                if isinstance(item.acc_from_back_side_y, SensorTimeSeriesWrite)
+            ]
+        )
+
     @property
     def acc_from_back_side_z(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.acc_from_back_side_z for item in self.data if isinstance(item.acc_from_back_side_z, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [
+                item.acc_from_back_side_z
+                for item in self.data
+                if isinstance(item.acc_from_back_side_z, SensorTimeSeriesWrite)
+            ]
+        )
+
     @property
     def gearbox(self) -> GearboxWriteList:
         from ._gearbox import GearboxWrite, GearboxWriteList
+
         return GearboxWriteList([item.gearbox for item in self.data if isinstance(item.gearbox, GearboxWrite)])
+
     @property
     def generator(self) -> GeneratorWriteList:
         from ._generator import GeneratorWrite, GeneratorWriteList
+
         return GeneratorWriteList([item.generator for item in self.data if isinstance(item.generator, GeneratorWrite)])
+
     @property
     def high_speed_shaft(self) -> HighSpeedShaftWriteList:
         from ._high_speed_shaft import HighSpeedShaftWrite, HighSpeedShaftWriteList
-        return HighSpeedShaftWriteList([item.high_speed_shaft for item in self.data if isinstance(item.high_speed_shaft, HighSpeedShaftWrite)])
+
+        return HighSpeedShaftWriteList(
+            [item.high_speed_shaft for item in self.data if isinstance(item.high_speed_shaft, HighSpeedShaftWrite)]
+        )
+
     @property
     def main_shaft(self) -> MainShaftWriteList:
         from ._main_shaft import MainShaftWrite, MainShaftWriteList
-        return MainShaftWriteList([item.main_shaft for item in self.data if isinstance(item.main_shaft, MainShaftWrite)])
+
+        return MainShaftWriteList(
+            [item.main_shaft for item in self.data if isinstance(item.main_shaft, MainShaftWrite)]
+        )
+
     @property
     def power_inverter(self) -> PowerInverterWriteList:
         from ._power_inverter import PowerInverterWrite, PowerInverterWriteList
-        return PowerInverterWriteList([item.power_inverter for item in self.data if isinstance(item.power_inverter, PowerInverterWrite)])
+
+        return PowerInverterWriteList(
+            [item.power_inverter for item in self.data if isinstance(item.power_inverter, PowerInverterWrite)]
+        )
+
     @property
     def yaw_direction(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.yaw_direction for item in self.data if isinstance(item.yaw_direction, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [item.yaw_direction for item in self.data if isinstance(item.yaw_direction, SensorTimeSeriesWrite)]
+        )
+
     @property
     def yaw_error(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.yaw_error for item in self.data if isinstance(item.yaw_error, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [item.yaw_error for item in self.data if isinstance(item.yaw_error, SensorTimeSeriesWrite)]
+        )
 
 
 def _create_nacelle_filter(
     view_id: dm.ViewId,
-    acc_from_back_side_x: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    acc_from_back_side_y: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    acc_from_back_side_z: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    gearbox: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    generator: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    high_speed_shaft: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    main_shaft: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    power_inverter: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    yaw_direction: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    yaw_error: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    acc_from_back_side_x: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    acc_from_back_side_y: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    acc_from_back_side_z: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    gearbox: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    generator: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    high_speed_shaft: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    main_shaft: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    power_inverter: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    yaw_direction: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    yaw_error: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if isinstance(acc_from_back_side_x, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(acc_from_back_side_x):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("acc_from_back_side_x"), value=as_instance_dict_id(acc_from_back_side_x)))
-    if acc_from_back_side_x and isinstance(acc_from_back_side_x, Sequence) and not isinstance(acc_from_back_side_x, str) and not is_tuple_id(acc_from_back_side_x):
-        filters.append(dm.filters.In(view_id.as_property_ref("acc_from_back_side_x"), values=[as_instance_dict_id(item) for item in acc_from_back_side_x]))
-    if isinstance(acc_from_back_side_y, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(acc_from_back_side_y):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("acc_from_back_side_y"), value=as_instance_dict_id(acc_from_back_side_y)))
-    if acc_from_back_side_y and isinstance(acc_from_back_side_y, Sequence) and not isinstance(acc_from_back_side_y, str) and not is_tuple_id(acc_from_back_side_y):
-        filters.append(dm.filters.In(view_id.as_property_ref("acc_from_back_side_y"), values=[as_instance_dict_id(item) for item in acc_from_back_side_y]))
-    if isinstance(acc_from_back_side_z, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(acc_from_back_side_z):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("acc_from_back_side_z"), value=as_instance_dict_id(acc_from_back_side_z)))
-    if acc_from_back_side_z and isinstance(acc_from_back_side_z, Sequence) and not isinstance(acc_from_back_side_z, str) and not is_tuple_id(acc_from_back_side_z):
-        filters.append(dm.filters.In(view_id.as_property_ref("acc_from_back_side_z"), values=[as_instance_dict_id(item) for item in acc_from_back_side_z]))
+    if isinstance(acc_from_back_side_x, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        acc_from_back_side_x
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("acc_from_back_side_x"), value=as_instance_dict_id(acc_from_back_side_x)
+            )
+        )
+    if (
+        acc_from_back_side_x
+        and isinstance(acc_from_back_side_x, Sequence)
+        and not isinstance(acc_from_back_side_x, str)
+        and not is_tuple_id(acc_from_back_side_x)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("acc_from_back_side_x"),
+                values=[as_instance_dict_id(item) for item in acc_from_back_side_x],
+            )
+        )
+    if isinstance(acc_from_back_side_y, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        acc_from_back_side_y
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("acc_from_back_side_y"), value=as_instance_dict_id(acc_from_back_side_y)
+            )
+        )
+    if (
+        acc_from_back_side_y
+        and isinstance(acc_from_back_side_y, Sequence)
+        and not isinstance(acc_from_back_side_y, str)
+        and not is_tuple_id(acc_from_back_side_y)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("acc_from_back_side_y"),
+                values=[as_instance_dict_id(item) for item in acc_from_back_side_y],
+            )
+        )
+    if isinstance(acc_from_back_side_z, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        acc_from_back_side_z
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("acc_from_back_side_z"), value=as_instance_dict_id(acc_from_back_side_z)
+            )
+        )
+    if (
+        acc_from_back_side_z
+        and isinstance(acc_from_back_side_z, Sequence)
+        and not isinstance(acc_from_back_side_z, str)
+        and not is_tuple_id(acc_from_back_side_z)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("acc_from_back_side_z"),
+                values=[as_instance_dict_id(item) for item in acc_from_back_side_z],
+            )
+        )
     if isinstance(gearbox, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(gearbox):
         filters.append(dm.filters.Equals(view_id.as_property_ref("gearbox"), value=as_instance_dict_id(gearbox)))
     if gearbox and isinstance(gearbox, Sequence) and not isinstance(gearbox, str) and not is_tuple_id(gearbox):
-        filters.append(dm.filters.In(view_id.as_property_ref("gearbox"), values=[as_instance_dict_id(item) for item in gearbox]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("gearbox"), values=[as_instance_dict_id(item) for item in gearbox])
+        )
     if isinstance(generator, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(generator):
         filters.append(dm.filters.Equals(view_id.as_property_ref("generator"), value=as_instance_dict_id(generator)))
     if generator and isinstance(generator, Sequence) and not isinstance(generator, str) and not is_tuple_id(generator):
-        filters.append(dm.filters.In(view_id.as_property_ref("generator"), values=[as_instance_dict_id(item) for item in generator]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("generator"), values=[as_instance_dict_id(item) for item in generator]
+            )
+        )
     if isinstance(high_speed_shaft, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(high_speed_shaft):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("high_speed_shaft"), value=as_instance_dict_id(high_speed_shaft)))
-    if high_speed_shaft and isinstance(high_speed_shaft, Sequence) and not isinstance(high_speed_shaft, str) and not is_tuple_id(high_speed_shaft):
-        filters.append(dm.filters.In(view_id.as_property_ref("high_speed_shaft"), values=[as_instance_dict_id(item) for item in high_speed_shaft]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("high_speed_shaft"), value=as_instance_dict_id(high_speed_shaft))
+        )
+    if (
+        high_speed_shaft
+        and isinstance(high_speed_shaft, Sequence)
+        and not isinstance(high_speed_shaft, str)
+        and not is_tuple_id(high_speed_shaft)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("high_speed_shaft"),
+                values=[as_instance_dict_id(item) for item in high_speed_shaft],
+            )
+        )
     if isinstance(main_shaft, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(main_shaft):
         filters.append(dm.filters.Equals(view_id.as_property_ref("main_shaft"), value=as_instance_dict_id(main_shaft)))
-    if main_shaft and isinstance(main_shaft, Sequence) and not isinstance(main_shaft, str) and not is_tuple_id(main_shaft):
-        filters.append(dm.filters.In(view_id.as_property_ref("main_shaft"), values=[as_instance_dict_id(item) for item in main_shaft]))
+    if (
+        main_shaft
+        and isinstance(main_shaft, Sequence)
+        and not isinstance(main_shaft, str)
+        and not is_tuple_id(main_shaft)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("main_shaft"), values=[as_instance_dict_id(item) for item in main_shaft]
+            )
+        )
     if isinstance(power_inverter, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(power_inverter):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("power_inverter"), value=as_instance_dict_id(power_inverter)))
-    if power_inverter and isinstance(power_inverter, Sequence) and not isinstance(power_inverter, str) and not is_tuple_id(power_inverter):
-        filters.append(dm.filters.In(view_id.as_property_ref("power_inverter"), values=[as_instance_dict_id(item) for item in power_inverter]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("power_inverter"), value=as_instance_dict_id(power_inverter))
+        )
+    if (
+        power_inverter
+        and isinstance(power_inverter, Sequence)
+        and not isinstance(power_inverter, str)
+        and not is_tuple_id(power_inverter)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("power_inverter"), values=[as_instance_dict_id(item) for item in power_inverter]
+            )
+        )
     if isinstance(yaw_direction, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(yaw_direction):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("yaw_direction"), value=as_instance_dict_id(yaw_direction)))
-    if yaw_direction and isinstance(yaw_direction, Sequence) and not isinstance(yaw_direction, str) and not is_tuple_id(yaw_direction):
-        filters.append(dm.filters.In(view_id.as_property_ref("yaw_direction"), values=[as_instance_dict_id(item) for item in yaw_direction]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("yaw_direction"), value=as_instance_dict_id(yaw_direction))
+        )
+    if (
+        yaw_direction
+        and isinstance(yaw_direction, Sequence)
+        and not isinstance(yaw_direction, str)
+        and not is_tuple_id(yaw_direction)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("yaw_direction"), values=[as_instance_dict_id(item) for item in yaw_direction]
+            )
+        )
     if isinstance(yaw_error, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(yaw_error):
         filters.append(dm.filters.Equals(view_id.as_property_ref("yaw_error"), value=as_instance_dict_id(yaw_error)))
     if yaw_error and isinstance(yaw_error, Sequence) and not isinstance(yaw_error, str) and not is_tuple_id(yaw_error):
-        filters.append(dm.filters.In(view_id.as_property_ref("yaw_error"), values=[as_instance_dict_id(item) for item in yaw_error]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("yaw_error"), values=[as_instance_dict_id(item) for item in yaw_error]
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -396,11 +733,11 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._gearbox import _GearboxQuery
         from ._generator import _GeneratorQuery
@@ -422,7 +759,6 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
             connection_type,
             reverse_expression,
         )
-
 
         if _SensorTimeSeriesQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.acc_from_back_side_y = _SensorTimeSeriesQuery(
@@ -566,9 +902,15 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self.acc_from_back_side_x_filter = DirectRelationFilter(self, self._view_id.as_property_ref("acc_from_back_side_x"))
-        self.acc_from_back_side_y_filter = DirectRelationFilter(self, self._view_id.as_property_ref("acc_from_back_side_y"))
-        self.acc_from_back_side_z_filter = DirectRelationFilter(self, self._view_id.as_property_ref("acc_from_back_side_z"))
+        self.acc_from_back_side_x_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("acc_from_back_side_x")
+        )
+        self.acc_from_back_side_y_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("acc_from_back_side_y")
+        )
+        self.acc_from_back_side_z_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("acc_from_back_side_z")
+        )
         self.gearbox_filter = DirectRelationFilter(self, self._view_id.as_property_ref("gearbox"))
         self.generator_filter = DirectRelationFilter(self, self._view_id.as_property_ref("generator"))
         self.high_speed_shaft_filter = DirectRelationFilter(self, self._view_id.as_property_ref("high_speed_shaft"))
@@ -576,20 +918,22 @@ class _NacelleQuery(NodeQueryCore[T_DomainModelList, NacelleList]):
         self.power_inverter_filter = DirectRelationFilter(self, self._view_id.as_property_ref("power_inverter"))
         self.yaw_direction_filter = DirectRelationFilter(self, self._view_id.as_property_ref("yaw_direction"))
         self.yaw_error_filter = DirectRelationFilter(self, self._view_id.as_property_ref("yaw_error"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.acc_from_back_side_x_filter,
-            self.acc_from_back_side_y_filter,
-            self.acc_from_back_side_z_filter,
-            self.gearbox_filter,
-            self.generator_filter,
-            self.high_speed_shaft_filter,
-            self.main_shaft_filter,
-            self.power_inverter_filter,
-            self.yaw_direction_filter,
-            self.yaw_error_filter,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.acc_from_back_side_x_filter,
+                self.acc_from_back_side_y_filter,
+                self.acc_from_back_side_z_filter,
+                self.gearbox_filter,
+                self.generator_filter,
+                self.high_speed_shaft_filter,
+                self.main_shaft_filter,
+                self.power_inverter_filter,
+                self.yaw_direction_filter,
+                self.yaw_error_filter,
+            ]
+        )
 
     def list_nacelle(self, limit: int = DEFAULT_QUERY_LIMIT) -> NacelleList:
         return self._list(limit=limit)

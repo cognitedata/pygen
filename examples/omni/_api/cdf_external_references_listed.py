@@ -44,7 +44,14 @@ from omni.data_classes import (
 )
 
 
-class CDFExternalReferencesListedAPI(NodeAPI[CDFExternalReferencesListed, CDFExternalReferencesListedWrite, CDFExternalReferencesListedList, CDFExternalReferencesListedWriteList]):
+class CDFExternalReferencesListedAPI(
+    NodeAPI[
+        CDFExternalReferencesListed,
+        CDFExternalReferencesListedWrite,
+        CDFExternalReferencesListedList,
+        CDFExternalReferencesListedWriteList,
+    ]
+):
     _view_id = dm.ViewId("sp_pygen_models", "CDFExternalReferencesListed", "1")
     _properties_by_field: ClassVar[dict[str, str]] = _CDFEXTERNALREFERENCESLISTED_PROPERTIES_BY_FIELD
     _class_type = CDFExternalReferencesListed
@@ -53,7 +60,6 @@ class CDFExternalReferencesListedAPI(NodeAPI[CDFExternalReferencesListed, CDFExt
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -102,7 +108,9 @@ class CDFExternalReferencesListedAPI(NodeAPI[CDFExternalReferencesListed, CDFExt
     def search(
         self,
         query: str,
-        properties: CDFExternalReferencesListedTextFields | SequenceNotStr[CDFExternalReferencesListedTextFields] | None = None,
+        properties: (
+            CDFExternalReferencesListedTextFields | SequenceNotStr[CDFExternalReferencesListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -185,9 +193,11 @@ class CDFExternalReferencesListedAPI(NodeAPI[CDFExternalReferencesListed, CDFExt
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields],
         property: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields] | None = None,
         external_id_prefix: str | None = None,
@@ -198,9 +208,11 @@ class CDFExternalReferencesListedAPI(NodeAPI[CDFExternalReferencesListed, CDFExt
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields] | None = None,
         property: CDFExternalReferencesListedFields | SequenceNotStr[CDFExternalReferencesListedFields] | None = None,
         external_id_prefix: str | None = None,
@@ -308,13 +320,15 @@ class CDFExternalReferencesListedAPI(NodeAPI[CDFExternalReferencesListed, CDFExt
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         return builder.build()
 
     def iterate(
@@ -433,6 +447,5 @@ class CDFExternalReferencesListedAPI(NodeAPI[CDFExternalReferencesListed, CDFExt
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit,  filter=filter_, sort=sort_input)
-
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

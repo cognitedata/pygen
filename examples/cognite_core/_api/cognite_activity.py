@@ -59,7 +59,6 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     @overload
     def retrieve(
         self,
@@ -115,19 +114,40 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         self,
         query: str,
         properties: CogniteActivityTextFields | SequenceNotStr[CogniteActivityTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        equipment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         min_scheduled_end_time: datetime.datetime | None = None,
         max_scheduled_end_time: datetime.datetime | None = None,
         min_scheduled_start_time: datetime.datetime | None = None,
         max_scheduled_start_time: datetime.datetime | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -142,7 +162,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         source_updated_user_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
-        time_series: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        time_series: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -262,19 +289,40 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         property: CogniteActivityFields | SequenceNotStr[CogniteActivityFields] | None = None,
         query: str | None = None,
         search_property: CogniteActivityTextFields | SequenceNotStr[CogniteActivityTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        equipment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         min_scheduled_end_time: datetime.datetime | None = None,
         max_scheduled_end_time: datetime.datetime | None = None,
         min_scheduled_start_time: datetime.datetime | None = None,
         max_scheduled_start_time: datetime.datetime | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -289,7 +337,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         source_updated_user_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
-        time_series: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        time_series: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -304,19 +359,40 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         property: CogniteActivityFields | SequenceNotStr[CogniteActivityFields] | None = None,
         query: str | None = None,
         search_property: CogniteActivityTextFields | SequenceNotStr[CogniteActivityTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        equipment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         min_scheduled_end_time: datetime.datetime | None = None,
         max_scheduled_end_time: datetime.datetime | None = None,
         min_scheduled_start_time: datetime.datetime | None = None,
         max_scheduled_start_time: datetime.datetime | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -331,7 +407,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         source_updated_user_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
-        time_series: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        time_series: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -341,26 +424,49 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteActivityFields | SequenceNotStr[CogniteActivityFields],
         property: CogniteActivityFields | SequenceNotStr[CogniteActivityFields] | None = None,
         query: str | None = None,
         search_property: CogniteActivityTextFields | SequenceNotStr[CogniteActivityTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        equipment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         min_scheduled_end_time: datetime.datetime | None = None,
         max_scheduled_end_time: datetime.datetime | None = None,
         min_scheduled_start_time: datetime.datetime | None = None,
         max_scheduled_start_time: datetime.datetime | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -375,7 +481,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         source_updated_user_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
-        time_series: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        time_series: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -384,26 +497,49 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteActivityFields | SequenceNotStr[CogniteActivityFields] | None = None,
         property: CogniteActivityFields | SequenceNotStr[CogniteActivityFields] | None = None,
         query: str | None = None,
         search_property: CogniteActivityTextFields | SequenceNotStr[CogniteActivityTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        equipment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         min_scheduled_end_time: datetime.datetime | None = None,
         max_scheduled_end_time: datetime.datetime | None = None,
         min_scheduled_start_time: datetime.datetime | None = None,
         max_scheduled_start_time: datetime.datetime | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -418,7 +554,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         source_updated_user_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
-        time_series: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        time_series: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -534,19 +677,40 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         interval: float,
         query: str | None = None,
         search_property: CogniteActivityTextFields | SequenceNotStr[CogniteActivityTextFields] | None = None,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        equipment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         min_scheduled_end_time: datetime.datetime | None = None,
         max_scheduled_end_time: datetime.datetime | None = None,
         min_scheduled_start_time: datetime.datetime | None = None,
         max_scheduled_start_time: datetime.datetime | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -561,7 +725,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         source_updated_user_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
-        time_series: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        time_series: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -670,13 +841,15 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
@@ -711,19 +884,40 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
     def iterate(
         self,
         chunk_size: int = DEFAULT_CHUNK_SIZE,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        equipment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         min_scheduled_end_time: datetime.datetime | None = None,
         max_scheduled_end_time: datetime.datetime | None = None,
         min_scheduled_start_time: datetime.datetime | None = None,
         max_scheduled_start_time: datetime.datetime | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -738,7 +932,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         source_updated_user_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
-        time_series: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        time_series: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
@@ -871,19 +1072,40 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
 
     def list(
         self,
-        assets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        assets: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
         min_end_time: datetime.datetime | None = None,
         max_end_time: datetime.datetime | None = None,
-        equipment: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        equipment: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         min_scheduled_end_time: datetime.datetime | None = None,
         max_scheduled_end_time: datetime.datetime | None = None,
         min_scheduled_start_time: datetime.datetime | None = None,
         max_scheduled_start_time: datetime.datetime | None = None,
-        source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        source: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         source_context: str | list[str] | None = None,
         source_context_prefix: str | None = None,
         min_source_created_time: datetime.datetime | None = None,
@@ -898,7 +1120,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
         source_updated_user_prefix: str | None = None,
         min_start_time: datetime.datetime | None = None,
         max_start_time: datetime.datetime | None = None,
-        time_series: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        time_series: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -1000,8 +1229,7 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(limit=limit,  filter=filter_, sort=sort_input)
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
         return self._query(filter_, limit, retrieve_connections, sort_input, "list")
-

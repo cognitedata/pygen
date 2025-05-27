@@ -49,7 +49,9 @@ __all__ = [
 
 
 PrimitiveRequiredListedTextFields = Literal["external_id", "text"]
-PrimitiveRequiredListedFields = Literal["external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"]
+PrimitiveRequiredListedFields = Literal[
+    "external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
+]
 
 _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -108,8 +110,6 @@ class PrimitiveRequiredListedGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> PrimitiveRequiredListed:
         """Convert this GraphQL format of primitive required listed to the reading format."""
         return PrimitiveRequiredListed.model_validate(as_read_args(self))
@@ -153,11 +153,9 @@ class PrimitiveRequiredListed(DomainModel):
     text: list[str]
     timestamp: list[datetime.datetime]
 
-
     def as_write(self) -> PrimitiveRequiredListedWrite:
         """Convert this read version of primitive required listed to the writing version."""
         return PrimitiveRequiredListedWrite.model_validate(as_write_args(self))
-
 
 
 class PrimitiveRequiredListedWrite(DomainModelWrite):
@@ -179,7 +177,18 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
         text: The text field.
         timestamp: The timestamp field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "boolean",
+        "date",
+        "float_32",
+        "float_64",
+        "int_32",
+        "int_64",
+        "json_",
+        "text",
+        "timestamp",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
 
@@ -196,15 +205,14 @@ class PrimitiveRequiredListedWrite(DomainModelWrite):
     timestamp: list[datetime.datetime]
 
 
-
 class PrimitiveRequiredListedList(DomainModelList[PrimitiveRequiredListed]):
     """List of primitive required listeds in the read version."""
 
     _INSTANCE = PrimitiveRequiredListed
+
     def as_write(self) -> PrimitiveRequiredListedWriteList:
         """Convert these read versions of primitive required listed to the writing versions."""
         return PrimitiveRequiredListedWriteList([node.as_write() for node in self.data])
-
 
 
 class PrimitiveRequiredListedWriteList(DomainModelWriteList[PrimitiveRequiredListedWrite]):
@@ -242,11 +250,11 @@ class _PrimitiveRequiredListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveRe
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -264,10 +272,12 @@ class _PrimitiveRequiredListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveRe
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
 
     def list_primitive_required_listed(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveRequiredListedList:
         return self._list(limit=limit)

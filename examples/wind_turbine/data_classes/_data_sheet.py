@@ -52,7 +52,9 @@ __all__ = [
 
 
 DataSheetTextFields = Literal["external_id", "description", "directory", "mime_type", "name"]
-DataSheetFields = Literal["external_id", "description", "directory", "is_uploaded", "mime_type", "name", "uploaded_time"]
+DataSheetFields = Literal[
+    "external_id", "description", "directory", "is_uploaded", "mime_type", "name", "uploaded_time"
+]
 
 _DATASHEET_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -103,8 +105,6 @@ class DataSheetGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> DataSheet:
         """Convert this GraphQL format of data sheet to the reading format."""
         return DataSheet.model_validate(as_read_args(self))
@@ -143,11 +143,9 @@ class DataSheet(DomainModel):
     name: Optional[str] = None
     uploaded_time: Optional[datetime.datetime] = Field(None, alias="uploadedTime")
 
-
     def as_write(self) -> DataSheetWrite:
         """Convert this read version of data sheet to the writing version."""
         return DataSheetWrite.model_validate(as_write_args(self))
-
 
 
 class DataSheetWrite(DomainModelWrite):
@@ -165,7 +163,13 @@ class DataSheetWrite(DomainModelWrite):
         mime_type: The MIME type of the file.
         name: Name of the instance
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("description", "directory", "mime_type", "name",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "description",
+        "directory",
+        "mime_type",
+        "name",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "DataSheet", "1")
 
@@ -177,15 +181,14 @@ class DataSheetWrite(DomainModelWrite):
     name: Optional[str] = None
 
 
-
 class DataSheetList(DomainModelList[DataSheet]):
     """List of data sheets in the read version."""
 
     _INSTANCE = DataSheet
+
     def as_write(self) -> DataSheetWriteList:
         """Convert these read versions of data sheet to the writing versions."""
         return DataSheetWriteList([node.as_write() for node in self.data])
-
 
 
 class DataSheetWriteList(DomainModelWriteList[DataSheetWrite]):
@@ -239,7 +242,13 @@ def _create_data_sheet_filter(
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if min_uploaded_time is not None or max_uploaded_time is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("uploadedTime"), gte=min_uploaded_time.isoformat(timespec="milliseconds") if min_uploaded_time else None, lte=max_uploaded_time.isoformat(timespec="milliseconds") if max_uploaded_time else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("uploadedTime"),
+                gte=min_uploaded_time.isoformat(timespec="milliseconds") if min_uploaded_time else None,
+                lte=max_uploaded_time.isoformat(timespec="milliseconds") if max_uploaded_time else None,
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -262,11 +271,11 @@ class _DataSheetQuery(NodeQueryCore[T_DomainModelList, DataSheetList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -290,16 +299,18 @@ class _DataSheetQuery(NodeQueryCore[T_DomainModelList, DataSheetList]):
         self.mime_type = StringFilter(self, self._view_id.as_property_ref("mimeType"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.uploaded_time = TimestampFilter(self, self._view_id.as_property_ref("uploadedTime"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.directory,
-            self.is_uploaded,
-            self.mime_type,
-            self.name,
-            self.uploaded_time,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.directory,
+                self.is_uploaded,
+                self.mime_type,
+                self.name,
+                self.uploaded_time,
+            ]
+        )
         self.content = FileContentAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
 
     def list_data_sheet(self, limit: int = DEFAULT_QUERY_LIMIT) -> DataSheetList:

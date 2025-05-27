@@ -49,8 +49,12 @@ __all__ = [
 ]
 
 
-SensorTimeSeriesTextFields = Literal["external_id", "aliases", "concept_id", "description", "name", "source_unit", "standard_name"]
-SensorTimeSeriesFields = Literal["external_id", "aliases", "concept_id", "description", "is_step", "name", "source_unit", "standard_name", "type_"]
+SensorTimeSeriesTextFields = Literal[
+    "external_id", "aliases", "concept_id", "description", "name", "source_unit", "standard_name"
+]
+SensorTimeSeriesFields = Literal[
+    "external_id", "aliases", "concept_id", "description", "is_step", "name", "source_unit", "standard_name", "type_"
+]
 
 _SENSORTIMESERIES_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -106,8 +110,6 @@ class SensorTimeSeriesGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> SensorTimeSeries:
         """Convert this GraphQL format of sensor time series to the reading format."""
         return SensorTimeSeries.model_validate(as_read_args(self))
@@ -149,11 +151,9 @@ class SensorTimeSeries(DomainModel):
     standard_name: Optional[str] = Field(None, alias="standardName")
     type_: Literal["numeric", "string"] | str = Field(alias="type")
 
-
     def as_write(self) -> SensorTimeSeriesWrite:
         """Convert this read version of sensor time series to the writing version."""
         return SensorTimeSeriesWrite.model_validate(as_write_args(self))
-
 
 
 class SensorTimeSeriesWrite(DomainModelWrite):
@@ -174,7 +174,17 @@ class SensorTimeSeriesWrite(DomainModelWrite):
         standard_name: The standard name of the time series.
         type_: Specifies the data type of the data points.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "concept_id", "description", "is_step", "name", "source_unit", "standard_name", "type_",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "concept_id",
+        "description",
+        "is_step",
+        "name",
+        "source_unit",
+        "standard_name",
+        "type_",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "SensorTimeSeries", "1")
 
@@ -190,15 +200,14 @@ class SensorTimeSeriesWrite(DomainModelWrite):
     type_: Literal["numeric", "string"] = Field(alias="type")
 
 
-
 class SensorTimeSeriesList(DomainModelList[SensorTimeSeries]):
     """List of sensor time series in the read version."""
 
     _INSTANCE = SensorTimeSeries
+
     def as_write(self) -> SensorTimeSeriesWriteList:
         """Convert these read versions of sensor time series to the writing versions."""
         return SensorTimeSeriesWriteList([node.as_write() for node in self.data])
-
 
 
 class SensorTimeSeriesWriteList(DomainModelWriteList[SensorTimeSeriesWrite]):
@@ -284,11 +293,11 @@ class _SensorTimeSeriesQuery(NodeQueryCore[T_DomainModelList, SensorTimeSeriesLi
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -312,16 +321,18 @@ class _SensorTimeSeriesQuery(NodeQueryCore[T_DomainModelList, SensorTimeSeriesLi
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.source_unit = StringFilter(self, self._view_id.as_property_ref("sourceUnit"))
         self.standard_name = StringFilter(self, self._view_id.as_property_ref("standardName"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.concept_id,
-            self.description,
-            self.is_step,
-            self.name,
-            self.source_unit,
-            self.standard_name,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.concept_id,
+                self.description,
+                self.is_step,
+                self.name,
+                self.source_unit,
+                self.standard_name,
+            ]
+        )
         self.data = DataPointsAPI(client, lambda limit: self._list(limit=limit).as_node_ids())
 
     def list_sensor_time_series(self, limit: int = DEFAULT_QUERY_LIMIT) -> SensorTimeSeriesList:

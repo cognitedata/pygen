@@ -33,10 +33,14 @@ from omni.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
-    
 )
+
 if TYPE_CHECKING:
-    from omni.data_classes._implementation_1_non_writeable import Implementation1NonWriteable, Implementation1NonWriteableList, Implementation1NonWriteableGraphQL
+    from omni.data_classes._implementation_1_non_writeable import (
+        Implementation1NonWriteable,
+        Implementation1NonWriteableList,
+        Implementation1NonWriteableGraphQL,
+    )
 
 
 __all__ = [
@@ -75,7 +79,9 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Optional[list[Implementation1NonWriteableGraphQL]] = Field(default=None, repr=False, alias="toNonWritable")
+    to_non_writable: Optional[list[Implementation1NonWriteableGraphQL]] = Field(
+        default=None, repr=False, alias="toNonWritable"
+    )
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -87,7 +93,6 @@ class DependentOnNonWritableGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
-
 
     @field_validator("to_non_writable", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
@@ -122,9 +127,13 @@ class DependentOnNonWritable(DomainModel):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "DependentOnNonWritable")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "DependentOnNonWritable"
+    )
     a_value: Optional[str] = Field(None, alias="aValue")
-    to_non_writable: Optional[list[Union[Implementation1NonWriteable, str, dm.NodeId]]] = Field(default=None, repr=False, alias="toNonWritable")
+    to_non_writable: Optional[list[Union[Implementation1NonWriteable, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="toNonWritable"
+    )
 
     @field_validator("to_non_writable", mode="before")
     @classmethod
@@ -136,7 +145,6 @@ class DependentOnNonWritable(DomainModel):
     def as_write(self) -> DependentOnNonWritableWrite:
         """Convert this read version of dependent on non writable to the writing version."""
         return DependentOnNonWritableWrite.model_validate(as_write_args(self))
-
 
 
 class DependentOnNonWritableWrite(DomainModelWrite):
@@ -151,13 +159,18 @@ class DependentOnNonWritableWrite(DomainModelWrite):
         a_value: The a value field.
         to_non_writable: The to non writable field.
     """
+
     _container_fields: ClassVar[tuple[str, ...]] = ("a_value",)
-    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (("to_non_writable", dm.DirectRelationReference("sp_pygen_models", "toNonWritable")),)
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("to_non_writable", dm.DirectRelationReference("sp_pygen_models", "toNonWritable")),
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "DependentOnNonWritable", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("sp_pygen_models", "DependentOnNonWritable")
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
+        "sp_pygen_models", "DependentOnNonWritable"
+    )
     a_value: Optional[str] = Field(None, alias="aValue")
     to_non_writable: Optional[list[Union[str, dm.NodeId]]] = Field(default=None, alias="toNonWritable")
 
@@ -176,15 +189,23 @@ class DependentOnNonWritableList(DomainModelList[DependentOnNonWritable]):
     """List of dependent on non writables in the read version."""
 
     _INSTANCE = DependentOnNonWritable
+
     def as_write(self) -> DependentOnNonWritableWriteList:
         """Convert these read versions of dependent on non writable to the writing versions."""
         return DependentOnNonWritableWriteList([node.as_write() for node in self.data])
 
-
     @property
     def to_non_writable(self) -> Implementation1NonWriteableList:
         from ._implementation_1_non_writeable import Implementation1NonWriteable, Implementation1NonWriteableList
-        return Implementation1NonWriteableList([item for items in self.data for item in items.to_non_writable or [] if isinstance(item, Implementation1NonWriteable)])
+
+        return Implementation1NonWriteableList(
+            [
+                item
+                for items in self.data
+                for item in items.to_non_writable or []
+                if isinstance(item, Implementation1NonWriteable)
+            ]
+        )
 
 
 class DependentOnNonWritableWriteList(DomainModelWriteList[DependentOnNonWritableWrite]):
@@ -230,11 +251,11 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._implementation_1_non_writeable import _Implementation1NonWriteableQuery
 
@@ -251,7 +272,10 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
             reverse_expression,
         )
 
-        if _Implementation1NonWriteableQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
+        if (
+            _Implementation1NonWriteableQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.to_non_writable = _Implementation1NonWriteableQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -268,11 +292,13 @@ class _DependentOnNonWritableQuery(NodeQueryCore[T_DomainModelList, DependentOnN
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.a_value = StringFilter(self, self._view_id.as_property_ref("aValue"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.a_value,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.a_value,
+            ]
+        )
 
     def list_dependent_on_non_writable(self, limit: int = DEFAULT_QUERY_LIMIT) -> DependentOnNonWritableList:
         return self._list(limit=limit)

@@ -36,9 +36,22 @@ from cognite_core.data_classes._core import (
     DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_3_d_model import Cognite3DModel, Cognite3DModelWrite
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_file import CogniteFile, CogniteFileList, CogniteFileGraphQL, CogniteFileWrite, CogniteFileWriteList
-    from cognite_core.data_classes._cognite_point_cloud_revision import CognitePointCloudRevision, CognitePointCloudRevisionList, CognitePointCloudRevisionGraphQL, CognitePointCloudRevisionWrite, CognitePointCloudRevisionWriteList
+    from cognite_core.data_classes._cognite_file import (
+        CogniteFile,
+        CogniteFileList,
+        CogniteFileGraphQL,
+        CogniteFileWrite,
+        CogniteFileWriteList,
+    )
+    from cognite_core.data_classes._cognite_point_cloud_revision import (
+        CognitePointCloudRevision,
+        CognitePointCloudRevisionList,
+        CognitePointCloudRevisionGraphQL,
+        CognitePointCloudRevisionWrite,
+        CognitePointCloudRevisionWriteList,
+    )
 
 
 __all__ = [
@@ -104,7 +117,6 @@ class CognitePointCloudModelGraphQL(GraphQLCore):
             )
         return values
 
-
     @field_validator("revisions", "thumbnail", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -144,6 +156,7 @@ class CognitePointCloudModel(Cognite3DModel):
 
     node_type: Union[dm.DirectRelationReference, None] = None
     revisions: Optional[list[CognitePointCloudRevision]] = Field(default=None, repr=False)
+
     @field_validator("thumbnail", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
@@ -159,7 +172,6 @@ class CognitePointCloudModel(Cognite3DModel):
     def as_write(self) -> CognitePointCloudModelWrite:
         """Convert this read version of Cognite point cloud model to the writing version."""
         return CognitePointCloudModelWrite.model_validate(as_write_args(self))
-
 
 
 class CognitePointCloudModelWrite(Cognite3DModelWrite):
@@ -178,7 +190,15 @@ class CognitePointCloudModelWrite(Cognite3DModelWrite):
         thumbnail: Thumbnail of the 3D model
         type_: CAD, PointCloud or Image360
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "name", "tags", "thumbnail", "type_",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+        "thumbnail",
+        "type_",
+    )
     _direct_relations: ClassVar[tuple[str, ...]] = ("thumbnail",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudModel", "v1")
@@ -186,34 +206,47 @@ class CognitePointCloudModelWrite(Cognite3DModelWrite):
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
 
 
-
 class CognitePointCloudModelList(DomainModelList[CognitePointCloudModel]):
     """List of Cognite point cloud models in the read version."""
 
     _INSTANCE = CognitePointCloudModel
+
     def as_write(self) -> CognitePointCloudModelWriteList:
         """Convert these read versions of Cognite point cloud model to the writing versions."""
         return CognitePointCloudModelWriteList([node.as_write() for node in self.data])
 
-
     @property
     def revisions(self) -> CognitePointCloudRevisionList:
         from ._cognite_point_cloud_revision import CognitePointCloudRevision, CognitePointCloudRevisionList
-        return CognitePointCloudRevisionList([item for items in self.data for item in items.revisions or [] if isinstance(item, CognitePointCloudRevision)])
+
+        return CognitePointCloudRevisionList(
+            [
+                item
+                for items in self.data
+                for item in items.revisions or []
+                if isinstance(item, CognitePointCloudRevision)
+            ]
+        )
 
     @property
     def thumbnail(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.thumbnail for item in self.data if isinstance(item.thumbnail, CogniteFile)])
+
 
 class CognitePointCloudModelWriteList(DomainModelWriteList[CognitePointCloudModelWrite]):
     """List of Cognite point cloud models in the writing version."""
 
     _INSTANCE = CognitePointCloudModelWrite
+
     @property
     def thumbnail(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
-        return CogniteFileWriteList([item.thumbnail for item in self.data if isinstance(item.thumbnail, CogniteFileWrite)])
+
+        return CogniteFileWriteList(
+            [item.thumbnail for item in self.data if isinstance(item.thumbnail, CogniteFileWrite)]
+        )
 
 
 def _create_cognite_point_cloud_model_filter(
@@ -222,7 +255,14 @@ def _create_cognite_point_cloud_model_filter(
     description_prefix: str | None = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    thumbnail: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    thumbnail: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -244,7 +284,11 @@ def _create_cognite_point_cloud_model_filter(
     if isinstance(thumbnail, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(thumbnail):
         filters.append(dm.filters.Equals(view_id.as_property_ref("thumbnail"), value=as_instance_dict_id(thumbnail)))
     if thumbnail and isinstance(thumbnail, Sequence) and not isinstance(thumbnail, str) and not is_tuple_id(thumbnail):
-        filters.append(dm.filters.In(view_id.as_property_ref("thumbnail"), values=[as_instance_dict_id(item) for item in thumbnail]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("thumbnail"), values=[as_instance_dict_id(item) for item in thumbnail]
+            )
+        )
     if isinstance(type_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
     if type_ and isinstance(type_, list):
@@ -271,11 +315,11 @@ class _CognitePointCloudModelQuery(NodeQueryCore[T_DomainModelList, CognitePoint
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_file import _CogniteFileQuery
         from ._cognite_point_cloud_revision import _CognitePointCloudRevisionQuery
@@ -293,7 +337,10 @@ class _CognitePointCloudModelQuery(NodeQueryCore[T_DomainModelList, CognitePoint
             reverse_expression,
         )
 
-        if _CognitePointCloudRevisionQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
+        if (
+            _CognitePointCloudRevisionQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.revisions = _CognitePointCloudRevisionQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -326,13 +373,15 @@ class _CognitePointCloudModelQuery(NodeQueryCore[T_DomainModelList, CognitePoint
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.thumbnail_filter = DirectRelationFilter(self, self._view_id.as_property_ref("thumbnail"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.name,
-            self.thumbnail_filter,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.name,
+                self.thumbnail_filter,
+            ]
+        )
 
     def list_cognite_point_cloud_model(self, limit: int = DEFAULT_QUERY_LIMIT) -> CognitePointCloudModelList:
         return self._list(limit=limit)

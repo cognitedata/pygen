@@ -89,8 +89,6 @@ class GeneratingUnitGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> GeneratingUnit:
         """Convert this GraphQL format of generating unit to the reading format."""
         return GeneratingUnit.model_validate(as_read_args(self))
@@ -122,11 +120,9 @@ class GeneratingUnit(DomainModel):
     description: Optional[str] = None
     name: Optional[str] = None
 
-
     def as_write(self) -> GeneratingUnitWrite:
         """Convert this read version of generating unit to the writing version."""
         return GeneratingUnitWrite.model_validate(as_write_args(self))
-
 
 
 class GeneratingUnitWrite(DomainModelWrite):
@@ -142,7 +138,12 @@ class GeneratingUnitWrite(DomainModelWrite):
         description: Description of the instance
         name: Name of the instance
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("capacity", "description", "name",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "capacity",
+        "description",
+        "name",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "GeneratingUnit", "1")
 
@@ -153,15 +154,14 @@ class GeneratingUnitWrite(DomainModelWrite):
     name: Optional[str] = None
 
 
-
 class GeneratingUnitList(DomainModelList[GeneratingUnit]):
     """List of generating units in the read version."""
 
     _INSTANCE = GeneratingUnit
+
     def as_write(self) -> GeneratingUnitWriteList:
         """Convert these read versions of generating unit to the writing versions."""
         return GeneratingUnitWriteList([node.as_write() for node in self.data])
-
 
 
 class GeneratingUnitWriteList(DomainModelWriteList[GeneratingUnitWrite]):
@@ -219,11 +219,11 @@ class _GeneratingUnitQuery(NodeQueryCore[T_DomainModelList, GeneratingUnitList])
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -244,13 +244,15 @@ class _GeneratingUnitQuery(NodeQueryCore[T_DomainModelList, GeneratingUnitList])
         self.capacity = FloatFilter(self, self._view_id.as_property_ref("capacity"))
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.capacity,
-            self.description,
-            self.name,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.capacity,
+                self.description,
+                self.name,
+            ]
+        )
 
     def list_generating_unit(self, limit: int = DEFAULT_QUERY_LIMIT) -> GeneratingUnitList:
         return self._list(limit=limit)

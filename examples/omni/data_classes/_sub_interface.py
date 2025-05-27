@@ -33,7 +33,6 @@ from omni.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
-    
 )
 from omni.data_classes._main_interface import MainInterface, MainInterfaceWrite
 
@@ -88,8 +87,6 @@ class SubInterfaceGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> SubInterface:
         """Convert this GraphQL format of sub interface to the reading format."""
         return SubInterface.model_validate(as_read_args(self))
@@ -117,11 +114,9 @@ class SubInterface(MainInterface):
     node_type: Union[dm.DirectRelationReference, None] = None
     sub_value: Optional[str] = Field(None, alias="subValue")
 
-
     def as_write(self) -> SubInterfaceWrite:
         """Convert this read version of sub interface to the writing version."""
         return SubInterfaceWrite.model_validate(as_write_args(self))
-
 
 
 class SubInterfaceWrite(MainInterfaceWrite):
@@ -136,7 +131,11 @@ class SubInterfaceWrite(MainInterfaceWrite):
         main_value: The main value field.
         sub_value: The sub value field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("main_value", "sub_value",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "main_value",
+        "sub_value",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "SubInterface", "1")
 
@@ -144,15 +143,14 @@ class SubInterfaceWrite(MainInterfaceWrite):
     sub_value: Optional[str] = Field(None, alias="subValue")
 
 
-
 class SubInterfaceList(DomainModelList[SubInterface]):
     """List of sub interfaces in the read version."""
 
     _INSTANCE = SubInterface
+
     def as_write(self) -> SubInterfaceWriteList:
         """Convert these read versions of sub interface to the writing versions."""
         return SubInterfaceWriteList([node.as_write() for node in self.data])
-
 
 
 class SubInterfaceWriteList(DomainModelWriteList[SubInterfaceWrite]):
@@ -206,11 +204,11 @@ class _SubInterfaceQuery(NodeQueryCore[T_DomainModelList, SubInterfaceList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -230,12 +228,14 @@ class _SubInterfaceQuery(NodeQueryCore[T_DomainModelList, SubInterfaceList]):
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.main_value,
-            self.sub_value,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.main_value,
+                self.sub_value,
+            ]
+        )
 
     def list_sub_interface(self, limit: int = DEFAULT_QUERY_LIMIT) -> SubInterfaceList:
         return self._list(limit=limit)

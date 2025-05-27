@@ -35,9 +35,22 @@ from omni.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
+
 if TYPE_CHECKING:
-    from omni.data_classes._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList, ConnectionEdgeAGraphQL, ConnectionEdgeAWrite, ConnectionEdgeAWriteList
-    from omni.data_classes._connection_item_d import ConnectionItemD, ConnectionItemDList, ConnectionItemDGraphQL, ConnectionItemDWrite, ConnectionItemDWriteList
+    from omni.data_classes._connection_edge_a import (
+        ConnectionEdgeA,
+        ConnectionEdgeAList,
+        ConnectionEdgeAGraphQL,
+        ConnectionEdgeAWrite,
+        ConnectionEdgeAWriteList,
+    )
+    from omni.data_classes._connection_item_d import (
+        ConnectionItemD,
+        ConnectionItemDList,
+        ConnectionItemDGraphQL,
+        ConnectionItemDWrite,
+        ConnectionItemDWriteList,
+    )
 
 
 __all__ = [
@@ -82,10 +95,16 @@ class ConnectionItemEGraphQL(GraphQLCore):
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
     direct_list_no_source: Optional[list[dict]] = Field(default=None, alias="directListNoSource")
     direct_no_source: Optional[dict] = Field(default=None, alias="directNoSource")
-    direct_reverse_multi: Optional[list[ConnectionItemDGraphQL]] = Field(default=None, repr=False, alias="directReverseMulti")
-    direct_reverse_single: Optional[ConnectionItemDGraphQL] = Field(default=None, repr=False, alias="directReverseSingle")
+    direct_reverse_multi: Optional[list[ConnectionItemDGraphQL]] = Field(
+        default=None, repr=False, alias="directReverseMulti"
+    )
+    direct_reverse_single: Optional[ConnectionItemDGraphQL] = Field(
+        default=None, repr=False, alias="directReverseSingle"
+    )
     inwards_single: Optional[ConnectionItemDGraphQL] = Field(default=None, repr=False, alias="inwardsSingle")
-    inwards_single_property: Optional[ConnectionEdgeAGraphQL] = Field(default=None, repr=False, alias="inwardsSingleProperty")
+    inwards_single_property: Optional[ConnectionEdgeAGraphQL] = Field(
+        default=None, repr=False, alias="inwardsSingleProperty"
+    )
     name: Optional[str] = None
 
     @model_validator(mode="before")
@@ -99,8 +118,15 @@ class ConnectionItemEGraphQL(GraphQLCore):
             )
         return values
 
-
-    @field_validator("direct_list_no_source", "direct_no_source", "direct_reverse_multi", "direct_reverse_single", "inwards_single", "inwards_single_property", mode="before")
+    @field_validator(
+        "direct_list_no_source",
+        "direct_no_source",
+        "direct_reverse_multi",
+        "direct_reverse_single",
+        "inwards_single",
+        "inwards_single_property",
+        mode="before",
+    )
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -138,15 +164,22 @@ class ConnectionItemE(DomainModel):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemE")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemE"
+    )
     direct_list_no_source: Optional[list[Union[str, dm.NodeId]]] = Field(default=None, alias="directListNoSource")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
     direct_reverse_multi: Optional[list[ConnectionItemD]] = Field(default=None, repr=False, alias="directReverseMulti")
     direct_reverse_single: Optional[ConnectionItemD] = Field(default=None, repr=False, alias="directReverseSingle")
-    inwards_single: Union[ConnectionItemD, str, dm.NodeId, None] = Field(default=None, repr=False, alias="inwardsSingle")
+    inwards_single: Union[ConnectionItemD, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="inwardsSingle"
+    )
     inwards_single_property: Optional[ConnectionEdgeA] = Field(default=None, repr=False, alias="inwardsSingleProperty")
     name: Optional[str] = None
-    @field_validator("direct_no_source", "direct_reverse_single", "inwards_single", "inwards_single_property", mode="before")
+
+    @field_validator(
+        "direct_no_source", "direct_reverse_single", "inwards_single", "inwards_single_property", mode="before"
+    )
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
@@ -161,7 +194,6 @@ class ConnectionItemE(DomainModel):
     def as_write(self) -> ConnectionItemEWrite:
         """Convert this read version of connection item e to the writing version."""
         return ConnectionItemEWrite.model_validate(as_write_args(self))
-
 
 
 class ConnectionItemEWrite(DomainModelWrite):
@@ -179,17 +211,31 @@ class ConnectionItemEWrite(DomainModelWrite):
         inwards_single_property: The inwards single property field.
         name: The name field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("direct_list_no_source", "direct_no_source", "name",)
-    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (("inwards_single", dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle")), ("inwards_single_property", dm.DirectRelationReference("sp_pygen_models", "multiProperty")),)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "direct_list_no_source",
+        "direct_no_source",
+        "name",
+    )
+    _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("inwards_single", dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle")),
+        ("inwards_single_property", dm.DirectRelationReference("sp_pygen_models", "multiProperty")),
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("sp_pygen_models", "ConnectionItemE")
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
+        "sp_pygen_models", "ConnectionItemE"
+    )
     direct_list_no_source: Optional[list[Union[str, dm.NodeId]]] = Field(default=None, alias="directListNoSource")
     direct_no_source: Union[str, dm.NodeId, None] = Field(default=None, alias="directNoSource")
-    inwards_single: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="inwardsSingle")
-    inwards_single_property: Optional[ConnectionEdgeAWrite] = Field(default=None, repr=False, alias="inwardsSingleProperty")
+    inwards_single: Union[ConnectionItemDWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="inwardsSingle"
+    )
+    inwards_single_property: Optional[ConnectionEdgeAWrite] = Field(
+        default=None, repr=False, alias="inwardsSingleProperty"
+    )
     name: Optional[str] = None
 
     @field_validator("inwards_single", "inwards_single_property", mode="before")
@@ -207,47 +253,101 @@ class ConnectionItemEList(DomainModelList[ConnectionItemE]):
     """List of connection item es in the read version."""
 
     _INSTANCE = ConnectionItemE
+
     def as_write(self) -> ConnectionItemEWriteList:
         """Convert these read versions of connection item e to the writing versions."""
         return ConnectionItemEWriteList([node.as_write() for node in self.data])
 
-
     @property
     def direct_reverse_multi(self) -> ConnectionItemDList:
         from ._connection_item_d import ConnectionItemD, ConnectionItemDList
-        return ConnectionItemDList([item for items in self.data for item in items.direct_reverse_multi or [] if isinstance(item, ConnectionItemD)])
+
+        return ConnectionItemDList(
+            [
+                item
+                for items in self.data
+                for item in items.direct_reverse_multi or []
+                if isinstance(item, ConnectionItemD)
+            ]
+        )
 
     @property
     def direct_reverse_single(self) -> ConnectionItemDList:
         from ._connection_item_d import ConnectionItemD, ConnectionItemDList
-        return ConnectionItemDList([item.direct_reverse_single for item in self.data if isinstance(item.direct_reverse_single, ConnectionItemD)])
+
+        return ConnectionItemDList(
+            [
+                item.direct_reverse_single
+                for item in self.data
+                if isinstance(item.direct_reverse_single, ConnectionItemD)
+            ]
+        )
+
     @property
     def inwards_single(self) -> ConnectionItemDList:
         from ._connection_item_d import ConnectionItemD, ConnectionItemDList
-        return ConnectionItemDList([item.inwards_single for item in self.data if isinstance(item.inwards_single, ConnectionItemD)])
+
+        return ConnectionItemDList(
+            [item.inwards_single for item in self.data if isinstance(item.inwards_single, ConnectionItemD)]
+        )
+
     @property
     def inwards_single_property(self) -> ConnectionEdgeAList:
         from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAList
-        return ConnectionEdgeAList([item.inwards_single_property for item in self.data if isinstance(item.inwards_single_property, ConnectionEdgeA)])
+
+        return ConnectionEdgeAList(
+            [
+                item.inwards_single_property
+                for item in self.data
+                if isinstance(item.inwards_single_property, ConnectionEdgeA)
+            ]
+        )
+
 
 class ConnectionItemEWriteList(DomainModelWriteList[ConnectionItemEWrite]):
     """List of connection item es in the writing version."""
 
     _INSTANCE = ConnectionItemEWrite
+
     @property
     def inwards_single(self) -> ConnectionItemDWriteList:
         from ._connection_item_d import ConnectionItemDWrite, ConnectionItemDWriteList
-        return ConnectionItemDWriteList([item.inwards_single for item in self.data if isinstance(item.inwards_single, ConnectionItemDWrite)])
+
+        return ConnectionItemDWriteList(
+            [item.inwards_single for item in self.data if isinstance(item.inwards_single, ConnectionItemDWrite)]
+        )
+
     @property
     def inwards_single_property(self) -> ConnectionEdgeAWriteList:
         from ._connection_edge_a import ConnectionEdgeAWrite, ConnectionEdgeAWriteList
-        return ConnectionEdgeAWriteList([item.inwards_single_property for item in self.data if isinstance(item.inwards_single_property, ConnectionEdgeAWrite)])
+
+        return ConnectionEdgeAWriteList(
+            [
+                item.inwards_single_property
+                for item in self.data
+                if isinstance(item.inwards_single_property, ConnectionEdgeAWrite)
+            ]
+        )
 
 
 def _create_connection_item_e_filter(
     view_id: dm.ViewId,
-    direct_list_no_source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    direct_no_source: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    direct_list_no_source: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    direct_no_source: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -255,14 +355,42 @@ def _create_connection_item_e_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if isinstance(direct_list_no_source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(direct_list_no_source):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("directListNoSource"), value=as_instance_dict_id(direct_list_no_source)))
-    if direct_list_no_source and isinstance(direct_list_no_source, Sequence) and not isinstance(direct_list_no_source, str) and not is_tuple_id(direct_list_no_source):
-        filters.append(dm.filters.In(view_id.as_property_ref("directListNoSource"), values=[as_instance_dict_id(item) for item in direct_list_no_source]))
+    if isinstance(direct_list_no_source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        direct_list_no_source
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("directListNoSource"), value=as_instance_dict_id(direct_list_no_source)
+            )
+        )
+    if (
+        direct_list_no_source
+        and isinstance(direct_list_no_source, Sequence)
+        and not isinstance(direct_list_no_source, str)
+        and not is_tuple_id(direct_list_no_source)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("directListNoSource"),
+                values=[as_instance_dict_id(item) for item in direct_list_no_source],
+            )
+        )
     if isinstance(direct_no_source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(direct_no_source):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("directNoSource"), value=as_instance_dict_id(direct_no_source)))
-    if direct_no_source and isinstance(direct_no_source, Sequence) and not isinstance(direct_no_source, str) and not is_tuple_id(direct_no_source):
-        filters.append(dm.filters.In(view_id.as_property_ref("directNoSource"), values=[as_instance_dict_id(item) for item in direct_no_source]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("directNoSource"), value=as_instance_dict_id(direct_no_source))
+        )
+    if (
+        direct_no_source
+        and isinstance(direct_no_source, Sequence)
+        and not isinstance(direct_no_source, str)
+        and not is_tuple_id(direct_no_source)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("directNoSource"),
+                values=[as_instance_dict_id(item) for item in direct_no_source],
+            )
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -291,11 +419,11 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._connection_edge_a import _ConnectionEdgeAQuery
         from ._connection_item_d import _ConnectionItemDQuery
@@ -313,8 +441,6 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
             connection_type,
             reverse_expression,
         )
-
-
 
         if _ConnectionItemDQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
             self.direct_reverse_multi = _ConnectionItemDQuery(
@@ -378,12 +504,14 @@ class _ConnectionItemEQuery(NodeQueryCore[T_DomainModelList, ConnectionItemEList
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.direct_no_source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("directNoSource"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.direct_no_source_filter,
-            self.name,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.direct_no_source_filter,
+                self.name,
+            ]
+        )
 
     def list_connection_item_e(self, limit: int = DEFAULT_QUERY_LIMIT) -> ConnectionItemEList:
         return self._list(limit=limit)

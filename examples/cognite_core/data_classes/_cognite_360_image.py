@@ -38,12 +38,34 @@ from cognite_core.data_classes._core import (
     FloatFilter,
     TimestampFilter,
 )
-from cognite_core.data_classes._cognite_3_d_transformation_node import Cognite3DTransformationNode, Cognite3DTransformationNodeWrite
+from cognite_core.data_classes._cognite_3_d_transformation_node import (
+    Cognite3DTransformationNode,
+    Cognite3DTransformationNodeWrite,
+)
 from cognite_core.data_classes._cognite_cube_map import CogniteCubeMap, CogniteCubeMapWrite
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_360_image_collection import Cognite360ImageCollection, Cognite360ImageCollectionList, Cognite360ImageCollectionGraphQL, Cognite360ImageCollectionWrite, Cognite360ImageCollectionWriteList
-    from cognite_core.data_classes._cognite_360_image_station import Cognite360ImageStation, Cognite360ImageStationList, Cognite360ImageStationGraphQL, Cognite360ImageStationWrite, Cognite360ImageStationWriteList
-    from cognite_core.data_classes._cognite_file import CogniteFile, CogniteFileList, CogniteFileGraphQL, CogniteFileWrite, CogniteFileWriteList
+    from cognite_core.data_classes._cognite_360_image_collection import (
+        Cognite360ImageCollection,
+        Cognite360ImageCollectionList,
+        Cognite360ImageCollectionGraphQL,
+        Cognite360ImageCollectionWrite,
+        Cognite360ImageCollectionWriteList,
+    )
+    from cognite_core.data_classes._cognite_360_image_station import (
+        Cognite360ImageStation,
+        Cognite360ImageStationList,
+        Cognite360ImageStationGraphQL,
+        Cognite360ImageStationWrite,
+        Cognite360ImageStationWriteList,
+    )
+    from cognite_core.data_classes._cognite_file import (
+        CogniteFile,
+        CogniteFileList,
+        CogniteFileGraphQL,
+        CogniteFileWrite,
+        CogniteFileWriteList,
+    )
 
 
 __all__ = [
@@ -56,8 +78,20 @@ __all__ = [
 ]
 
 
-Cognite360ImageTextFields = Literal["external_id", ]
-Cognite360ImageFields = Literal["external_id", "euler_rotation_x", "euler_rotation_y", "euler_rotation_z", "scale_x", "scale_y", "scale_z", "taken_at", "translation_x", "translation_y", "translation_z"]
+Cognite360ImageTextFields = Literal["external_id",]
+Cognite360ImageFields = Literal[
+    "external_id",
+    "euler_rotation_x",
+    "euler_rotation_y",
+    "euler_rotation_z",
+    "scale_x",
+    "scale_y",
+    "scale_z",
+    "taken_at",
+    "translation_x",
+    "translation_y",
+    "translation_z",
+]
 
 _COGNITE360IMAGE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -136,7 +170,6 @@ class Cognite360ImageGraphQL(GraphQLCore):
             )
         return values
 
-
     @field_validator("back", "bottom", "collection_360", "front", "left", "right", "station_360", "top", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -187,19 +220,22 @@ class Cognite360Image(Cognite3DTransformationNode, CogniteCubeMap):
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360Image", "v1")
 
     node_type: Union[dm.DirectRelationReference, None] = None
-    collection_360: Union[Cognite360ImageCollection, str, dm.NodeId, None] = Field(default=None, repr=False, alias="collection360")
-    station_360: Union[Cognite360ImageStation, str, dm.NodeId, None] = Field(default=None, repr=False, alias="station360")
+    collection_360: Union[Cognite360ImageCollection, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="collection360"
+    )
+    station_360: Union[Cognite360ImageStation, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="station360"
+    )
     taken_at: Optional[datetime.datetime] = Field(None, alias="takenAt")
+
     @field_validator("back", "bottom", "collection_360", "front", "left", "right", "station_360", "top", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> Cognite360ImageWrite:
         """Convert this read version of Cognite 360 image to the writing version."""
         return Cognite360ImageWrite.model_validate(as_write_args(self))
-
 
 
 class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite):
@@ -231,14 +267,47 @@ class Cognite360ImageWrite(Cognite3DTransformationNodeWrite, CogniteCubeMapWrite
         translation_y: The displacement of the object along the Y-axis in the 3D coordinate system
         translation_z: The displacement of the object along the Z-axis in the 3D coordinate system
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("back", "bottom", "collection_360", "euler_rotation_x", "euler_rotation_y", "euler_rotation_z", "front", "left", "right", "scale_x", "scale_y", "scale_z", "station_360", "taken_at", "top", "translation_x", "translation_y", "translation_z",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("back", "bottom", "collection_360", "front", "left", "right", "station_360", "top",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "collection_360",
+        "euler_rotation_x",
+        "euler_rotation_y",
+        "euler_rotation_z",
+        "front",
+        "left",
+        "right",
+        "scale_x",
+        "scale_y",
+        "scale_z",
+        "station_360",
+        "taken_at",
+        "top",
+        "translation_x",
+        "translation_y",
+        "translation_z",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "back",
+        "bottom",
+        "collection_360",
+        "front",
+        "left",
+        "right",
+        "station_360",
+        "top",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360Image", "v1")
 
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    collection_360: Union[Cognite360ImageCollectionWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="collection360")
-    station_360: Union[Cognite360ImageStationWrite, str, dm.NodeId, None] = Field(default=None, repr=False, alias="station360")
+    collection_360: Union[Cognite360ImageCollectionWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="collection360"
+    )
+    station_360: Union[Cognite360ImageStationWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False, alias="station360"
+    )
     taken_at: Optional[datetime.datetime] = Field(None, alias="takenAt")
 
     @field_validator("collection_360", "station_360", mode="before")
@@ -256,106 +325,206 @@ class Cognite360ImageList(DomainModelList[Cognite360Image]):
     """List of Cognite 360 images in the read version."""
 
     _INSTANCE = Cognite360Image
+
     def as_write(self) -> Cognite360ImageWriteList:
         """Convert these read versions of Cognite 360 image to the writing versions."""
         return Cognite360ImageWriteList([node.as_write() for node in self.data])
 
-
     @property
     def back(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.back for item in self.data if isinstance(item.back, CogniteFile)])
+
     @property
     def bottom(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.bottom for item in self.data if isinstance(item.bottom, CogniteFile)])
+
     @property
     def collection_360(self) -> Cognite360ImageCollectionList:
         from ._cognite_360_image_collection import Cognite360ImageCollection, Cognite360ImageCollectionList
-        return Cognite360ImageCollectionList([item.collection_360 for item in self.data if isinstance(item.collection_360, Cognite360ImageCollection)])
+
+        return Cognite360ImageCollectionList(
+            [item.collection_360 for item in self.data if isinstance(item.collection_360, Cognite360ImageCollection)]
+        )
+
     @property
     def front(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.front for item in self.data if isinstance(item.front, CogniteFile)])
+
     @property
     def left(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.left for item in self.data if isinstance(item.left, CogniteFile)])
+
     @property
     def right(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.right for item in self.data if isinstance(item.right, CogniteFile)])
+
     @property
     def station_360(self) -> Cognite360ImageStationList:
         from ._cognite_360_image_station import Cognite360ImageStation, Cognite360ImageStationList
-        return Cognite360ImageStationList([item.station_360 for item in self.data if isinstance(item.station_360, Cognite360ImageStation)])
+
+        return Cognite360ImageStationList(
+            [item.station_360 for item in self.data if isinstance(item.station_360, Cognite360ImageStation)]
+        )
+
     @property
     def top(self) -> CogniteFileList:
         from ._cognite_file import CogniteFile, CogniteFileList
+
         return CogniteFileList([item.top for item in self.data if isinstance(item.top, CogniteFile)])
+
 
 class Cognite360ImageWriteList(DomainModelWriteList[Cognite360ImageWrite]):
     """List of Cognite 360 images in the writing version."""
 
     _INSTANCE = Cognite360ImageWrite
+
     @property
     def back(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.back for item in self.data if isinstance(item.back, CogniteFileWrite)])
+
     @property
     def bottom(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.bottom for item in self.data if isinstance(item.bottom, CogniteFileWrite)])
+
     @property
     def collection_360(self) -> Cognite360ImageCollectionWriteList:
         from ._cognite_360_image_collection import Cognite360ImageCollectionWrite, Cognite360ImageCollectionWriteList
-        return Cognite360ImageCollectionWriteList([item.collection_360 for item in self.data if isinstance(item.collection_360, Cognite360ImageCollectionWrite)])
+
+        return Cognite360ImageCollectionWriteList(
+            [
+                item.collection_360
+                for item in self.data
+                if isinstance(item.collection_360, Cognite360ImageCollectionWrite)
+            ]
+        )
+
     @property
     def front(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.front for item in self.data if isinstance(item.front, CogniteFileWrite)])
+
     @property
     def left(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.left for item in self.data if isinstance(item.left, CogniteFileWrite)])
+
     @property
     def right(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.right for item in self.data if isinstance(item.right, CogniteFileWrite)])
+
     @property
     def station_360(self) -> Cognite360ImageStationWriteList:
         from ._cognite_360_image_station import Cognite360ImageStationWrite, Cognite360ImageStationWriteList
-        return Cognite360ImageStationWriteList([item.station_360 for item in self.data if isinstance(item.station_360, Cognite360ImageStationWrite)])
+
+        return Cognite360ImageStationWriteList(
+            [item.station_360 for item in self.data if isinstance(item.station_360, Cognite360ImageStationWrite)]
+        )
+
     @property
     def top(self) -> CogniteFileWriteList:
         from ._cognite_file import CogniteFileWrite, CogniteFileWriteList
+
         return CogniteFileWriteList([item.top for item in self.data if isinstance(item.top, CogniteFileWrite)])
 
 
 def _create_cognite_360_image_filter(
     view_id: dm.ViewId,
-    back: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    bottom: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    collection_360: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    back: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    bottom: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    collection_360: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     min_euler_rotation_x: float | None = None,
     max_euler_rotation_x: float | None = None,
     min_euler_rotation_y: float | None = None,
     max_euler_rotation_y: float | None = None,
     min_euler_rotation_z: float | None = None,
     max_euler_rotation_z: float | None = None,
-    front: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    left: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    right: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    front: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    left: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    right: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     min_scale_x: float | None = None,
     max_scale_x: float | None = None,
     min_scale_y: float | None = None,
     max_scale_y: float | None = None,
     min_scale_z: float | None = None,
     max_scale_z: float | None = None,
-    station_360: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    station_360: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     min_taken_at: datetime.datetime | None = None,
     max_taken_at: datetime.datetime | None = None,
-    top: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    top: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     min_translation_x: float | None = None,
     max_translation_x: float | None = None,
     min_translation_y: float | None = None,
@@ -370,33 +539,66 @@ def _create_cognite_360_image_filter(
     if isinstance(back, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(back):
         filters.append(dm.filters.Equals(view_id.as_property_ref("back"), value=as_instance_dict_id(back)))
     if back and isinstance(back, Sequence) and not isinstance(back, str) and not is_tuple_id(back):
-        filters.append(dm.filters.In(view_id.as_property_ref("back"), values=[as_instance_dict_id(item) for item in back]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("back"), values=[as_instance_dict_id(item) for item in back])
+        )
     if isinstance(bottom, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(bottom):
         filters.append(dm.filters.Equals(view_id.as_property_ref("bottom"), value=as_instance_dict_id(bottom)))
     if bottom and isinstance(bottom, Sequence) and not isinstance(bottom, str) and not is_tuple_id(bottom):
-        filters.append(dm.filters.In(view_id.as_property_ref("bottom"), values=[as_instance_dict_id(item) for item in bottom]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("bottom"), values=[as_instance_dict_id(item) for item in bottom])
+        )
     if isinstance(collection_360, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(collection_360):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("collection360"), value=as_instance_dict_id(collection_360)))
-    if collection_360 and isinstance(collection_360, Sequence) and not isinstance(collection_360, str) and not is_tuple_id(collection_360):
-        filters.append(dm.filters.In(view_id.as_property_ref("collection360"), values=[as_instance_dict_id(item) for item in collection_360]))
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("collection360"), value=as_instance_dict_id(collection_360))
+        )
+    if (
+        collection_360
+        and isinstance(collection_360, Sequence)
+        and not isinstance(collection_360, str)
+        and not is_tuple_id(collection_360)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("collection360"), values=[as_instance_dict_id(item) for item in collection_360]
+            )
+        )
     if min_euler_rotation_x is not None or max_euler_rotation_x is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("eulerRotationX"), gte=min_euler_rotation_x, lte=max_euler_rotation_x))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("eulerRotationX"), gte=min_euler_rotation_x, lte=max_euler_rotation_x
+            )
+        )
     if min_euler_rotation_y is not None or max_euler_rotation_y is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("eulerRotationY"), gte=min_euler_rotation_y, lte=max_euler_rotation_y))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("eulerRotationY"), gte=min_euler_rotation_y, lte=max_euler_rotation_y
+            )
+        )
     if min_euler_rotation_z is not None or max_euler_rotation_z is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("eulerRotationZ"), gte=min_euler_rotation_z, lte=max_euler_rotation_z))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("eulerRotationZ"), gte=min_euler_rotation_z, lte=max_euler_rotation_z
+            )
+        )
     if isinstance(front, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(front):
         filters.append(dm.filters.Equals(view_id.as_property_ref("front"), value=as_instance_dict_id(front)))
     if front and isinstance(front, Sequence) and not isinstance(front, str) and not is_tuple_id(front):
-        filters.append(dm.filters.In(view_id.as_property_ref("front"), values=[as_instance_dict_id(item) for item in front]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("front"), values=[as_instance_dict_id(item) for item in front])
+        )
     if isinstance(left, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(left):
         filters.append(dm.filters.Equals(view_id.as_property_ref("left"), value=as_instance_dict_id(left)))
     if left and isinstance(left, Sequence) and not isinstance(left, str) and not is_tuple_id(left):
-        filters.append(dm.filters.In(view_id.as_property_ref("left"), values=[as_instance_dict_id(item) for item in left]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("left"), values=[as_instance_dict_id(item) for item in left])
+        )
     if isinstance(right, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(right):
         filters.append(dm.filters.Equals(view_id.as_property_ref("right"), value=as_instance_dict_id(right)))
     if right and isinstance(right, Sequence) and not isinstance(right, str) and not is_tuple_id(right):
-        filters.append(dm.filters.In(view_id.as_property_ref("right"), values=[as_instance_dict_id(item) for item in right]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("right"), values=[as_instance_dict_id(item) for item in right])
+        )
     if min_scale_x is not None or max_scale_x is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("scaleX"), gte=min_scale_x, lte=max_scale_x))
     if min_scale_y is not None or max_scale_y is not None:
@@ -405,20 +607,43 @@ def _create_cognite_360_image_filter(
         filters.append(dm.filters.Range(view_id.as_property_ref("scaleZ"), gte=min_scale_z, lte=max_scale_z))
     if isinstance(station_360, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(station_360):
         filters.append(dm.filters.Equals(view_id.as_property_ref("station360"), value=as_instance_dict_id(station_360)))
-    if station_360 and isinstance(station_360, Sequence) and not isinstance(station_360, str) and not is_tuple_id(station_360):
-        filters.append(dm.filters.In(view_id.as_property_ref("station360"), values=[as_instance_dict_id(item) for item in station_360]))
+    if (
+        station_360
+        and isinstance(station_360, Sequence)
+        and not isinstance(station_360, str)
+        and not is_tuple_id(station_360)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("station360"), values=[as_instance_dict_id(item) for item in station_360]
+            )
+        )
     if min_taken_at is not None or max_taken_at is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("takenAt"), gte=min_taken_at.isoformat(timespec="milliseconds") if min_taken_at else None, lte=max_taken_at.isoformat(timespec="milliseconds") if max_taken_at else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("takenAt"),
+                gte=min_taken_at.isoformat(timespec="milliseconds") if min_taken_at else None,
+                lte=max_taken_at.isoformat(timespec="milliseconds") if max_taken_at else None,
+            )
+        )
     if isinstance(top, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(top):
         filters.append(dm.filters.Equals(view_id.as_property_ref("top"), value=as_instance_dict_id(top)))
     if top and isinstance(top, Sequence) and not isinstance(top, str) and not is_tuple_id(top):
-        filters.append(dm.filters.In(view_id.as_property_ref("top"), values=[as_instance_dict_id(item) for item in top]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("top"), values=[as_instance_dict_id(item) for item in top])
+        )
     if min_translation_x is not None or max_translation_x is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("translationX"), gte=min_translation_x, lte=max_translation_x))
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("translationX"), gte=min_translation_x, lte=max_translation_x)
+        )
     if min_translation_y is not None or max_translation_y is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("translationY"), gte=min_translation_y, lte=max_translation_y))
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("translationY"), gte=min_translation_y, lte=max_translation_y)
+        )
     if min_translation_z is not None or max_translation_z is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("translationZ"), gte=min_translation_z, lte=max_translation_z))
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("translationZ"), gte=min_translation_z, lte=max_translation_z)
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -441,11 +666,11 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_360_image_collection import _Cognite360ImageCollectionQuery
         from ._cognite_360_image_station import _Cognite360ImageStationQuery
@@ -492,7 +717,10 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "bottom"),
             )
 
-        if _Cognite360ImageCollectionQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
+        if (
+            _Cognite360ImageCollectionQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.collection_360 = _Cognite360ImageCollectionQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -548,7 +776,10 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
                 connection_property=ViewPropertyId(self._view_id, "right"),
             )
 
-        if _Cognite360ImageStationQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
+        if (
+            _Cognite360ImageStationQuery not in created_types
+            and len(creation_path) + 1 < global_config.max_select_depth
+        ):
             self.station_360 = _Cognite360ImageStationQuery(
                 created_types.copy(),
                 self._creation_path,
@@ -596,28 +827,30 @@ class _Cognite360ImageQuery(NodeQueryCore[T_DomainModelList, Cognite360ImageList
         self.translation_x = FloatFilter(self, self._view_id.as_property_ref("translationX"))
         self.translation_y = FloatFilter(self, self._view_id.as_property_ref("translationY"))
         self.translation_z = FloatFilter(self, self._view_id.as_property_ref("translationZ"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.back_filter,
-            self.bottom_filter,
-            self.collection_360_filter,
-            self.euler_rotation_x,
-            self.euler_rotation_y,
-            self.euler_rotation_z,
-            self.front_filter,
-            self.left_filter,
-            self.right_filter,
-            self.scale_x,
-            self.scale_y,
-            self.scale_z,
-            self.station_360_filter,
-            self.taken_at,
-            self.top_filter,
-            self.translation_x,
-            self.translation_y,
-            self.translation_z,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.back_filter,
+                self.bottom_filter,
+                self.collection_360_filter,
+                self.euler_rotation_x,
+                self.euler_rotation_y,
+                self.euler_rotation_z,
+                self.front_filter,
+                self.left_filter,
+                self.right_filter,
+                self.scale_x,
+                self.scale_y,
+                self.scale_z,
+                self.station_360_filter,
+                self.taken_at,
+                self.top_filter,
+                self.translation_x,
+                self.translation_y,
+                self.translation_z,
+            ]
+        )
 
     def list_cognite_360_image(self, limit: int = DEFAULT_QUERY_LIMIT) -> Cognite360ImageList:
         return self._list(limit=limit)

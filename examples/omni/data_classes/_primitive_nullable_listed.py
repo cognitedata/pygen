@@ -49,7 +49,9 @@ __all__ = [
 
 
 PrimitiveNullableListedTextFields = Literal["external_id", "text"]
-PrimitiveNullableListedFields = Literal["external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"]
+PrimitiveNullableListedFields = Literal[
+    "external_id", "boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp"
+]
 
 _PRIMITIVENULLABLELISTED_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -108,8 +110,6 @@ class PrimitiveNullableListedGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> PrimitiveNullableListed:
         """Convert this GraphQL format of primitive nullable listed to the reading format."""
         return PrimitiveNullableListed.model_validate(as_read_args(self))
@@ -153,11 +153,9 @@ class PrimitiveNullableListed(DomainModel):
     text: Optional[list[str]] = None
     timestamp: Optional[list[datetime.datetime]] = None
 
-
     def as_write(self) -> PrimitiveNullableListedWrite:
         """Convert this read version of primitive nullable listed to the writing version."""
         return PrimitiveNullableListedWrite.model_validate(as_write_args(self))
-
 
 
 class PrimitiveNullableListedWrite(DomainModelWrite):
@@ -179,7 +177,18 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
         text: The text field.
         timestamp: The timestamp field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("boolean", "date", "float_32", "float_64", "int_32", "int_64", "json_", "text", "timestamp",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "boolean",
+        "date",
+        "float_32",
+        "float_64",
+        "int_32",
+        "int_64",
+        "json_",
+        "text",
+        "timestamp",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveNullableListed", "1")
 
@@ -196,15 +205,14 @@ class PrimitiveNullableListedWrite(DomainModelWrite):
     timestamp: Optional[list[datetime.datetime]] = None
 
 
-
 class PrimitiveNullableListedList(DomainModelList[PrimitiveNullableListed]):
     """List of primitive nullable listeds in the read version."""
 
     _INSTANCE = PrimitiveNullableListed
+
     def as_write(self) -> PrimitiveNullableListedWriteList:
         """Convert these read versions of primitive nullable listed to the writing versions."""
         return PrimitiveNullableListedWriteList([node.as_write() for node in self.data])
-
 
 
 class PrimitiveNullableListedWriteList(DomainModelWriteList[PrimitiveNullableListedWrite]):
@@ -242,11 +250,11 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -264,10 +272,12 @@ class _PrimitiveNullableListedQuery(NodeQueryCore[T_DomainModelList, PrimitiveNu
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
 
     def list_primitive_nullable_listed(self, limit: int = DEFAULT_QUERY_LIMIT) -> PrimitiveNullableListedList:
         return self._list(limit=limit)

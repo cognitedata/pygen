@@ -286,9 +286,11 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Cognite3DObjectFields | SequenceNotStr[Cognite3DObjectFields],
         property: Cognite3DObjectFields | SequenceNotStr[Cognite3DObjectFields] | None = None,
         query: str | None = None,
@@ -317,9 +319,11 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Cognite3DObjectFields | SequenceNotStr[Cognite3DObjectFields] | None = None,
         property: Cognite3DObjectFields | SequenceNotStr[Cognite3DObjectFields] | None = None,
         query: str | None = None,
@@ -531,13 +535,15 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         if retrieve_connections == "identifier" or retrieve_connections == "full":
             builder.extend(
                 factory.from_edge(
@@ -551,30 +557,30 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             )
         if retrieve_connections == "full":
             builder.extend(
-            factory.from_reverse_relation(
-                CogniteAsset._view_id,
-                through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteAsset", "v1"), "object3D"),
-                connection_type=None,
-                connection_property=ViewPropertyId(self._view_id, "asset"),
-                has_container_fields=True,
+                factory.from_reverse_relation(
+                    CogniteAsset._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteAsset", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "asset"),
+                    has_container_fields=True,
                 )
             )
             builder.extend(
-            factory.from_reverse_relation(
-                CogniteCADNode._view_id,
-                through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteCADNode", "v1"), "object3D"),
-                connection_type=None,
-                connection_property=ViewPropertyId(self._view_id, "cadNodes"),
-                has_container_fields=True,
+                factory.from_reverse_relation(
+                    CogniteCADNode._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteCADNode", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "cadNodes"),
+                    has_container_fields=True,
                 )
             )
             builder.extend(
-            factory.from_reverse_relation(
-                CognitePointCloudVolume._view_id,
-                through=dm.PropertyId(dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1"), "object3D"),
-                connection_type=None,
-                connection_property=ViewPropertyId(self._view_id, "pointCloudVolumes"),
-                has_container_fields=True,
+                factory.from_reverse_relation(
+                    CognitePointCloudVolume._view_id,
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1"), "object3D"),
+                    connection_type=None,
+                    connection_property=ViewPropertyId(self._view_id, "pointCloudVolumes"),
+                    has_container_fields=True,
                 )
             )
         return builder.build()
@@ -799,8 +805,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(limit=limit,  filter=filter_, sort=sort_input)
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
         return self._query(filter_, limit, retrieve_connections, sort_input, "list")
-

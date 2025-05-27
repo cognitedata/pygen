@@ -45,7 +45,14 @@ from cognite_core.data_classes import (
 )
 
 
-class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360ImageCollectionWrite, Cognite360ImageCollectionList, Cognite360ImageCollectionWriteList]):
+class Cognite360ImageCollectionAPI(
+    NodeAPI[
+        Cognite360ImageCollection,
+        Cognite360ImageCollectionWrite,
+        Cognite360ImageCollectionList,
+        Cognite360ImageCollectionWriteList,
+    ]
+):
     _view_id = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITE360IMAGECOLLECTION_PROPERTIES_BY_FIELD
     _class_type = Cognite360ImageCollection
@@ -54,7 +61,6 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -110,14 +116,27 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
     def search(
         self,
         query: str,
-        properties: Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None = None,
+        properties: (
+            Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -197,14 +216,27 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
         group_by: None = None,
         property: Cognite360ImageCollectionFields | SequenceNotStr[Cognite360ImageCollectionFields] | None = None,
         query: str | None = None,
-        search_property: Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None = None,
+        search_property: (
+            Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -219,14 +251,27 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
         group_by: None = None,
         property: Cognite360ImageCollectionFields | SequenceNotStr[Cognite360ImageCollectionFields] | None = None,
         query: str | None = None,
-        search_property: Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None = None,
+        search_property: (
+            Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -237,20 +282,35 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Cognite360ImageCollectionFields | SequenceNotStr[Cognite360ImageCollectionFields],
         property: Cognite360ImageCollectionFields | SequenceNotStr[Cognite360ImageCollectionFields] | None = None,
         query: str | None = None,
-        search_property: Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None = None,
+        search_property: (
+            Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -260,20 +320,35 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Cognite360ImageCollectionFields | SequenceNotStr[Cognite360ImageCollectionFields] | None = None,
         property: Cognite360ImageCollectionFields | SequenceNotStr[Cognite360ImageCollectionFields] | None = None,
         query: str | None = None,
-        search_property: Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None = None,
+        search_property: (
+            Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -349,14 +424,27 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
         property: Cognite360ImageCollectionFields,
         interval: float,
         query: str | None = None,
-        search_property: Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None = None,
+        search_property: (
+            Cognite360ImageCollectionTextFields | SequenceNotStr[Cognite360ImageCollectionTextFields] | None
+        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -426,13 +514,15 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
@@ -448,11 +538,22 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
         chunk_size: int = DEFAULT_CHUNK_SIZE,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -548,11 +649,22 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
         self,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -615,8 +727,7 @@ class Cognite360ImageCollectionAPI(NodeAPI[Cognite360ImageCollection, Cognite360
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(limit=limit,  filter=filter_, sort=sort_input)
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
         return self._query(filter_, limit, retrieve_connections, sort_input, "list")
-

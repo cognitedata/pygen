@@ -35,8 +35,15 @@ from wind_turbine.data_classes._core import (
     ViewPropertyId,
     BooleanFilter,
 )
+
 if TYPE_CHECKING:
-    from wind_turbine.data_classes._sensor_position import SensorPosition, SensorPositionList, SensorPositionGraphQL, SensorPositionWrite, SensorPositionWriteList
+    from wind_turbine.data_classes._sensor_position import (
+        SensorPosition,
+        SensorPositionList,
+        SensorPositionGraphQL,
+        SensorPositionWrite,
+        SensorPositionWriteList,
+    )
 
 
 __all__ = [
@@ -91,7 +98,6 @@ class BladeGraphQL(GraphQLCore):
             )
         return values
 
-
     @field_validator("sensor_positions", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -143,7 +149,6 @@ class Blade(DomainModel):
         return BladeWrite.model_validate(as_write_args(self))
 
 
-
 class BladeWrite(DomainModelWrite):
     """This represents the writing version of blade.
 
@@ -156,7 +161,11 @@ class BladeWrite(DomainModelWrite):
         is_damaged: The is damaged field.
         name: Name of the instance
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("is_damaged", "name",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "is_damaged",
+        "name",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Blade", "1")
 
@@ -166,20 +175,22 @@ class BladeWrite(DomainModelWrite):
     name: Optional[str] = None
 
 
-
 class BladeList(DomainModelList[Blade]):
     """List of blades in the read version."""
 
     _INSTANCE = Blade
+
     def as_write(self) -> BladeWriteList:
         """Convert these read versions of blade to the writing versions."""
         return BladeWriteList([node.as_write() for node in self.data])
 
-
     @property
     def sensor_positions(self) -> SensorPositionList:
         from ._sensor_position import SensorPosition, SensorPositionList
-        return SensorPositionList([item for items in self.data for item in items.sensor_positions or [] if isinstance(item, SensorPosition)])
+
+        return SensorPositionList(
+            [item for items in self.data for item in items.sensor_positions or [] if isinstance(item, SensorPosition)]
+        )
 
 
 class BladeWriteList(DomainModelWriteList[BladeWrite]):
@@ -228,11 +239,11 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._sensor_position import _SensorPositionQuery
 
@@ -267,12 +278,14 @@ class _BladeQuery(NodeQueryCore[T_DomainModelList, BladeList]):
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.is_damaged = BooleanFilter(self, self._view_id.as_property_ref("is_damaged"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.is_damaged,
-            self.name,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.is_damaged,
+                self.name,
+            ]
+        )
 
     def list_blade(self, limit: int = DEFAULT_QUERY_LIMIT) -> BladeList:
         return self._list(limit=limit)

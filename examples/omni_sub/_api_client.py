@@ -26,14 +26,15 @@ class OmniSubClient:
 
     Generated with:
         pygen = 0.0.0
-        cognite-sdk = 7.74.5
-        pydantic = 2.10.6
+        cognite-sdk = 7.75.1
+        pydantic = 2.11.5
 
     Data Model:
         space: sp_pygen_models
         externalId: OmniSub
         version: 1
     """
+
     _data_model_id = dm.DataModelId("sp_pygen_models", "OmniSub", "1")
 
     def __init__(self, config_or_client: CogniteClient | ClientConfig):
@@ -121,7 +122,10 @@ class OmniSubClient:
     def delete(
         self,
         external_id: (
-            str | dm.NodeId | data_classes.DomainModelWrite | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
+            str
+            | dm.NodeId
+            | data_classes.DomainModelWrite
+            | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
         ),
         space: str | None = None,
     ) -> dm.InstancesDeleteResult:
@@ -185,9 +189,9 @@ class OmniSubClient:
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniSub data model.
 
-            Args:
-                query (str): The GraphQL query to issue.
-                variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
         data_model_id = dm.DataModelId("sp_pygen_models", "OmniSub", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)

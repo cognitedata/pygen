@@ -32,7 +32,6 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
-    
 )
 
 
@@ -92,8 +91,6 @@ class CogniteDescribableNodeGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> CogniteDescribableNode:
         """Convert this GraphQL format of Cognite describable node to the reading format."""
         return CogniteDescribableNode.model_validate(as_read_args(self))
@@ -127,11 +124,9 @@ class CogniteDescribableNode(DomainModel):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
 
-
     def as_write(self) -> CogniteDescribableNodeWrite:
         """Convert this read version of Cognite describable node to the writing version."""
         return CogniteDescribableNodeWrite.model_validate(as_write_args(self))
-
 
 
 class CogniteDescribableNodeWrite(DomainModelWrite):
@@ -148,7 +143,13 @@ class CogniteDescribableNodeWrite(DomainModelWrite):
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "name", "tags",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
 
@@ -160,15 +161,14 @@ class CogniteDescribableNodeWrite(DomainModelWrite):
     tags: Optional[list[str]] = None
 
 
-
 class CogniteDescribableNodeList(DomainModelList[CogniteDescribableNode]):
     """List of Cognite describable nodes in the read version."""
 
     _INSTANCE = CogniteDescribableNode
+
     def as_write(self) -> CogniteDescribableNodeWriteList:
         """Convert these read versions of Cognite describable node to the writing versions."""
         return CogniteDescribableNodeWriteList([node.as_write() for node in self.data])
-
 
 
 class CogniteDescribableNodeWriteList(DomainModelWriteList[CogniteDescribableNodeWrite]):
@@ -222,11 +222,11 @@ class _CogniteDescribableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteDescr
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -246,12 +246,14 @@ class _CogniteDescribableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteDescr
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.name,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.name,
+            ]
+        )
 
     def list_cognite_describable_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteDescribableNodeList:
         return self._list(limit=limit)

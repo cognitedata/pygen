@@ -47,10 +47,23 @@ from wind_turbine.data_classes._core import (
     FloatFilter,
 )
 from wind_turbine.data_classes._generating_unit import GeneratingUnit, GeneratingUnitWrite
+
 if TYPE_CHECKING:
     from wind_turbine.data_classes._blade import Blade, BladeList, BladeGraphQL, BladeWrite, BladeWriteList
-    from wind_turbine.data_classes._data_sheet import DataSheet, DataSheetList, DataSheetGraphQL, DataSheetWrite, DataSheetWriteList
-    from wind_turbine.data_classes._distance import Distance, DistanceList, DistanceGraphQL, DistanceWrite, DistanceWriteList
+    from wind_turbine.data_classes._data_sheet import (
+        DataSheet,
+        DataSheetList,
+        DataSheetGraphQL,
+        DataSheetWrite,
+        DataSheetWriteList,
+    )
+    from wind_turbine.data_classes._distance import (
+        Distance,
+        DistanceList,
+        DistanceGraphQL,
+        DistanceWrite,
+        DistanceWriteList,
+    )
     from wind_turbine.data_classes._nacelle import Nacelle, NacelleList, NacelleGraphQL, NacelleWrite, NacelleWriteList
     from wind_turbine.data_classes._rotor import Rotor, RotorList, RotorGraphQL, RotorWrite, RotorWriteList
 
@@ -124,7 +137,6 @@ class WindTurbineGraphQL(GraphQLCore):
             )
         return values
 
-
     @field_validator("blades", "datasheets", "metmast", "nacelle", "rotor", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -173,6 +185,7 @@ class WindTurbine(GeneratingUnit):
     power_curve: Union[SequenceRead, str, None] = Field(None, alias="powerCurve")
     rotor: Union[Rotor, str, dm.NodeId, None] = Field(default=None, repr=False)
     windfarm: Optional[str] = None
+
     @field_validator("nacelle", "rotor", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
@@ -188,7 +201,6 @@ class WindTurbine(GeneratingUnit):
     def as_write(self) -> WindTurbineWrite:
         """Convert this read version of wind turbine to the writing version."""
         return WindTurbineWrite.model_validate(as_write_args(self))
-
 
 
 class WindTurbineWrite(GeneratingUnitWrite):
@@ -211,9 +223,27 @@ class WindTurbineWrite(GeneratingUnitWrite):
         rotor: The rotor field.
         windfarm: The windfarm field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("blades", "capacity", "datasheets", "description", "nacelle", "name", "power_curve", "rotor", "windfarm",)
-    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (("metmast", dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance")),)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("blades", "datasheets", "nacelle", "rotor",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "blades",
+        "capacity",
+        "datasheets",
+        "description",
+        "nacelle",
+        "name",
+        "power_curve",
+        "rotor",
+        "windfarm",
+    )
+    _outwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = (
+        ("metmast", dm.DirectRelationReference("sp_pygen_power_enterprise", "Distance")),
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "blades",
+        "datasheets",
+        "nacelle",
+        "rotor",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "WindTurbine", "1")
 
@@ -241,76 +271,126 @@ class WindTurbineList(DomainModelList[WindTurbine]):
     """List of wind turbines in the read version."""
 
     _INSTANCE = WindTurbine
+
     def as_write(self) -> WindTurbineWriteList:
         """Convert these read versions of wind turbine to the writing versions."""
         return WindTurbineWriteList([node.as_write() for node in self.data])
 
-
     @property
     def blades(self) -> BladeList:
         from ._blade import Blade, BladeList
+
         return BladeList([item for items in self.data for item in items.blades or [] if isinstance(item, Blade)])
 
     @property
     def datasheets(self) -> DataSheetList:
         from ._data_sheet import DataSheet, DataSheetList
-        return DataSheetList([item for items in self.data for item in items.datasheets or [] if isinstance(item, DataSheet)])
+
+        return DataSheetList(
+            [item for items in self.data for item in items.datasheets or [] if isinstance(item, DataSheet)]
+        )
 
     @property
     def metmast(self) -> DistanceList:
         from ._distance import Distance, DistanceList
+
         return DistanceList([item for items in self.data for item in items.metmast or [] if isinstance(item, Distance)])
 
     @property
     def nacelle(self) -> NacelleList:
         from ._nacelle import Nacelle, NacelleList
+
         return NacelleList([item.nacelle for item in self.data if isinstance(item.nacelle, Nacelle)])
+
     @property
     def rotor(self) -> RotorList:
         from ._rotor import Rotor, RotorList
+
         return RotorList([item.rotor for item in self.data if isinstance(item.rotor, Rotor)])
+
 
 class WindTurbineWriteList(DomainModelWriteList[WindTurbineWrite]):
     """List of wind turbines in the writing version."""
 
     _INSTANCE = WindTurbineWrite
+
     @property
     def blades(self) -> BladeWriteList:
         from ._blade import BladeWrite, BladeWriteList
-        return BladeWriteList([item for items in self.data for item in items.blades or [] if isinstance(item, BladeWrite)])
+
+        return BladeWriteList(
+            [item for items in self.data for item in items.blades or [] if isinstance(item, BladeWrite)]
+        )
 
     @property
     def datasheets(self) -> DataSheetWriteList:
         from ._data_sheet import DataSheetWrite, DataSheetWriteList
-        return DataSheetWriteList([item for items in self.data for item in items.datasheets or [] if isinstance(item, DataSheetWrite)])
+
+        return DataSheetWriteList(
+            [item for items in self.data for item in items.datasheets or [] if isinstance(item, DataSheetWrite)]
+        )
 
     @property
     def metmast(self) -> DistanceWriteList:
         from ._distance import DistanceWrite, DistanceWriteList
-        return DistanceWriteList([item for items in self.data for item in items.metmast or [] if isinstance(item, DistanceWrite)])
+
+        return DistanceWriteList(
+            [item for items in self.data for item in items.metmast or [] if isinstance(item, DistanceWrite)]
+        )
 
     @property
     def nacelle(self) -> NacelleWriteList:
         from ._nacelle import NacelleWrite, NacelleWriteList
+
         return NacelleWriteList([item.nacelle for item in self.data if isinstance(item.nacelle, NacelleWrite)])
+
     @property
     def rotor(self) -> RotorWriteList:
         from ._rotor import RotorWrite, RotorWriteList
+
         return RotorWriteList([item.rotor for item in self.data if isinstance(item.rotor, RotorWrite)])
 
 
 def _create_wind_turbine_filter(
     view_id: dm.ViewId,
-    blades: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    blades: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     min_capacity: float | None = None,
     max_capacity: float | None = None,
-    datasheets: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    datasheets: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     description: str | list[str] | None = None,
     description_prefix: str | None = None,
-    nacelle: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    nacelle: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    rotor: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    rotor: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     windfarm: str | list[str] | None = None,
     windfarm_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -321,13 +401,24 @@ def _create_wind_turbine_filter(
     if isinstance(blades, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(blades):
         filters.append(dm.filters.Equals(view_id.as_property_ref("blades"), value=as_instance_dict_id(blades)))
     if blades and isinstance(blades, Sequence) and not isinstance(blades, str) and not is_tuple_id(blades):
-        filters.append(dm.filters.In(view_id.as_property_ref("blades"), values=[as_instance_dict_id(item) for item in blades]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("blades"), values=[as_instance_dict_id(item) for item in blades])
+        )
     if min_capacity is not None or max_capacity is not None:
         filters.append(dm.filters.Range(view_id.as_property_ref("capacity"), gte=min_capacity, lte=max_capacity))
     if isinstance(datasheets, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(datasheets):
         filters.append(dm.filters.Equals(view_id.as_property_ref("datasheets"), value=as_instance_dict_id(datasheets)))
-    if datasheets and isinstance(datasheets, Sequence) and not isinstance(datasheets, str) and not is_tuple_id(datasheets):
-        filters.append(dm.filters.In(view_id.as_property_ref("datasheets"), values=[as_instance_dict_id(item) for item in datasheets]))
+    if (
+        datasheets
+        and isinstance(datasheets, Sequence)
+        and not isinstance(datasheets, str)
+        and not is_tuple_id(datasheets)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("datasheets"), values=[as_instance_dict_id(item) for item in datasheets]
+            )
+        )
     if isinstance(description, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
     if description and isinstance(description, list):
@@ -337,7 +428,9 @@ def _create_wind_turbine_filter(
     if isinstance(nacelle, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(nacelle):
         filters.append(dm.filters.Equals(view_id.as_property_ref("nacelle"), value=as_instance_dict_id(nacelle)))
     if nacelle and isinstance(nacelle, Sequence) and not isinstance(nacelle, str) and not is_tuple_id(nacelle):
-        filters.append(dm.filters.In(view_id.as_property_ref("nacelle"), values=[as_instance_dict_id(item) for item in nacelle]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("nacelle"), values=[as_instance_dict_id(item) for item in nacelle])
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -347,7 +440,9 @@ def _create_wind_turbine_filter(
     if isinstance(rotor, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(rotor):
         filters.append(dm.filters.Equals(view_id.as_property_ref("rotor"), value=as_instance_dict_id(rotor)))
     if rotor and isinstance(rotor, Sequence) and not isinstance(rotor, str) and not is_tuple_id(rotor):
-        filters.append(dm.filters.In(view_id.as_property_ref("rotor"), values=[as_instance_dict_id(item) for item in rotor]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("rotor"), values=[as_instance_dict_id(item) for item in rotor])
+        )
     if isinstance(windfarm, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("windfarm"), value=windfarm))
     if windfarm and isinstance(windfarm, list):
@@ -376,11 +471,11 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._blade import _BladeQuery
         from ._data_sheet import _DataSheetQuery
@@ -481,16 +576,18 @@ class _WindTurbineQuery(NodeQueryCore[T_DomainModelList, WindTurbineList]):
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.rotor_filter = DirectRelationFilter(self, self._view_id.as_property_ref("rotor"))
         self.windfarm = StringFilter(self, self._view_id.as_property_ref("windfarm"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.capacity,
-            self.description,
-            self.nacelle_filter,
-            self.name,
-            self.rotor_filter,
-            self.windfarm,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.capacity,
+                self.description,
+                self.nacelle_filter,
+                self.name,
+                self.rotor_filter,
+                self.windfarm,
+            ]
+        )
 
     def list_wind_turbine(self, limit: int = DEFAULT_QUERY_LIMIT) -> WindTurbineList:
         return self._list(limit=limit)

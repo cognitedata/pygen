@@ -36,8 +36,15 @@ from cognite_core.data_classes._core import (
     BooleanFilter,
     DirectRelationFilter,
 )
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_3_d_model import Cognite3DModel, Cognite3DModelList, Cognite3DModelGraphQL, Cognite3DModelWrite, Cognite3DModelWriteList
+    from cognite_core.data_classes._cognite_3_d_model import (
+        Cognite3DModel,
+        Cognite3DModelList,
+        Cognite3DModelGraphQL,
+        Cognite3DModelWrite,
+        Cognite3DModelWriteList,
+    )
 
 
 __all__ = [
@@ -50,7 +57,7 @@ __all__ = [
 ]
 
 
-Cognite3DRevisionTextFields = Literal["external_id", ]
+Cognite3DRevisionTextFields = Literal["external_id",]
 Cognite3DRevisionFields = Literal["external_id", "published", "status", "type_"]
 
 _COGNITE3DREVISION_PROPERTIES_BY_FIELD = {
@@ -94,7 +101,6 @@ class Cognite3DRevisionGraphQL(GraphQLCore, protected_namespaces=()):
             )
         return values
 
-
     @field_validator("model_3d", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -135,16 +141,15 @@ class Cognite3DRevision(DomainModel, protected_namespaces=()):
     published: Optional[bool] = None
     status: Optional[Literal["Done", "Failed", "Processing", "Queued"]] | str = None
     type_: Optional[Literal["CAD", "Image360", "PointCloud"]] | str = Field(None, alias="type")
+
     @field_validator("model_3d", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> Cognite3DRevisionWrite:
         """Convert this read version of Cognite 3D revision to the writing version."""
         return Cognite3DRevisionWrite.model_validate(as_write_args(self))
-
 
 
 class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
@@ -161,7 +166,13 @@ class Cognite3DRevisionWrite(DomainModelWrite, protected_namespaces=()):
         status: The status field.
         type_: The type field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("model_3d", "published", "status", "type_",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "published",
+        "status",
+        "type_",
+    )
     _direct_relations: ClassVar[tuple[str, ...]] = ("model_3d",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1")
@@ -188,31 +199,48 @@ class Cognite3DRevisionList(DomainModelList[Cognite3DRevision]):
     """List of Cognite 3D revisions in the read version."""
 
     _INSTANCE = Cognite3DRevision
+
     def as_write(self) -> Cognite3DRevisionWriteList:
         """Convert these read versions of Cognite 3D revision to the writing versions."""
         return Cognite3DRevisionWriteList([node.as_write() for node in self.data])
 
-
     @property
     def model_3d(self) -> Cognite3DModelList:
         from ._cognite_3_d_model import Cognite3DModel, Cognite3DModelList
+
         return Cognite3DModelList([item.model_3d for item in self.data if isinstance(item.model_3d, Cognite3DModel)])
+
 
 class Cognite3DRevisionWriteList(DomainModelWriteList[Cognite3DRevisionWrite]):
     """List of Cognite 3D revisions in the writing version."""
 
     _INSTANCE = Cognite3DRevisionWrite
+
     @property
     def model_3d(self) -> Cognite3DModelWriteList:
         from ._cognite_3_d_model import Cognite3DModelWrite, Cognite3DModelWriteList
-        return Cognite3DModelWriteList([item.model_3d for item in self.data if isinstance(item.model_3d, Cognite3DModelWrite)])
+
+        return Cognite3DModelWriteList(
+            [item.model_3d for item in self.data if isinstance(item.model_3d, Cognite3DModelWrite)]
+        )
 
 
 def _create_cognite_3_d_revision_filter(
     view_id: dm.ViewId,
-    model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    model_3d: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     published: bool | None = None,
-    status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+    status: (
+        Literal["Done", "Failed", "Processing", "Queued"]
+        | list[Literal["Done", "Failed", "Processing", "Queued"]]
+        | None
+    ) = None,
     type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -222,7 +250,9 @@ def _create_cognite_3_d_revision_filter(
     if isinstance(model_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(model_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("model3D"), value=as_instance_dict_id(model_3d)))
     if model_3d and isinstance(model_3d, Sequence) and not isinstance(model_3d, str) and not is_tuple_id(model_3d):
-        filters.append(dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d])
+        )
     if isinstance(published, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("published"), value=published))
     if isinstance(status, str):
@@ -255,11 +285,11 @@ class _Cognite3DRevisionQuery(NodeQueryCore[T_DomainModelList, Cognite3DRevision
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_3_d_model import _Cognite3DModelQuery
 
@@ -294,12 +324,14 @@ class _Cognite3DRevisionQuery(NodeQueryCore[T_DomainModelList, Cognite3DRevision
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.published = BooleanFilter(self, self._view_id.as_property_ref("published"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.model_3d_filter,
-            self.published,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.model_3d_filter,
+                self.published,
+            ]
+        )
 
     def list_cognite_3_d_revision(self, limit: int = DEFAULT_QUERY_LIMIT) -> Cognite3DRevisionList:
         return self._list(limit=limit)

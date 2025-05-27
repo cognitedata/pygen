@@ -35,9 +35,16 @@ from wind_turbine.data_classes._core import (
     ViewPropertyId,
     DirectRelationFilter,
 )
+
 if TYPE_CHECKING:
     from wind_turbine.data_classes._nacelle import Nacelle, NacelleList, NacelleGraphQL, NacelleWrite, NacelleWriteList
-    from wind_turbine.data_classes._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList, SensorTimeSeriesGraphQL, SensorTimeSeriesWrite, SensorTimeSeriesWriteList
+    from wind_turbine.data_classes._sensor_time_series import (
+        SensorTimeSeries,
+        SensorTimeSeriesList,
+        SensorTimeSeriesGraphQL,
+        SensorTimeSeriesWrite,
+        SensorTimeSeriesWriteList,
+    )
 
 
 __all__ = [
@@ -49,8 +56,8 @@ __all__ = [
 ]
 
 
-GeneratorTextFields = Literal["external_id", ]
-GeneratorFields = Literal["external_id", ]
+GeneratorTextFields = Literal["external_id",]
+GeneratorFields = Literal["external_id",]
 
 _GENERATOR_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -88,7 +95,6 @@ class GeneratorGraphQL(GraphQLCore):
             )
         return values
 
-
     @field_validator("generator_speed_controller", "generator_speed_controller_reference", "nacelle", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -125,18 +131,19 @@ class Generator(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     generator_speed_controller: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
-    generator_speed_controller_reference: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(default=None, repr=False)
+    generator_speed_controller_reference: Union[SensorTimeSeries, str, dm.NodeId, None] = Field(
+        default=None, repr=False
+    )
     nacelle: Optional[Nacelle] = Field(default=None, repr=False)
+
     @field_validator("generator_speed_controller", "generator_speed_controller_reference", "nacelle", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> GeneratorWrite:
         """Convert this read version of generator to the writing version."""
         return GeneratorWrite.model_validate(as_write_args(self))
-
 
 
 class GeneratorWrite(DomainModelWrite):
@@ -151,15 +158,24 @@ class GeneratorWrite(DomainModelWrite):
         generator_speed_controller: The generator speed controller field.
         generator_speed_controller_reference: The generator speed controller reference field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("generator_speed_controller", "generator_speed_controller_reference",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("generator_speed_controller", "generator_speed_controller_reference",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "generator_speed_controller",
+        "generator_speed_controller_reference",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "generator_speed_controller",
+        "generator_speed_controller_reference",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Generator", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     generator_speed_controller: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    generator_speed_controller_reference: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
+    generator_speed_controller_reference: Union[SensorTimeSeriesWrite, str, dm.NodeId, None] = Field(
+        default=None, repr=False
+    )
 
     @field_validator("generator_speed_controller", "generator_speed_controller_reference", mode="before")
     def as_node_id(cls, value: Any) -> Any:
@@ -176,55 +192,137 @@ class GeneratorList(DomainModelList[Generator]):
     """List of generators in the read version."""
 
     _INSTANCE = Generator
+
     def as_write(self) -> GeneratorWriteList:
         """Convert these read versions of generator to the writing versions."""
         return GeneratorWriteList([node.as_write() for node in self.data])
 
-
     @property
     def generator_speed_controller(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.generator_speed_controller for item in self.data if isinstance(item.generator_speed_controller, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [
+                item.generator_speed_controller
+                for item in self.data
+                if isinstance(item.generator_speed_controller, SensorTimeSeries)
+            ]
+        )
+
     @property
     def generator_speed_controller_reference(self) -> SensorTimeSeriesList:
         from ._sensor_time_series import SensorTimeSeries, SensorTimeSeriesList
-        return SensorTimeSeriesList([item.generator_speed_controller_reference for item in self.data if isinstance(item.generator_speed_controller_reference, SensorTimeSeries)])
+
+        return SensorTimeSeriesList(
+            [
+                item.generator_speed_controller_reference
+                for item in self.data
+                if isinstance(item.generator_speed_controller_reference, SensorTimeSeries)
+            ]
+        )
+
     @property
     def nacelle(self) -> NacelleList:
         from ._nacelle import Nacelle, NacelleList
+
         return NacelleList([item.nacelle for item in self.data if isinstance(item.nacelle, Nacelle)])
+
 
 class GeneratorWriteList(DomainModelWriteList[GeneratorWrite]):
     """List of generators in the writing version."""
 
     _INSTANCE = GeneratorWrite
+
     @property
     def generator_speed_controller(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.generator_speed_controller for item in self.data if isinstance(item.generator_speed_controller, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [
+                item.generator_speed_controller
+                for item in self.data
+                if isinstance(item.generator_speed_controller, SensorTimeSeriesWrite)
+            ]
+        )
+
     @property
     def generator_speed_controller_reference(self) -> SensorTimeSeriesWriteList:
         from ._sensor_time_series import SensorTimeSeriesWrite, SensorTimeSeriesWriteList
-        return SensorTimeSeriesWriteList([item.generator_speed_controller_reference for item in self.data if isinstance(item.generator_speed_controller_reference, SensorTimeSeriesWrite)])
+
+        return SensorTimeSeriesWriteList(
+            [
+                item.generator_speed_controller_reference
+                for item in self.data
+                if isinstance(item.generator_speed_controller_reference, SensorTimeSeriesWrite)
+            ]
+        )
 
 
 def _create_generator_filter(
     view_id: dm.ViewId,
-    generator_speed_controller: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    generator_speed_controller_reference: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    generator_speed_controller: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    generator_speed_controller_reference: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
-    if isinstance(generator_speed_controller, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(generator_speed_controller):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("generator_speed_controller"), value=as_instance_dict_id(generator_speed_controller)))
-    if generator_speed_controller and isinstance(generator_speed_controller, Sequence) and not isinstance(generator_speed_controller, str) and not is_tuple_id(generator_speed_controller):
-        filters.append(dm.filters.In(view_id.as_property_ref("generator_speed_controller"), values=[as_instance_dict_id(item) for item in generator_speed_controller]))
-    if isinstance(generator_speed_controller_reference, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(generator_speed_controller_reference):
-        filters.append(dm.filters.Equals(view_id.as_property_ref("generator_speed_controller_reference"), value=as_instance_dict_id(generator_speed_controller_reference)))
-    if generator_speed_controller_reference and isinstance(generator_speed_controller_reference, Sequence) and not isinstance(generator_speed_controller_reference, str) and not is_tuple_id(generator_speed_controller_reference):
-        filters.append(dm.filters.In(view_id.as_property_ref("generator_speed_controller_reference"), values=[as_instance_dict_id(item) for item in generator_speed_controller_reference]))
+    if isinstance(generator_speed_controller, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        generator_speed_controller
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("generator_speed_controller"),
+                value=as_instance_dict_id(generator_speed_controller),
+            )
+        )
+    if (
+        generator_speed_controller
+        and isinstance(generator_speed_controller, Sequence)
+        and not isinstance(generator_speed_controller, str)
+        and not is_tuple_id(generator_speed_controller)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("generator_speed_controller"),
+                values=[as_instance_dict_id(item) for item in generator_speed_controller],
+            )
+        )
+    if isinstance(generator_speed_controller_reference, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(
+        generator_speed_controller_reference
+    ):
+        filters.append(
+            dm.filters.Equals(
+                view_id.as_property_ref("generator_speed_controller_reference"),
+                value=as_instance_dict_id(generator_speed_controller_reference),
+            )
+        )
+    if (
+        generator_speed_controller_reference
+        and isinstance(generator_speed_controller_reference, Sequence)
+        and not isinstance(generator_speed_controller_reference, str)
+        and not is_tuple_id(generator_speed_controller_reference)
+    ):
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("generator_speed_controller_reference"),
+                values=[as_instance_dict_id(item) for item in generator_speed_controller_reference],
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -247,11 +345,11 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._nacelle import _NacelleQuery
         from ._sensor_time_series import _SensorTimeSeriesQuery
@@ -313,14 +411,20 @@ class _GeneratorQuery(NodeQueryCore[T_DomainModelList, GeneratorList]):
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self.generator_speed_controller_filter = DirectRelationFilter(self, self._view_id.as_property_ref("generator_speed_controller"))
-        self.generator_speed_controller_reference_filter = DirectRelationFilter(self, self._view_id.as_property_ref("generator_speed_controller_reference"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.generator_speed_controller_filter,
-            self.generator_speed_controller_reference_filter,
-        ])
+        self.generator_speed_controller_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("generator_speed_controller")
+        )
+        self.generator_speed_controller_reference_filter = DirectRelationFilter(
+            self, self._view_id.as_property_ref("generator_speed_controller_reference")
+        )
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.generator_speed_controller_filter,
+                self.generator_speed_controller_reference_filter,
+            ]
+        )
 
     def list_generator(self, limit: int = DEFAULT_QUERY_LIMIT) -> GeneratorList:
         return self._list(limit=limit)

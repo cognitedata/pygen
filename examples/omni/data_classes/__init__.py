@@ -17,29 +17,202 @@ from omni.data_classes._core import (
     SequenceColumnGraphQL,
     SequenceGraphQL,
 )
-from ._cdf_external_references import CDFExternalReferences, CDFExternalReferencesFields, CDFExternalReferencesGraphQL, CDFExternalReferencesList, CDFExternalReferencesTextFields, CDFExternalReferencesWrite, CDFExternalReferencesWriteList
-from ._cdf_external_references_listed import CDFExternalReferencesListed, CDFExternalReferencesListedFields, CDFExternalReferencesListedGraphQL, CDFExternalReferencesListedList, CDFExternalReferencesListedTextFields, CDFExternalReferencesListedWrite, CDFExternalReferencesListedWriteList
-from ._connection_edge_a import ConnectionEdgeA, ConnectionEdgeAFields, ConnectionEdgeAGraphQL, ConnectionEdgeAList, ConnectionEdgeATextFields, ConnectionEdgeAWrite, ConnectionEdgeAWriteList
-from ._connection_item_a import ConnectionItemA, ConnectionItemAFields, ConnectionItemAGraphQL, ConnectionItemAList, ConnectionItemATextFields, ConnectionItemAWrite, ConnectionItemAWriteList
-from ._connection_item_b import ConnectionItemB, ConnectionItemBFields, ConnectionItemBGraphQL, ConnectionItemBList, ConnectionItemBTextFields, ConnectionItemBWrite, ConnectionItemBWriteList
-from ._connection_item_c_edge import ConnectionItemCEdge, ConnectionItemCEdgeFields, ConnectionItemCEdgeGraphQL, ConnectionItemCEdgeList, ConnectionItemCEdgeTextFields
-from ._connection_item_c_node import ConnectionItemCNode, ConnectionItemCNodeFields, ConnectionItemCNodeGraphQL, ConnectionItemCNodeList, ConnectionItemCNodeTextFields, ConnectionItemCNodeWrite, ConnectionItemCNodeWriteList
-from ._connection_item_d import ConnectionItemD, ConnectionItemDFields, ConnectionItemDGraphQL, ConnectionItemDList, ConnectionItemDTextFields, ConnectionItemDWrite, ConnectionItemDWriteList
-from ._connection_item_e import ConnectionItemE, ConnectionItemEFields, ConnectionItemEGraphQL, ConnectionItemEList, ConnectionItemETextFields, ConnectionItemEWrite, ConnectionItemEWriteList
-from ._connection_item_f import ConnectionItemF, ConnectionItemFFields, ConnectionItemFGraphQL, ConnectionItemFList, ConnectionItemFTextFields, ConnectionItemFWrite, ConnectionItemFWriteList
-from ._connection_item_g import ConnectionItemG, ConnectionItemGFields, ConnectionItemGGraphQL, ConnectionItemGList, ConnectionItemGTextFields, ConnectionItemGWrite, ConnectionItemGWriteList
-from ._dependent_on_non_writable import DependentOnNonWritable, DependentOnNonWritableFields, DependentOnNonWritableGraphQL, DependentOnNonWritableList, DependentOnNonWritableTextFields, DependentOnNonWritableWrite, DependentOnNonWritableWriteList
+from ._cdf_external_references import (
+    CDFExternalReferences,
+    CDFExternalReferencesFields,
+    CDFExternalReferencesGraphQL,
+    CDFExternalReferencesList,
+    CDFExternalReferencesTextFields,
+    CDFExternalReferencesWrite,
+    CDFExternalReferencesWriteList,
+)
+from ._cdf_external_references_listed import (
+    CDFExternalReferencesListed,
+    CDFExternalReferencesListedFields,
+    CDFExternalReferencesListedGraphQL,
+    CDFExternalReferencesListedList,
+    CDFExternalReferencesListedTextFields,
+    CDFExternalReferencesListedWrite,
+    CDFExternalReferencesListedWriteList,
+)
+from ._connection_edge_a import (
+    ConnectionEdgeA,
+    ConnectionEdgeAFields,
+    ConnectionEdgeAGraphQL,
+    ConnectionEdgeAList,
+    ConnectionEdgeATextFields,
+    ConnectionEdgeAWrite,
+    ConnectionEdgeAWriteList,
+)
+from ._connection_item_a import (
+    ConnectionItemA,
+    ConnectionItemAFields,
+    ConnectionItemAGraphQL,
+    ConnectionItemAList,
+    ConnectionItemATextFields,
+    ConnectionItemAWrite,
+    ConnectionItemAWriteList,
+)
+from ._connection_item_b import (
+    ConnectionItemB,
+    ConnectionItemBFields,
+    ConnectionItemBGraphQL,
+    ConnectionItemBList,
+    ConnectionItemBTextFields,
+    ConnectionItemBWrite,
+    ConnectionItemBWriteList,
+)
+from ._connection_item_c_edge import (
+    ConnectionItemCEdge,
+    ConnectionItemCEdgeFields,
+    ConnectionItemCEdgeGraphQL,
+    ConnectionItemCEdgeList,
+    ConnectionItemCEdgeTextFields,
+)
+from ._connection_item_c_node import (
+    ConnectionItemCNode,
+    ConnectionItemCNodeFields,
+    ConnectionItemCNodeGraphQL,
+    ConnectionItemCNodeList,
+    ConnectionItemCNodeTextFields,
+    ConnectionItemCNodeWrite,
+    ConnectionItemCNodeWriteList,
+)
+from ._connection_item_d import (
+    ConnectionItemD,
+    ConnectionItemDFields,
+    ConnectionItemDGraphQL,
+    ConnectionItemDList,
+    ConnectionItemDTextFields,
+    ConnectionItemDWrite,
+    ConnectionItemDWriteList,
+)
+from ._connection_item_e import (
+    ConnectionItemE,
+    ConnectionItemEFields,
+    ConnectionItemEGraphQL,
+    ConnectionItemEList,
+    ConnectionItemETextFields,
+    ConnectionItemEWrite,
+    ConnectionItemEWriteList,
+)
+from ._connection_item_f import (
+    ConnectionItemF,
+    ConnectionItemFFields,
+    ConnectionItemFGraphQL,
+    ConnectionItemFList,
+    ConnectionItemFTextFields,
+    ConnectionItemFWrite,
+    ConnectionItemFWriteList,
+)
+from ._connection_item_g import (
+    ConnectionItemG,
+    ConnectionItemGFields,
+    ConnectionItemGGraphQL,
+    ConnectionItemGList,
+    ConnectionItemGTextFields,
+    ConnectionItemGWrite,
+    ConnectionItemGWriteList,
+)
+from ._dependent_on_non_writable import (
+    DependentOnNonWritable,
+    DependentOnNonWritableFields,
+    DependentOnNonWritableGraphQL,
+    DependentOnNonWritableList,
+    DependentOnNonWritableTextFields,
+    DependentOnNonWritableWrite,
+    DependentOnNonWritableWriteList,
+)
 from ._empty import Empty, EmptyFields, EmptyGraphQL, EmptyList, EmptyTextFields, EmptyWrite, EmptyWriteList
-from ._implementation_1 import Implementation1, Implementation1Fields, Implementation1GraphQL, Implementation1List, Implementation1TextFields, Implementation1Write, Implementation1WriteList
-from ._implementation_1_non_writeable import Implementation1NonWriteable, Implementation1NonWriteableFields, Implementation1NonWriteableGraphQL, Implementation1NonWriteableList, Implementation1NonWriteableTextFields
-from ._implementation_2 import Implementation2, Implementation2Fields, Implementation2GraphQL, Implementation2List, Implementation2TextFields, Implementation2Write, Implementation2WriteList
-from ._main_interface import MainInterface, MainInterfaceFields, MainInterfaceGraphQL, MainInterfaceList, MainInterfaceTextFields, MainInterfaceWrite, MainInterfaceWriteList
-from ._primitive_nullable import PrimitiveNullable, PrimitiveNullableFields, PrimitiveNullableGraphQL, PrimitiveNullableList, PrimitiveNullableTextFields, PrimitiveNullableWrite, PrimitiveNullableWriteList
-from ._primitive_nullable_listed import PrimitiveNullableListed, PrimitiveNullableListedFields, PrimitiveNullableListedGraphQL, PrimitiveNullableListedList, PrimitiveNullableListedTextFields, PrimitiveNullableListedWrite, PrimitiveNullableListedWriteList
-from ._primitive_required import PrimitiveRequired, PrimitiveRequiredFields, PrimitiveRequiredGraphQL, PrimitiveRequiredList, PrimitiveRequiredTextFields, PrimitiveRequiredWrite, PrimitiveRequiredWriteList
-from ._primitive_required_listed import PrimitiveRequiredListed, PrimitiveRequiredListedFields, PrimitiveRequiredListedGraphQL, PrimitiveRequiredListedList, PrimitiveRequiredListedTextFields, PrimitiveRequiredListedWrite, PrimitiveRequiredListedWriteList
-from ._primitive_with_defaults import PrimitiveWithDefaults, PrimitiveWithDefaultsFields, PrimitiveWithDefaultsGraphQL, PrimitiveWithDefaultsList, PrimitiveWithDefaultsTextFields, PrimitiveWithDefaultsWrite, PrimitiveWithDefaultsWriteList
-from ._sub_interface import SubInterface, SubInterfaceFields, SubInterfaceGraphQL, SubInterfaceList, SubInterfaceTextFields, SubInterfaceWrite, SubInterfaceWriteList
+from ._implementation_1 import (
+    Implementation1,
+    Implementation1Fields,
+    Implementation1GraphQL,
+    Implementation1List,
+    Implementation1TextFields,
+    Implementation1Write,
+    Implementation1WriteList,
+)
+from ._implementation_1_non_writeable import (
+    Implementation1NonWriteable,
+    Implementation1NonWriteableFields,
+    Implementation1NonWriteableGraphQL,
+    Implementation1NonWriteableList,
+    Implementation1NonWriteableTextFields,
+)
+from ._implementation_2 import (
+    Implementation2,
+    Implementation2Fields,
+    Implementation2GraphQL,
+    Implementation2List,
+    Implementation2TextFields,
+    Implementation2Write,
+    Implementation2WriteList,
+)
+from ._main_interface import (
+    MainInterface,
+    MainInterfaceFields,
+    MainInterfaceGraphQL,
+    MainInterfaceList,
+    MainInterfaceTextFields,
+    MainInterfaceWrite,
+    MainInterfaceWriteList,
+)
+from ._primitive_nullable import (
+    PrimitiveNullable,
+    PrimitiveNullableFields,
+    PrimitiveNullableGraphQL,
+    PrimitiveNullableList,
+    PrimitiveNullableTextFields,
+    PrimitiveNullableWrite,
+    PrimitiveNullableWriteList,
+)
+from ._primitive_nullable_listed import (
+    PrimitiveNullableListed,
+    PrimitiveNullableListedFields,
+    PrimitiveNullableListedGraphQL,
+    PrimitiveNullableListedList,
+    PrimitiveNullableListedTextFields,
+    PrimitiveNullableListedWrite,
+    PrimitiveNullableListedWriteList,
+)
+from ._primitive_required import (
+    PrimitiveRequired,
+    PrimitiveRequiredFields,
+    PrimitiveRequiredGraphQL,
+    PrimitiveRequiredList,
+    PrimitiveRequiredTextFields,
+    PrimitiveRequiredWrite,
+    PrimitiveRequiredWriteList,
+)
+from ._primitive_required_listed import (
+    PrimitiveRequiredListed,
+    PrimitiveRequiredListedFields,
+    PrimitiveRequiredListedGraphQL,
+    PrimitiveRequiredListedList,
+    PrimitiveRequiredListedTextFields,
+    PrimitiveRequiredListedWrite,
+    PrimitiveRequiredListedWriteList,
+)
+from ._primitive_with_defaults import (
+    PrimitiveWithDefaults,
+    PrimitiveWithDefaultsFields,
+    PrimitiveWithDefaultsGraphQL,
+    PrimitiveWithDefaultsList,
+    PrimitiveWithDefaultsTextFields,
+    PrimitiveWithDefaultsWrite,
+    PrimitiveWithDefaultsWriteList,
+)
+from ._sub_interface import (
+    SubInterface,
+    SubInterfaceFields,
+    SubInterfaceGraphQL,
+    SubInterfaceList,
+    SubInterfaceTextFields,
+    SubInterfaceWrite,
+    SubInterfaceWriteList,
+)
+
 CDFExternalReferences.model_rebuild()
 CDFExternalReferencesGraphQL.model_rebuild()
 CDFExternalReferencesWrite.model_rebuild()

@@ -3,6 +3,7 @@ import time
 import warnings
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
+from typing import cast
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes import data_modeling as dm
@@ -200,7 +201,8 @@ class QueryExecutor:
         for name, status in self._status_by_name.items():
             if name not in self._query.with_:
                 continue
-            expression = self._query.with_[name]
+            # In the QueryExecutor we are only working with NodeOrEdgeResultSetExpression, so we cast it.
+            expression = cast(dm.query.NodeOrEdgeResultSetExpression, self._query.with_[name])
             if status.is_unlimited:
                 expression.limit = status.max_retrieve_batch_limit
             else:

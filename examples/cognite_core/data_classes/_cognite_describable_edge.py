@@ -33,22 +33,29 @@ from cognite_core.data_classes._core import (
     QueryCore,
     StringFilter,
     ViewPropertyId,
-    
 )
 
 
 __all__ = [
-    "CogniteDescribableEdge",    "CogniteDescribableEdgeWrite",    "CogniteDescribableEdgeList",    "CogniteDescribableEdgeWriteList",    "CogniteDescribableEdgeFields",    "CogniteDescribableEdgeTextFields",]
+    "CogniteDescribableEdge",
+    "CogniteDescribableEdgeWrite",
+    "CogniteDescribableEdgeList",
+    "CogniteDescribableEdgeWriteList",
+    "CogniteDescribableEdgeFields",
+    "CogniteDescribableEdgeTextFields",
+]
 
 
 CogniteDescribableEdgeTextFields = Literal["external_id", "aliases", "description", "name", "tags"]
 CogniteDescribableEdgeFields = Literal["external_id", "aliases", "description", "name", "tags"]
-_COGNITEDESCRIBABLEEDGE_PROPERTIES_BY_FIELD = {    "external_id": "externalId",
+_COGNITEDESCRIBABLEEDGE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "aliases": "aliases",
     "description": "description",
     "name": "name",
     "tags": "tags",
 }
+
 
 class CogniteDescribableEdgeGraphQL(GraphQLCore):
     """This represents the reading version of Cognite describable edge, used
@@ -66,6 +73,7 @@ class CogniteDescribableEdgeGraphQL(GraphQLCore):
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
     end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     aliases: Optional[list[str]] = None
@@ -97,6 +105,7 @@ class CogniteDescribableEdge(DomainRelation):
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId] = Field(alias="endNode")
@@ -105,7 +114,6 @@ class CogniteDescribableEdge(DomainRelation):
     name: Optional[str] = None
     tags: Optional[list[str]] = None
 
-
     def as_write(self) -> CogniteDescribableEdgeWrite:
         """Convert this read version of Cognite describable edge to the writing version."""
         return CogniteDescribableEdgeWrite.model_validate(as_write_args(self))
@@ -113,9 +121,8 @@ class CogniteDescribableEdge(DomainRelation):
 
 _EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {}
 
-def _validate_end_node(
-    start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]
-) -> None:
+
+def _validate_end_node(start_node: DomainModelWrite, end_node: Union[str, dm.NodeId]) -> None:
     if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
         return
@@ -146,7 +153,13 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
         name: Name of the instance
         tags: Text based labels for generic use, limited to 1000
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "name", "tags",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
+        "tags",
+    )
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
@@ -161,10 +174,10 @@ class CogniteDescribableEdgeList(DomainRelationList[CogniteDescribableEdge]):
     """List of Cognite describable edges in the reading version."""
 
     _INSTANCE = CogniteDescribableEdge
+
     def as_write(self) -> CogniteDescribableEdgeWriteList:
         """Convert this read version of Cognite describable edge list to the writing version."""
         return CogniteDescribableEdgeWriteList([edge.as_write() for edge in self])
-
 
 
 class CogniteDescribableEdgeWriteList(DomainRelationWriteList[CogniteDescribableEdgeWrite]):
@@ -208,9 +221,12 @@ def _create_cognite_describable_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[                    {"space": start_node_space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                values=[
+                    (
+                        {"space": start_node_space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in start_node
                 ],
             )
@@ -225,9 +241,12 @@ def _create_cognite_describable_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[                    {"space": space_end_node, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                values=[
+                    (
+                        {"space": space_end_node, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in end_node
                 ],
             )
@@ -267,12 +286,21 @@ class _CogniteDescribableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteDescribabl
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
     ):
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -280,16 +308,18 @@ class _CogniteDescribableEdgeQuery(EdgeQueryCore[T_DomainList, CogniteDescribabl
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
-                connection_property=ViewPropertyId(self._view_id, "end_node")
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.description = StringFilter(self, self._view_id.as_property_ref("description"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.name,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.name,
+            ]
+        )

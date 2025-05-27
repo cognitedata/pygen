@@ -11,9 +11,15 @@ from cognite.client.credentials import OAuthClientCredentials
 from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeriesList
 
 from omni_multi import data_classes
-from omni_multi._api import (    Implementation1v1API,    Implementation1v2API,    MainInterfaceAPI,    SubInterfaceAPI,)
+from omni_multi._api import (
+    Implementation1v1API,
+    Implementation1v2API,
+    MainInterfaceAPI,
+    SubInterfaceAPI,
+)
 from omni_multi._api._core import GraphQLQueryResponse, SequenceNotStr
 from omni_multi.data_classes._core import GraphQLList
+
 
 class OmniMultiAAPIs:
     """
@@ -25,6 +31,7 @@ class OmniMultiAAPIs:
         version: 1
 
     """
+
     _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
@@ -36,13 +43,14 @@ class OmniMultiAAPIs:
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniMultiA data model.
 
-            Args:
-                query (str): The GraphQL query to issue.
-                variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
         data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
+
 
 class OmniMultiBAPIs:
     """
@@ -54,6 +62,7 @@ class OmniMultiBAPIs:
         version: 1
 
     """
+
     _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
@@ -66,13 +75,14 @@ class OmniMultiBAPIs:
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniMultiB data model.
 
-            Args:
-                query (str): The GraphQL query to issue.
-                variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
         data_model_id = dm.DataModelId("pygen-models", "OmniMultiB", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
+
 
 class OmniMultiCAPIs:
     """
@@ -84,6 +94,7 @@ class OmniMultiCAPIs:
         version: 1
 
     """
+
     _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
@@ -94,13 +105,14 @@ class OmniMultiCAPIs:
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniMultiC data model.
 
-            Args:
-                query (str): The GraphQL query to issue.
-                variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
+        Args:
+            query (str): The GraphQL query to issue.
+            variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
         data_model_id = dm.DataModelId("pygen-models", "OmniMultiC", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
+
 
 class OmniMultiClient:
     """
@@ -108,8 +120,8 @@ class OmniMultiClient:
 
     Generated with:
         pygen = 0.0.0
-        cognite-sdk = 7.74.5
-        pydantic = 2.10.6
+        cognite-sdk = 7.75.1
+        pydantic = 2.11.5
 
     """
 
@@ -128,7 +140,6 @@ class OmniMultiClient:
         self.omni_multi_c = OmniMultiCAPIs(client)
 
         self._client = client
-
 
     def upsert(
         self,
@@ -199,7 +210,10 @@ class OmniMultiClient:
     def delete(
         self,
         external_id: (
-            str | dm.NodeId | data_classes.DomainModelWrite | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
+            str
+            | dm.NodeId
+            | data_classes.DomainModelWrite
+            | SequenceNotStr[str | dm.NodeId | data_classes.DomainModelWrite]
         ),
         space: str | None = None,
     ) -> dm.InstancesDeleteResult:

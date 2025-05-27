@@ -7,7 +7,7 @@ from typing import (
 )
 
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes.data_modeling.query import ResultSetExpression
+from cognite.client.data_classes.data_modeling.query import NodeOrEdgeResultSetExpression
 
 from wind_turbine.data_classes._core.query.executor import QueryExecutor
 from wind_turbine.data_classes._core.query.step import QueryBuildStep
@@ -28,10 +28,12 @@ class QueryBuilder(list, MutableSequence[QueryBuildStep]):
     def _build(self) -> tuple[dm.query.Query, list[QueryBuildStep], set[str]]:
         # We serialize and deserialize query steps to get a copy as we will modify the
         # cursor and limit in the execution.
-        # The cast is needed as mypy does not understand that the ResultSetExpression is
+        # The cast is needed as mypy does not understand that the NodeOrEdgeResultSetExpression is
         # the parent of NodeSetExpression and EdgeSetExpression.
         with_ = {
-            step.name: cast(ResultSetExpression, dm.query.ResultSetExpression._load(step.expression.dump()))
+            step.name: cast(
+                NodeOrEdgeResultSetExpression, dm.query.NodeOrEdgeResultSetExpression._load(step.expression.dump())
+            )
             for step in self
             if step.is_queryable
         }
@@ -52,7 +54,9 @@ class QueryBuilder(list, MutableSequence[QueryBuildStep]):
                     continue
                 select[step.from_] = dm.query.Select([dm.query.SourceSelector(view_id, ["*"])])
                 temporary_select.add(step.from_)
-        return dm.query.Query(with_=with_, select=select), search, temporary_select
+        # MyPy requires with to be an invariant mapping. We do not control the query clas in the SDK,
+        # so we use a cast here.
+        return dm.query.Query(with_=with_, select=select), search, temporary_select  # type: ignore[arg-type]
 
     def _dump_yaml(self) -> str:
         return self._build()[0].dump_yaml()

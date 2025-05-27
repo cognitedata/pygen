@@ -33,7 +33,6 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
-    
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -49,7 +48,9 @@ __all__ = [
 ]
 
 
-CogniteSourceSystemTextFields = Literal["external_id", "aliases", "description", "manufacturer", "name", "tags", "version_"]
+CogniteSourceSystemTextFields = Literal[
+    "external_id", "aliases", "description", "manufacturer", "name", "tags", "version_"
+]
 CogniteSourceSystemFields = Literal["external_id", "aliases", "description", "manufacturer", "name", "tags", "version_"]
 
 _COGNITESOURCESYSTEM_PROPERTIES_BY_FIELD = {
@@ -100,8 +101,6 @@ class CogniteSourceSystemGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> CogniteSourceSystem:
         """Convert this GraphQL format of Cognite source system to the reading format."""
         return CogniteSourceSystem.model_validate(as_read_args(self))
@@ -134,11 +133,9 @@ class CogniteSourceSystem(CogniteDescribableNode):
     manufacturer: Optional[str] = None
     version_: Optional[str] = Field(None, alias="version")
 
-
     def as_write(self) -> CogniteSourceSystemWrite:
         """Convert this read version of Cognite source system to the writing version."""
         return CogniteSourceSystemWrite.model_validate(as_write_args(self))
-
 
 
 class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
@@ -157,7 +154,15 @@ class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
         tags: Text based labels for generic use, limited to 1000
         version_: Version identifier for the source system
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "manufacturer", "name", "tags", "version_",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "manufacturer",
+        "name",
+        "tags",
+        "version_",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
 
@@ -166,15 +171,14 @@ class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
     version_: Optional[str] = Field(None, alias="version")
 
 
-
 class CogniteSourceSystemList(DomainModelList[CogniteSourceSystem]):
     """List of Cognite source systems in the read version."""
 
     _INSTANCE = CogniteSourceSystem
+
     def as_write(self) -> CogniteSourceSystemWriteList:
         """Convert these read versions of Cognite source system to the writing versions."""
         return CogniteSourceSystemWriteList([node.as_write() for node in self.data])
-
 
 
 class CogniteSourceSystemWriteList(DomainModelWriteList[CogniteSourceSystemWrite]):
@@ -244,11 +248,11 @@ class _CogniteSourceSystemQuery(NodeQueryCore[T_DomainModelList, CogniteSourceSy
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -270,14 +274,16 @@ class _CogniteSourceSystemQuery(NodeQueryCore[T_DomainModelList, CogniteSourceSy
         self.manufacturer = StringFilter(self, self._view_id.as_property_ref("manufacturer"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.version_ = StringFilter(self, self._view_id.as_property_ref("version"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.manufacturer,
-            self.name,
-            self.version_,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.manufacturer,
+                self.name,
+                self.version_,
+            ]
+        )
 
     def list_cognite_source_system(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteSourceSystemList:
         return self._list(limit=limit)

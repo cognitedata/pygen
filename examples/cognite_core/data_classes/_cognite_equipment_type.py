@@ -33,7 +33,6 @@ from cognite_core.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
-    
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
@@ -49,8 +48,12 @@ __all__ = [
 ]
 
 
-CogniteEquipmentTypeTextFields = Literal["external_id", "aliases", "code", "description", "equipment_class", "name", "standard", "standard_reference", "tags"]
-CogniteEquipmentTypeFields = Literal["external_id", "aliases", "code", "description", "equipment_class", "name", "standard", "standard_reference", "tags"]
+CogniteEquipmentTypeTextFields = Literal[
+    "external_id", "aliases", "code", "description", "equipment_class", "name", "standard", "standard_reference", "tags"
+]
+CogniteEquipmentTypeFields = Literal[
+    "external_id", "aliases", "code", "description", "equipment_class", "name", "standard", "standard_reference", "tags"
+]
 
 _COGNITEEQUIPMENTTYPE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -106,8 +109,6 @@ class CogniteEquipmentTypeGraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> CogniteEquipmentType:
         """Convert this GraphQL format of Cognite equipment type to the reading format."""
         return CogniteEquipmentType.model_validate(as_read_args(self))
@@ -144,11 +145,9 @@ class CogniteEquipmentType(CogniteDescribableNode):
     standard: Optional[str] = None
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
-
     def as_write(self) -> CogniteEquipmentTypeWrite:
         """Convert this read version of Cognite equipment type to the writing version."""
         return CogniteEquipmentTypeWrite.model_validate(as_write_args(self))
-
 
 
 class CogniteEquipmentTypeWrite(CogniteDescribableNodeWrite):
@@ -169,7 +168,17 @@ class CogniteEquipmentTypeWrite(CogniteDescribableNodeWrite):
         standard_reference: A reference to the source of the equipment standard.
         tags: Text based labels for generic use, limited to 1000
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "code", "description", "equipment_class", "name", "standard", "standard_reference", "tags",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "code",
+        "description",
+        "equipment_class",
+        "name",
+        "standard",
+        "standard_reference",
+        "tags",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteEquipmentType", "v1")
 
@@ -180,15 +189,14 @@ class CogniteEquipmentTypeWrite(CogniteDescribableNodeWrite):
     standard_reference: Optional[str] = Field(None, alias="standardReference")
 
 
-
 class CogniteEquipmentTypeList(DomainModelList[CogniteEquipmentType]):
     """List of Cognite equipment types in the read version."""
 
     _INSTANCE = CogniteEquipmentType
+
     def as_write(self) -> CogniteEquipmentTypeWriteList:
         """Convert these read versions of Cognite equipment type to the writing versions."""
         return CogniteEquipmentTypeWriteList([node.as_write() for node in self.data])
-
 
 
 class CogniteEquipmentTypeWriteList(DomainModelWriteList[CogniteEquipmentTypeWrite]):
@@ -274,11 +282,11 @@ class _CogniteEquipmentTypeQuery(NodeQueryCore[T_DomainModelList, CogniteEquipme
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -302,16 +310,18 @@ class _CogniteEquipmentTypeQuery(NodeQueryCore[T_DomainModelList, CogniteEquipme
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.standard = StringFilter(self, self._view_id.as_property_ref("standard"))
         self.standard_reference = StringFilter(self, self._view_id.as_property_ref("standardReference"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.code,
-            self.description,
-            self.equipment_class,
-            self.name,
-            self.standard,
-            self.standard_reference,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.code,
+                self.description,
+                self.equipment_class,
+                self.name,
+                self.standard,
+                self.standard_reference,
+            ]
+        )
 
     def list_cognite_equipment_type(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteEquipmentTypeList:
         return self._list(limit=limit)

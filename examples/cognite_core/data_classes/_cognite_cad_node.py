@@ -36,10 +36,29 @@ from cognite_core.data_classes._core import (
     DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_3_d_object import Cognite3DObject, Cognite3DObjectList, Cognite3DObjectGraphQL, Cognite3DObjectWrite, Cognite3DObjectWriteList
-    from cognite_core.data_classes._cognite_cad_model import CogniteCADModel, CogniteCADModelList, CogniteCADModelGraphQL, CogniteCADModelWrite, CogniteCADModelWriteList
-    from cognite_core.data_classes._cognite_cad_revision import CogniteCADRevision, CogniteCADRevisionList, CogniteCADRevisionGraphQL, CogniteCADRevisionWrite, CogniteCADRevisionWriteList
+    from cognite_core.data_classes._cognite_3_d_object import (
+        Cognite3DObject,
+        Cognite3DObjectList,
+        Cognite3DObjectGraphQL,
+        Cognite3DObjectWrite,
+        Cognite3DObjectWriteList,
+    )
+    from cognite_core.data_classes._cognite_cad_model import (
+        CogniteCADModel,
+        CogniteCADModelList,
+        CogniteCADModelGraphQL,
+        CogniteCADModelWrite,
+        CogniteCADModelWriteList,
+    )
+    from cognite_core.data_classes._cognite_cad_revision import (
+        CogniteCADRevision,
+        CogniteCADRevisionList,
+        CogniteCADRevisionGraphQL,
+        CogniteCADRevisionWrite,
+        CogniteCADRevisionWriteList,
+    )
 
 
 __all__ = [
@@ -54,7 +73,9 @@ __all__ = [
 
 
 CogniteCADNodeTextFields = Literal["external_id", "aliases", "cad_node_reference", "description", "name", "tags"]
-CogniteCADNodeFields = Literal["external_id", "aliases", "cad_node_reference", "description", "name", "sub_tree_sizes", "tags", "tree_indexes"]
+CogniteCADNodeFields = Literal[
+    "external_id", "aliases", "cad_node_reference", "description", "name", "sub_tree_sizes", "tags", "tree_indexes"
+]
 
 _COGNITECADNODE_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -115,7 +136,6 @@ class CogniteCADNodeGraphQL(GraphQLCore, protected_namespaces=()):
             )
         return values
 
-
     @field_validator("model_3d", "object_3d", "revisions", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -165,6 +185,7 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
     revisions: Optional[list[Union[CogniteCADRevision, str, dm.NodeId]]] = Field(default=None, repr=False)
     sub_tree_sizes: Optional[list[int]] = Field(None, alias="subTreeSizes")
     tree_indexes: Optional[list[int]] = Field(None, alias="treeIndexes")
+
     @field_validator("model_3d", "object_3d", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
@@ -180,7 +201,6 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
     def as_write(self) -> CogniteCADNodeWrite:
         """Convert this read version of Cognite cad node to the writing version."""
         return CogniteCADNodeWrite.model_validate(as_write_args(self))
-
 
 
 class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
@@ -205,8 +225,24 @@ class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
         tree_indexes: List of tree indexes in the same order as revisions. Used by Reveal and similar applications to
             map from CogniteCADNode to tree index
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "cad_node_reference", "description", "model_3d", "name", "object_3d", "revisions", "sub_tree_sizes", "tags", "tree_indexes",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("model_3d", "object_3d", "revisions",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "cad_node_reference",
+        "description",
+        "model_3d",
+        "name",
+        "object_3d",
+        "revisions",
+        "sub_tree_sizes",
+        "tags",
+        "tree_indexes",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "object_3d",
+        "revisions",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCADNode", "v1")
 
@@ -233,42 +269,62 @@ class CogniteCADNodeList(DomainModelList[CogniteCADNode]):
     """List of Cognite cad nodes in the read version."""
 
     _INSTANCE = CogniteCADNode
+
     def as_write(self) -> CogniteCADNodeWriteList:
         """Convert these read versions of Cognite cad node to the writing versions."""
         return CogniteCADNodeWriteList([node.as_write() for node in self.data])
 
-
     @property
     def model_3d(self) -> CogniteCADModelList:
         from ._cognite_cad_model import CogniteCADModel, CogniteCADModelList
+
         return CogniteCADModelList([item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModel)])
+
     @property
     def object_3d(self) -> Cognite3DObjectList:
         from ._cognite_3_d_object import Cognite3DObject, Cognite3DObjectList
-        return Cognite3DObjectList([item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObject)])
+
+        return Cognite3DObjectList(
+            [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObject)]
+        )
+
     @property
     def revisions(self) -> CogniteCADRevisionList:
         from ._cognite_cad_revision import CogniteCADRevision, CogniteCADRevisionList
-        return CogniteCADRevisionList([item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevision)])
+
+        return CogniteCADRevisionList(
+            [item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevision)]
+        )
 
 
 class CogniteCADNodeWriteList(DomainModelWriteList[CogniteCADNodeWrite]):
     """List of Cognite cad nodes in the writing version."""
 
     _INSTANCE = CogniteCADNodeWrite
+
     @property
     def model_3d(self) -> CogniteCADModelWriteList:
         from ._cognite_cad_model import CogniteCADModelWrite, CogniteCADModelWriteList
-        return CogniteCADModelWriteList([item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModelWrite)])
+
+        return CogniteCADModelWriteList(
+            [item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModelWrite)]
+        )
+
     @property
     def object_3d(self) -> Cognite3DObjectWriteList:
         from ._cognite_3_d_object import Cognite3DObjectWrite, Cognite3DObjectWriteList
-        return Cognite3DObjectWriteList([item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)])
+
+        return Cognite3DObjectWriteList(
+            [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)]
+        )
+
     @property
     def revisions(self) -> CogniteCADRevisionWriteList:
         from ._cognite_cad_revision import CogniteCADRevisionWrite, CogniteCADRevisionWriteList
-        return CogniteCADRevisionWriteList([item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevisionWrite)])
 
+        return CogniteCADRevisionWriteList(
+            [item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevisionWrite)]
+        )
 
 
 def _create_cognite_cad_node_filter(
@@ -277,11 +333,32 @@ def _create_cognite_cad_node_filter(
     cad_node_reference_prefix: str | None = None,
     description: str | list[str] | None = None,
     description_prefix: str | None = None,
-    model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    model_3d: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    object_3d: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    revisions: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -302,7 +379,9 @@ def _create_cognite_cad_node_filter(
     if isinstance(model_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(model_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("model3D"), value=as_instance_dict_id(model_3d)))
     if model_3d and isinstance(model_3d, Sequence) and not isinstance(model_3d, str) and not is_tuple_id(model_3d):
-        filters.append(dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d])
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -312,11 +391,17 @@ def _create_cognite_cad_node_filter(
     if isinstance(object_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(object_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("object3D"), value=as_instance_dict_id(object_3d)))
     if object_3d and isinstance(object_3d, Sequence) and not isinstance(object_3d, str) and not is_tuple_id(object_3d):
-        filters.append(dm.filters.In(view_id.as_property_ref("object3D"), values=[as_instance_dict_id(item) for item in object_3d]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("object3D"), values=[as_instance_dict_id(item) for item in object_3d])
+        )
     if isinstance(revisions, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(revisions):
         filters.append(dm.filters.Equals(view_id.as_property_ref("revisions"), value=as_instance_dict_id(revisions)))
     if revisions and isinstance(revisions, Sequence) and not isinstance(revisions, str) and not is_tuple_id(revisions):
-        filters.append(dm.filters.In(view_id.as_property_ref("revisions"), values=[as_instance_dict_id(item) for item in revisions]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("revisions"), values=[as_instance_dict_id(item) for item in revisions]
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -339,11 +424,11 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_3_d_object import _Cognite3DObjectQuery
         from ._cognite_cad_model import _CogniteCADModelQuery
@@ -411,15 +496,17 @@ class _CogniteCADNodeQuery(NodeQueryCore[T_DomainModelList, CogniteCADNodeList])
         self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.object_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("object3D"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.cad_node_reference,
-            self.description,
-            self.model_3d_filter,
-            self.name,
-            self.object_3d_filter,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.cad_node_reference,
+                self.description,
+                self.model_3d_filter,
+                self.name,
+                self.object_3d_filter,
+            ]
+        )
 
     def list_cognite_cad_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteCADNodeList:
         return self._list(limit=limit)

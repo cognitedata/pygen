@@ -44,7 +44,11 @@ from omni.data_classes import (
 )
 
 
-class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList, CDFExternalReferencesWriteList]):
+class CDFExternalReferencesAPI(
+    NodeAPI[
+        CDFExternalReferences, CDFExternalReferencesWrite, CDFExternalReferencesList, CDFExternalReferencesWriteList
+    ]
+):
     _view_id = dm.ViewId("sp_pygen_models", "CDFExternalReferences", "1")
     _properties_by_field: ClassVar[dict[str, str]] = _CDFEXTERNALREFERENCES_PROPERTIES_BY_FIELD
     _class_type = CDFExternalReferences
@@ -53,7 +57,6 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -185,9 +188,11 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields],
         property: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields] | None = None,
         external_id_prefix: str | None = None,
@@ -198,9 +203,11 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields] | None = None,
         property: CDFExternalReferencesFields | SequenceNotStr[CDFExternalReferencesFields] | None = None,
         external_id_prefix: str | None = None,
@@ -308,13 +315,15 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         return builder.build()
 
     def iterate(
@@ -433,6 +442,5 @@ class CDFExternalReferencesAPI(NodeAPI[CDFExternalReferences, CDFExternalReferen
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit,  filter=filter_, sort=sort_input)
-
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

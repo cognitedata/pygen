@@ -45,7 +45,9 @@ from cognite_core.data_classes import (
 )
 
 
-class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWrite, CogniteVisualizableList, CogniteVisualizableWriteList]):
+class CogniteVisualizableAPI(
+    NodeAPI[CogniteVisualizable, CogniteVisualizableWrite, CogniteVisualizableList, CogniteVisualizableWriteList]
+):
     _view_id = dm.ViewId("cdf_cdm", "CogniteVisualizable", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = {}
     _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
@@ -57,7 +59,6 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -111,17 +112,21 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
 
         """
         return self._retrieve(
-            external_id,
-            space,
-            retrieve_connections=retrieve_connections,
-            as_child_class=as_child_class
+            external_id, space, retrieve_connections=retrieve_connections, as_child_class=as_child_class
         )
 
     def search(
         self,
         query: str,
         properties: CogniteVisualizableTextFields | SequenceNotStr[CogniteVisualizableTextFields] | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -185,7 +190,14 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
         aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
         property: CogniteVisualizableFields | SequenceNotStr[CogniteVisualizableFields] | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -198,7 +210,14 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
         aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: None = None,
         property: CogniteVisualizableFields | SequenceNotStr[CogniteVisualizableFields] | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -208,12 +227,21 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteVisualizableFields | SequenceNotStr[CogniteVisualizableFields],
         property: CogniteVisualizableFields | SequenceNotStr[CogniteVisualizableFields] | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -222,12 +250,21 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteVisualizableFields | SequenceNotStr[CogniteVisualizableFields] | None = None,
         property: CogniteVisualizableFields | SequenceNotStr[CogniteVisualizableFields] | None = None,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -285,7 +322,14 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
         self,
         property: CogniteVisualizableFields,
         interval: float,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -338,12 +382,14 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
@@ -357,7 +403,14 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
     def iterate(
         self,
         chunk_size: int = DEFAULT_CHUNK_SIZE,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
@@ -436,7 +489,14 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
 
     def list(
         self,
-        object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        object_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -477,6 +537,5 @@ class CogniteVisualizableAPI(NodeAPI[CogniteVisualizable, CogniteVisualizableWri
             filter,
         )
         if retrieve_connections == "skip":
-            return self._list(limit=limit,  filter=filter_)
+            return self._list(limit=limit, filter=filter_)
         return self._query(filter_, limit, retrieve_connections, None, "list")
-

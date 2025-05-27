@@ -45,7 +45,14 @@ from omni.data_classes import (
 )
 
 
-class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequiredListedWrite, PrimitiveRequiredListedList, PrimitiveRequiredListedWriteList]):
+class PrimitiveRequiredListedAPI(
+    NodeAPI[
+        PrimitiveRequiredListed,
+        PrimitiveRequiredListedWrite,
+        PrimitiveRequiredListedList,
+        PrimitiveRequiredListedWriteList,
+    ]
+):
     _view_id = dm.ViewId("sp_pygen_models", "PrimitiveRequiredListed", "1")
     _properties_by_field: ClassVar[dict[str, str]] = _PRIMITIVEREQUIREDLISTED_PROPERTIES_BY_FIELD
     _class_type = PrimitiveRequiredListed
@@ -54,7 +61,6 @@ class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequi
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -166,7 +172,9 @@ class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequi
         group_by: None = None,
         property: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None = None,
+        search_property: (
+            PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -180,7 +188,9 @@ class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequi
         group_by: None = None,
         property: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None = None,
+        search_property: (
+            PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -190,13 +200,17 @@ class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequi
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields],
         property: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None = None,
+        search_property: (
+            PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -205,13 +219,17 @@ class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequi
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields] | None = None,
         property: PrimitiveRequiredListedFields | SequenceNotStr[PrimitiveRequiredListedFields] | None = None,
         query: str | None = None,
-        search_property: PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None = None,
+        search_property: (
+            PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -270,7 +288,9 @@ class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequi
         property: PrimitiveRequiredListedFields,
         interval: float,
         query: str | None = None,
-        search_property: PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None = None,
+        search_property: (
+            PrimitiveRequiredListedTextFields | SequenceNotStr[PrimitiveRequiredListedTextFields] | None
+        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -323,13 +343,15 @@ class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequi
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         return builder.build()
 
     def iterate(
@@ -448,6 +470,5 @@ class PrimitiveRequiredListedAPI(NodeAPI[PrimitiveRequiredListed, PrimitiveRequi
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit,  filter=filter_, sort=sort_input)
-
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

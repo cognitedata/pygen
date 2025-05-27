@@ -38,8 +38,15 @@ from cognite_core.data_classes._core import (
     IntFilter,
 )
 from cognite_core.data_classes._cognite_3_d_revision import Cognite3DRevision, Cognite3DRevisionWrite
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_cad_model import CogniteCADModel, CogniteCADModelList, CogniteCADModelGraphQL, CogniteCADModelWrite, CogniteCADModelWriteList
+    from cognite_core.data_classes._cognite_cad_model import (
+        CogniteCADModel,
+        CogniteCADModelList,
+        CogniteCADModelGraphQL,
+        CogniteCADModelWrite,
+        CogniteCADModelWriteList,
+    )
 
 
 __all__ = [
@@ -52,7 +59,7 @@ __all__ = [
 ]
 
 
-CogniteCADRevisionTextFields = Literal["external_id", ]
+CogniteCADRevisionTextFields = Literal["external_id",]
 CogniteCADRevisionFields = Literal["external_id", "published", "revision_id", "status", "type_"]
 
 _COGNITECADREVISION_PROPERTIES_BY_FIELD = {
@@ -99,7 +106,6 @@ class CogniteCADRevisionGraphQL(GraphQLCore, protected_namespaces=()):
             )
         return values
 
-
     @field_validator("model_3d", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -138,16 +144,15 @@ class CogniteCADRevision(Cognite3DRevision, protected_namespaces=()):
     node_type: Union[dm.DirectRelationReference, None] = None
     model_3d: Union[CogniteCADModel, str, dm.NodeId, None] = Field(default=None, repr=False, alias="model3D")
     revision_id: Optional[int] = Field(None, alias="revisionId")
+
     @field_validator("model_3d", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-
     def as_write(self) -> CogniteCADRevisionWrite:
         """Convert this read version of Cognite cad revision to the writing version."""
         return CogniteCADRevisionWrite.model_validate(as_write_args(self))
-
 
 
 class CogniteCADRevisionWrite(Cognite3DRevisionWrite, protected_namespaces=()):
@@ -165,7 +170,14 @@ class CogniteCADRevisionWrite(Cognite3DRevisionWrite, protected_namespaces=()):
         status: The status field.
         type_: The type field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("model_3d", "published", "revision_id", "status", "type_",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "published",
+        "revision_id",
+        "status",
+        "type_",
+    )
     _direct_relations: ClassVar[tuple[str, ...]] = ("model_3d",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteCADRevision", "v1")
@@ -189,33 +201,50 @@ class CogniteCADRevisionList(DomainModelList[CogniteCADRevision]):
     """List of Cognite cad revisions in the read version."""
 
     _INSTANCE = CogniteCADRevision
+
     def as_write(self) -> CogniteCADRevisionWriteList:
         """Convert these read versions of Cognite cad revision to the writing versions."""
         return CogniteCADRevisionWriteList([node.as_write() for node in self.data])
 
-
     @property
     def model_3d(self) -> CogniteCADModelList:
         from ._cognite_cad_model import CogniteCADModel, CogniteCADModelList
+
         return CogniteCADModelList([item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModel)])
+
 
 class CogniteCADRevisionWriteList(DomainModelWriteList[CogniteCADRevisionWrite]):
     """List of Cognite cad revisions in the writing version."""
 
     _INSTANCE = CogniteCADRevisionWrite
+
     @property
     def model_3d(self) -> CogniteCADModelWriteList:
         from ._cognite_cad_model import CogniteCADModelWrite, CogniteCADModelWriteList
-        return CogniteCADModelWriteList([item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModelWrite)])
+
+        return CogniteCADModelWriteList(
+            [item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModelWrite)]
+        )
 
 
 def _create_cognite_cad_revision_filter(
     view_id: dm.ViewId,
-    model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    model_3d: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     published: bool | None = None,
     min_revision_id: int | None = None,
     max_revision_id: int | None = None,
-    status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+    status: (
+        Literal["Done", "Failed", "Processing", "Queued"]
+        | list[Literal["Done", "Failed", "Processing", "Queued"]]
+        | None
+    ) = None,
     type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -225,11 +254,15 @@ def _create_cognite_cad_revision_filter(
     if isinstance(model_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(model_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("model3D"), value=as_instance_dict_id(model_3d)))
     if model_3d and isinstance(model_3d, Sequence) and not isinstance(model_3d, str) and not is_tuple_id(model_3d):
-        filters.append(dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d])
+        )
     if isinstance(published, bool):
         filters.append(dm.filters.Equals(view_id.as_property_ref("published"), value=published))
     if min_revision_id is not None or max_revision_id is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("revisionId"), gte=min_revision_id, lte=max_revision_id))
+        filters.append(
+            dm.filters.Range(view_id.as_property_ref("revisionId"), gte=min_revision_id, lte=max_revision_id)
+        )
     if isinstance(status, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("status"), value=status))
     if status and isinstance(status, list):
@@ -260,11 +293,11 @@ class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisi
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_cad_model import _CogniteCADModelQuery
 
@@ -300,13 +333,15 @@ class _CogniteCADRevisionQuery(NodeQueryCore[T_DomainModelList, CogniteCADRevisi
         self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.published = BooleanFilter(self, self._view_id.as_property_ref("published"))
         self.revision_id = IntFilter(self, self._view_id.as_property_ref("revisionId"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.model_3d_filter,
-            self.published,
-            self.revision_id,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.model_3d_filter,
+                self.published,
+                self.revision_id,
+            ]
+        )
 
     def list_cognite_cad_revision(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteCADRevisionList:
         return self._list(limit=limit)

@@ -37,20 +37,28 @@ from wind_turbine.data_classes._core import (
 )
 from wind_turbine.data_classes._wind_turbine import WindTurbineWrite
 from wind_turbine.data_classes._metmast import Metmast, MetmastGraphQL, MetmastWrite
+
 if TYPE_CHECKING:
     from wind_turbine.data_classes._metmast import Metmast, MetmastGraphQL, MetmastWrite
     from wind_turbine.data_classes._wind_turbine import WindTurbine, WindTurbineGraphQL, WindTurbineWrite
 
 
 __all__ = [
-    "Distance",    "DistanceWrite",    "DistanceList",    "DistanceWriteList",    "DistanceFields",]
+    "Distance",
+    "DistanceWrite",
+    "DistanceList",
+    "DistanceWriteList",
+    "DistanceFields",
+]
 
 
-DistanceTextFields = Literal["external_id", ]
+DistanceTextFields = Literal["external_id",]
 DistanceFields = Literal["external_id", "distance"]
-_DISTANCE_PROPERTIES_BY_FIELD = {    "external_id": "externalId",
+_DISTANCE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "distance": "distance",
 }
+
 
 class DistanceGraphQL(GraphQLCore):
     """This represents the reading version of distance, used
@@ -65,6 +73,7 @@ class DistanceGraphQL(GraphQLCore):
         end_node: The end node of this edge.
         distance: The distance field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Distance", "1")
     end_node: Union[MetmastGraphQL, WindTurbineGraphQL, None] = Field(None, alias="endNode")
     distance: Optional[float] = None
@@ -90,18 +99,21 @@ class Distance(DomainRelation):
         end_node: The end node of this edge.
         distance: The distance field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_power", "Distance", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[Metmast, WindTurbine, str, dm.NodeId] = Field(alias="endNode")
     distance: Optional[float] = None
-
 
     def as_write(self) -> DistanceWrite:
         """Convert this read version of distance to the writing version."""
         return DistanceWrite.model_validate(as_write_args(self))
 
 
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {    MetmastWrite: {WindTurbineWrite},}
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
+    MetmastWrite: {WindTurbineWrite},
+}
+
 
 def _validate_end_node(
     start_node: DomainModelWrite, end_node: Union[MetmastWrite, WindTurbineWrite, str, dm.NodeId]
@@ -133,6 +145,7 @@ class DistanceWrite(DomainRelationWrite):
         end_node: The end node of this edge.
         distance: The distance field.
     """
+
     _container_fields: ClassVar[tuple[str, ...]] = ("distance",)
     _validate_end_node = _validate_end_node
 
@@ -145,10 +158,10 @@ class DistanceList(DomainRelationList[Distance]):
     """List of distances in the reading version."""
 
     _INSTANCE = Distance
+
     def as_write(self) -> DistanceWriteList:
         """Convert this read version of distance list to the writing version."""
         return DistanceWriteList([edge.as_write() for edge in self])
-
 
 
 class DistanceWriteList(DomainRelationWriteList[DistanceWrite]):
@@ -190,9 +203,12 @@ def _create_distance_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[                    {"space": start_node_space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                values=[
+                    (
+                        {"space": start_node_space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in start_node
                 ],
             )
@@ -207,9 +223,12 @@ def _create_distance_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[                    {"space": space_end_node, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                values=[
+                    (
+                        {"space": space_end_node, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in end_node
                 ],
             )
@@ -239,14 +258,23 @@ class _DistanceQuery(EdgeQueryCore[T_DomainList, DistanceList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
     ):
         from ._metmast import _MetmastQuery
         from ._wind_turbine import _WindTurbineQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -254,14 +282,16 @@ class _DistanceQuery(EdgeQueryCore[T_DomainList, DistanceList]):
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
-                connection_property=ViewPropertyId(self._view_id, "end_node")
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.distance = FloatFilter(self, self._view_id.as_property_ref("distance"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.distance,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.distance,
+            ]
+        )

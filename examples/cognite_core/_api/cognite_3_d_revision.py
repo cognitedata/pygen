@@ -48,7 +48,9 @@ from cognite_core.data_classes import (
 )
 
 
-class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Cognite3DRevisionList, Cognite3DRevisionWriteList]):
+class Cognite3DRevisionAPI(
+    NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Cognite3DRevisionList, Cognite3DRevisionWriteList]
+):
     _view_id = dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITE3DREVISION_PROPERTIES_BY_FIELD
     _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
@@ -63,13 +65,15 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
 
-
     @overload
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]] | None = None,
+        as_child_class: (
+            SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]]
+            | None
+        ) = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DRevision | None: ...
 
@@ -78,7 +82,10 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
         self,
         external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]] | None = None,
+        as_child_class: (
+            SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]]
+            | None
+        ) = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DRevisionList: ...
 
@@ -86,7 +93,10 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
-        as_child_class: SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]] | None = None,
+        as_child_class: (
+            SequenceNotStr[Literal["Cognite360ImageCollection", "CogniteCADRevision", "CognitePointCloudRevision"]]
+            | None
+        ) = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> Cognite3DRevision | Cognite3DRevisionList | None:
         """Retrieve one or more Cognite 3D revisions by id(s).
@@ -116,19 +126,27 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
 
         """
         return self._retrieve(
-            external_id,
-            space,
-            retrieve_connections=retrieve_connections,
-            as_child_class=as_child_class
+            external_id, space, retrieve_connections=retrieve_connections, as_child_class=as_child_class
         )
 
     def search(
         self,
         query: str,
         properties: Cognite3DRevisionTextFields | SequenceNotStr[Cognite3DRevisionTextFields] | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -199,9 +217,20 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
         aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
         property: Cognite3DRevisionFields | SequenceNotStr[Cognite3DRevisionFields] | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -215,9 +244,20 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
         aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: None = None,
         property: Cognite3DRevisionFields | SequenceNotStr[Cognite3DRevisionFields] | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -228,14 +268,27 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Cognite3DRevisionFields | SequenceNotStr[Cognite3DRevisionFields],
         property: Cognite3DRevisionFields | SequenceNotStr[Cognite3DRevisionFields] | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -245,14 +298,27 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: Cognite3DRevisionFields | SequenceNotStr[Cognite3DRevisionFields] | None = None,
         property: Cognite3DRevisionFields | SequenceNotStr[Cognite3DRevisionFields] | None = None,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -317,9 +383,20 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
         self,
         property: Cognite3DRevisionFields,
         interval: float,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -379,13 +456,15 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
@@ -399,9 +478,20 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
     def iterate(
         self,
         chunk_size: int = DEFAULT_CHUNK_SIZE,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -487,9 +577,20 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
 
     def list(
         self,
-        model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+        model_3d: (
+            str
+            | tuple[str, str]
+            | dm.NodeId
+            | dm.DirectRelationReference
+            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+            | None
+        ) = None,
         published: bool | None = None,
-        status: Literal["Done", "Failed", "Processing", "Queued"] | list[Literal["Done", "Failed", "Processing", "Queued"]] | None = None,
+        status: (
+            Literal["Done", "Failed", "Processing", "Queued"]
+            | list[Literal["Done", "Failed", "Processing", "Queued"]]
+            | None
+        ) = None,
         type_: Literal["CAD", "Image360", "PointCloud"] | list[Literal["CAD", "Image360", "PointCloud"]] | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
@@ -544,8 +645,7 @@ class Cognite3DRevisionAPI(NodeAPI[Cognite3DRevision, Cognite3DRevisionWrite, Co
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
         if retrieve_connections == "skip":
-            return self._list(limit=limit,  filter=filter_, sort=sort_input)
+            return self._list(limit=limit, filter=filter_, sort=sort_input)
         return self._query(filter_, limit, retrieve_connections, sort_input, "list")
-

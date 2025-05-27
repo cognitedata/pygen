@@ -44,7 +44,9 @@ from cognite_core.data_classes import (
 )
 
 
-class CogniteFileCategoryAPI(NodeAPI[CogniteFileCategory, CogniteFileCategoryWrite, CogniteFileCategoryList, CogniteFileCategoryWriteList]):
+class CogniteFileCategoryAPI(
+    NodeAPI[CogniteFileCategory, CogniteFileCategoryWrite, CogniteFileCategoryList, CogniteFileCategoryWriteList]
+):
     _view_id = dm.ViewId("cdf_cdm", "CogniteFileCategory", "v1")
     _properties_by_field: ClassVar[dict[str, str]] = _COGNITEFILECATEGORY_PROPERTIES_BY_FIELD
     _class_type = CogniteFileCategory
@@ -53,7 +55,6 @@ class CogniteFileCategoryAPI(NodeAPI[CogniteFileCategory, CogniteFileCategoryWri
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
-
 
     @overload
     def retrieve(
@@ -239,9 +240,11 @@ class CogniteFileCategoryAPI(NodeAPI[CogniteFileCategory, CogniteFileCategoryWri
     @overload
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteFileCategoryFields | SequenceNotStr[CogniteFileCategoryFields],
         property: CogniteFileCategoryFields | SequenceNotStr[CogniteFileCategoryFields] | None = None,
         query: str | None = None,
@@ -264,9 +267,11 @@ class CogniteFileCategoryAPI(NodeAPI[CogniteFileCategory, CogniteFileCategoryWri
 
     def aggregate(
         self,
-        aggregate: Aggregations
-        | dm.aggregations.MetricAggregation
-        | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
+        aggregate: (
+            Aggregations
+            | dm.aggregations.MetricAggregation
+            | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
+        ),
         group_by: CogniteFileCategoryFields | SequenceNotStr[CogniteFileCategoryFields] | None = None,
         property: CogniteFileCategoryFields | SequenceNotStr[CogniteFileCategoryFields] | None = None,
         query: str | None = None,
@@ -442,13 +447,15 @@ class CogniteFileCategoryAPI(NodeAPI[CogniteFileCategory, CogniteFileCategoryWri
     ) -> QueryExecutor:
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(builder.create_name, view_id=self._view_id, edge_connection_property="end_node")
-        builder.append(factory.root(
-            filter=filter_,
-            sort=sort,
-            limit=limit,
-            max_retrieve_batch_limit=chunk_size,
-            has_container_fields=True,
-        ))
+        builder.append(
+            factory.root(
+                filter=filter_,
+                sort=sort,
+                limit=limit,
+                max_retrieve_batch_limit=chunk_size,
+                has_container_fields=True,
+            )
+        )
         return builder.build()
 
     def iterate(
@@ -627,6 +634,5 @@ class CogniteFileCategoryAPI(NodeAPI[CogniteFileCategory, CogniteFileCategoryWri
             space,
             filter,
         )
-        sort_input =  self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        return self._list(limit=limit,  filter=filter_, sort=sort_input)
-
+        sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

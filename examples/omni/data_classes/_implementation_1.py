@@ -33,7 +33,6 @@ from omni.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
-    
 )
 from omni.data_classes._sub_interface import SubInterface, SubInterfaceWrite
 
@@ -94,8 +93,6 @@ class Implementation1GraphQL(GraphQLCore):
             )
         return values
 
-
-
     def as_read(self) -> Implementation1:
         """Convert this GraphQL format of implementation 1 to the reading format."""
         return Implementation1.model_validate(as_read_args(self))
@@ -122,15 +119,15 @@ class Implementation1(SubInterface):
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
 
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("sp_pygen_models", "Implementation1")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "Implementation1"
+    )
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
-
 
     def as_write(self) -> Implementation1Write:
         """Convert this read version of implementation 1 to the writing version."""
         return Implementation1Write.model_validate(as_write_args(self))
-
 
 
 class Implementation1Write(SubInterfaceWrite):
@@ -147,24 +144,31 @@ class Implementation1Write(SubInterfaceWrite):
         value_1: The value 1 field.
         value_2: The value 2 field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("main_value", "sub_value", "value_1", "value_2",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "main_value",
+        "sub_value",
+        "value_1",
+        "value_2",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
 
-    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference("sp_pygen_models", "Implementation1")
+    node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
+        "sp_pygen_models", "Implementation1"
+    )
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
-
 
 
 class Implementation1List(DomainModelList[Implementation1]):
     """List of implementation 1 in the read version."""
 
     _INSTANCE = Implementation1
+
     def as_write(self) -> Implementation1WriteList:
         """Convert these read versions of implementation 1 to the writing versions."""
         return Implementation1WriteList([node.as_write() for node in self.data])
-
 
 
 class Implementation1WriteList(DomainModelWriteList[Implementation1Write]):
@@ -234,11 +238,11 @@ class _Implementation1Query(NodeQueryCore[T_DomainModelList, Implementation1List
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
 
         super().__init__(
@@ -260,14 +264,16 @@ class _Implementation1Query(NodeQueryCore[T_DomainModelList, Implementation1List
         self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
         self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.main_value,
-            self.sub_value,
-            self.value_1,
-            self.value_2,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.main_value,
+                self.sub_value,
+                self.value_1,
+                self.value_2,
+            ]
+        )
 
     def list_implementation_1(self, limit: int = DEFAULT_QUERY_LIMIT) -> Implementation1List:
         return self._list(limit=limit)

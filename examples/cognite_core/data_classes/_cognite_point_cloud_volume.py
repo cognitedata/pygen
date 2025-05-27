@@ -36,10 +36,29 @@ from cognite_core.data_classes._core import (
     DirectRelationFilter,
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
+
 if TYPE_CHECKING:
-    from cognite_core.data_classes._cognite_3_d_object import Cognite3DObject, Cognite3DObjectList, Cognite3DObjectGraphQL, Cognite3DObjectWrite, Cognite3DObjectWriteList
-    from cognite_core.data_classes._cognite_cad_model import CogniteCADModel, CogniteCADModelList, CogniteCADModelGraphQL, CogniteCADModelWrite, CogniteCADModelWriteList
-    from cognite_core.data_classes._cognite_cad_revision import CogniteCADRevision, CogniteCADRevisionList, CogniteCADRevisionGraphQL, CogniteCADRevisionWrite, CogniteCADRevisionWriteList
+    from cognite_core.data_classes._cognite_3_d_object import (
+        Cognite3DObject,
+        Cognite3DObjectList,
+        Cognite3DObjectGraphQL,
+        Cognite3DObjectWrite,
+        Cognite3DObjectWriteList,
+    )
+    from cognite_core.data_classes._cognite_cad_model import (
+        CogniteCADModel,
+        CogniteCADModelList,
+        CogniteCADModelGraphQL,
+        CogniteCADModelWrite,
+        CogniteCADModelWriteList,
+    )
+    from cognite_core.data_classes._cognite_cad_revision import (
+        CogniteCADRevision,
+        CogniteCADRevisionList,
+        CogniteCADRevisionGraphQL,
+        CogniteCADRevisionWrite,
+        CogniteCADRevisionWriteList,
+    )
 
 
 __all__ = [
@@ -53,8 +72,20 @@ __all__ = [
 ]
 
 
-CognitePointCloudVolumeTextFields = Literal["external_id", "aliases", "description", "format_version", "name", "tags", "volume_references"]
-CognitePointCloudVolumeFields = Literal["external_id", "aliases", "description", "format_version", "name", "tags", "volume", "volume_references", "volume_type"]
+CognitePointCloudVolumeTextFields = Literal[
+    "external_id", "aliases", "description", "format_version", "name", "tags", "volume_references"
+]
+CognitePointCloudVolumeFields = Literal[
+    "external_id",
+    "aliases",
+    "description",
+    "format_version",
+    "name",
+    "tags",
+    "volume",
+    "volume_references",
+    "volume_type",
+]
 
 _COGNITEPOINTCLOUDVOLUME_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
@@ -117,7 +148,6 @@ class CognitePointCloudVolumeGraphQL(GraphQLCore, protected_namespaces=()):
             )
         return values
 
-
     @field_validator("model_3d", "object_3d", "revisions", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
@@ -168,6 +198,7 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
     volume: Optional[list[float]] = None
     volume_references: Optional[list[str]] = Field(None, alias="volumeReferences")
     volume_type: Optional[Literal["Box", "Cylinder"]] | str = Field(None, alias="volumeType")
+
     @field_validator("model_3d", "object_3d", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
@@ -183,7 +214,6 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
     def as_write(self) -> CognitePointCloudVolumeWrite:
         """Convert this read version of Cognite point cloud volume to the writing version."""
         return CognitePointCloudVolumeWrite.model_validate(as_write_args(self))
-
 
 
 class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
@@ -208,8 +238,25 @@ class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namesp
         volume_references: Unique volume metric hashes used to access the 3D specialized data storage
         volume_type: Type of volume (Cylinder or Box)
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("aliases", "description", "format_version", "model_3d", "name", "object_3d", "revisions", "tags", "volume", "volume_references", "volume_type",)
-    _direct_relations: ClassVar[tuple[str, ...]] = ("model_3d", "object_3d", "revisions",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "format_version",
+        "model_3d",
+        "name",
+        "object_3d",
+        "revisions",
+        "tags",
+        "volume",
+        "volume_references",
+        "volume_type",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "model_3d",
+        "object_3d",
+        "revisions",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudVolume", "v1")
 
@@ -237,42 +284,62 @@ class CognitePointCloudVolumeList(DomainModelList[CognitePointCloudVolume]):
     """List of Cognite point cloud volumes in the read version."""
 
     _INSTANCE = CognitePointCloudVolume
+
     def as_write(self) -> CognitePointCloudVolumeWriteList:
         """Convert these read versions of Cognite point cloud volume to the writing versions."""
         return CognitePointCloudVolumeWriteList([node.as_write() for node in self.data])
 
-
     @property
     def model_3d(self) -> CogniteCADModelList:
         from ._cognite_cad_model import CogniteCADModel, CogniteCADModelList
+
         return CogniteCADModelList([item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModel)])
+
     @property
     def object_3d(self) -> Cognite3DObjectList:
         from ._cognite_3_d_object import Cognite3DObject, Cognite3DObjectList
-        return Cognite3DObjectList([item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObject)])
+
+        return Cognite3DObjectList(
+            [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObject)]
+        )
+
     @property
     def revisions(self) -> CogniteCADRevisionList:
         from ._cognite_cad_revision import CogniteCADRevision, CogniteCADRevisionList
-        return CogniteCADRevisionList([item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevision)])
+
+        return CogniteCADRevisionList(
+            [item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevision)]
+        )
 
 
 class CognitePointCloudVolumeWriteList(DomainModelWriteList[CognitePointCloudVolumeWrite]):
     """List of Cognite point cloud volumes in the writing version."""
 
     _INSTANCE = CognitePointCloudVolumeWrite
+
     @property
     def model_3d(self) -> CogniteCADModelWriteList:
         from ._cognite_cad_model import CogniteCADModelWrite, CogniteCADModelWriteList
-        return CogniteCADModelWriteList([item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModelWrite)])
+
+        return CogniteCADModelWriteList(
+            [item.model_3d for item in self.data if isinstance(item.model_3d, CogniteCADModelWrite)]
+        )
+
     @property
     def object_3d(self) -> Cognite3DObjectWriteList:
         from ._cognite_3_d_object import Cognite3DObjectWrite, Cognite3DObjectWriteList
-        return Cognite3DObjectWriteList([item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)])
+
+        return Cognite3DObjectWriteList(
+            [item.object_3d for item in self.data if isinstance(item.object_3d, Cognite3DObjectWrite)]
+        )
+
     @property
     def revisions(self) -> CogniteCADRevisionWriteList:
         from ._cognite_cad_revision import CogniteCADRevisionWrite, CogniteCADRevisionWriteList
-        return CogniteCADRevisionWriteList([item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevisionWrite)])
 
+        return CogniteCADRevisionWriteList(
+            [item for items in self.data for item in items.revisions or [] if isinstance(item, CogniteCADRevisionWrite)]
+        )
 
 
 def _create_cognite_point_cloud_volume_filter(
@@ -281,11 +348,32 @@ def _create_cognite_point_cloud_volume_filter(
     description_prefix: str | None = None,
     format_version: str | list[str] | None = None,
     format_version_prefix: str | None = None,
-    model_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    model_3d: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
-    object_3d: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
-    revisions: str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference] | None = None,
+    object_3d: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    revisions: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     volume_type: Literal["Box", "Cylinder"] | list[Literal["Box", "Cylinder"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
@@ -307,7 +395,9 @@ def _create_cognite_point_cloud_volume_filter(
     if isinstance(model_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(model_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("model3D"), value=as_instance_dict_id(model_3d)))
     if model_3d and isinstance(model_3d, Sequence) and not isinstance(model_3d, str) and not is_tuple_id(model_3d):
-        filters.append(dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("model3D"), values=[as_instance_dict_id(item) for item in model_3d])
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -317,11 +407,17 @@ def _create_cognite_point_cloud_volume_filter(
     if isinstance(object_3d, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(object_3d):
         filters.append(dm.filters.Equals(view_id.as_property_ref("object3D"), value=as_instance_dict_id(object_3d)))
     if object_3d and isinstance(object_3d, Sequence) and not isinstance(object_3d, str) and not is_tuple_id(object_3d):
-        filters.append(dm.filters.In(view_id.as_property_ref("object3D"), values=[as_instance_dict_id(item) for item in object_3d]))
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("object3D"), values=[as_instance_dict_id(item) for item in object_3d])
+        )
     if isinstance(revisions, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(revisions):
         filters.append(dm.filters.Equals(view_id.as_property_ref("revisions"), value=as_instance_dict_id(revisions)))
     if revisions and isinstance(revisions, Sequence) and not isinstance(revisions, str) and not is_tuple_id(revisions):
-        filters.append(dm.filters.In(view_id.as_property_ref("revisions"), values=[as_instance_dict_id(item) for item in revisions]))
+        filters.append(
+            dm.filters.In(
+                view_id.as_property_ref("revisions"), values=[as_instance_dict_id(item) for item in revisions]
+            )
+        )
     if isinstance(volume_type, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("volumeType"), value=volume_type))
     if volume_type and isinstance(volume_type, list):
@@ -348,11 +444,11 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_3_d_object import _Cognite3DObjectQuery
         from ._cognite_cad_model import _CogniteCADModelQuery
@@ -420,15 +516,17 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
         self.model_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("model3D"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.object_3d_filter = DirectRelationFilter(self, self._view_id.as_property_ref("object3D"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.description,
-            self.format_version,
-            self.model_3d_filter,
-            self.name,
-            self.object_3d_filter,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.description,
+                self.format_version,
+                self.model_3d_filter,
+                self.name,
+                self.object_3d_filter,
+            ]
+        )
 
     def list_cognite_point_cloud_volume(self, limit: int = DEFAULT_QUERY_LIMIT) -> CognitePointCloudVolumeList:
         return self._list(limit=limit)

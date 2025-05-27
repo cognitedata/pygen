@@ -39,6 +39,7 @@ from omni.data_classes._core import (
 from omni.data_classes._connection_item_f import ConnectionItemFWrite
 from omni.data_classes._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
 from omni.data_classes._connection_item_g import ConnectionItemG, ConnectionItemGGraphQL, ConnectionItemGWrite
+
 if TYPE_CHECKING:
     from omni.data_classes._connection_item_e import ConnectionItemE, ConnectionItemEGraphQL, ConnectionItemEWrite
     from omni.data_classes._connection_item_f import ConnectionItemF, ConnectionItemFGraphQL, ConnectionItemFWrite
@@ -46,16 +47,24 @@ if TYPE_CHECKING:
 
 
 __all__ = [
-    "ConnectionEdgeA",    "ConnectionEdgeAWrite",    "ConnectionEdgeAList",    "ConnectionEdgeAWriteList",    "ConnectionEdgeAFields",    "ConnectionEdgeATextFields",]
+    "ConnectionEdgeA",
+    "ConnectionEdgeAWrite",
+    "ConnectionEdgeAList",
+    "ConnectionEdgeAWriteList",
+    "ConnectionEdgeAFields",
+    "ConnectionEdgeATextFields",
+]
 
 
 ConnectionEdgeATextFields = Literal["external_id", "name"]
 ConnectionEdgeAFields = Literal["external_id", "end_time", "name", "start_time"]
-_CONNECTIONEDGEA_PROPERTIES_BY_FIELD = {    "external_id": "externalId",
+_CONNECTIONEDGEA_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
     "end_time": "endTime",
     "name": "name",
     "start_time": "startTime",
 }
+
 
 class ConnectionEdgeAGraphQL(GraphQLCore):
     """This represents the reading version of connection edge a, used
@@ -72,8 +81,11 @@ class ConnectionEdgeAGraphQL(GraphQLCore):
         name: The name field.
         start_time: The start time field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
-    end_node: Union[ConnectionItemEGraphQL, ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = Field(None, alias="endNode")
+    end_node: Union[ConnectionItemEGraphQL, ConnectionItemFGraphQL, ConnectionItemGGraphQL, None] = Field(
+        None, alias="endNode"
+    )
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -101,6 +113,7 @@ class ConnectionEdgeA(DomainRelation):
         name: The name field.
         start_time: The start time field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[ConnectionItemE, ConnectionItemF, ConnectionItemG, str, dm.NodeId] = Field(alias="endNode")
@@ -108,16 +121,21 @@ class ConnectionEdgeA(DomainRelation):
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
 
-
     def as_write(self) -> ConnectionEdgeAWrite:
         """Convert this read version of connection edge a to the writing version."""
         return ConnectionEdgeAWrite.model_validate(as_write_args(self))
 
 
-_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {    ConnectionItemEWrite: {ConnectionItemFWrite},    ConnectionItemFWrite: {ConnectionItemEWrite},    ConnectionItemGWrite: {ConnectionItemFWrite},}
+_EXPECTED_START_NODES_BY_END_NODE: dict[type[DomainModelWrite], set[type[DomainModelWrite]]] = {
+    ConnectionItemEWrite: {ConnectionItemFWrite},
+    ConnectionItemFWrite: {ConnectionItemEWrite},
+    ConnectionItemGWrite: {ConnectionItemFWrite},
+}
+
 
 def _validate_end_node(
-    start_node: DomainModelWrite, end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId]
+    start_node: DomainModelWrite,
+    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId],
 ) -> None:
     if isinstance(end_node, str | dm.NodeId):
         # Nothing to validate
@@ -148,11 +166,18 @@ class ConnectionEdgeAWrite(DomainRelationWrite):
         name: The name field.
         start_time: The start time field.
     """
-    _container_fields: ClassVar[tuple[str, ...]] = ("end_time", "name", "start_time",)
+
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "end_time",
+        "name",
+        "start_time",
+    )
     _validate_end_node = _validate_end_node
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionEdgeA", "1")
-    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId] = Field(alias="endNode")
+    end_node: Union[ConnectionItemEWrite, ConnectionItemFWrite, ConnectionItemGWrite, str, dm.NodeId] = Field(
+        alias="endNode"
+    )
     end_time: Optional[datetime.datetime] = Field(None, alias="endTime")
     name: Optional[str] = None
     start_time: Optional[datetime.datetime] = Field(None, alias="startTime")
@@ -162,10 +187,10 @@ class ConnectionEdgeAList(DomainRelationList[ConnectionEdgeA]):
     """List of connection edge as in the reading version."""
 
     _INSTANCE = ConnectionEdgeA
+
     def as_write(self) -> ConnectionEdgeAWriteList:
         """Convert this read version of connection edge a list to the writing version."""
         return ConnectionEdgeAWriteList([edge.as_write() for edge in self])
-
 
 
 class ConnectionEdgeAWriteList(DomainRelationWriteList[ConnectionEdgeAWrite]):
@@ -211,9 +236,12 @@ def _create_connection_edge_a_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[                    {"space": start_node_space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                values=[
+                    (
+                        {"space": start_node_space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in start_node
                 ],
             )
@@ -228,15 +256,24 @@ def _create_connection_edge_a_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[                    {"space": space_end_node, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                values=[
+                    (
+                        {"space": space_end_node, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in end_node
                 ],
             )
         )
     if min_end_time is not None or max_end_time is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("endTime"), gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None, lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("endTime"),
+                gte=min_end_time.isoformat(timespec="milliseconds") if min_end_time else None,
+                lte=max_end_time.isoformat(timespec="milliseconds") if max_end_time else None,
+            )
+        )
     if isinstance(name, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
     if name and isinstance(name, list):
@@ -244,7 +281,13 @@ def _create_connection_edge_a_filter(
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if min_start_time is not None or max_start_time is not None:
-        filters.append(dm.filters.Range(view_id.as_property_ref("startTime"), gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None, lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None))
+        filters.append(
+            dm.filters.Range(
+                view_id.as_property_ref("startTime"),
+                gte=min_start_time.isoformat(timespec="milliseconds") if min_start_time else None,
+                lte=max_start_time.isoformat(timespec="milliseconds") if max_start_time else None,
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["edge", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -268,7 +311,7 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
     ):
@@ -276,7 +319,16 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         from ._connection_item_f import _ConnectionItemFQuery
         from ._connection_item_g import _ConnectionItemGQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -284,7 +336,7 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
-                connection_property=ViewPropertyId(self._view_id, "end_node")
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         self.space = StringFilter(self, ["node", "space"])
@@ -292,10 +344,12 @@ class _ConnectionEdgeAQuery(EdgeQueryCore[T_DomainList, ConnectionEdgeAList]):
         self.end_time = TimestampFilter(self, self._view_id.as_property_ref("endTime"))
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.start_time = TimestampFilter(self, self._view_id.as_property_ref("startTime"))
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-            self.end_time,
-            self.name,
-            self.start_time,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+                self.end_time,
+                self.name,
+                self.start_time,
+            ]
+        )

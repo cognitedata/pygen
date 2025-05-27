@@ -34,19 +34,24 @@ from omni.data_classes._core import (
     StringFilter,
     ViewPropertyId,
 )
+
 if TYPE_CHECKING:
     from omni.data_classes._connection_item_a import ConnectionItemA, ConnectionItemAGraphQL, ConnectionItemAWrite
     from omni.data_classes._connection_item_b import ConnectionItemB, ConnectionItemBGraphQL, ConnectionItemBWrite
 
 
 __all__ = [
-    "ConnectionItemCEdge",    "ConnectionItemCEdgeList",]
+    "ConnectionItemCEdge",
+    "ConnectionItemCEdgeList",
+]
 
 
-ConnectionItemCEdgeTextFields = Literal["external_id", ]
-ConnectionItemCEdgeFields = Literal["external_id", ]
-_CONNECTIONITEMCEDGE_PROPERTIES_BY_FIELD = {    "external_id": "externalId",
+ConnectionItemCEdgeTextFields = Literal["external_id",]
+ConnectionItemCEdgeFields = Literal["external_id",]
+_CONNECTIONITEMCEDGE_PROPERTIES_BY_FIELD = {
+    "external_id": "externalId",
 }
+
 
 class ConnectionItemCEdgeGraphQL(GraphQLCore):
     """This represents the reading version of connection item c edge, used
@@ -62,6 +67,7 @@ class ConnectionItemCEdgeGraphQL(GraphQLCore):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
+
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
     end_node: Union[dm.NodeId, None] = Field(None, alias="endNode")
     connection_item_a: Optional[list[ConnectionItemAGraphQL]] = Field(default=None, repr=False, alias="connectionItemA")
@@ -70,7 +76,6 @@ class ConnectionItemCEdgeGraphQL(GraphQLCore):
     def as_read(self) -> ConnectionItemCEdge:
         """Convert this GraphQL format of connection item c edge to the reading format."""
         return ConnectionItemCEdge.model_validate(as_read_args(self))
-
 
 
 class ConnectionItemCEdge(DomainRelation):
@@ -86,17 +91,24 @@ class ConnectionItemCEdge(DomainRelation):
         connection_item_a: The connection item a field.
         connection_item_b: The connection item b field.
     """
+
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemC", "1")
     space: str = DEFAULT_INSTANCE_SPACE
     end_node: Union[str, dm.NodeId] = Field(alias="endNode")
-    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemA")
-    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(default=None, repr=False, alias="connectionItemB")
+    connection_item_a: Optional[list[Union[ConnectionItemA, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemA"
+    )
+    connection_item_b: Optional[list[Union[ConnectionItemB, str, dm.NodeId]]] = Field(
+        default=None, repr=False, alias="connectionItemB"
+    )
 
 
 class ConnectionItemCEdgeList(DomainRelationList[ConnectionItemCEdge]):
     """List of connection item c edges in the reading version."""
 
     _INSTANCE = ConnectionItemCEdge
+
+
 def _create_connection_item_c_edge_filter(
     edge_type: dm.DirectRelationReference,
     view_id: dm.ViewId,
@@ -128,9 +140,12 @@ def _create_connection_item_c_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "startNode"],
-                values=[                    {"space": start_node_space, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                values=[
+                    (
+                        {"space": start_node_space, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in start_node
                 ],
             )
@@ -145,9 +160,12 @@ def _create_connection_item_c_edge_filter(
         filters.append(
             dm.filters.In(
                 ["edge", "endNode"],
-                values=[                    {"space": space_end_node, "externalId": ext_id}
-                    if isinstance(ext_id, str)
-                    else ext_id.dump(camel_case=True, include_instance_type=False)
+                values=[
+                    (
+                        {"space": space_end_node, "externalId": ext_id}
+                        if isinstance(ext_id, str)
+                        else ext_id.dump(camel_case=True, include_instance_type=False)
+                    )
                     for ext_id in end_node
                 ],
             )
@@ -175,14 +193,23 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
         end_node_cls: type[NodeQueryCore],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
     ):
         from ._connection_item_a import _ConnectionItemAQuery
         from ._connection_item_b import _ConnectionItemBQuery
 
-        super().__init__(created_types, creation_path, client, result_list_cls, expression, None, connection_name, connection_property)
+        super().__init__(
+            created_types,
+            creation_path,
+            client,
+            result_list_cls,
+            expression,
+            None,
+            connection_name,
+            connection_property,
+        )
         if end_node_cls not in created_types:
             self.end_node = end_node_cls(
                 created_types=created_types.copy(),
@@ -190,7 +217,7 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
                 client=client,
                 result_list_cls=result_list_cls,  # type: ignore[type-var]
                 expression=dm.query.NodeResultSetExpression(),
-                connection_property=ViewPropertyId(self._view_id, "end_node")
+                connection_property=ViewPropertyId(self._view_id, "end_node"),
             )
 
         if _ConnectionItemAQuery not in created_types:
@@ -223,7 +250,9 @@ class _ConnectionItemCEdgeQuery(EdgeQueryCore[T_DomainList, ConnectionItemCEdgeL
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
-        self._filter_classes.extend([
-            self.space,
-            self.external_id,
-        ])
+        self._filter_classes.extend(
+            [
+                self.space,
+                self.external_id,
+            ]
+        )
