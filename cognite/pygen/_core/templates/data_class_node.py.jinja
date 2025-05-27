@@ -361,11 +361,11 @@ class _{{ data_class.query_cls_name }}(NodeQueryCore[T_DomainModelList, {{ data_
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         {% for dependency_class in data_class.dependencies_with_edge_destinations %}
         {% if dependency_class.file_name != data_class.file_name %}

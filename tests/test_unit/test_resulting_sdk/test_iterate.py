@@ -1,7 +1,7 @@
 from cognite.client.data_classes.aggregations import AggregatedNumberedValue
 from cognite.client.data_classes.data_modeling import Node, NodeListWithCursor
 from cognite.client.data_classes.data_modeling.instances import Properties
-from cognite.client.data_classes.data_modeling.query import Query, QueryResult
+from cognite.client.data_classes.data_modeling.query import NodeOrEdgeResultSetExpression, Query, QueryResult
 from cognite.client.testing import monkeypatch_cognite_client
 from omni import OmniClient
 from omni import data_classes as odc
@@ -11,7 +11,9 @@ class TestIterateMethod:
     def test_api_call_chunk_size_limit(self) -> None:
         def query_call(query: Query) -> QueryResult:
             assert "0" in query.with_
-            assert query.with_["0"].limit == 1
+            zero = query.with_["0"]
+            assert isinstance(zero, NodeOrEdgeResultSetExpression)
+            assert zero.limit == 1
             return self.single_item_a_result
 
         with monkeypatch_cognite_client() as client:
