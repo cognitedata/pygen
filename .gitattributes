@@ -1,4 +1,5 @@
-examples/ linguist-generated=true
+examples/** linguist-generated=true
+uv.lock linguist-generated=true
 
 # Source files
 # ============
