@@ -8,7 +8,9 @@ requires-python = ">=3.10,<4.0"
 license = "Apache-2.0"
 dependencies = [
     "cognite-sdk>=7.73.6, <8.0.0",
-    "pydantic>=2.7.0, <2.11.0",
+    # pydantic 2.10.5 is the latest versoin supported by pyodide.
+    # Thus, we pin it to ensure compatibility with the pyodide build.
+    "pydantic>=2.10.5",
     "Jinja2>=3.1",
     "inflect>=6.2",
 ]
