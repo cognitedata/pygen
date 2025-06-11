@@ -435,7 +435,7 @@ dev = [
 requires-dist = [
     { name = "black", marker = "extra == 'format'", specifier = ">=24.4.2" },
     { name = "build", marker = "extra == 'cli'", specifier = ">=1.1" },
-    { name = "cognite-sdk", specifier = ">=7.74.0,<8.0.0" },
+    { name = "cognite-sdk", specifier = ">=7.75.0,<8.0.0" },
     { name = "inflect", specifier = ">=6.2" },
     { name = "jinja2", specifier = ">=3.1" },
     { name = "packaging", marker = "extra == 'cli'", specifier = ">=21.3" },
@@ -480,7 +480,7 @@ dev = [
 
 [[package]]
 name = "cognite-sdk"
-version = "7.74.5"
+version = "7.75.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "msal" },
@@ -490,9 +490,9 @@ dependencies = [
     { name = "requests-oauthlib" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6b/a8/3ea39eb71a163c7816735bedc3f94f399a96d02ba8ded1d51562d8fa7897/cognite_sdk-7.74.5.tar.gz", hash = "sha256:201b565113decaea946c9cfed02a7841104ab6bd8a6a7ff72b4814f6a492b323", size = 497644 }
+sdist = { url = "https://files.pythonhosted.org/packages/a1/a3/c613ba3d4ea34c7591a4d648b23a9c5d6d05a654b77391e2613752965dc6/cognite_sdk-7.75.1.tar.gz", hash = "sha256:f026a621c737bbaf9be8bc503f9946c83333fa09769fa2c5dbc324783c4d9f1a", size = 500308 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/83/fcc97b65b7378ff43f072823d3c2432e4c9ab179e469458e408a6069d204/cognite_sdk-7.74.5-py3-none-any.whl", hash = "sha256:423d718c7bc51effa301c3920fc5c15c13fe499d20cb7fc0ea4a9451c73fc503", size = 619020 },
+    { url = "https://files.pythonhosted.org/packages/5e/ff/db712d28ddfdf9584636338df89be8f4837e712cf4bb4f75093a0f2c513e/cognite_sdk-7.75.1-py3-none-any.whl", hash = "sha256:6ff7200e0e4a55e208ce82c86b76f2002943e9a42b51f62e91bc34998ae8e592", size = 623264 },
 ]
 
 [[package]]

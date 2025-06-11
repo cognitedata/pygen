@@ -7,7 +7,7 @@ readme="README.md"
 requires-python = ">=3.10,<4.0"
 license = "Apache-2.0"
 dependencies = [
-    "cognite-sdk>=7.74.0, <8.0.0",
+    "cognite-sdk>=7.75.0, <8.0.0",
     # pydantic 2.7.0 is the latest versoion supported by pyodide '0.26.2' which is what is used in the
     # Cognite JupyterLab environment.
     # Thus, we pin it to ensure compatibility with the pyodide build.
