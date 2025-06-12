@@ -415,7 +415,8 @@ class CodeFormatter:
 
         if format_code:
             try:
-                import black
+                # There are no stubs for the black package, so we do ignore to avoid MyPy errors.
+                import black  # type: ignore[import-not-found]
             except ImportError:
                 logger("black not installed. Skipping code formatting.")
             else:

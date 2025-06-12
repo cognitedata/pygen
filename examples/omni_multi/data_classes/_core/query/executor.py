@@ -200,7 +200,10 @@ class QueryExecutor:
         for name, status in self._status_by_name.items():
             if name not in self._query.with_:
                 continue
+            # In the QueryExecutor we are only working with NodeOrEdgeResultSetExpression, so we cast it.
             expression = self._query.with_[name]
+            if not isinstance(expression, dm.query.NodeOrEdgeResultSetExpression):
+                raise ValueError(f"Expected NodeOrEdgeResultSetExpression for step '{name}', got {type(expression)}")
             if status.is_unlimited:
                 expression.limit = status.max_retrieve_batch_limit
             else:

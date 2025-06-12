@@ -46,12 +46,12 @@ class QueryCore(Generic[T_DomainList, T_DomainListEnd]):
         creation_path: "list[QueryCore]",
         client: CogniteClient,
         result_list_cls: type[T_DomainList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         view_filter: dm.filters.Filter | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         created_types.add(type(self))
         self._creation_path = creation_path[:] + [self]

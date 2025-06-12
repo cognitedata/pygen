@@ -69,7 +69,7 @@ class QueryBuildStep:
     def __init__(
         self,
         name: str,
-        expression: dm.query.ResultSetExpression,
+        expression: dm.query.NodeOrEdgeResultSetExpression,
         view_id: dm.ViewId | None = None,
         max_retrieve_limit: int = -1,
         max_retrieve_batch_limit: int | None = None,
@@ -460,7 +460,7 @@ class QueryResultStep(QueryBuildStep):
         self,
         results: dm.NodeListWithCursor | dm.EdgeListWithCursor,
         name: str,
-        expression: dm.query.ResultSetExpression,
+        expression: dm.query.NodeOrEdgeResultSetExpression,
         view_id: dm.ViewId | None = None,
         max_retrieve_limit: int = -1,
         select: dm.query.Select | None | type[NotSetSentinel] = NotSetSentinel,

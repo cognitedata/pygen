@@ -166,7 +166,7 @@ class GraphQLList(UserList):
         """
         df = pd.DataFrame(self.dump())
         if df.empty:
-            df = pd.DataFrame(columns=GraphQLCore.model_fields)
+            df = pd.DataFrame(columns=list(GraphQLCore.model_fields.keys()))
         # Reorder columns to have the most relevant first
         id_columns = ["space", "external_id"]
         end_columns = ["data_record"]
@@ -308,7 +308,7 @@ class _DataRecordListCore(UserList, Generic[T_DataRecord]):
         """
         df = pd.DataFrame([item.model_dump() for item in self])
         if df.empty:
-            df = pd.DataFrame(columns=self._INSTANCE.model_fields)
+            df = pd.DataFrame(columns=list(self._INSTANCE.model_fields.keys()))
         return df
 
     def _repr_html_(self) -> str:
@@ -449,7 +449,7 @@ class CoreList(UserList, Generic[T_Core]):
         """
         df = pd.DataFrame(self.dump())
         if df.empty:
-            df = pd.DataFrame(columns=self._INSTANCE.model_fields)
+            df = pd.DataFrame(columns=list(self._INSTANCE.model_fields.keys()))
         # Reorder columns to have the most relevant first
         id_columns = ["space", "external_id"]
         end_columns = ["node_type", "data_record"]
@@ -781,10 +781,11 @@ def unpack_properties(properties: Properties) -> Mapping[str, PropertyValue | dm
 
 def serialize_properties(model: DomainModelWrite | DomainRelationWrite, resources: ResourcesWrite) -> dict[str, Any]:
     properties: dict[str, Any] = {}
+    model_fields = type(model).model_fields
     for field_name in model._container_fields:
         if field_name in model.model_fields_set:
             value = getattr(model, field_name)
-            key = model.model_fields[field_name].alias or field_name
+            key = model_fields[field_name].alias or field_name
             if field_name in model._direct_relations:
                 properties[key] = serialize_relation(value, model.space)
             else:
@@ -889,9 +890,10 @@ T_DomainList = TypeVar("T_DomainList", bound=Union[DomainModelList, DomainRelati
 
 def as_read_args(model: GraphQLCore | GraphQLExternal) -> dict[str, Any]:
     output: dict[str, Any] = {}
+    model_fields = type(model).model_fields
     for field_name in model.model_fields_set:
         value = getattr(model, field_name)
-        key = model.model_fields[field_name].alias or field_name
+        key = model_fields[field_name].alias or field_name
         if field_name == "data_record" and isinstance(model, GraphQLCore):
             # Dict to postpone validation
             if model.data_record is None:
@@ -917,14 +919,15 @@ def as_read_value(value: Any) -> Any:
 
 def as_write_args(model: DomainModel | GraphQLCore | DomainRelation | GraphQLExternal) -> dict[str, Any]:
     output: dict[str, Any] = {}
+    model_fields = type(model).model_fields
     for field_name in model.model_fields_set:
-        if field_name not in model.model_fields:
+        if field_name not in model_fields:
             # The field is an extra field. Typically, happens when a property has been added
             # to the model after the SDK was generated. Extra fields are not allowed in the write
             # format of the data class.
             continue
         value = getattr(model, field_name)
-        key = model.model_fields[field_name].alias or field_name
+        key = model_fields[field_name].alias or field_name
         if field_name == "data_record" and isinstance(model, DomainModel | DomainRelation):
             output[field_name] = DataRecordWrite(existing_version=model.data_record.version)
         elif field_name == "data_record" and isinstance(model, GraphQLCore):

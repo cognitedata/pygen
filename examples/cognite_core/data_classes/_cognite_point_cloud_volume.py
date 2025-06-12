@@ -444,11 +444,11 @@ class _CognitePointCloudVolumeQuery(NodeQueryCore[T_DomainModelList, CognitePoin
         creation_path: list[QueryCore],
         client: CogniteClient,
         result_list_cls: type[T_DomainModelList],
-        expression: dm.query.ResultSetExpression | None = None,
+        expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
         connection_name: str | None = None,
         connection_property: ViewPropertyId | None = None,
         connection_type: Literal["reverse-list"] | None = None,
-        reverse_expression: dm.query.ResultSetExpression | None = None,
+        reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
         from ._cognite_3_d_object import _Cognite3DObjectQuery
         from ._cognite_cad_model import _CogniteCADModelQuery
