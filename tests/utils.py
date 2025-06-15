@@ -15,6 +15,9 @@ from cognite.client.credentials import CredentialProvider, OAuthClientCredential
 from cognite.pygen._core.models import DataClass, EdgeDataClass, NodeDataClass
 from cognite.pygen.config import PygenConfig
 
+_LOGIN_FLOW: TypeAlias = Literal["infer", "client_credentials", "interactive", "token"]
+_VALID_LOGIN_FLOWS = get_args(_LOGIN_FLOW)
+
 
 def to_data_class_by_view_id(
     views: Iterable[dm.View], pygen_config: PygenConfig
@@ -40,10 +43,6 @@ def to_data_class_by_view_id(
             )
 
     return node_by_view_id, edge_by_view_id
-
-
-_LOGIN_FLOW: TypeAlias = Literal["infer", "client_credentials", "interactive", "token"]
-_VALID_LOGIN_FLOWS = get_args(_LOGIN_FLOW)
 
 
 def get_cognite_client(env_file_name: str) -> CogniteClient:
