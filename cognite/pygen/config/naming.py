@@ -196,9 +196,15 @@ class NamingConfig:
         api_class: The naming convention for the generated API classes.
         multi_api_class: The naming convention for the generated multi API classes (Used when generating
             an SDK for multiple data models).
+        prefix_class_name_instance_property_collision: If a property field is named 'version' or 'type', it
+            has a name collision with the node/edge properties 'version' and 'type'. By default, pygen will
+            add a _ to the name. If this is set to True, pygen will prefix the field with the name of the
+            data class. For example, if the data class is named "MyDataClass" and the property is named
+            "version", the field will be named "MyDataClass_version".
     """
 
     field: FieldNaming = dataclass_field(default_factory=FieldNaming)
     data_class: DataClassNaming = dataclass_field(default_factory=DataClassNaming)
     api_class: APIClassNaming = dataclass_field(default_factory=APIClassNaming)
     multi_api_class: MultiAPIClassNaming = dataclass_field(default_factory=MultiAPIClassNaming)
+    prefix_class_name_instance_property_collision: bool = False
