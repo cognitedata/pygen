@@ -1,6 +1,8 @@
 from typing import Any
 
 import pytest
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client.credentials import Token
 from cognite.client.data_classes.aggregations import (
     AggregatedNumberedValue,
     CountValue,
@@ -10,6 +12,7 @@ from cognite.client.data_classes.aggregations import (
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResult, InstanceAggregationResultList
 
 from cognite.pygen._query.interface import QueryExecutor
+from cognite.pygen._version import __version__
 
 
 class TestQueryInterface:
@@ -93,3 +96,17 @@ class TestQueryInterface:
         actual = QueryExecutor._merge_groupby_aggregate_results(results)
 
         assert actual == expected_merged, f"Expected: {expected_merged}, but got: {actual}"
+
+    def test_not_prefix_existing_client(self) -> None:
+        client_name = f"CognitePygen:{__version__}:QueryExecutor"
+        client = CogniteClient(
+            ClientConfig(
+                client_name,
+                project="test_project",
+                credentials=Token("223ienie"),
+            )
+        )
+
+        _ = QueryExecutor(client)
+
+        assert client.config.client_name == client_name, "Client name should not be prefixed again."
