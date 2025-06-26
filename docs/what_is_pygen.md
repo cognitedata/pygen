@@ -54,7 +54,7 @@ generate the following data classes:
     `GraphQL` responses can be partial.
 
 In addition, to these three data classes for each view, `Pygen` generates a `WindTurbineList` and
-`WindTurbineWriteList` that are UserList of the corresponding data classes. These behaves liken a
+`WindTurbineWriteList` that are UserList of the corresponding data classes. These behave like a
 regular Python list with a few extra helper methods such as:
 
  * `.to_pandas()` - Converts the list of WindTurbine to a pandas DataFrame with each column corresponding
