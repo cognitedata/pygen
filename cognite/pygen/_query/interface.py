@@ -33,7 +33,8 @@ class QueryExecutor:
     def __init__(self, client: CogniteClient, views: Sequence[dm.View] | None = None):
         self._client = client
         # Used for aggregated logging of requests
-        client.config.client_name = f"CognitePygen:{__version__}:QueryExecutor:{client.config.client_name}"
+        if not client.config.client_name.startswith("CognitePygen"):
+            client.config.client_name = f"CognitePygen:{__version__}:QueryExecutor:{client.config.client_name}"
         self._view_by_id: dict[dm.ViewId, dm.View] = {view.as_id(): view for view in views or []}
         self._unpack_edges: Literal["skip", "include"] = "include"
 

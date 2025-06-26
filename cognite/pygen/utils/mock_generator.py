@@ -1322,6 +1322,7 @@ def _log_pygen_mock_call(client: CogniteClient) -> typing.Generator[CogniteClien
     """Context manager for logging Pygen usage."""
     current_client_name = client.config.client_name
     # The client name is used for aggregated logging of Pygen Usage
-    client.config.client_name = f"CognitePygen:{__version__}:MockGenerator:{client.config.client_name}"
+    if not client.config.client_name.startswith("CognitePygen"):
+        client.config.client_name = f"CognitePygen:{__version__}:MockGenerator:{client.config.client_name}"
     yield client
     client.config.client_name = current_client_name
