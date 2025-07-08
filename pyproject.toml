@@ -61,7 +61,7 @@ dev = [
     "Faker>=18.0.0",
     "hypothesis>=6.0.0",
     "jupyterlab>=3.0.0",
-    "cognite-toolkit==0.5.20",
+    "cognite-toolkit==0.5.74",
     "marko>=2.1.0, <3.0.0",
 ]
 
