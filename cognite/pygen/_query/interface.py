@@ -37,7 +37,7 @@ class QueryExecutor:
         self,
         client: CogniteClient,
         views: Sequence[dm.View] | None = None,
-        unpack_edges: Literal["skip", "include"] = "include",
+        unpack_edges: Literal["skip", "include"] = "skip",
     ):
         self._client = client
         # Used for aggregated logging of requests
