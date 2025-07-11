@@ -28,15 +28,23 @@ class QueryExecutor:
         client (CogniteClient): An instance of the CogniteClient.
         views (Sequence[dm.View], optional): A list of views to use for the queries. Defaults to None.
             If not passed, the views will be fetched from the server when needed.
+        unpack_edges (Literal["skip", "include"], optional): Whether to unpack edges in the result.
+            If "skip", edges will not be included in the result. If "include", edges will be included.
+            Defaults to "include".
     """
 
-    def __init__(self, client: CogniteClient, views: Sequence[dm.View] | None = None):
+    def __init__(
+        self,
+        client: CogniteClient,
+        views: Sequence[dm.View] | None = None,
+        unpack_edges: Literal["skip", "include"] = "skip",
+    ):
         self._client = client
         # Used for aggregated logging of requests
         if not client.config.client_name.startswith("CognitePygen"):
             client.config.client_name = f"CognitePygen:{__version__}:QueryExecutor:{client.config.client_name}"
         self._view_by_id: dict[dm.ViewId, dm.View] = {view.as_id(): view for view in views or []}
-        self._unpack_edges: Literal["skip", "include"] = "include"
+        self._unpack_edges: Literal["skip", "include"] = unpack_edges
 
     def search(
         self,
@@ -271,7 +279,9 @@ class QueryExecutor:
         view = self._get_view(view_id)
         root_properties, _ = self._as_property_list(properties, "list")
         builder = QueryBuilder()
-        factory = QueryBuildStepFactory(builder.create_name, view=view, user_selected_properties=properties)
+        factory = QueryBuildStepFactory(
+            builder.create_name, view=view, user_selected_properties=properties, unpack_edges=self._unpack_edges
+        )
 
         if not factory.connection_properties:
             list_results: list[dict[str, Any]] = []

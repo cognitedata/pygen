@@ -161,6 +161,7 @@ class QueryBuildStepFactory:
         view: dm.View | None = None,
         user_selected_properties: SelectedProperties | None = None,
         edge_connection_property: str = "node",
+        unpack_edges: Literal["skip", "include"] = "include",
     ) -> None:
         if sum(1 for x in (view_id, view) if x is not None) != 1:
             raise ValueError("Either view_id or view must be set")
@@ -175,6 +176,7 @@ class QueryBuildStepFactory:
         self._user_selected_properties = user_selected_properties
         self._root_name: str | None = None
         self._edge_connection_property = edge_connection_property
+        self._unpack_edges = unpack_edges
 
     @property
     def root_name(self) -> str:
@@ -338,12 +340,17 @@ class QueryBuildStepFactory:
         if not include_end_node:
             return steps
 
-        node_properties = next(
-            (prop for prop in selected_properties or [] if isinstance(prop, dict) and "node" in prop), None
-        )
-        selected_node_properties: list[str] | None = None
-        if isinstance(node_properties, dict) and self._edge_connection_property in node_properties:
-            selected_node_properties = node_properties[self._edge_connection_property]
+        if self._unpack_edges == "include":
+            node_properties = next(
+                (prop for prop in selected_properties or [] if isinstance(prop, dict) and "node" in prop), None
+            )
+            selected_node_properties: list[str] | None = None
+            if isinstance(node_properties, dict) and self._edge_connection_property in node_properties:
+                selected_node_properties = node_properties[self._edge_connection_property]
+        elif self._unpack_edges == "skip":
+            selected_node_properties = [prop for prop in selected_properties or [] if isinstance(prop, str)]
+        else:
+            raise ValueError(f"Unexpected unpack_edges value: {self._unpack_edges!r}. Expected 'include' or 'skip'.")
 
         query_properties = self._create_query_properties(selected_node_properties, None)
         target_view = source
