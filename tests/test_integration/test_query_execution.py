@@ -12,7 +12,7 @@ from cognite.pygen._query.interface import QueryExecutor
 def test_query_reverse_direct_relation(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     item_e = omni_views["ConnectionItemE"]
     item_d = omni_views["ConnectionItemD"]
-    executor = QueryExecutor(cognite_client, views=[item_e, item_d])
+    executor = QueryExecutor(cognite_client, views=[item_e, item_d], unpack_edges="include")
     properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
@@ -45,7 +45,7 @@ def test_query_reverse_direct_relation(cognite_client: CogniteClient, omni_views
 def test_query_direct_relation(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     item_e = omni_views["ConnectionItemE"]
     item_d = omni_views["ConnectionItemD"]
-    executor = QueryExecutor(cognite_client, views=[item_e, item_d])
+    executor = QueryExecutor(cognite_client, views=[item_e, item_d], unpack_edges="include")
     properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
@@ -83,7 +83,7 @@ def test_query_direct_relation(cognite_client: CogniteClient, omni_views: dict[s
 def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     item_a = omni_views["ConnectionItemA"]
     item_b = omni_views["ConnectionItemB"]
-    executor = QueryExecutor(cognite_client, views=[item_a, item_b])
+    executor = QueryExecutor(cognite_client, views=[item_a, item_b], unpack_edges="include")
     properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
@@ -108,12 +108,11 @@ def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str
 def test_query_edge_outwards_skip_edge(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     item_a = omni_views["ConnectionItemA"]
     item_b = omni_views["ConnectionItemB"]
-    executor = QueryExecutor(cognite_client, views=[item_a, item_b])
-    executor._unpack_edges = "skip"
+    executor = QueryExecutor(cognite_client, views=[item_a, item_b], unpack_edges="skip")
     properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
-        {"outwards": [{"node": ["name", "externalId"]}, "type"]},
+        {"outwards": [{"node": ["name", "externalId"]}]},
     ]
     flatten_props = {"name", "outwards", "externalId"}
     result = executor.list(item_a.as_id(), properties, limit=5)
@@ -132,7 +131,7 @@ def test_query_edge_outwards_skip_edge(cognite_client: CogniteClient, omni_views
 
 def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveNullable"]
-    executor = QueryExecutor(cognite_client, views=[view])
+    executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
     properties: list[str | dict[str, Any]] = ["text", "boolean", "date"]
     result = executor.list(view.as_id(), properties, limit=5)
 
@@ -145,7 +144,7 @@ def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_vie
 
 def test_aggregate_count(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
-    executor = QueryExecutor(cognite_client, views=[view])
+    executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
     result = executor.aggregate(view.as_id(), aggregates=dm.aggregations.Count(property="externalId"))
 
     assert isinstance(result, dict)
@@ -154,7 +153,7 @@ def test_aggregate_count(cognite_client: CogniteClient, omni_views: dict[str, dm
 
 def test_aggregate_count_filter_no_results(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
-    executor = QueryExecutor(cognite_client, views=[view])
+    executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
     result = executor.aggregate(
         view.as_id(),
         aggregates=dm.aggregations.Avg(property="int64"),
@@ -167,7 +166,7 @@ def test_aggregate_count_filter_no_results(cognite_client: CogniteClient, omni_v
 
 def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
-    executor = QueryExecutor(cognite_client, views=[view])
+    executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
     result = executor.aggregate(
         view.as_id(), aggregates=dm.aggregations.Count(property="externalId"), group_by="boolean"
     )
@@ -177,7 +176,7 @@ def test_aggregate_count_with_group_by(cognite_client: CogniteClient, omni_views
 
 def test_histogram(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["PrimitiveRequired"]
-    executor = QueryExecutor(cognite_client, views=[view])
+    executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
     result = executor.aggregate(view.as_id(), aggregates=dm.aggregations.Histogram(property="float32", interval=100.0))
 
     assert isinstance(result, dict)
@@ -191,7 +190,7 @@ def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_vie
     word = item.text.split(" ", maxsplit=1)[0]
 
     view = omni_views["PrimitiveRequired"]
-    executor = QueryExecutor(cognite_client, views=[view])
+    executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
     selected_properties: list[str | dict[str, Any]] = ["text", "boolean", "externalId"]
     result = executor.search(view.as_id(), selected_properties, query=word, limit=5)
 
@@ -204,7 +203,7 @@ def test_search(cognite_client: CogniteClient, omni_client: OmniClient, omni_vie
 
 def test_search_nested_properties(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     view = omni_views["ConnectionItemE"]
-    executor = QueryExecutor(cognite_client, views=[view])
+    executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
     selected_properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
@@ -228,7 +227,7 @@ def test_search_nested_properties(cognite_client: CogniteClient, omni_views: dic
 
 
 def test_query_list_root_nodes(cognite_client: CogniteClient) -> None:
-    executor = QueryExecutor(cognite_client)
+    executor = QueryExecutor(cognite_client, unpack_edges="include")
     view_id = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
 
     no_parent = filters.Equals(view_id.as_property_ref("parent"), None)  # type: ignore[arg-type]
@@ -240,7 +239,7 @@ def test_query_list_root_nodes(cognite_client: CogniteClient) -> None:
 
 
 def test_query_list_edges(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
-    executor = QueryExecutor(cognite_client)
+    executor = QueryExecutor(cognite_client, unpack_edges="include")
     view_id = omni_views["ConnectionEdgeA"].as_id()
     selected_properties: SelectedProperties = ["externalId", "name", "startNode"]
     result = executor.list(view_id, selected_properties, limit=5)
@@ -251,7 +250,7 @@ def test_query_list_edges(cognite_client: CogniteClient, omni_views: dict[str, d
 
 
 def test_query_aggregate_edges(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
-    executor = QueryExecutor(cognite_client)
+    executor = QueryExecutor(cognite_client, unpack_edges="include")
     view_id = omni_views["ConnectionEdgeA"].as_id()
 
     result = executor.aggregate(view_id, aggregates=dm.aggregations.Count(property="externalId"))
@@ -266,7 +265,7 @@ def test_query_aggregate_edges(cognite_client: CogniteClient, omni_views: dict[s
 
 
 def test_query_aggregate_edges_group_by(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
-    executor = QueryExecutor(cognite_client)
+    executor = QueryExecutor(cognite_client, unpack_edges="include")
     view_id = omni_views["ConnectionEdgeA"].as_id()
 
     result = executor.aggregate(view_id, aggregates=dm.aggregations.Count(property="externalId"), group_by="name")
@@ -285,7 +284,7 @@ def test_query_aggregate_edges_group_by(cognite_client: CogniteClient, omni_view
 def test_query_search_edges(
     cognite_client: CogniteClient, omni_views: dict[str, dm.View], omni_client: OmniClient
 ) -> None:
-    executor = QueryExecutor(cognite_client)
+    executor = QueryExecutor(cognite_client, unpack_edges="include")
     view_id = omni_views["ConnectionEdgeA"].as_id()
     item = omni_client.connection_item_f.outwards_multi_edge.list(limit=1)
     assert len(item) == 1
