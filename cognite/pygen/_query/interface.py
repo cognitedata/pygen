@@ -279,7 +279,9 @@ class QueryExecutor:
         view = self._get_view(view_id)
         root_properties, _ = self._as_property_list(properties, "list")
         builder = QueryBuilder()
-        factory = QueryBuildStepFactory(builder.create_name, view=view, user_selected_properties=properties)
+        factory = QueryBuildStepFactory(
+            builder.create_name, view=view, user_selected_properties=properties, unpack_edges=self._unpack_edges
+        )
 
         if not factory.connection_properties:
             list_results: list[dict[str, Any]] = []
