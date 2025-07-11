@@ -112,7 +112,7 @@ def test_query_edge_outwards_skip_edge(cognite_client: CogniteClient, omni_views
     properties: list[str | dict[str, Any]] = [
         "externalId",
         "name",
-        {"outwards": [{"node": ["name", "externalId"]}]},
+        {"outwards": ["name", "externalId"]},
     ]
     flatten_props = {"name", "outwards", "externalId"}
     result = executor.list(item_a.as_id(), properties, limit=5)
