@@ -199,9 +199,9 @@ class {{ client_name }}:
             edge_ids: list[dm.EdgeId] = []
             for item in external_id:
                 {% if has_default_instance_space %}
-                if isinstance(external_id, str):
+                if isinstance(item, str):
                 {% else %}
-                if isinstance(external_id, str) and space is not None:
+                if isinstance(item, str) and space is not None:
                 {% endif %}
                     node_ids.append(dm.NodeId(space, item))
                 elif isinstance(item, dm.NodeId):
