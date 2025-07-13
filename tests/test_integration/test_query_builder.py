@@ -3,7 +3,10 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from omni import data_classes as dc
-from omni.data_classes._core import QueryBuilder, QueryBuildStep, QueryUnpacker, ViewPropertyId
+
+from cognite.pygen._query.builder import QueryBuilder, QueryBuildStep
+from cognite.pygen._query.processing import QueryUnpacker
+from cognite.pygen._query.step import ViewPropertyId
 
 
 class TestQueryBuilder:
