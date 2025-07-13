@@ -152,7 +152,7 @@ class EnvironmentVariables:
             LOGIN_FLOW=os.environ.get("LOGIN_FLOW", "infer"),  # type: ignore[arg-type]
             IDP_CLIENT_ID=os.environ.get("IDP_CLIENT_ID"),
             IDP_CLIENT_SECRET=os.environ.get("IDP_CLIENT_SECRET"),
-            CDF_TOKEN=os.environ.get("TOKEN"),
+            CDF_TOKEN=os.environ.get("CDF_TOKEN"),
             CDF_URL=os.environ.get("CDF_URL"),
             IDP_TOKEN_URL=os.environ.get("IDP_TOKEN_URL"),
             IDP_TENANT_ID=os.environ.get("IDP_TENANT_ID"),
