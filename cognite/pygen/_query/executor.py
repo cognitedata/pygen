@@ -246,6 +246,7 @@ class QueryExecutor:
             limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
 
             step_result = dm.NodeList[dm.Node]([])
+            seen: set[dm.NodeId] = set()
             for item_ids_chunk in chunker(item_ids, self._in_filter_chunk_size):
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids_chunk)
                 is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
@@ -253,7 +254,14 @@ class QueryExecutor:
                 chunk_result = client.data_modeling.instances.search(
                     view_id, properties=None, filter=is_selected, limit=limit
                 )
-                step_result.extend(chunk_result)
+                for node in chunk_result:
+                    node_id = node.as_id()
+                    if node_id in seen:
+                        # If the same node has direct relations to multiple nodes in the list,
+                        # we only want to keep it once.
+                        continue
+                    seen.add(node_id)
+                    step_result.append(node)
 
             batch[step.name] = dm.NodeListWithCursor(step_result, None)
         return None
