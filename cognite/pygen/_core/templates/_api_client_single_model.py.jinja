@@ -157,8 +157,12 @@ class {{ client_name }}:
         ):
             raise ValueError("Expected space to be set when deleting by external_id")
         {% endif %}
+        {% if has_default_instance_space %}
         if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif +%}
+        {% else %}
+        if isinstance(external_id, str) and space is not None:
+        {% endif %}
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         elif isinstance(external_id, dm.NodeId):
             return self._client.data_modeling.instances.delete(nodes=external_id)
         elif isinstance(external_id, data_classes.DomainModelWrite):
@@ -171,8 +175,12 @@ class {{ client_name }}:
             node_ids: list[dm.NodeId] = []
             edge_ids: list[dm.EdgeId] = []
             for item in external_id:
-                if isinstance(item, str):
-                    node_ids.append(dm.NodeId(space, item)){% if not has_default_instance_space %}  # type: ignore[arg-type]{% endif +%}
+                {% if has_default_instance_space %}
+                if isinstance(external_id, str):
+                {% else %}
+                if isinstance(external_id, str) and space is not None:
+                {% endif %}
+                    node_ids.append(dm.NodeId(space, item))
                 elif isinstance(item, dm.NodeId):
                     node_ids.append(item)
                 elif isinstance(item, data_classes.DomainModelWrite):
