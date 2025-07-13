@@ -218,7 +218,7 @@ class CogniteCoreClient:
             node_ids: list[dm.NodeId] = []
             edge_ids: list[dm.EdgeId] = []
             for item in external_id:
-                if isinstance(item, str):
+                if isinstance(external_id, str):
                     node_ids.append(dm.NodeId(space, item))
                 elif isinstance(item, dm.NodeId):
                     node_ids.append(item)
