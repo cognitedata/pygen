@@ -126,6 +126,7 @@ class QueryExecutor:
             )
             for step in steps
         }
+        self._in_filter_chunk_size = IN_FILTER_CHUNK_SIZE
 
     def execute_query(
         self,
@@ -222,9 +223,8 @@ class QueryExecutor:
                 return False
         return True
 
-    @staticmethod
     def _fetch_reverse_direct_relation_of_lists(
-        client: CogniteClient, to_search: Sequence[QueryBuildStep], batch: dm.query.QueryResult
+        self, client: CogniteClient, to_search: Sequence[QueryBuildStep], batch: dm.query.QueryResult
     ) -> None:
         """Reverse direct relations for lists are not supported by the query API.
         This method fetches them separately."""
@@ -246,7 +246,7 @@ class QueryExecutor:
             limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
 
             step_result = dm.NodeList[dm.Node]([])
-            for item_ids_chunk in chunker(item_ids, IN_FILTER_CHUNK_SIZE):
+            for item_ids_chunk in chunker(item_ids, self._in_filter_chunk_size):
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids_chunk)
                 is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
 
