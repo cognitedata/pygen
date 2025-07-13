@@ -59,6 +59,8 @@ class TestQueryBuilder:
         )
         # Act
         executor = builder.build()
+        # Force multiple chunks in /instances/search calls.
+        executor._in_filter_chunk_size = 1
         results = executor.execute_query(cognite_client)
         unpacked = QueryUnpacker(results).unpack()
         result = dc.ConnectionItemEList([dc.ConnectionItemE.model_validate(item) for item in unpacked])
