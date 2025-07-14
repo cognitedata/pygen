@@ -248,11 +248,15 @@ class QueryExecutor:
             step_result = dm.NodeList[dm.Node]([])
             seen: set[dm.NodeId] = set()
             for item_ids_chunk in chunker(item_ids, self._in_filter_chunk_size):
+                if not step.is_unlimited and len(step_result) >= limit:
+                    break
+                api_limit = limit if step.is_unlimited else limit - len(step_result)
+
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids_chunk)
                 is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
 
                 chunk_result = client.data_modeling.instances.search(
-                    view_id, properties=None, filter=is_selected, limit=limit
+                    view_id, properties=None, filter=is_selected, limit=api_limit
                 )
                 for node in chunk_result:
                     node_id = node.as_id()
