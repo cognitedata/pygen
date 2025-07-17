@@ -243,8 +243,8 @@ class OmniMultiClient:
             or (isinstance(external_id, Sequence) and any(isinstance(item, str) for item in external_id))
         ):
             raise ValueError("Expected space to be set when deleting by external_id")
-        if isinstance(external_id, str):
-            return self._client.data_modeling.instances.delete(nodes=(space, external_id))  # type: ignore[arg-type]
+        if isinstance(external_id, str) and space is not None:
+            return self._client.data_modeling.instances.delete(nodes=(space, external_id))
         elif isinstance(external_id, dm.NodeId):
             return self._client.data_modeling.instances.delete(nodes=external_id)
         elif isinstance(external_id, data_classes.DomainModelWrite):
@@ -257,8 +257,8 @@ class OmniMultiClient:
             node_ids: list[dm.NodeId] = []
             edge_ids: list[dm.EdgeId] = []
             for item in external_id:
-                if isinstance(item, str):
-                    node_ids.append(dm.NodeId(space, item))  # type: ignore[arg-type]
+                if isinstance(item, str) and space is not None:
+                    node_ids.append(dm.NodeId(space, item))
                 elif isinstance(item, dm.NodeId):
                     node_ids.append(item)
                 elif isinstance(item, data_classes.DomainModelWrite):
