@@ -224,6 +224,36 @@ class TestGenerateSDK:
             parent_field = my_asset.model_fields["parent"]
             assert "MyAsset" in str(parent_field.annotation)
 
+    def test_generate_sdk_overwriting_reverse_direct_relation(self, tmp_path: Path) -> None:
+        top_level_package = "overwriting_reverse_direct_relation_model"
+        client_name = "OverwritingReverseDirectRelationClient"
+
+        printed_messages: list[str] = []
+
+        def logger(message: str) -> None:
+            printed_messages.append(message)
+
+        generate_sdk(
+            DATA_MODEL_OVERWRITING_REVERSE_DIRECT_RELATION,
+            top_level_package=top_level_package,
+            output_dir=tmp_path / top_level_package,
+            overwrite=True,
+            client_name=client_name,
+            default_instance_space="my_space",
+            logger=logger,
+        )
+        skipping_messages = [msg for msg in printed_messages if "skipping reverse direct relation" in msg.casefold()]
+        assert len(skipping_messages) == 0, f"Unexpected skipping messages: {skipping_messages}"
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+            data_class_module = vars(importlib.import_module(f"{top_level_package}.data_classes"))
+            assert "Tag" in data_class_module
+            tag = data_class_module["Tag"]
+            assert issubclass(tag, BaseModel)
+            assert "children" in tag.model_fields
+
 
 DATA_MODEL_WITH_VIEW_PROPERTY_OF_TYPE_FIELD: dm.DataModel = dm.DataModel.load(
     {
@@ -886,5 +916,58 @@ DATA_MODEL_WITH_OVERWRITING_PARENT_PROPERTY = dm.DataModel(
             writable=True,
             filter=None,
         ),
+    ],
+)
+
+DATA_MODEL_OVERWRITING_REVERSE_DIRECT_RELATION = dm.DataModel(
+    space="my_space",
+    external_id="MyModel",
+    version="1",
+    is_global=False,
+    last_updated_time=0,
+    created_time=0,
+    description=None,
+    name=None,
+    views=[
+        dm.View(
+            space="my_space",
+            external_id="Tag",
+            version="v1",
+            name="Tag",
+            implements=[dm.ViewId("cdf_cdm", "CogniteAsset", "v1")],
+            properties={
+                "name": dm.MappedProperty(
+                    container=dm.ContainerId("cdf_cdm", "CogniteDescribable"),
+                    container_property_identifier="name",
+                    type=dm.Text(),
+                    nullable=False,
+                    auto_increment=False,
+                    immutable=False,
+                ),
+                "parent": dm.MappedProperty(
+                    container=dm.ContainerId("cdf_cdm", "CogniteAsset"),
+                    container_property_identifier="parent",
+                    type=dm.DirectRelation(),
+                    nullable=True,
+                    auto_increment=False,
+                    immutable=False,
+                    source=dm.ViewId("my_space", "Tag", "v1"),
+                ),
+                "children": dm.MultiReverseDirectRelation(
+                    source=dm.ViewId("my_space", "Tag", "v1"),
+                    through=dm.PropertyId(
+                        source=dm.ViewId("cdf_cdm", "CogniteAsset", "v1"),
+                        property="parent",
+                    ),
+                ),
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            writable=True,
+            filter=None,
+        )
     ],
 )
