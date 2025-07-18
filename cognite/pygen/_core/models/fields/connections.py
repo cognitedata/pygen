@@ -275,7 +275,15 @@ class BaseConnectionField(Field, ABC):
             return None
         through: dm.PropertyId | None = None
         if isinstance(prop, ReverseDirectRelation):
-            if isinstance(prop.through.source, dm.ViewId):
+            if prop.source is not None and prop.source in direct_relations_by_view_id:
+                direct_relations_in_source_view = direct_relations_by_view_id[prop.source]
+                through = dm.PropertyId(prop.source, prop.through.property)
+                if prop.through.property not in direct_relations_in_source_view:
+                    warnings.warn(
+                        MissingReverseDirectRelationTargetWarning(through, view_id, base.prop_name), stacklevel=2
+                    )
+                    return None
+            elif isinstance(prop.through.source, dm.ViewId):
                 direct_relations_in_view = direct_relations_by_view_id.get(prop.through.source)
                 if direct_relations_in_view is None or prop.through.property not in direct_relations_in_view:
                     warnings.warn(
