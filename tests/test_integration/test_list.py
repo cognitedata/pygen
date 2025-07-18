@@ -159,6 +159,8 @@ def test_list_with_full_connections(omni_client: OmniClient) -> None:
     assert not missing_self_direct, f"Missing {len(missing_self_direct)} self_direct: {missing_self_direct}"
     outwards_edges = [edge for item in items if item.outwards for edge in item.outwards or []]
     assert outwards_edges, f"Missing outwards edges: {outwards_edges}"
+    first = items[0]
+    assert "instanceType" not in first.model_fields_set, "Expected instanceType to be removed from the list result"
 
 
 def test_list_with_identifier_connections(omni_client: OmniClient) -> None:
