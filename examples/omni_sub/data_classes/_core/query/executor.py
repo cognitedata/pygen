@@ -126,6 +126,7 @@ class QueryExecutor:
             )
             for step in steps
         }
+        self._in_filter_chunk_size = IN_FILTER_CHUNK_SIZE
 
     def execute_query(
         self,
@@ -222,9 +223,8 @@ class QueryExecutor:
                 return False
         return True
 
-    @staticmethod
     def _fetch_reverse_direct_relation_of_lists(
-        client: CogniteClient, to_search: Sequence[QueryBuildStep], batch: dm.query.QueryResult
+        self, client: CogniteClient, to_search: Sequence[QueryBuildStep], batch: dm.query.QueryResult
     ) -> None:
         """Reverse direct relations for lists are not supported by the query API.
         This method fetches them separately."""
@@ -246,14 +246,26 @@ class QueryExecutor:
             limit = SEARCH_LIMIT if step.is_unlimited else min(step.max_retrieve_limit, SEARCH_LIMIT)
 
             step_result = dm.NodeList[dm.Node]([])
-            for item_ids_chunk in chunker(item_ids, IN_FILTER_CHUNK_SIZE):
+            seen: set[dm.NodeId] = set()
+            for item_ids_chunk in chunker(item_ids, self._in_filter_chunk_size):
+                if not step.is_unlimited and len(step_result) >= limit:
+                    break
+                api_limit = limit if step.is_unlimited else limit - len(step_result)
+
                 is_items = dm.filters.In(view_id.as_property_ref(expression.through.property), item_ids_chunk)
                 is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
 
                 chunk_result = client.data_modeling.instances.search(
-                    view_id, properties=None, filter=is_selected, limit=limit
+                    view_id, properties=None, filter=is_selected, limit=api_limit
                 )
-                step_result.extend(chunk_result)
+                for node in chunk_result:
+                    node_id = node.as_id()
+                    if node_id in seen:
+                        # If the same node has direct relations to multiple nodes in the list,
+                        # we only want to keep it once.
+                        continue
+                    seen.add(node_id)
+                    step_result.append(node)
 
             batch[step.name] = dm.NodeListWithCursor(step_result, None)
         return None
