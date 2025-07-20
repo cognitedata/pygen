@@ -218,7 +218,7 @@ class NodeReadAPI(Generic[T_DomainModel, T_DomainModelList], ABC):
             unpack_edges: Literal["skip", "identifier"] = (
                 "identifier" if retrieve_connections == "identifier" else "skip"
             )
-            unpacked = QueryUnpacker(batch_results, edges=unpack_edges).unpack()
+            unpacked = QueryUnpacker(batch_results, edges="skip").unpack()
             yield self._class_list(
                 instantiate_classes(self._class_type, unpacked, "iterate"), cursors=batch_results._cursors
             )
