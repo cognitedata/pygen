@@ -209,7 +209,7 @@ class QueryUnpacker:
         # dict[Step Name, list[Connection Property, dict[Source Node ID, list[Target Node]]]]
         # This is used for each step, to look up the connected nodes/edges.
         nodes_by_step_name: dict[str, list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]]] = defaultdict(list)
-        fist_step = self._steps[0]
+        first_step = self._steps[0]
         output: list[dict[str, Any]] = []
         # The steps are organized in a tree structure, where each step has a reference to a previous step.
         # The unpacking is done in reverse order, starting with the last step, i.e., the leaf steps. This
@@ -222,7 +222,7 @@ class QueryUnpacker:
             else:
                 raise TypeError("Unexpected step")
 
-            if step is fist_step:
+            if step is first_step:
                 output = [item for items in unpacked.values() for item in items]
             elif (connection_property := step.connection_property) and (step.from_ is not None):
                 nodes_by_step_name[step.from_].append((connection_property.property, unpacked))
