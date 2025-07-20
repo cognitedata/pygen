@@ -115,14 +115,8 @@ class TestQueryUnpacker:
                 [
                     {
                         "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
-                        "edgeType": {"externalId": "outwards", "space": "sp_pygen_models"},
-                        "endNode": {
-                            "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
-                            "externalId": "brenda",
-                            "instanceType": "node",
-                            "name": "Brenda",
-                            "space": "test_space",
-                        },
+                        "edge_type": {"externalId": "outwards", "space": "sp_pygen_models"},
+                        "endNode": {"externalId": "brenda", "space": "test_space"},
                         "externalId": "edge_external_id",
                         "space": "test_space",
                         "startNode": {"externalId": "jennifer", "space": "test_space"},
