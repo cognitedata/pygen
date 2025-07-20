@@ -59,12 +59,39 @@ def node_with_edge_results() -> list[QueryResultStep]:
                 ],
                 cursor=None,
             ),
-            name="1",
+            name="0_1",
             expression=query.EdgeResultSetExpression(from_="0", chain_to="source", direction="outwards"),
             selected_properties=None,
             connection_property=ViewPropertyId(view_id, "outwards"),
         ),
     ]
+    return results
+
+
+@pytest.fixture(scope="module")
+def node_with_edge_and_node_results(node_with_edge_results: list[QueryResultStep]) -> list[QueryResultStep]:
+    view_id = ViewId("sp_pygen_models", "ConnectionItemB", "1")
+    results = node_with_edge_results.copy()
+    results.append(
+        QueryResultStep(
+            results=NodeListWithCursor(
+                [
+                    Node(
+                        space="test_space",
+                        external_id="brenda",
+                        properties=Properties({view_id: {"name": "Brenda"}}),
+                        type=None,
+                        **DEFAULT_INSTANCE_ARGS,
+                    )
+                ],
+                cursor=None,
+            ),
+            name="0_1_1",
+            expression=query.NodeResultSetExpression(filter=filters.HasData(views=[view_id]), from_="0_1"),
+            view_id=view_id,
+            connection_property=ViewPropertyId(view_id, "endNode"),
+        ),
+    )
     return results
 
 
@@ -88,8 +115,14 @@ class TestQueryUnpacker:
                 [
                     {
                         "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
-                        "edge_type": {"externalId": "outwards", "space": "sp_pygen_models"},
-                        "endNode": {"externalId": "brenda", "space": "test_space"},
+                        "edgeType": {"externalId": "outwards", "space": "sp_pygen_models"},
+                        "endNode": {
+                            "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
+                            "externalId": "brenda",
+                            "instanceType": "node",
+                            "name": "Brenda",
+                            "space": "test_space",
+                        },
                         "externalId": "edge_external_id",
                         "space": "test_space",
                         "startNode": {"externalId": "jennifer", "space": "test_space"},
@@ -99,13 +132,92 @@ class TestQueryUnpacker:
             ),
         ],
     )
-    def test_unpack_with_edge_end_step(
+    def test_unpack_with_edge_leaf_step(
         self,
         edges: Literal["skip", "identifier", "include"],
         expected_outwards: list[dict],
         node_with_edge_results: list[QueryResultStep],
     ) -> None:
         unpacker = QueryUnpacker(steps=node_with_edge_results, edges=edges)
+
+        unpacked = unpacker.unpack()
+
+        assert len(unpacked) == 1
+        item = unpacked[0]
+        # Bug which will be fixed in PR #494
+        item.pop("instanceType", None)
+        for outwards in item.get("outwards", []):
+            outwards.pop("instanceType", None)
+
+        assert isinstance(item, dict)
+        assert item == {
+            "space": "test_space",
+            "externalId": "jennifer",
+            "name": "Jennifer",
+            "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
+            "outwards": expected_outwards,
+        }
+
+    @pytest.mark.parametrize(
+        "edges, expected_outwards",
+        [
+            pytest.param(
+                "skip",
+                [
+                    {
+                        "space": "test_space",
+                        "externalId": "brenda",
+                        "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
+                        "name": "Brenda",
+                    }
+                ],
+                id="Skip edges",
+            ),
+            pytest.param(
+                "identifier",
+                [
+                    {
+                        "space": "test_space",
+                        "externalId": "edge_external_id",
+                        "endNode": {
+                            "space": "test_space",
+                            "externalId": "brenda",
+                            "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
+                            "name": "Brenda",
+                        },
+                    }
+                ],
+                id="Only edge identifier",
+            ),
+            pytest.param(
+                "include",
+                [
+                    {
+                        "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
+                        "edge_type": {"externalId": "outwards", "space": "sp_pygen_models"},
+                        "endNode": {
+                            "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
+                            "externalId": "brenda",
+                            "instanceType": "node",
+                            "name": "Brenda",
+                            "space": "test_space",
+                        },
+                        "externalId": "edge_external_id",
+                        "space": "test_space",
+                        "startNode": {"externalId": "jennifer", "space": "test_space"},
+                    }
+                ],
+                id="Include edges",
+            ),
+        ],
+    )
+    def test_unpack_with_node_leaf_step(
+        self,
+        edges: Literal["skip", "identifier", "include"],
+        expected_outwards: list[dict],
+        node_with_edge_and_node_results: list[QueryResultStep],
+    ) -> None:
+        unpacker = QueryUnpacker(steps=node_with_edge_and_node_results, edges=edges)
 
         unpacked = unpacker.unpack()
 
