@@ -25,10 +25,13 @@ from typing import (
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
+    TimeSeries,
     TimeSeriesWrite,
     TimeSeriesWriteList,
+    FileMetadata,
     FileMetadataWrite,
     FileMetadataWriteList,
+    Sequence as CogniteSequence,
     SequenceWrite,
     SequenceWriteList,
     TimeSeriesList,
@@ -898,6 +901,8 @@ def as_write_value(value: Any) -> Any:
         return as_write_args(value)
     elif isinstance(value, Sequence) and not isinstance(value, str):
         return [as_write_value(item) for item in value]
+    elif isinstance(value, TimeSeries | FileMetadata | CogniteSequence):
+        return value.as_write()
     return value
 
 

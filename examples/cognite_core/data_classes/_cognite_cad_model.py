@@ -339,7 +339,7 @@ class _CogniteCADModelQuery(NodeQueryCore[T_DomainModelList, CogniteCADModelList
                 client,
                 result_list_cls,
                 dm.query.NodeResultSetExpression(
-                    through=dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1").as_property_ref("model3D"),
+                    through=dm.ViewId("cdf_cdm", "CogniteCADRevision", "v1").as_property_ref("model3D"),
                     direction="inwards",
                 ),
                 connection_name="revisions",
