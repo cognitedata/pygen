@@ -25,18 +25,18 @@ from typing import (
 import pandas as pd
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import (
-    TimeSeries,
-    TimeSeriesWrite,
-    TimeSeriesWriteList,
     FileMetadata,
+    FileMetadataList,
     FileMetadataWrite,
     FileMetadataWriteList,
     Sequence as CogniteSequence,
+    SequenceList,
     SequenceWrite,
     SequenceWriteList,
+    TimeSeries,
     TimeSeriesList,
-    FileMetadataList,
-    SequenceList,
+    TimeSeriesWrite,
+    TimeSeriesWriteList,
 )
 from cognite.client.data_classes.data_modeling.instances import (
     Instance,
