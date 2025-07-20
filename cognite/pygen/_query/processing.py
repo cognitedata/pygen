@@ -368,17 +368,32 @@ class QueryUnpacker:
                 source_node = end_node
                 target_node = start_node
             # step.view_id means that the edge has properties
+            dumped: dict[str, Any]
             if self._edges == "include" or step.view_id:
                 dumped = self.flatten_dump(
                     edge, step_properties, as_data_record=self._as_data_record, type_key=self._edge_type_key
                 )
                 for connection_property, node_targets_by_source in connections:
-                    if target_node in node_targets_by_source:
-                        dumped[connection_property] = node_targets_by_source[target_node]
+                    if dumped_target_node := node_targets_by_source.get(target_node):
+                        if len(dumped_target_node) != 1:
+                            raise ValueError(
+                                f"Expected exactly one target node for connection property '{connection_property}'"
+                                f" for edge {edge.as_id()}. Found: {len(dumped_target_node)}"
+                            )
+                        dumped[connection_property] = dumped_target_node[0]
 
                 unpacked_by_source[source_node].append(dumped)
             elif self._edges == "identifier":
                 dumped = edge.as_id().dump(include_instance_type=False)
+                for connection_property, node_targets_by_source in connections:
+                    if dumped_target_node := node_targets_by_source.get(target_node):
+                        if len(dumped_target_node) != 1:
+                            raise ValueError(
+                                f"Expected exactly one target node for connection property '{connection_property}'"
+                                f" for edge {edge.as_id()}. Found: {len(dumped_target_node)}"
+                            )
+                        dumped[connection_property] = dumped_target_node[0]  # type: ignore[assignment]
+
                 unpacked_by_source[source_node].append(dumped)
             elif self._edges == "skip" and is_leaf_step:
                 unpacked_by_source[source_node].append(target_node.dump(include_instance_type=False))
