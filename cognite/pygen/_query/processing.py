@@ -359,51 +359,49 @@ class QueryUnpacker:
         unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
         is_leaf_step = len(connections) == 0
         for edge in step.edge_results:
-            start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
-            end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
+            start_node, end_node = dm.NodeId.load(edge.start_node.dump()), dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
             if edge_expression.direction == "outwards":
-                source_node = start_node
-                target_node = end_node
+                source_node, target_node = start_node, end_node
             else:
-                source_node = end_node
-                target_node = start_node
+                source_node, target_node = end_node, start_node
             # step.view_id means that the edge has properties
-            dumped: dict[str, Any]
+            dumped_edge: dict[str, Any]
             if self._edges == "include" or step.view_id:
-                dumped = self.flatten_dump(
+                dumped_edge = self.flatten_dump(
                     edge, step_properties, as_data_record=self._as_data_record, type_key=self._edge_type_key
                 )
-                for connection_property, node_targets_by_source in connections:
-                    if dumped_target_node := node_targets_by_source.get(target_node):
-                        if len(dumped_target_node) != 1:
-                            raise ValueError(
-                                f"Expected exactly one target node for connection property '{connection_property}'"
-                                f" for edge {edge.as_id()}. Found: {len(dumped_target_node)}"
-                            )
-                        dumped[connection_property] = dumped_target_node[0]
-
-                unpacked_by_source[source_node].append(dumped)
+                self._append_connections(dumped_edge, connections, target_node, edge.as_id())
+                dumped = [dumped_edge]
             elif self._edges == "identifier":
-                dumped = edge.as_id().dump(include_instance_type=False)
-                for connection_property, node_targets_by_source in connections:
-                    if dumped_target_node := node_targets_by_source.get(target_node):
-                        if len(dumped_target_node) != 1:
-                            raise ValueError(
-                                f"Expected exactly one target node for connection property '{connection_property}'"
-                                f" for edge {edge.as_id()}. Found: {len(dumped_target_node)}"
-                            )
-                        dumped[connection_property] = dumped_target_node[0]  # type: ignore[assignment]
-
-                unpacked_by_source[source_node].append(dumped)
+                dumped_edge = edge.as_id().dump(include_instance_type=False)
+                self._append_connections(dumped_edge, connections, target_node, edge.as_id())
+                dumped = [dumped_edge]
             elif self._edges == "skip" and is_leaf_step:
-                unpacked_by_source[source_node].append(target_node.dump(include_instance_type=False))
+                dumped = [target_node.dump(include_instance_type=False)]
             elif self._edges == "skip":
+                # Skipping the edge, instead adding the target node to the source node
+                # such that the target node(s) can be connected to the source node.
                 for _, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
-                        # Skipping the edge, instead adding the target node to the source node
-                        # such that the target node(s) can be connected to the source node.
                         unpacked_by_source[source_node].extend(node_targets_by_source[target_node])
+                continue
             else:
                 raise ValueError(f"Unexpected value for edges: {self._edges}")
-
+            unpacked_by_source[source_node].extend(dumped)
         return unpacked_by_source
+
+    @staticmethod
+    def _append_connections(
+        dumped_edge: dict[str, Any],
+        connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
+        target_node: dm.NodeId,
+        edge_id: dm.EdgeId,
+    ) -> None:
+        for connection_property, node_targets_by_source in connections:
+            if dumped_target_node := node_targets_by_source.get(target_node):
+                if len(dumped_target_node) != 1:
+                    raise ValueError(
+                        f"Expected exactly one target node for connection property '{connection_property}'"
+                        f" for edge {edge_id}. Found: {len(dumped_target_node)}"
+                    )
+                dumped_edge[connection_property] = dumped_target_node[0]
