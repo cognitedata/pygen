@@ -374,6 +374,6 @@ def test_upsert_parent_direct_relation(core_client: CogniteCoreClient, omni_tmp_
         assert len(child_nodes) == 1
         child_node = child_nodes[0]
 
-        assert child_node.properties[view_id].get("parent") == parent.as_id()
+        assert child_node.properties[view_id].get("parent") == parent.as_id().dump(include_instance_type=False)
     finally:
         core_client.delete([parent.as_id(), child.as_id()])
