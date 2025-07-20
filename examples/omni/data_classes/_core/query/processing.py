@@ -136,6 +136,9 @@ class QueryUnpacker:
             to 'edge_type'.
         node_type_key: The key to use for the node type. Default is "type". In pygen generated SDKs, this is set
             to 'node_type'.
+        edge_connections: How to represent the connections of edges. If "list", the connections are represented
+            as a list of dictionaries. If "object", the connections are represented as a dictionary with the
+            connection property as the key and the target node as the value. Default is "list". In pygen generated
 
     Example:
         Unpacking query steps including edges:
@@ -195,12 +198,14 @@ class QueryUnpacker:
         as_data_record: bool = True,
         edge_type_key: str = "edge_type",
         node_type_key: str = "node_type",
+        edge_connections: Literal["list", "object"] = "list",
     ) -> None:
         self._steps = steps
         self._edges = edges
         self._as_data_record = as_data_record
         self._edge_type_key = edge_type_key
         self._node_type_key = node_type_key
+        self._edge_connections = edge_connections
 
     def unpack(self) -> list[dict[str, Any]]:
         if not self._steps:
@@ -390,8 +395,8 @@ class QueryUnpacker:
             unpacked_by_source[source_node].extend(dumped)
         return unpacked_by_source
 
-    @staticmethod
     def _append_connections(
+        self,
         dumped_edge: dict[str, Any],
         connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
         target_node: dm.NodeId,
@@ -399,9 +404,16 @@ class QueryUnpacker:
     ) -> None:
         for connection_property, node_targets_by_source in connections:
             if dumped_target_node := node_targets_by_source.get(target_node):
-                if len(dumped_target_node) != 1:
+                if self._edge_connections == "list":
+                    dumped_edge[connection_property] = dumped_target_node
+                elif self._edge_connections == "object":
+                    if len(dumped_target_node) != 1:
+                        raise ValueError(
+                            f"Expected exactly one target node for connection property '{connection_property}'"
+                            f" for edge {edge_id}. Found: {len(dumped_target_node)}"
+                        )
+                    dumped_edge[connection_property] = dumped_target_node[0]
+                else:
                     raise ValueError(
-                        f"Expected exactly one target node for connection property '{connection_property}'"
-                        f" for edge {edge_id}. Found: {len(dumped_target_node)}"
+                        f"Unexpected value for edge_connections: {self._edge_connections}. Expected 'list' or 'object'."
                     )
-                dumped_edge[connection_property] = dumped_target_node[0]
