@@ -357,6 +357,7 @@ class QueryUnpacker:
     ) -> dict[dm.NodeId, list[dict[str, Any]]]:
         step_properties = set(step.selected_properties or []) or None
         unpacked_by_source: dict[dm.NodeId, list[dict[str, Any]]] = defaultdict(list)
+        is_leaf_step = len(connections) == 0
         for edge in step.edge_results:
             start_node = dm.NodeId.load(edge.start_node.dump())  # type: ignore[arg-type]
             end_node = dm.NodeId.load(edge.end_node.dump())  # type: ignore[arg-type]
@@ -379,6 +380,8 @@ class QueryUnpacker:
             elif self._edges == "identifier":
                 dumped = edge.as_id().dump(include_instance_type=False)
                 unpacked_by_source[source_node].append(dumped)
+            elif self._edges == "skip" and is_leaf_step:
+                unpacked_by_source[source_node].append(target_node.dump(include_instance_type=False))
             elif self._edges == "skip":
                 for _, node_targets_by_source in connections:
                     if target_node in node_targets_by_source:
