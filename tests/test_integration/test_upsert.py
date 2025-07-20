@@ -4,6 +4,9 @@ from collections.abc import Iterable
 import pytest
 from cognite.client import CogniteClient
 from cognite.client.data_classes import FileMetadataWrite, SequenceColumnWrite, SequenceWrite, TimeSeriesWrite
+from cognite.client.data_classes.data_modeling import DirectRelationReference, Space
+from cognite_core import CogniteCoreClient
+from cognite_core import data_classes as cdc
 from omni import OmniClient
 from omni import data_classes as dc
 
@@ -342,3 +345,35 @@ def test_upsert_with_cdf_external_listed(omni_client: OmniClient, cognite_client
             cognite_client.files.delete(id=resources.files.as_ids())
         if resources.sequences:
             cognite_client.sequences.delete(external_id=resources.sequences.as_external_ids())
+
+
+def test_upsert_parent_direct_relation(core_client: CogniteCoreClient, omni_tmp_space: Space) -> None:
+    space = omni_tmp_space.space
+    client = core_client._client
+    parent = cdc.CogniteAssetWrite(
+        space=space,
+        external_id="pygen_integration_test_parent_direct_relation",
+        name="Root Asset",
+    )
+    child = cdc.CogniteAssetWrite(
+        space=space,
+        external_id="pygen_integration_test_child_direct_relation",
+        name="Child Asset",
+        # Pydantic converts the DirectRelationReference to a NodeId on the fly.
+        parent=DirectRelationReference(space, parent.external_id),  # type: ignore[arg-type]
+    )
+    view_id = cdc.CogniteAssetWrite._view_id
+
+    try:
+        created_parent = core_client.upsert(parent)
+        assert len(created_parent.nodes) == 1
+        created_child = core_client.upsert(child)
+        assert len(created_child.nodes) == 1
+
+        child_nodes = client.data_modeling.instances.retrieve(child.as_id(), sources=[view_id]).nodes
+        assert len(child_nodes) == 1
+        child_node = child_nodes[0]
+
+        assert child_node.properties[view_id].get("parent") == parent.as_id()
+    finally:
+        core_client.delete([parent.as_id(), child.as_id()])
