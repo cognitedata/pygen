@@ -203,6 +203,8 @@ class QueryUnpacker:
         self._node_type_key = node_type_key
 
     def unpack(self) -> list[dict[str, Any]]:
+        if not self._steps:
+            return []
         # The unpacked nodes/edges are stored in the dictionary below
         # dict[Step Name, list[Connection Property, dict[Source Node ID, list[Target Node]]]]
         # This is used for each step, to look up the connected nodes/edges.
