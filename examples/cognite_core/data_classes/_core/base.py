@@ -761,22 +761,23 @@ def serialize_properties(model: DomainModelWrite | DomainRelationWrite, resource
     properties: dict[str, Any] = {}
     model_fields = type(model).model_fields
     for field_name in model._container_fields:
-        if field_name in model.model_fields_set:
-            value = getattr(model, field_name)
-            key = model_fields[field_name].alias or field_name
-            if field_name in model._direct_relations:
-                properties[key] = serialize_relation(value, model.space)
-            else:
-                properties[key] = serialize_property(value)
+        if field_name not in model.model_fields_set:
+            continue
+        value = getattr(model, field_name)
+        key = model_fields[field_name].alias or field_name
+        if field_name in model._direct_relations:
+            properties[key] = serialize_relation(value, model.space)
+        else:
+            properties[key] = serialize_property(value)
 
-            values = value if isinstance(value, Sequence) else [value]
-            for item in values:
-                if isinstance(item, FileMetadataWrite):
-                    resources.files.append(item)
-                elif isinstance(item, TimeSeriesWrite):
-                    resources.time_series.append(item)
-                elif isinstance(item, SequenceWrite):
-                    resources.sequences.append(item)
+        values = value if isinstance(value, Sequence) and not isinstance(value, str) else [value]
+        for item in values:
+            if isinstance(item, FileMetadataWrite):
+                resources.files.append(item)
+            elif isinstance(item, TimeSeriesWrite):
+                resources.time_series.append(item)
+            elif isinstance(item, SequenceWrite):
+                resources.sequences.append(item)
 
     return properties
 
