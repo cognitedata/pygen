@@ -192,7 +192,6 @@ class TestQueryUnpacker:
                         "endNode": {
                             "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
                             "externalId": "brenda",
-                            "instanceType": "node",
                             "name": "Brenda",
                             "space": "test_space",
                         },
@@ -221,6 +220,10 @@ class TestQueryUnpacker:
         item.pop("instanceType", None)
         for outwards in item.get("outwards", []):
             outwards.pop("instanceType", None)
+            if "endNode" in outwards:
+                end_node = outwards["endNode"]
+                if isinstance(end_node, dict):
+                    end_node.pop("instanceType", None)
 
         assert isinstance(item, dict)
         assert item == {
