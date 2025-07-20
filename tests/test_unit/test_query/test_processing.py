@@ -210,7 +210,7 @@ class TestQueryUnpacker:
         expected_outwards: list[dict],
         node_with_edge_and_node_results: list[QueryResultStep],
     ) -> None:
-        unpacker = QueryUnpacker(steps=node_with_edge_and_node_results, edges=edges)
+        unpacker = QueryUnpacker(steps=node_with_edge_and_node_results, edges=edges, edge_connections="object")
 
         unpacked = unpacker.unpack()
 
