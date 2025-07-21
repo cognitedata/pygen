@@ -5,6 +5,15 @@ from typing import cast
 
 import pytest
 from cognite.client import data_modeling as dm
+from cognite.client.data_classes import (
+    FileMetadata,
+    FileMetadataWrite,
+    Sequence,
+    SequenceColumn,
+    SequenceWrite,
+    TimeSeries,
+    TimeSeriesWrite,
+)
 from cognite_core.data_classes import CogniteFileWrite
 from omni import data_classes as dc
 from pydantic import TypeAdapter
@@ -228,3 +237,50 @@ class TestAsWrite:
             "data_record": {"existing_version": 1},
             "text": "Some text",
         }
+
+    def test_as_write_with_cdf_external_references(self) -> None:
+        now = datetime.now(timezone.utc)
+        read_instance = dc.CDFExternalReferences(
+            external_id="my_external_id",
+            data_record=dc.DataRecord(
+                version=1,
+                last_updated_time=now,
+                created_time=now,
+                deleted_time=None,
+            ),
+            node_type=None,
+            file=FileMetadata(
+                id=123456789,
+                external_id="my_file_external_id",
+                source="my_source_id",
+                mime_type="application/json",
+                directory="/tmp",
+                name="my_file_external_id",
+            ),
+            timeseries=TimeSeries(
+                id=987654321,
+                external_id="my_timeseries_external_id",
+                name="my_timeseries_external_id",
+                is_step=False,
+                is_string=False,
+            ),
+            sequence=Sequence(
+                id=1122334455,
+                external_id="my_sequence_external_id",
+                name="my_sequence_external_id",
+                columns=[
+                    SequenceColumn(
+                        external_id="column1",
+                        name="column1",
+                        value_type="String",
+                    )
+                ],
+            ),
+        )
+
+        write = read_instance.as_write()
+
+        assert isinstance(write, dc.CDFExternalReferencesWrite)
+        assert isinstance(write.file, FileMetadataWrite)
+        assert isinstance(write.sequence, SequenceWrite)
+        assert isinstance(write.timeseries, TimeSeriesWrite)

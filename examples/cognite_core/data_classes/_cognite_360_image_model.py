@@ -347,7 +347,7 @@ class _Cognite360ImageModelQuery(NodeQueryCore[T_DomainModelList, Cognite360Imag
                 client,
                 result_list_cls,
                 dm.query.NodeResultSetExpression(
-                    through=dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1").as_property_ref("model3D"),
+                    through=dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1").as_property_ref("model3D"),
                     direction="inwards",
                 ),
                 connection_name="collections",

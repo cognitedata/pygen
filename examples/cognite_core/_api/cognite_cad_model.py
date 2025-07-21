@@ -461,7 +461,7 @@ class CogniteCADModelAPI(NodeAPI[CogniteCADModel, CogniteCADModelWrite, CogniteC
             builder.extend(
                 factory.from_reverse_relation(
                     CogniteCADRevision._view_id,
-                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1"), "model3D"),
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteCADRevision", "v1"), "model3D"),
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "revisions"),
                     has_container_fields=True,

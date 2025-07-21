@@ -463,7 +463,7 @@ class Cognite360ImageModelAPI(
             builder.extend(
                 factory.from_reverse_relation(
                     Cognite360ImageCollection._view_id,
-                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "Cognite3DRevision", "v1"), "model3D"),
+                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1"), "model3D"),
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "collections"),
                     has_container_fields=True,
