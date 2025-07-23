@@ -138,7 +138,7 @@ class QueryUnpacker:
             to 'node_type'.
         edge_connections: How to represent the connections of edges. If "list", the connections are represented
             as a list of dictionaries. If "object", the connections are represented as a dictionary with the
-            connection property as the key and the target node as the value. Default is "list". In pygen generated
+            connection property as the key and the target node as the value. Default is "list".
 
     Example:
         Unpacking query steps including edges:
