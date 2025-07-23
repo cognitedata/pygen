@@ -153,10 +153,11 @@ class TestQueryUnpacker:
         }
 
     @pytest.mark.parametrize(
-        "edges, expected_outwards",
+        "edges, edge_connections, expected_outwards",
         [
             pytest.param(
                 "skip",
+                "object",
                 [
                     {
                         "space": "test_space",
@@ -169,6 +170,7 @@ class TestQueryUnpacker:
             ),
             pytest.param(
                 "identifier",
+                "object",
                 [
                     {
                         "space": "test_space",
@@ -185,16 +187,19 @@ class TestQueryUnpacker:
             ),
             pytest.param(
                 "include",
+                "list",
                 [
                     {
                         "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
                         "edge_type": {"externalId": "outwards", "space": "sp_pygen_models"},
-                        "endNode": {
-                            "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
-                            "externalId": "brenda",
-                            "name": "Brenda",
-                            "space": "test_space",
-                        },
+                        "endNode": [
+                            {
+                                "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
+                                "externalId": "brenda",
+                                "name": "Brenda",
+                                "space": "test_space",
+                            }
+                        ],
                         "externalId": "edge_external_id",
                         "space": "test_space",
                         "startNode": {"externalId": "jennifer", "space": "test_space"},
@@ -207,10 +212,11 @@ class TestQueryUnpacker:
     def test_unpack_with_node_leaf_step(
         self,
         edges: Literal["skip", "identifier", "include"],
+        edge_connections: Literal["object", "list"],
         expected_outwards: list[dict],
         node_with_edge_and_node_results: list[QueryResultStep],
     ) -> None:
-        unpacker = QueryUnpacker(steps=node_with_edge_and_node_results, edges=edges, edge_connections="object")
+        unpacker = QueryUnpacker(steps=node_with_edge_and_node_results, edges=edges, edge_connections=edge_connections)
 
         unpacked = unpacker.unpack()
 
@@ -224,6 +230,9 @@ class TestQueryUnpacker:
                 end_node = outwards["endNode"]
                 if isinstance(end_node, dict):
                     end_node.pop("instanceType", None)
+                elif isinstance(end_node, list):
+                    for node in end_node:
+                        node.pop("instanceType", None)
 
         assert isinstance(item, dict)
         assert item == {
