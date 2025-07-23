@@ -71,3 +71,21 @@ def test_retrieve_multiple_with_connections(omni_client: OmniClient, item_a_list
     for item in items:
         connections = [c for c in [item.outwards, item.self_direct, item.other_direct] if c is not None]
         assert connections
+
+
+def test_retrieve_with_connections_same(omni_client: OmniClient, item_a_list: dc.ConnectionItemAList) -> None:
+    item_a = item_a_list[0]
+    retrieve_identifier = omni_client.connection_item_a.retrieve(
+        external_id=item_a.external_id, retrieve_connections="identifier"
+    )
+    retrieve_full = omni_client.connection_item_a.retrieve(external_id=item_a.external_id, retrieve_connections="full")
+
+    assert retrieve_identifier is not None
+    assert retrieve_full is not None
+    outward_identifiers = sorted(
+        [outward for outward in retrieve_identifier.outwards or [] if isinstance(outward, str)]
+    )
+    outward_full = sorted(
+        [outward.external_id for outward in retrieve_full.outwards or [] if isinstance(outward, dc.ConnectionItemB)]
+    )
+    assert outward_identifiers == outward_full
