@@ -1,5 +1,7 @@
 # Description
 
+**Reviewer**: All code inside `examples/` is generated.
+
 Please describe the change you have made.
 
 ## Bump
