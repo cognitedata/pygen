@@ -284,3 +284,40 @@ class TestAsWrite:
         assert isinstance(write.file, FileMetadataWrite)
         assert isinstance(write.sequence, SequenceWrite)
         assert isinstance(write.timeseries, TimeSeriesWrite)
+
+    def test_as_write_maintain_view_type(self) -> None:
+        now = datetime.now(timezone.utc)
+        record = dc.DataRecord(
+            version=1,
+            last_updated_time=now,
+            created_time=now,
+            deleted_time=None,
+        )
+        read = dc.ConnectionItemH(
+            external_id="test_as_write_maintain_view_type",
+            name="ConnectionH",
+            data_record=record,
+            direct_parent_single=dc.Implementation1(
+                external_id="test_as_write_maintain_view_type:Implementation1",
+                main_value="main_value",
+                value_1="value_1",
+                value_2="value_2",
+                data_record=record,
+            ),
+            direct_parent_multi=[
+                dc.Implementation2(
+                    external_id="test_as_write_maintain_view_type:Implementation2",
+                    main_value="main_value",
+                    sub_value="sub_value",
+                    data_record=record,
+                )
+            ],
+        )
+
+        write = read.as_write()
+
+        assert isinstance(write, dc.ConnectionItemHWrite)
+        assert isinstance(write.direct_parent_single, dc.Implementation1Write)
+        assert isinstance(write.direct_parent_single, list)
+        assert len(write.direct_parent_multi) == 1
+        assert isinstance(write.direct_parent_multi[0], dc.Implementation2Write)
