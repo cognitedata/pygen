@@ -263,8 +263,8 @@ class {{ data_class.write_name }}({{ data_class.write_base_class }}{% if data_cl
     {% if data_class.has_inwards_edges %}
     _inwards_edges: ClassVar[tuple[tuple[str, dm.DirectRelationReference], ...]] = ({{ data_class.inwards_edges_comma_sep }},)
     {% endif %}
-    {% if data_class.has_direct_relations_with_source %}
-    _direct_relations: ClassVar[tuple[str, ...]] = ({{ data_class.direct_relations_with_source_comma_sep }},)
+    {% if data_class.has_direct_relations %}
+    _direct_relations: ClassVar[tuple[str, ...]] = ({{ data_class.direct_relations_including_sourceless_comma_sep }},)
     {% endif %}
 
     _view_id: ClassVar[dm.ViewId] = {{ data_class.view_id_str }}

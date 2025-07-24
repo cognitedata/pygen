@@ -271,6 +271,7 @@ class NacelleWrite(DomainModelWrite):
         "yaw_error",
     )
     _direct_relations: ClassVar[tuple[str, ...]] = (
+        "acc_from_back_side_x",
         "acc_from_back_side_y",
         "acc_from_back_side_z",
         "gearbox",
