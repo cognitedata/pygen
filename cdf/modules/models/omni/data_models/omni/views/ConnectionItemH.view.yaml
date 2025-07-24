@@ -1,0 +1,44 @@
+space: {{ pygen_models_space }}
+externalId: ConnectionItemH
+name: ConnectionItemH
+version: '1'
+filter:
+  equals:
+    property:
+    - node
+    - type
+    value:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionItemH
+properties:
+  name:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionBase
+      type: container
+    containerPropertyIdentifier: name
+    name: name
+  directParentMulti:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionDirectList
+      type: container
+    containerPropertyIdentifier: directList
+    name: directMulti
+    source:
+      space: {{ pygen_models_space }}
+      externalId: MainInterface
+      version: '1'
+      type: view
+  directParentSingle:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: ConnectionDirectList
+      type: container
+    containerPropertyIdentifier: directNoList
+    name: directSingle
+    source:
+      space: {{ pygen_models_space }}
+      externalId: MainInterface
+      version: '1'
+      type: view
