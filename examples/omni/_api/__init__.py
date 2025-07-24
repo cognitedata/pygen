@@ -18,6 +18,7 @@ from omni._api.connection_item_f_outwards_multi import ConnectionItemFOutwardsMu
 from omni._api.connection_item_f_outwards_single import ConnectionItemFOutwardsSingleAPI
 from omni._api.connection_item_g import ConnectionItemGAPI
 from omni._api.connection_item_g_inwards_multi_property import ConnectionItemGInwardsMultiPropertyAPI
+from omni._api.connection_item_h import ConnectionItemHAPI
 from omni._api.dependent_on_non_writable import DependentOnNonWritableAPI
 from omni._api.dependent_on_non_writable_to_non_writable import DependentOnNonWritableToNonWritableAPI
 from omni._api.empty import EmptyAPI
@@ -53,6 +54,7 @@ __all__ = [
     "ConnectionItemFOutwardsSingleAPI",
     "ConnectionItemGAPI",
     "ConnectionItemGInwardsMultiPropertyAPI",
+    "ConnectionItemHAPI",
     "DependentOnNonWritableAPI",
     "DependentOnNonWritableToNonWritableAPI",
     "EmptyAPI",

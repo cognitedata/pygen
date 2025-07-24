@@ -21,6 +21,7 @@ from omni._api import (
     ConnectionItemEAPI,
     ConnectionItemFAPI,
     ConnectionItemGAPI,
+    ConnectionItemHAPI,
     DependentOnNonWritableAPI,
     EmptyAPI,
     Implementation1API,
@@ -44,8 +45,8 @@ class OmniClient:
 
     Generated with:
         pygen = 0.0.0
-        cognite-sdk = 7.75.1
-        pydantic = 2.10.6
+        cognite-sdk = 7.77.0
+        pydantic = 2.11.7
 
     Data Model:
         space: sp_pygen_models
@@ -77,6 +78,7 @@ class OmniClient:
         self.connection_item_e = ConnectionItemEAPI(client)
         self.connection_item_f = ConnectionItemFAPI(client)
         self.connection_item_g = ConnectionItemGAPI(client)
+        self.connection_item_h = ConnectionItemHAPI(client)
         self.dependent_on_non_writable = DependentOnNonWritableAPI(client)
         self.empty = EmptyAPI(client)
         self.implementation_1 = Implementation1API(client)
@@ -264,6 +266,7 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_e<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_f<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.connection_item_g<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.connection_item_h<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.dependent_on_non_writable<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.empty<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.implementation_1<br />

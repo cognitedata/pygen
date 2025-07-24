@@ -581,6 +581,7 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[G
         "ConnectionItemE": data_classes.ConnectionItemEGraphQL,
         "ConnectionItemF": data_classes.ConnectionItemFGraphQL,
         "ConnectionItemG": data_classes.ConnectionItemGGraphQL,
+        "ConnectionItemH": data_classes.ConnectionItemHGraphQL,
         "DependentOnNonWritable": data_classes.DependentOnNonWritableGraphQL,
         "Empty": data_classes.EmptyGraphQL,
         "Implementation1": data_classes.Implementation1GraphQL,
