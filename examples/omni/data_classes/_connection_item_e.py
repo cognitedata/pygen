@@ -221,6 +221,10 @@ class ConnectionItemEWrite(DomainModelWrite):
         ("inwards_single", dm.DirectRelationReference("sp_pygen_models", "bidirectionalSingle")),
         ("inwards_single_property", dm.DirectRelationReference("sp_pygen_models", "multiProperty")),
     )
+    _direct_relations: ClassVar[tuple[str, ...]] = (
+        "direct_list_no_source",
+        "direct_no_source",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "ConnectionItemE", "1")
 
