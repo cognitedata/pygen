@@ -448,7 +448,7 @@ provides-extras = ["cli", "format"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "cognite-toolkit", specifier = "==0.5.86" },
+    { name = "cognite-toolkit", specifier = "==0.5.87" },
     { name = "faker", specifier = ">=18.0.0" },
     { name = "hypothesis", specifier = ">=6.0.0" },
     { name = "ipython", specifier = ">=8.0.0" },
@@ -497,7 +497,7 @@ wheels = [
 
 [[package]]
 name = "cognite-toolkit"
-version = "0.5.86"
+version = "0.5.87"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cognite-sdk" },
@@ -516,9 +516,9 @@ dependencies = [
     { name = "typer" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/db/da/eb7a3b6310d1782d33081e6b154d0a634f73673b48093bee7f3c94937854/cognite_toolkit-0.5.86.tar.gz", hash = "sha256:eae38a42c2b483a4a15fb3c6a0703dc0478e88d0594089b0d8f8a8133637016b", size = 930973, upload-time = "2025-07-23T14:46:49.104Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9b/0e/054b1cdaaf2a4e576b8ac920cd2f35c26a63b12a725be108113a40a3b542/cognite_toolkit-0.5.87.tar.gz", hash = "sha256:1eb1fb6e7f8206ae644eb969d082cdd214588f086671834ea421c8e18f1ef6e6", size = 931171, upload-time = "2025-07-24T05:02:18.917Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/f4/79250680423e78adf5894cf59ea259d3ef70ef28713590cd3d36ba00db5b/cognite_toolkit-0.5.86-py3-none-any.whl", hash = "sha256:2d566b8262c069520f9da016b29f63e907833d245e9f90d39175b627b14849a4", size = 789124, upload-time = "2025-07-23T14:46:47.495Z" },
+    { url = "https://files.pythonhosted.org/packages/78/38/2105da47828d62529ba3e489956cecf7eeb4a4d21712da4a90585ffebf67/cognite_toolkit-0.5.87-py3-none-any.whl", hash = "sha256:b3f572b85c18458da822e94db28b789a50bb99f52bb8c091c9d50b5ff400fdab", size = 787252, upload-time = "2025-07-24T05:02:17.228Z" },
 ]
 
 [[package]]

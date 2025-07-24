@@ -5,7 +5,7 @@ default_env = "dev"
 [modules]
 # This is the version of the modules. It should not be changed manually.
 # It will be updated by the 'cdf module upgrade' command.
-version = "0.5.86"
+version = "0.5.87"
 
 [plugins]
 run = false
@@ -15,3 +15,5 @@ dump = true
 [alpha_flags]
 graphql = true
 purge = true
+dump-extended = true
+agents = true
