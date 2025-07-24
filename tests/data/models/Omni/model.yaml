@@ -725,6 +725,77 @@ views:
   lastUpdatedTime: 1729345477397
   createdTime: 1729345477397
 - space: sp_pygen_models
+  externalId: ConnectionItemH
+  name: ConnectionItemH
+  filter:
+    equals:
+      property:
+      - node
+      - type
+      value:
+        space: sp_pygen_models
+        externalId: ConnectionItemH
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    directParentMulti:
+      container:
+        space: sp_pygen_models
+        externalId: ConnectionDirectList
+      containerPropertyIdentifier: directList
+      type:
+        list: true
+        type: direct
+        source:
+          space: sp_pygen_models
+          externalId: MainInterface
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: directMulti
+      description: null
+    directParentSingle:
+      container:
+        space: sp_pygen_models
+        externalId: ConnectionDirectList
+      containerPropertyIdentifier: directNoList
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_models
+          externalId: MainInterface
+          version: '1'
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      defaultValue: null
+      name: directSingle
+      description: null
+    name:
+      container:
+        space: sp_pygen_models
+        externalId: ConnectionBase
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: true
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: null
+      name: name
+      description: null
+  lastUpdatedTime: 1753335858852
+  createdTime: 1753335858852
+- space: sp_pygen_models
   externalId: DependentOnNonWritable
   name: DependentOnNonWritable
   filter:
