@@ -605,6 +605,11 @@ class DataClass:
         )
 
     @property
+    def has_direct_relations(self) -> bool:
+        """Check if the data class has any direct relations."""
+        return any(isinstance(field_, BaseConnectionField) and field_.is_direct_relation for field_ in self)
+
+    @property
     def has_direct_relations_with_source(self) -> bool:
         """Check if the data class has any direct relations with source."""
         return any(
