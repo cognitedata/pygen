@@ -624,6 +624,17 @@ class DataClass:
         )
 
     @property
+    def direct_relations_including_sourceless_comma_sep(self) -> str:
+        """All direct relations with source, including sourceless direct relations."""
+        return ", ".join(
+            sorted(
+                f'"{field_.name}"'
+                for field_ in self
+                if isinstance(field_, BaseConnectionField) and field_.is_direct_relation
+            )
+        )
+
+    @property
     def has_single_connection_fields(self) -> bool:
         """Check if the data class has any single connection fields."""
         return any(isinstance(field_, OneToOneConnectionField) for field_ in self)
