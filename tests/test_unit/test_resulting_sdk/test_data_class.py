@@ -318,6 +318,6 @@ class TestAsWrite:
 
         assert isinstance(write, dc.ConnectionItemHWrite)
         assert isinstance(write.direct_parent_single, dc.Implementation1Write)
-        assert isinstance(write.direct_parent_single, list)
+        assert isinstance(write.direct_parent_multi, list)
         assert len(write.direct_parent_multi) == 1
         assert isinstance(write.direct_parent_multi[0], dc.Implementation2Write)
