@@ -920,7 +920,7 @@ def as_write_args(model: DomainModel | GraphQLCore | DomainRelation | GraphQLExt
 
 def as_write_value(value: Any) -> Any:
     if isinstance(value, DomainModel | GraphQLCore | GraphQLExternal):
-        return as_write_args(value)
+        return value.as_write() if hasattr(value, "as_write") else as_write_args(value)
     elif isinstance(value, Sequence) and not isinstance(value, str):
         return [as_write_value(item) for item in value]
     elif isinstance(value, TimeSeries | FileMetadata | CogniteSequence):
