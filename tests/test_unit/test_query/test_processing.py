@@ -10,7 +10,7 @@ from cognite.client.data_classes.data_modeling import (
     filters,
     query,
 )
-from cognite.client.data_classes.data_modeling.instances import Edge, EdgeListWithCursor, Properties
+from cognite.client.data_classes.data_modeling.instances import Edge, EdgeListWithCursor, Instance, Properties
 
 from cognite.pygen._query.processing import QueryUnpacker
 from cognite.pygen._query.step import QueryResultStep, ViewPropertyId
@@ -242,3 +242,76 @@ class TestQueryUnpacker:
             "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
             "outwards": expected_outwards,
         }
+
+    @pytest.mark.parametrize(
+        "instance, expected",
+        [
+            pytest.param(
+                Node(
+                    space="test_space",
+                    external_id="test_id",
+                    version=1,
+                    last_updated_time=1,
+                    created_time=1,
+                    properties=Properties(
+                        {
+                            ViewId("schema_space", "MyViewId", "v1"): {
+                                "name": "Test Node",
+                                "description": "This is a test node",
+                            }
+                        }
+                    ),
+                    deleted_time=None,
+                    type=None,
+                ),
+                {
+                    "space": "test_space",
+                    "externalId": "test_id",
+                    "version": 1,
+                    "lastUpdatedTime": 1,
+                    "createdTime": 1,
+                    "name": "Test Node",
+                    "description": "This is a test node",
+                },
+                id="Node with properties",
+            ),
+            pytest.param(
+                Edge(
+                    space="test_space",
+                    external_id="test_id",
+                    version=1,
+                    last_updated_time=1,
+                    created_time=1,
+                    properties=Properties(
+                        {
+                            ViewId("schema_space", "MyViewId", "v1"): {
+                                "name": "Test Edge",
+                                "description": "This is a test edge",
+                            }
+                        }
+                    ),
+                    deleted_time=None,
+                    type=("schema_space", "myType"),
+                    start_node=("test_space", "node1"),
+                    end_node=("test_space", "node2"),
+                ),
+                {
+                    "space": "test_space",
+                    "externalId": "test_id",
+                    "version": 1,
+                    "lastUpdatedTime": 1,
+                    "createdTime": 1,
+                    "name": "Test Edge",
+                    "description": "This is a test edge",
+                    "type": {"space": "schema_space", "externalId": "myType"},
+                    "startNode": {"space": "test_space", "externalId": "node1"},
+                    "endNode": {"space": "test_space", "externalId": "node2"},
+                },
+                id="Edge with properties",
+            ),
+        ],
+    )
+    def test_dump_flatten(self, instance: Instance, expected: dict[str, object]) -> None:
+        result = QueryUnpacker.flatten_dump(instance, None)
+
+        assert result == expected, f"Expected {expected}, but got {result}"
