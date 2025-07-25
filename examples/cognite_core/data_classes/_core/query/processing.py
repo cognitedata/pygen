@@ -242,7 +242,7 @@ class QueryUnpacker:
     @classmethod
     def flatten_dump(
         cls,
-        node: dm.Node | dm.Edge,
+        instance: Instance,
         selected_properties: set[str] | None,
         direct_property: str | None = None,
         as_data_record: bool = False,
@@ -251,7 +251,7 @@ class QueryUnpacker:
         """Dumps the node/edge into a flat dictionary.
 
         Args:
-            node: The node or edge to dump.
+            instance: The node or edge to dump.
             selected_properties: The properties to include in the dump. If None, all properties are included.
             direct_property: Assumed to be the property ID of a direct relation. If present, the value
                 of this property will be converted to a NodeId or a list of NodeIds. The motivation for this is
@@ -263,7 +263,9 @@ class QueryUnpacker:
             A dictionary with the properties of the node or edge
 
         """
-        dumped = node.dump()
+        dumped = instance.dump()
+        # Remove the instanceType as we already have the context of the instance type
+        dumped.pop("instanceType", None)
         dumped_properties = dumped.pop("properties", {})
         if "type" in dumped:
             dumped[type_key] = dumped.pop("type")
