@@ -37,6 +37,10 @@ views:
   version: "1"
   type: view
 - space: {{ pygen_models_space }}
+  externalId: ConnectionItemH
+  version: "1"
+  type: view
+- space: {{ pygen_models_space }}
   externalId: DependentOnNonWritable
   version: "1"
   type: view

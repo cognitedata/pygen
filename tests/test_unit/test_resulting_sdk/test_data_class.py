@@ -134,6 +134,36 @@ class TestToInstancesWrite:
         assert connection.outwards == [dm.NodeId(space="my_space", external_id="my_external_id2")]
         assert connection.self_direct == dm.NodeId(space="my_space", external_id="my_external_id3")
 
+    def test_to_instances_write_sourceless_direct_relation(self) -> None:
+        item = dc.ConnectionItemEWrite(
+            external_id="test_to_instances_write_sourceless_direct_relation",
+            name="connectionE",
+            direct_no_source="some_node_of_unknown_type",
+            direct_list_no_source=[
+                "some_node_of_unknown_type_1",
+                "some_node_of_unknown_type_2",
+            ],
+        )
+
+        instances = item.to_instances_write()
+
+        assert len(instances.nodes) == 1
+        node = instances.nodes[0]
+        assert len(node.sources) == 1
+        source = node.sources[0]
+        assert "directNoSource" in source.properties
+        direct_no_source = source.properties["directNoSource"]
+        assert isinstance(direct_no_source, dict)
+        assert "externalId" in direct_no_source and "space" in direct_no_source
+        assert direct_no_source["externalId"] == "some_node_of_unknown_type"
+        assert "directListNoSource" in source.properties
+        direct_list_no_source = source.properties["directListNoSource"]
+        assert isinstance(direct_list_no_source, list)
+        for no, item in enumerate(direct_list_no_source, 1):
+            assert isinstance(item, dict)
+            assert "externalId" in item and "space" in item
+            assert item["externalId"] == f"some_node_of_unknown_type_{no}"
+
 
 @pytest.mark.parametrize(
     "factory, expected_node_count, expected_edge_count",
@@ -284,3 +314,40 @@ class TestAsWrite:
         assert isinstance(write.file, FileMetadataWrite)
         assert isinstance(write.sequence, SequenceWrite)
         assert isinstance(write.timeseries, TimeSeriesWrite)
+
+    def test_as_write_maintain_view_type(self) -> None:
+        now = datetime.now(timezone.utc)
+        record = dc.DataRecord(
+            version=1,
+            last_updated_time=now,
+            created_time=now,
+            deleted_time=None,
+        )
+        read = dc.ConnectionItemH(
+            external_id="test_as_write_maintain_view_type",
+            name="ConnectionH",
+            data_record=record,
+            direct_parent_single=dc.Implementation1(
+                external_id="test_as_write_maintain_view_type:Implementation1",
+                main_value="main_value",
+                value_1="value_1",
+                value_2="value_2",
+                data_record=record,
+            ),
+            direct_parent_multi=[
+                dc.Implementation2(
+                    external_id="test_as_write_maintain_view_type:Implementation2",
+                    main_value="main_value",
+                    sub_value="sub_value",
+                    data_record=record,
+                )
+            ],
+        )
+
+        write = read.as_write()
+
+        assert isinstance(write, dc.ConnectionItemHWrite)
+        assert isinstance(write.direct_parent_single, dc.Implementation1Write)
+        assert isinstance(write.direct_parent_multi, list)
+        assert len(write.direct_parent_multi) == 1
+        assert isinstance(write.direct_parent_multi[0], dc.Implementation2Write)

@@ -605,6 +605,11 @@ class DataClass:
         )
 
     @property
+    def has_direct_relations(self) -> bool:
+        """Check if the data class has any direct relations."""
+        return any(isinstance(field_, BaseConnectionField) and field_.is_direct_relation for field_ in self)
+
+    @property
     def has_direct_relations_with_source(self) -> bool:
         """Check if the data class has any direct relations with source."""
         return any(
@@ -620,6 +625,17 @@ class DataClass:
                 f'"{field_.name}"'
                 for field_ in self
                 if isinstance(field_, BaseConnectionField) and field_.is_direct_relation and field_.destination_class
+            )
+        )
+
+    @property
+    def direct_relations_including_sourceless_comma_sep(self) -> str:
+        """All direct relations with source, including sourceless direct relations."""
+        return ", ".join(
+            sorted(
+                f'"{field_.name}"'
+                for field_ in self
+                if isinstance(field_, BaseConnectionField) and field_.is_direct_relation
             )
         )
 
