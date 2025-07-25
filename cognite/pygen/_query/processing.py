@@ -264,6 +264,8 @@ class QueryUnpacker:
 
         """
         dumped = instance.dump()
+        # Remove the instanceType as we already have the context of the instance type
+        dumped.pop("instanceType", None)
         dumped_properties = dumped.pop("properties", {})
         if "type" in dumped:
             dumped[type_key] = dumped.pop("type")
