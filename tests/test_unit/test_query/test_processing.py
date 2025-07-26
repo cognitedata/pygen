@@ -4,15 +4,17 @@ from typing import Literal
 import pytest
 from cognite.client.data_classes.data_modeling import (
     DirectRelationReference,
-    Node,
-    NodeListWithCursor,
     ViewId,
     filters,
     query,
 )
-from cognite.client.data_classes.data_modeling.instances import Edge, EdgeListWithCursor, Properties
-from cognite.client.data_classes.data_modeling import ViewId
-from cognite.client.data_classes.data_modeling.instances import Edge, Node, Properties
+from cognite.client.data_classes.data_modeling.instances import (
+    Edge,
+    EdgeListWithCursor,
+    Node,
+    NodeListWithCursor,
+    Properties,
+)
 
 from cognite.pygen._query.processing import QueryUnpacker
 from cognite.pygen._query.step import QueryResultStep, ViewPropertyId
