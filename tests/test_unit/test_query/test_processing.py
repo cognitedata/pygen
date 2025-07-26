@@ -142,10 +142,6 @@ class TestQueryUnpacker:
 
         assert len(unpacked) == 1
         item = unpacked[0]
-        # Bug which will be fixed in PR #494
-        item.pop("instanceType", None)
-        for outwards in item.get("outwards", []):
-            outwards.pop("instanceType", None)
 
         assert isinstance(item, dict)
         assert item == {
@@ -226,18 +222,6 @@ class TestQueryUnpacker:
 
         assert len(unpacked) == 1
         item = unpacked[0]
-        # Bug which will be fixed in PR #494
-        item.pop("instanceType", None)
-        for outwards in item.get("outwards", []):
-            outwards.pop("instanceType", None)
-            if "endNode" in outwards:
-                end_node = outwards["endNode"]
-                if isinstance(end_node, dict):
-                    end_node.pop("instanceType", None)
-                elif isinstance(end_node, list):
-                    for node in end_node:
-                        node.pop("instanceType", None)
-
         assert isinstance(item, dict)
         assert item == {
             "space": "test_space",
