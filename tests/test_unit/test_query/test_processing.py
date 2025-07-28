@@ -4,13 +4,17 @@ from typing import Literal
 import pytest
 from cognite.client.data_classes.data_modeling import (
     DirectRelationReference,
-    Node,
-    NodeListWithCursor,
     ViewId,
     filters,
     query,
 )
-from cognite.client.data_classes.data_modeling.instances import Edge, EdgeListWithCursor, Properties
+from cognite.client.data_classes.data_modeling.instances import (
+    Edge,
+    EdgeListWithCursor,
+    Node,
+    NodeListWithCursor,
+    Properties,
+)
 
 from cognite.pygen._query.processing import QueryUnpacker
 from cognite.pygen._query.step import QueryResultStep, ViewPropertyId
@@ -138,10 +142,6 @@ class TestQueryUnpacker:
 
         assert len(unpacked) == 1
         item = unpacked[0]
-        # Bug which will be fixed in PR #494
-        item.pop("instanceType", None)
-        for outwards in item.get("outwards", []):
-            outwards.pop("instanceType", None)
 
         assert isinstance(item, dict)
         assert item == {
@@ -222,18 +222,6 @@ class TestQueryUnpacker:
 
         assert len(unpacked) == 1
         item = unpacked[0]
-        # Bug which will be fixed in PR #494
-        item.pop("instanceType", None)
-        for outwards in item.get("outwards", []):
-            outwards.pop("instanceType", None)
-            if "endNode" in outwards:
-                end_node = outwards["endNode"]
-                if isinstance(end_node, dict):
-                    end_node.pop("instanceType", None)
-                elif isinstance(end_node, list):
-                    for node in end_node:
-                        node.pop("instanceType", None)
-
         assert isinstance(item, dict)
         assert item == {
             "space": "test_space",
@@ -242,3 +230,76 @@ class TestQueryUnpacker:
             "data_record": {"createdTime": 0, "lastUpdatedTime": 0, "version": 1},
             "outwards": expected_outwards,
         }
+
+    @pytest.mark.parametrize(
+        "instance, expected",
+        [
+            pytest.param(
+                Node(
+                    space="test_space",
+                    external_id="test_id",
+                    version=1,
+                    last_updated_time=1,
+                    created_time=1,
+                    properties=Properties(
+                        {
+                            ViewId("schema_space", "MyViewId", "v1"): {
+                                "name": "Test Node",
+                                "description": "This is a test node",
+                            }
+                        }
+                    ),
+                    deleted_time=None,
+                    type=None,
+                ),
+                {
+                    "space": "test_space",
+                    "externalId": "test_id",
+                    "version": 1,
+                    "lastUpdatedTime": 1,
+                    "createdTime": 1,
+                    "name": "Test Node",
+                    "description": "This is a test node",
+                },
+                id="Node with properties",
+            ),
+            pytest.param(
+                Edge(
+                    space="test_space",
+                    external_id="test_id",
+                    version=1,
+                    last_updated_time=1,
+                    created_time=1,
+                    properties=Properties(
+                        {
+                            ViewId("schema_space", "MyViewId", "v1"): {
+                                "name": "Test Edge",
+                                "description": "This is a test edge",
+                            }
+                        }
+                    ),
+                    deleted_time=None,
+                    type=("schema_space", "myType"),
+                    start_node=("test_space", "node1"),
+                    end_node=("test_space", "node2"),
+                ),
+                {
+                    "space": "test_space",
+                    "externalId": "test_id",
+                    "version": 1,
+                    "lastUpdatedTime": 1,
+                    "createdTime": 1,
+                    "name": "Test Edge",
+                    "description": "This is a test edge",
+                    "type": {"space": "schema_space", "externalId": "myType"},
+                    "startNode": {"space": "test_space", "externalId": "node1"},
+                    "endNode": {"space": "test_space", "externalId": "node2"},
+                },
+                id="Edge with properties",
+            ),
+        ],
+    )
+    def test_flatten_dump(self, instance: Node | Edge, expected: dict[str, object]) -> None:
+        flatten = QueryUnpacker.flatten_dump(instance, None, None)
+
+        assert flatten == expected
