@@ -294,20 +294,18 @@ class QueryBuildStepFactory:
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
     ) -> list[QueryBuildStep]:
-        if source is None:
-            raise ValueError("Source view not found")
         query_properties = self._create_query_properties(selected_properties, None)
         return [
             QueryBuildStep(
                 self._create_step_name(self.root_name),
                 dm.query.NodeResultSetExpression(
-                    filter=self._full_filter(None, has_container_fields, source),
+                    filter=self._full_filter(None, has_container_fields, source) if source is not None else None,
                     from_=self.root_name,
                     direction="outwards",
                     through=self._view_id.as_property_ref(connection_property.property),
                 ),
                 connection_property=connection_property,
-                select=self._create_select(query_properties, source),
+                select=self._create_select(query_properties, source) if source is not None else dm.query.Select(),
                 selected_properties=selected_properties,
                 view_id=source,
             )
