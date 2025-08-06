@@ -1,9 +1,11 @@
 from typing import Any
 
+import pytest
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from omni import OmniClient
+from omni import data_classes as dc
 
 from cognite.pygen._query.constants import SelectedProperties
 from cognite.pygen._query.interface import QueryExecutor
@@ -140,6 +142,43 @@ def test_query_list_primitive_properties(cognite_client: CogniteClient, omni_vie
     properties_set = set(properties)
     ill_formed_items = [item for item in result if not (set(item.keys()) <= properties_set)]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+
+
+@pytest.fixture()
+def connection_item_e_with_source(omni_client: OmniClient) -> tuple[dc.ConnectionItemEWrite, dc.PrimitiveNullableWrite]:
+    target = dc.PrimitiveNullableWrite(
+        external_id="query_across_direct_relation_no_source_target",
+        text="This is a target node that we wil use to query across a direct relation without a source.",
+    )
+    source = dc.ConnectionItemEWrite(
+        external_id="test_connection_item",
+        name="query_across_direct_relation_no_source",
+        direct_no_source=target.as_id(),
+    )
+    omni_client.upsert([source, target])
+
+    return source, target
+
+
+def test_query_across_direct_relation_no_source(
+    cognite_client: CogniteClient,
+    omni_views: dict[str, dm.View],
+    connection_item_e_with_source: tuple[dc.ConnectionItemEWrite, dc.PrimitiveNullableWrite],
+) -> None:
+    source, target = connection_item_e_with_source
+    item_e = omni_views["ConnectionItemE"]
+    executor = QueryExecutor(cognite_client, views=[item_e])
+    properties: list[str | dict[str, Any]] = [
+        "externalId",
+        "name",
+        {"directNoSource": ["externalId"]},
+    ]
+    is_node = dm.filters.InstanceReferences([source.as_id()])
+    result = executor.list(item_e.as_id(), properties, filter=is_node, limit=1)
+
+    assert result == [
+        {"externalId": source.external_id, "name": source.name, "directNoSource": [{"externalId": target.external_id}]}
+    ]
 
 
 def test_aggregate_count(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
