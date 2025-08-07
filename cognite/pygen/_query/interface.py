@@ -98,8 +98,7 @@ class QueryExecutor:
         view = self._get_view(view_id)
         flatten_props, are_flat_properties = self._as_property_list(properties, "list") if properties else (None, False)
         if properties is None or are_flat_properties:
-            if instance_types is None:
-                instance_types = self._get_instance_types(view)
+            instance_types = instance_types or self._get_instance_types(view)
             all_results: list[dict[str, Any]] = []
             for instance_type in instance_types:
                 # The .search has 4 overloads methods and MyPy seems to just give up:
@@ -294,8 +293,7 @@ class QueryExecutor:
 
         if not factory.connection_properties:
             list_results: list[dict[str, Any]] = []
-            if instance_types is None:
-                instance_types = self._get_instance_types(view)
+            instance_types = instance_types or self._get_instance_types(view)
             for instance_type in instance_types:
                 response = self._client.data_modeling.instances.list(
                     instance_type=instance_type,
@@ -358,8 +356,7 @@ class QueryExecutor:
             raise ValueError("Cannot mix metric and histogram aggregations")
 
         view = self._get_view(view_id)
-        if instance_types is None:
-            instance_types = self._get_instance_types(view)
+        instance_types = instance_types or self._get_instance_types(view)
         if metric_aggregates and group_by is not None:
             if len(instance_types) == 2 and any(isinstance(agg, Avg) for agg in metric_aggregates):
                 # This can be supported (need to add the count of the values to the AvgValue, but will postpone
