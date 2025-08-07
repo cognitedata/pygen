@@ -227,7 +227,9 @@ class QueryExecutor:
 
         """
         filter = self._equals_none_to_not_exists(filter)
-        return self._execute_aggregation(view, aggregates, search_properties, query, filter, group_by, limit, instance_types)
+        return self._execute_aggregation(
+            view, aggregates, search_properties, query, filter, group_by, limit, instance_types
+        )
 
     @classmethod
     def _equals_none_to_not_exists(cls, filter: filters.Filter | None) -> filters.Filter | None:
