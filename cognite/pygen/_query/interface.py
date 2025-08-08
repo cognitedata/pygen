@@ -55,6 +55,7 @@ class QueryExecutor:
         search_properties: str | SequenceNotStr[str] | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
         """Search for nodes/edges in a view.
 
@@ -70,6 +71,7 @@ class QueryExecutor:
             search_properties: The properties to search. If None, all text properties are searched.
             sort: The sort order of the results.
             limit: The maximum number of results to return. Max 1000.
+            instance_types: The instance types to search. If None, defaults to the view's supported types.
 
         Returns:
             list[dict[str, Any]]: The search results.
@@ -80,7 +82,7 @@ class QueryExecutor:
 
         """
         filter = self._equals_none_to_not_exists(filter)
-        return self._execute_search(view, properties, query, filter, search_properties, sort, limit)
+        return self._execute_search(view, properties, query, filter, search_properties, sort, limit, instance_types)
 
     def _execute_search(
         self,
@@ -91,11 +93,12 @@ class QueryExecutor:
         search_properties: str | SequenceNotStr[str] | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
         view = self._get_view(view_id)
         flatten_props, are_flat_properties = self._as_property_list(properties, "list") if properties else (None, False)
         if properties is None or are_flat_properties:
-            instance_types = self._get_instance_types(view)
+            instance_types = instance_types or self._get_instance_types(view)
             all_results: list[dict[str, Any]] = []
             for instance_type in instance_types:
                 # The .search has 4 overloads methods and MyPy seems to just give up:
@@ -172,6 +175,7 @@ class QueryExecutor:
         query: str | None = None,
         search_properties: str | SequenceNotStr[str] | None = None,
         limit: int | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> dict[str, Any]: ...
 
     @overload
@@ -184,6 +188,7 @@ class QueryExecutor:
         query: str | None = None,
         search_properties: str | SequenceNotStr[str] | None = None,
         limit: int | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]: ...
 
     def aggregate(
@@ -195,6 +200,7 @@ class QueryExecutor:
         query: str | None = None,
         search_properties: str | SequenceNotStr[str] | None = None,
         limit: int | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """Aggregate nodes/edges in a view.
 
@@ -211,6 +217,7 @@ class QueryExecutor:
                 of a specific search query. It is useful for combining with the search method.
             search_properties: The properties to search. If None, all text properties are searched.
             limit: The maximum number of results to return. Max 1000.
+            instance_types: The instance types to aggregate. If None, defaults to the view's supported types.
 
         Returns:
             dict[str, Any] | list[dict[str, Any]]: The aggregation results.
@@ -220,7 +227,9 @@ class QueryExecutor:
 
         """
         filter = self._equals_none_to_not_exists(filter)
-        return self._execute_aggregation(view, aggregates, search_properties, query, filter, group_by, limit)
+        return self._execute_aggregation(
+            view, aggregates, search_properties, query, filter, group_by, limit, instance_types
+        )
 
     @classmethod
     def _equals_none_to_not_exists(cls, filter: filters.Filter | None) -> filters.Filter | None:
@@ -275,6 +284,7 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
         view = self._get_view(view_id)
         root_properties, _ = self._as_property_list(properties, "list")
@@ -285,7 +295,7 @@ class QueryExecutor:
 
         if not factory.connection_properties:
             list_results: list[dict[str, Any]] = []
-            instance_types = self._get_instance_types(view)
+            instance_types = instance_types or self._get_instance_types(view)
             for instance_type in instance_types:
                 response = self._client.data_modeling.instances.list(
                     instance_type=instance_type,
@@ -339,6 +349,7 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         group_by: str | SequenceNotStr[str] | None = None,
         limit: int | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         aggregates_list = aggregates if isinstance(aggregates, Sequence) else [aggregates]
         metric_aggregates = [agg for agg in aggregates_list if isinstance(agg, dm.aggregations.MetricAggregation)]
@@ -347,7 +358,7 @@ class QueryExecutor:
             raise ValueError("Cannot mix metric and histogram aggregations")
 
         view = self._get_view(view_id)
-        instance_types = self._get_instance_types(view)
+        instance_types = instance_types or self._get_instance_types(view)
         if metric_aggregates and group_by is not None:
             if len(instance_types) == 2 and any(isinstance(agg, Avg) for agg in metric_aggregates):
                 # This can be supported (need to add the count of the values to the AvgValue, but will postpone
@@ -473,6 +484,7 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
         """List nodes/edges in a view.
 
@@ -486,6 +498,7 @@ class QueryExecutor:
             filter: The filter to apply ahead of the list operation.
             sort: The sort order of the results.
             limit: The maximum number of results to return. Pagination is handled automatically.
+            instance_types: The instance types to list. If None, defaults to the view's supported types.
 
         Returns:
             list[dict[str, Any]]: The list of nodes/edges in the view.
@@ -495,4 +508,4 @@ class QueryExecutor:
             CogniteAPIError: If the view is not found.
         """
         filter = self._equals_none_to_not_exists(filter)
-        return self._execute_list(view, properties, filter, sort, limit)
+        return self._execute_list(view, properties, filter, sort, limit, instance_types)
