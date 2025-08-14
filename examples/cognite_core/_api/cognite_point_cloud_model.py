@@ -471,7 +471,7 @@ class CognitePointCloudModelAPI(
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
+        if retrieve_connections in {"identifier", "full"}:
             builder.extend(
                 factory.from_reverse_relation(
                     CognitePointCloudRevision._view_id,
@@ -479,8 +479,10 @@ class CognitePointCloudModelAPI(
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "revisions"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
+        if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
                     CogniteFile._view_id,

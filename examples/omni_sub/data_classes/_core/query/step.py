@@ -305,7 +305,7 @@ class QueryBuildStepFactory:
                     through=self._view_id.as_property_ref(connection_property.property),
                 ),
                 connection_property=connection_property,
-                select=self._create_select(query_properties, source) if source is not None else dm.query.Select(),
+                select=self._create_select(query_properties, source),
                 selected_properties=selected_properties,
                 view_id=source,
             )
@@ -375,7 +375,24 @@ class QueryBuildStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
+        include_properties: bool = True,
     ) -> list[QueryBuildStep]:
+        """Creates a query step for a reverse direct relation.
+
+        Args:
+            source: The source view ID, i.e., the view that contains the direct relation
+                that is being reversed.
+            through: The property ID of the direct relation that is being reversed.
+            connection_type: The type of connection, either "reverse-list" or None.
+            connection_property: The property ID of the reverse direct relation connection.
+            selected_properties: The user selected properties to retrieve. Defaults to None, which indicates that all
+                properties should be retrieved. This is used to filter properties in the query.
+            has_container_fields: Whether to include the HasData filter in the query. Defaults to True
+            include_properties: Whether to request properties from the reverse direct relation.
+
+        Returns:
+            A list containing a single QueryBuildStep object representing the reverse direct relation query step.
+        """
         query_properties = self._create_query_properties(selected_properties, through.property)
         other_view_id = source
         return [
@@ -388,7 +405,7 @@ class QueryBuildStepFactory:
                     through=other_view_id.as_property_ref(through.property),
                 ),
                 connection_property=connection_property,
-                select=self._create_select(query_properties, other_view_id),
+                select=self._create_select(query_properties, other_view_id if include_properties else None),
                 selected_properties=selected_properties,
                 view_id=source,
                 connection_type=connection_type,
@@ -421,7 +438,9 @@ class QueryBuildStepFactory:
         )
 
     @staticmethod
-    def _create_select(properties: list[str] | None, view_id: dm.ViewId) -> dm.query.Select:
+    def _create_select(properties: list[str] | None, view_id: dm.ViewId | None) -> dm.query.Select:
+        if view_id is None:
+            return dm.query.Select()
         properties = properties or ["*"]
         return dm.query.Select([dm.query.SourceSelector(view_id, properties)])
 

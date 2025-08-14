@@ -435,7 +435,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
+        if retrieve_connections in {"identifier", "full"}:
             builder.extend(
                 factory.from_reverse_relation(
                     WindTurbine._view_id,
@@ -443,8 +443,10 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "wind_turbine"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
+        if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
                     SensorTimeSeries._view_id,

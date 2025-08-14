@@ -378,7 +378,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
+        if retrieve_connections in {"identifier", "full"}:
             builder.extend(
                 factory.from_reverse_relation(
                     SensorPosition._view_id,
@@ -386,6 +386,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "sensor_positions"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
         return builder.build()

@@ -512,12 +512,10 @@ class DataClass:
         )
 
     @property
-    def has_direct_or_reverse_relation_with_target(self) -> bool:
+    def has_direct_relation_with_target(self) -> bool:
         """Whether the data class has any fields that are direct or reverse relations."""
         return any(
-            isinstance(field_, BaseConnectionField)
-            and (field_.is_direct_relation or field_.is_reverse_direct_relation)
-            and field_.destination_class
+            isinstance(field_, BaseConnectionField) and field_.is_direct_relation and field_.destination_class
             for field_ in self
         )
 

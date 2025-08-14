@@ -459,7 +459,7 @@ class Cognite360ImageModelAPI(
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
+        if retrieve_connections in {"identifier", "full"}:
             builder.extend(
                 factory.from_reverse_relation(
                     Cognite360ImageCollection._view_id,
@@ -467,8 +467,10 @@ class Cognite360ImageModelAPI(
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "collections"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
+        if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
                     CogniteFile._view_id,

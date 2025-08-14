@@ -555,7 +555,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                     edge_view=Cognite360ImageAnnotation._view_id,
                 )
             )
-        if retrieve_connections == "full":
+        if retrieve_connections in {"identifier", "full"}:
             builder.extend(
                 factory.from_reverse_relation(
                     CogniteAsset._view_id,
@@ -563,6 +563,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "asset"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
             builder.extend(
@@ -572,6 +573,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "cadNodes"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
             builder.extend(
@@ -581,6 +583,7 @@ class Cognite3DObjectAPI(NodeAPI[Cognite3DObject, Cognite3DObjectWrite, Cognite3
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "pointCloudVolumes"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
         return builder.build()
