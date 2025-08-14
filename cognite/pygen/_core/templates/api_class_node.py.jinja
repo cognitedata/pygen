@@ -497,6 +497,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             )
             {% endif %}
             {% endfor %}
+        if retrieve_connections == "full":
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_direct_relation and field.destination_class %}
             builder.extend(
