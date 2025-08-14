@@ -505,7 +505,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                     edge_view=ConnectionEdgeA._view_id,
                 )
             )
-        if retrieve_connections == "full":
+        if retrieve_connections in {"identifier", "full"}:
             builder.extend(
                 factory.from_reverse_relation(
                     ConnectionItemD._view_id,
@@ -513,6 +513,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                     connection_type="reverse-list",
                     connection_property=ViewPropertyId(self._view_id, "directReverseMulti"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
             builder.extend(
@@ -522,6 +523,7 @@ class ConnectionItemEAPI(NodeAPI[ConnectionItemE, ConnectionItemEWrite, Connecti
                     connection_type=None,
                     connection_property=ViewPropertyId(self._view_id, "directReverseSingle"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
         return builder.build()

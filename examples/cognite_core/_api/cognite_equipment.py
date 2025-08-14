@@ -807,7 +807,7 @@ class CogniteEquipmentAPI(
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
+        if retrieve_connections in {"identifier", "full"}:
             builder.extend(
                 factory.from_reverse_relation(
                     CogniteActivity._view_id,
@@ -815,6 +815,7 @@ class CogniteEquipmentAPI(
                     connection_type="reverse-list",
                     connection_property=ViewPropertyId(self._view_id, "activities"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
             builder.extend(
@@ -824,8 +825,10 @@ class CogniteEquipmentAPI(
                     connection_type="reverse-list",
                     connection_property=ViewPropertyId(self._view_id, "timeSeries"),
                     has_container_fields=True,
+                    include_properties=retrieve_connections == "full",
                 )
             )
+        if retrieve_connections == "full":
             builder.extend(
                 factory.from_direct_relation(
                     CogniteAsset._view_id,
