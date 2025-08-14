@@ -473,7 +473,7 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             )
         {% endif %}
         {% endfor %}
-{% if data_class.has_direct_or_reverse_relation_with_target %}
+{% if data_class.has_reverse_direct_relations %}
         if retrieve_connections in {"identifier", "full"}:
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_reverse_direct_relation %}
@@ -497,6 +497,8 @@ class {{ api_class.name }}({% if data_class.is_writable %}NodeAPI{% else %}NodeR
             )
             {% endif %}
             {% endfor %}
+{% endif %}
+{% if data_class.has_direct_relation_with_target %}
         if retrieve_connections == "full":
             {% for field in data_class.fields_of_type(ft.BaseConnectionField) %}
             {% if field.is_direct_relation and field.destination_class %}
