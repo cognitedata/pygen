@@ -3,6 +3,7 @@ import sys
 import warnings
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Any
 
 from cognite.client import data_modeling as dm
 from pydantic import BaseModel
@@ -255,6 +256,13 @@ class TestGenerateSDK:
             assert "children" in tag.model_fields
 
 
+_DEFAULT_VALUES: dict[str, Any] = dict(
+    is_global=False,
+    last_updated_time=0,
+    created_time=0,
+    description=None,
+    name=None,
+)
 DATA_MODEL_WITH_VIEW_PROPERTY_OF_TYPE_FIELD: dm.DataModel = dm.DataModel.load(
     {
         "space": "fields-space",
@@ -359,11 +367,7 @@ DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
     space="field_space",
     external_id="FieldModel",
     version="1",
-    is_global=False,
-    last_updated_time=0,
-    created_time=0,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="field_space",
@@ -429,11 +433,7 @@ DATA_MODEL_WITH_VIEW_WITHOUT_PROPERTIES = dm.DataModel(
     space="no_properties_space",
     external_id="NoPropertiesModel",
     version="1",
-    is_global=False,
-    last_updated_time=0,
-    created_time=0,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="no_properties_space",
@@ -561,11 +561,7 @@ DATA_MODEL_WITH_REVERSE_DIRECT_RELATION_WITHOUT_TARGET = dm.DataModel(
     space="reverse_direct_relation_space",
     external_id="ReverseDirectRelationModel",
     version="1",
-    is_global=False,
-    last_updated_time=0,
-    created_time=0,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="reverse_direct_relation_space",
@@ -621,11 +617,7 @@ DATA_MODEL_SOURCE_OUTSIDE_MODEL = dm.DataModel(
     space="hydro_energi_watercourse_type_space",
     external_id="HydroModel",
     version="v1",
-    is_global=False,
-    last_updated_time=1,
-    created_time=1,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="hydro_energi_watercourse_type_space",
@@ -658,11 +650,7 @@ DATA_MODEL_DIRECT_RELATION_MISSING_SOURCE = dm.DataModel(
     space="hydro_energi_watercourse_type_space",
     external_id="HydroModel",
     version="v1",
-    is_global=False,
-    last_updated_time=1,
-    created_time=1,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="hydro_energi_watercourse_type_space",
@@ -700,11 +688,7 @@ DATA_MODEL_REVERSE_DIRECT_RELATION_THROUGH_CONTAINER = dm.DataModel(
     space="reverse_direct_relation_space",
     external_id="ReverseDirectRelationModel",
     version="1",
-    is_global=False,
-    last_updated_time=0,
-    created_time=0,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="reverse_direct_relation_space",
@@ -760,11 +744,7 @@ DATA_MODEL_REVERSE_DIRECT_RELATION_IN_EDGE_VIEW = dm.DataModel(
     space="my_space",
     external_id="MyModel",
     version="1",
-    is_global=False,
-    last_updated_time=0,
-    created_time=0,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="my_space",
@@ -844,11 +824,7 @@ DATA_MODEL_WITH_OVERWRITING_PARENT_PROPERTY = dm.DataModel(
     space="my_space",
     external_id="MyModel",
     version="1",
-    is_global=False,
-    last_updated_time=0,
-    created_time=0,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="my_space",
@@ -923,11 +899,7 @@ DATA_MODEL_OVERWRITING_REVERSE_DIRECT_RELATION = dm.DataModel(
     space="my_space",
     external_id="MyModel",
     version="1",
-    is_global=False,
-    last_updated_time=0,
-    created_time=0,
-    description=None,
-    name=None,
+    **_DEFAULT_VALUES,
     views=[
         dm.View(
             space="my_space",
