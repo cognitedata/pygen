@@ -11,6 +11,7 @@ version = "0.5.87"
 run = false
 pull = false
 dump = true
+purge = true
 
 [alpha_flags]
 graphql = true
