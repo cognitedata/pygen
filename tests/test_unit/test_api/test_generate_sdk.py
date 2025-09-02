@@ -255,13 +255,52 @@ class TestGenerateSDK:
             assert issubclass(tag, BaseModel)
             assert "children" in tag.model_fields
 
+    def test_generate_sdk_edge_source_not_in_model(self, tmp_path: Path) -> None:
+        top_level_package = "edge_with_source_not_in_model"
+        client_name = "EdgeWithSourceNotInModelClient"
 
-_DEFAULT_VALUES: dict[str, Any] = dict(
+        printed_messages: list[str] = []
+
+        def logger(message: str) -> None:
+            printed_messages.append(message)
+
+        generate_sdk(
+            DATA_MODEL_WITH_EDGE_SOURCE_NOT_IN_MODEL,
+            top_level_package=top_level_package,
+            output_dir=tmp_path / top_level_package,
+            overwrite=True,
+            client_name=client_name,
+            default_instance_space="my_space",
+            logger=logger,
+        )
+        skipping_messages = [msg for msg in printed_messages if "skipping connection" in msg.casefold()]
+        assert len(skipping_messages) == 1, f"Expected one skipping message. Found: {skipping_messages}"
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module, "SDK not imported correctly"
+
+
+_DEFAULT_SPACE_VALUES: dict[str, Any] = dict(
     is_global=False,
     last_updated_time=0,
     created_time=0,
     description=None,
     name=None,
+)
+_DEFAULT_VIEW_VALUES: dict[str, Any] = dict(
+    description=None,
+    is_global=False,
+    last_updated_time=0,
+    created_time=0,
+    implements=None,
+    writable=True,
+    filter=None,
+)
+_DEFAULT_MAPPED_PROPERTY_VALUES: dict[str, Any] = dict(
+    nullable=False,
+    auto_increment=False,
+    immutable=False,
 )
 DATA_MODEL_WITH_VIEW_PROPERTY_OF_TYPE_FIELD: dm.DataModel = dm.DataModel.load(
     {
@@ -367,7 +406,7 @@ DATA_MODEL_WITH_VIEW_NAMED_FIELD = dm.DataModel(
     space="field_space",
     external_id="FieldModel",
     version="1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="field_space",
@@ -433,7 +472,7 @@ DATA_MODEL_WITH_VIEW_WITHOUT_PROPERTIES = dm.DataModel(
     space="no_properties_space",
     external_id="NoPropertiesModel",
     version="1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="no_properties_space",
@@ -561,7 +600,7 @@ DATA_MODEL_WITH_REVERSE_DIRECT_RELATION_WITHOUT_TARGET = dm.DataModel(
     space="reverse_direct_relation_space",
     external_id="ReverseDirectRelationModel",
     version="1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="reverse_direct_relation_space",
@@ -617,7 +656,7 @@ DATA_MODEL_SOURCE_OUTSIDE_MODEL = dm.DataModel(
     space="hydro_energi_watercourse_type_space",
     external_id="HydroModel",
     version="v1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="hydro_energi_watercourse_type_space",
@@ -650,7 +689,7 @@ DATA_MODEL_DIRECT_RELATION_MISSING_SOURCE = dm.DataModel(
     space="hydro_energi_watercourse_type_space",
     external_id="HydroModel",
     version="v1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="hydro_energi_watercourse_type_space",
@@ -688,7 +727,7 @@ DATA_MODEL_REVERSE_DIRECT_RELATION_THROUGH_CONTAINER = dm.DataModel(
     space="reverse_direct_relation_space",
     external_id="ReverseDirectRelationModel",
     version="1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="reverse_direct_relation_space",
@@ -744,7 +783,7 @@ DATA_MODEL_REVERSE_DIRECT_RELATION_IN_EDGE_VIEW = dm.DataModel(
     space="my_space",
     external_id="MyModel",
     version="1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="my_space",
@@ -824,7 +863,7 @@ DATA_MODEL_WITH_OVERWRITING_PARENT_PROPERTY = dm.DataModel(
     space="my_space",
     external_id="MyModel",
     version="1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="my_space",
@@ -899,7 +938,7 @@ DATA_MODEL_OVERWRITING_REVERSE_DIRECT_RELATION = dm.DataModel(
     space="my_space",
     external_id="MyModel",
     version="1",
-    **_DEFAULT_VALUES,
+    **_DEFAULT_SPACE_VALUES,
     views=[
         dm.View(
             space="my_space",
@@ -941,5 +980,48 @@ DATA_MODEL_OVERWRITING_REVERSE_DIRECT_RELATION = dm.DataModel(
             writable=True,
             filter=None,
         )
+    ],
+)
+
+DATA_MODEL_WITH_EDGE_SOURCE_NOT_IN_MODEL = dm.DataModel(
+    space="edge_source_space",
+    external_id="EdgeSourceModel",
+    version="1",
+    **_DEFAULT_SPACE_VALUES,
+    views=[
+        dm.View(
+            space="edge_source_space",
+            external_id="MyView",
+            version="1",
+            name="MyView",
+            used_for="node",
+            properties={
+                "externalEdge": dm.MultiEdgeConnection(
+                    type=dm.DirectRelationReference("relatedTo", "edge_source_space"),
+                    source=dm.ViewId("external_space", "ExternalView", "1"),
+                    direction="outwards",
+                    edge_source=dm.ViewId("edge_source_space", "EdgeProp", "1"),
+                    name=None,
+                    description=None,
+                ),
+            },
+            **_DEFAULT_VIEW_VALUES,
+        ),
+        dm.View(
+            space="edge_source_space",
+            external_id="EdgeProp",
+            version="1",
+            name="EdgeProp",
+            used_for="edge",
+            properties={
+                "prop": dm.MappedProperty(
+                    container=dm.ContainerId("edge_source_space", "EdgeProp"),
+                    container_property_identifier="prop",
+                    type=dm.Text(),
+                    **_DEFAULT_MAPPED_PROPERTY_VALUES,
+                )
+            },
+            **_DEFAULT_VIEW_VALUES,
+        ),
     ],
 )
