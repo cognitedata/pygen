@@ -907,6 +907,11 @@ class EdgeDataClass(DataClass):
             source_class = node_class_by_view_id[view_id]
             for prop in view.properties.values():
                 if isinstance(prop, dm.EdgeConnection) and prop.edge_source == self.view_id:
+                    if prop.source not in node_class_by_view_id:
+                        # The edge points to a view that is not part of the generated SDK.
+                        # This will raise a warning in the view with the edge connection definition (view variable),
+                        # so we can just skip it here.
+                        continue
                     destination_class = node_class_by_view_id[prop.source]
                     start, end = (
                         (source_class, destination_class)
