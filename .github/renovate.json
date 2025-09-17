@@ -8,6 +8,10 @@
       "enabled": false,
       "matchManagers": ["poetry"],
       "matchPackagePatterns": ["*"]
+    },
+    {
+      "enabled": false,
+      "matchPackageNames": ["cognite-toolkit"]
     }
   ],
   "vulnerabilityAlerts": {
