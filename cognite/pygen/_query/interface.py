@@ -2,6 +2,7 @@ import itertools
 import json
 from collections import defaultdict
 from collections.abc import Sequence
+from datetime import date, datetime
 from typing import Any, Literal, cast, overload
 
 from cognite.client import CogniteClient
@@ -19,6 +20,11 @@ from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, Se
 from .executor import chunker
 from .processing import QueryUnpacker
 from .step import QueryBuildStepFactory
+
+
+class Page:
+    items: list[dict[str, str | int | float | bool | datetime | date | None]]
+    next_cursor: str | None
 
 
 class QueryExecutor:
@@ -476,6 +482,17 @@ class QueryExecutor:
                 "buckets": [bucket.dump() for bucket in item.buckets],
             }
         return dict(output)
+
+    def iterate(
+        self,
+        view: dm.ViewId,
+        properties: list[str],
+        filter: filters.Filter | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
+        cursor: str | None = None,
+    ) -> Page:
+        raise NotImplementedError()
 
     def list(
         self,
