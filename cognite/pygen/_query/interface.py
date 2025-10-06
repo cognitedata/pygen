@@ -24,7 +24,7 @@ from .step import QueryBuildStepFactory
 
 class Page:
     items: list[dict[str, str | int | float | bool | datetime | date | None]]
-    next_cursor: str | None
+    cursor: str | None
 
 
 class QueryExecutor:
@@ -486,11 +486,12 @@ class QueryExecutor:
     def iterate(
         self,
         view: dm.ViewId,
-        properties: list[str],
+        properties: Sequence[str],
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         instance_types: list[Literal["node", "edge"]] | None = None,
         cursor: str | None = None,
+        limit: int | None = None,
     ) -> Page:
         raise NotImplementedError()
 
