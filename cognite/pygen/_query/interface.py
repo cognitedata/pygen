@@ -25,7 +25,7 @@ from .step import QueryBuildStepFactory, QueryResultStepList
 
 @dataclass
 class Page:
-    items: list[dict[str, str | int | float | bool | datetime | date | None]]
+    items: list[dict[str, Any]]
     cursor: str | None
 
 
