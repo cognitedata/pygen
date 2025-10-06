@@ -2,6 +2,7 @@ import itertools
 import json
 from collections import defaultdict
 from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Literal, cast, overload
 
@@ -19,9 +20,10 @@ from .builder import QueryBuilder
 from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, SelectedProperties
 from .executor import chunker
 from .processing import QueryUnpacker
-from .step import QueryBuildStepFactory
+from .step import QueryBuildStepFactory, QueryResultStepList
 
 
+@dataclass
 class Page:
     items: list[dict[str, str | int | float | bool | datetime | date | None]]
     cursor: str | None
@@ -346,6 +348,50 @@ class QueryExecutor:
                 output.append(item)  # type: ignore[arg-type]
         return output
 
+    def _execute_iterate(
+        self,
+        view_id: dm.ViewId,
+        properties: list[str],
+        filter: filters.Filter | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        cursor: str | None = None,
+        limit: int | None = None,
+    ) -> Page:
+        view = self._get_view(view_id)
+        builder = QueryBuilder()
+        factory = QueryBuildStepFactory(
+            # MyPy complains about invariance.
+            builder.create_name,
+            view=view,
+            user_selected_properties=properties,  # type: ignore[arg-type]
+            unpack_edges=self._unpack_edges,
+        )
+        builder.append(factory.root(filter, limit=limit, sort=self._as_sort_list(sort)))
+
+        executor = builder.build()
+        init_cursors: dict[str, str | None] | None = None
+        if cursor is not None:
+            init_cursors = {factory.root_name: cursor}
+        result_page = Page(items=[], cursor=None)
+        step: QueryResultStepList
+        for step in executor.iterate(self._client, remove_not_connected=False, init_cursors=init_cursors):
+            items = QueryUnpacker(
+                step, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
+            ).unpack()
+            result_page.items.extend(items)
+            result_page.cursor = step._cursors.get(factory.root_name)
+            # We only want a single page
+            break
+        return result_page
+
+    @staticmethod
+    def _as_sort_list(sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None) -> list[dm.InstanceSort] | None:
+        if sort is None:
+            return None
+        if isinstance(sort, dm.InstanceSort):
+            return [sort]
+        return list(sort)
+
     def _execute_aggregation(
         self,
         view_id: dm.ViewId,
@@ -486,14 +532,14 @@ class QueryExecutor:
     def iterate(
         self,
         view: dm.ViewId,
-        properties: Sequence[str],
+        properties: list[str],
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
-        instance_types: list[Literal["node", "edge"]] | None = None,
         cursor: str | None = None,
         limit: int | None = None,
     ) -> Page:
-        raise NotImplementedError()
+        filter = self._equals_none_to_not_exists(filter)
+        return self._execute_iterate(view, properties, filter, sort, cursor, limit)
 
     def list(
         self,
