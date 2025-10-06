@@ -335,3 +335,21 @@ def test_query_search_edges(
     assert isinstance(result, list)
     assert len(result) > 0
     assert all(all(prop in item for prop in selected_properties) for item in result)
+
+
+class TestQueryExecutorIterate:
+    def test_iterate_two_pages(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+        view = omni_views["PrimitiveRequired"]
+        executor = QueryExecutor(cognite_client, views=[view], unpack_edges="skip")
+        properties = ["externalId", "text", "boolean", "externalId"]
+        first_page = executor.iterate(view.as_id(), properties, limit=2)
+        assert len(first_page.items) == 2
+        incorrect_items = [item for item in first_page.items if not (set(item.keys()) <= set(properties))]
+        assert not incorrect_items, f"Items with unexpected properties: {incorrect_items}"
+
+        second_page = executor.iterate(view.as_id(), properties, limit=2, cursor=first_page.cursor)
+        assert len(second_page.items) == 2
+        incorrect_items = [item for item in second_page.items if not (set(item.keys()) <= set(properties))]
+        assert not incorrect_items, f"Items with unexpected properties: {incorrect_items}"
+
+        assert first_page.items != second_page.items
