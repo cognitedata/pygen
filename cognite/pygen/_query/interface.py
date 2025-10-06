@@ -537,7 +537,7 @@ class QueryExecutor:
         cursor: str | None = None,
         limit: int | None = None,
     ) -> Page:
-        """Iterate ove nodes in a view.
+        """Iterate over nodes in a view.
 
         Args:
             view: The view in which the nodes have properties.
