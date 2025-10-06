@@ -3,7 +3,6 @@ import json
 from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import date, datetime
 from typing import Any, Literal, cast, overload
 
 from cognite.client import CogniteClient
@@ -538,6 +537,20 @@ class QueryExecutor:
         cursor: str | None = None,
         limit: int | None = None,
     ) -> Page:
+        """Iterate ove nodes in a view.
+
+        Args:
+            view: The view in which the nodes have properties.
+            properties: The properties to include in the result.
+            filter: The filter to apply ahead of the list operation.
+            sort: The sort order of the results.
+            cursor: The cursor to start from. If None, starts from the beginning.
+            limit: The maximum number of results to return.
+
+        Returns:
+            Page: The page of results.
+
+        """
         filter = self._equals_none_to_not_exists(filter)
         return self._execute_iterate(view, properties, filter, sort, cursor, limit)
 
