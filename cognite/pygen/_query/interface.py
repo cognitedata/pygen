@@ -1,7 +1,7 @@
 import itertools
 import json
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal, cast, overload
 
@@ -354,8 +354,8 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         cursor: str | None = None,
-        limit: int | None = None,
-    ) -> Page:
+        chunk_size: int | None = None,
+    ) -> Iterator[Page]:
         view = self._get_view(view_id)
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(
@@ -365,23 +365,20 @@ class QueryExecutor:
             user_selected_properties=properties,  # type: ignore[arg-type]
             unpack_edges=self._unpack_edges,
         )
-        builder.append(factory.root(filter, limit=limit, sort=self._as_sort_list(sort)))
+        builder.append(
+            factory.root(filter, limit=None, sort=self._as_sort_list(sort), max_retrieve_batch_limit=chunk_size)
+        )
 
         executor = builder.build()
         init_cursors: dict[str, str | None] | None = None
         if cursor is not None:
             init_cursors = {factory.root_name: cursor}
-        result_page = Page(items=[], cursor=None)
         step: QueryResultStepList
         for step in executor.iterate(self._client, remove_not_connected=False, init_cursors=init_cursors):
             items = QueryUnpacker(
                 step, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
             ).unpack()
-            result_page.items.extend(items)
-            result_page.cursor = step._cursors.get(factory.root_name)
-            # We only want a single page
-            break
-        return result_page
+            yield Page(items=items, cursor=step._cursors.get(factory.root_name))
 
     @staticmethod
     def _as_sort_list(sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None) -> list[dm.InstanceSort] | None:
@@ -534,9 +531,9 @@ class QueryExecutor:
         properties: list[str],
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
-        cursor: str | None = None,
-        limit: int | None = None,
-    ) -> Page:
+        initial_cursor: str | None = None,
+        chunk_size: int | None = None,
+    ) -> Iterator[Page]:
         """Iterate ove nodes in a view.
 
         Args:
@@ -544,15 +541,15 @@ class QueryExecutor:
             properties: The properties to include in the result.
             filter: The filter to apply ahead of the list operation.
             sort: The sort order of the results.
-            cursor: The cursor to start from. If None, starts from the beginning.
-            limit: The maximum number of results to return.
+            initial_cursor: The cursor to start from. If None, starts from the beginning.
+            chunk_size: The number of results to include in each page. If None, defaults to 1000.
 
         Returns:
             Page: The page of results.
 
         """
         filter = self._equals_none_to_not_exists(filter)
-        return self._execute_iterate(view, properties, filter, sort, cursor, limit)
+        yield from self._execute_iterate(view, properties, filter, sort, initial_cursor, chunk_size)
 
     def list(
         self,
