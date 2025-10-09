@@ -534,7 +534,7 @@ class QueryExecutor:
         initial_cursor: str | None = None,
         chunk_size: int | None = None,
     ) -> Iterator[Page]:
-        """Iterate ove nodes in a view.
+        """Iterate over nodes in a view.
 
         Args:
             view: The view in which the nodes have properties.
