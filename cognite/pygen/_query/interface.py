@@ -1,7 +1,8 @@
 import itertools
 import json
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from dataclasses import dataclass
 from typing import Any, Literal, cast, overload
 
 from cognite.client import CogniteClient
@@ -18,7 +19,13 @@ from .builder import QueryBuilder
 from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, SelectedProperties
 from .executor import chunker
 from .processing import QueryUnpacker
-from .step import QueryBuildStepFactory
+from .step import QueryBuildStepFactory, QueryResultStepList
+
+
+@dataclass
+class Page:
+    items: list[dict[str, Any]]
+    cursor: str | None
 
 
 class QueryExecutor:
@@ -340,6 +347,47 @@ class QueryExecutor:
                 output.append(item)  # type: ignore[arg-type]
         return output
 
+    def _execute_iterate(
+        self,
+        view_id: dm.ViewId,
+        properties: list[str],
+        filter: filters.Filter | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        cursor: str | None = None,
+        chunk_size: int | None = None,
+    ) -> Iterator[Page]:
+        view = self._get_view(view_id)
+        builder = QueryBuilder()
+        factory = QueryBuildStepFactory(
+            # MyPy complains about invariance.
+            builder.create_name,
+            view=view,
+            user_selected_properties=properties,  # type: ignore[arg-type]
+            unpack_edges=self._unpack_edges,
+        )
+        builder.append(
+            factory.root(filter, limit=None, sort=self._as_sort_list(sort), max_retrieve_batch_limit=chunk_size)
+        )
+
+        executor = builder.build()
+        init_cursors: dict[str, str | None] | None = None
+        if cursor is not None:
+            init_cursors = {factory.root_name: cursor}
+        step: QueryResultStepList
+        for step in executor.iterate(self._client, remove_not_connected=False, init_cursors=init_cursors):
+            items = QueryUnpacker(
+                step, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
+            ).unpack()
+            yield Page(items=items, cursor=step._cursors.get(factory.root_name))
+
+    @staticmethod
+    def _as_sort_list(sort: dm.InstanceSort | Sequence[dm.InstanceSort] | None) -> list[dm.InstanceSort] | None:
+        if sort is None:
+            return None
+        if isinstance(sort, dm.InstanceSort):
+            return [sort]
+        return list(sort)
+
     def _execute_aggregation(
         self,
         view_id: dm.ViewId,
@@ -476,6 +524,32 @@ class QueryExecutor:
                 "buckets": [bucket.dump() for bucket in item.buckets],
             }
         return dict(output)
+
+    def iterate(
+        self,
+        view: dm.ViewId,
+        properties: list[str],
+        filter: filters.Filter | None = None,
+        sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        initial_cursor: str | None = None,
+        chunk_size: int | None = None,
+    ) -> Iterator[Page]:
+        """Iterate over nodes in a view.
+
+        Args:
+            view: The view in which the nodes have properties.
+            properties: The properties to include in the result.
+            filter: The filter to apply ahead of the list operation.
+            sort: The sort order of the results.
+            initial_cursor: The cursor to start from. If None, starts from the beginning.
+            chunk_size: The number of results to include in each page. If None, defaults to 1000.
+
+        Returns:
+            Page: The page of results.
+
+        """
+        filter = self._equals_none_to_not_exists(filter)
+        yield from self._execute_iterate(view, properties, filter, sort, initial_cursor, chunk_size)
 
     def list(
         self,
