@@ -4,6 +4,7 @@ import pytest
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
+from cognite.client.data_classes.data_modeling import InstanceSort
 from omni import OmniClient
 from omni import data_classes as dc
 
@@ -84,6 +85,7 @@ def test_query_direct_relation(cognite_client: CogniteClient, omni_views: dict[s
 
 def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
     item_a = omni_views["ConnectionItemA"]
+    view_A_id = item_a.as_id()
     item_b = omni_views["ConnectionItemB"]
     executor = QueryExecutor(cognite_client, views=[item_a, item_b], unpack_edges="include")
     properties: list[str | dict[str, Any]] = [
@@ -92,7 +94,12 @@ def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str
         {"outwards": [{"node": ["name", "externalId"]}, "type"]},
     ]
     flatten_props = {"name", "outwards", "externalId"}
-    result = executor.list(item_a.as_id(), properties, limit=5)
+    result = executor.list(
+        view_A_id,
+        properties,
+        sort=InstanceSort(view_A_id.as_property_ref("name"), direction="descending", nulls_first=True),
+        limit=5,
+    )
     assert isinstance(result, list)
     assert len(result) > 0
     ill_formed_items = [item for item in result if not (set(item.keys()) <= flatten_props)]
@@ -105,6 +112,8 @@ def test_query_edge_outwards(cognite_client: CogniteClient, omni_views: dict[str
         if not (set(subitem.keys()) <= {"name", "externalId"})
     ]
     assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+
+    assert result == sorted(result, key=lambda x: (int("name" not in x), x.get("name", "")), reverse=True)
 
 
 def test_query_edge_outwards_skip_edge(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
