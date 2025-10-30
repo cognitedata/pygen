@@ -297,6 +297,12 @@ class TestGenerateSDK:
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 
+            data_classes = vars(importlib.import_module(f"{top_level_package}.data_classes"))
+            query_property_view = data_classes["QueryPropertyView"]
+
+            assert "query_" in query_property_view.model_fields
+            assert "query" not in query_property_view.model_fields
+
 
 _DEFAULT_SPACE_VALUES: dict[str, Any] = dict(
     is_global=False,
