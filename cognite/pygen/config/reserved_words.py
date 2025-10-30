@@ -25,6 +25,7 @@ FIELD_NAMES = (
         "list_full",
         "data",
         "content",
+        "query",
     }
     | {f for f in dir(BaseModel)}
     | {

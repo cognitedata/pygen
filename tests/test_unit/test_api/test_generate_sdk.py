@@ -280,6 +280,29 @@ class TestGenerateSDK:
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module, "SDK not imported correctly"
 
+    def test_generate_sdk_view_with_property_named_query(self, tmp_path: Path) -> None:
+        top_level_package = "view_with_property_named_query"
+        client_name = "ViewWithPropertyNamedQueryClient"
+
+        generate_sdk(
+            DATA_MODEL_WITH_VIEW_PROPERTY_NAMED_QUERY,
+            top_level_package=top_level_package,
+            output_dir=tmp_path / top_level_package,
+            overwrite=True,
+            client_name=client_name,
+            default_instance_space="my_space",
+        )
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert client_name in module
+
+            data_classes = vars(importlib.import_module(f"{top_level_package}.data_classes"))
+            query_property_view = data_classes["QueryPropertyView"]
+
+            assert "query_" in query_property_view.model_fields
+            assert "query" not in query_property_view.model_fields
+
 
 _DEFAULT_SPACE_VALUES: dict[str, Any] = dict(
     is_global=False,
@@ -1023,5 +1046,38 @@ DATA_MODEL_WITH_EDGE_SOURCE_NOT_IN_MODEL = dm.DataModel(
             },
             **_DEFAULT_VIEW_VALUES,
         ),
+    ],
+)
+
+DATA_MODEL_WITH_VIEW_PROPERTY_NAMED_QUERY = dm.DataModel(
+    space="query_property_space",
+    external_id="QueryPropertyModel",
+    version="1",
+    **_DEFAULT_SPACE_VALUES,
+    views=[
+        dm.View(
+            space="query_property_space",
+            name="QueryPropertyView",
+            external_id="QueryPropertyView",
+            version="1",
+            properties={
+                "query": dm.MappedProperty(
+                    container=dm.ContainerId("query_property_space", "QueryPropertyView"),
+                    container_property_identifier="query",
+                    type=dm.Text(),
+                    nullable=False,
+                    auto_increment=False,
+                    immutable=False,
+                )
+            },
+            description=None,
+            is_global=False,
+            last_updated_time=0,
+            created_time=0,
+            used_for="node",
+            implements=None,
+            writable=True,
+            filter=None,
+        )
     ],
 )
