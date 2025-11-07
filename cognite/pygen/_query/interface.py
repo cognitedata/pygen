@@ -61,7 +61,7 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         search_properties: str | SequenceNotStr[str] | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
-        operator: Literal["AND", "OR"] = "OR",
+        operator: Literal["AND", "OR"] | None = None,
         limit: int | None = None,
         instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
@@ -108,9 +108,12 @@ class QueryExecutor:
         search_properties: str | SequenceNotStr[str] | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
-        operator: Literal["AND", "OR"] = "OR",
+        operator: Literal["AND", "OR"] | None = None,
         instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
+        # The SDK requires the operator to be set to AND or OR, however we want to
+        # just use the default if not specified as this is expected to change in the future.
+        operator_arg: dict[str, Any] = {"operator": operator} if operator is not None else {}
         view = self._get_view(view_id)
         flatten_props, are_flat_properties = self._as_property_list(properties, "list") if properties else (None, False)
         if properties is None or are_flat_properties:
@@ -127,8 +130,8 @@ class QueryExecutor:
                     properties=search_properties,  # type: ignore[arg-type]
                     filter=filter,
                     limit=limit or SEARCH_LIMIT,
-                    operator=operator,
                     sort=sort,
+                    **operator_arg,
                 )
                 all_results.extend(
                     self._prepare_list_result(search_instance_result, set(flatten_props) if flatten_props else None)
@@ -143,8 +146,8 @@ class QueryExecutor:
             properties=search_properties,  # type: ignore[arg-type]
             filter=filter,
             limit=limit or SEARCH_LIMIT,
-            operator=operator,
             sort=sort,
+            **operator_arg,
         )
         # Lookup nested properties:
         order_by_node_ids = {node.as_id(): no for no, node in enumerate(search_result)}
