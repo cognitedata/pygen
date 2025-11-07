@@ -274,6 +274,28 @@ def test_search_nested_properties(cognite_client: CogniteClient, omni_views: dic
     assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
 
 
+def test_search_AND(cognite_client: CogniteClient, omni_client: OmniClient, omni_views: dict[str, dm.View]) -> None:
+    items = omni_client.primitive_required.list(limit=1)
+    assert len(items) > 0
+    item = items[0]
+    words = item.text.split(" ")
+    # The text property should be at least 3 words. (It is generated lorem ipsum text.)
+    assert len(words) > 2
+
+    view = omni_views["PrimitiveRequired"]
+    executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
+    selected_properties: list[str | dict[str, Any]] = ["text", "boolean", "externalId"]
+    result = executor.search(view.as_id(), selected_properties, query=" ".join(words), operator="AND", limit=5)
+
+    assert isinstance(result, list)
+    assert len(result) > 0
+    properties_set = set(selected_properties)
+    ill_formed_items = [item for item in result if not (set(item.keys()) <= properties_set)]
+    assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+    # As we are searching with AND, we expect only one result
+    assert len(result) == 1
+
+
 def test_query_list_root_nodes(cognite_client: CogniteClient) -> None:
     executor = QueryExecutor(cognite_client, unpack_edges="include")
     view_id = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")

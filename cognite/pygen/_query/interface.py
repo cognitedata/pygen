@@ -61,6 +61,7 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         search_properties: str | SequenceNotStr[str] | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        operator: Literal["AND", "OR"] | None = None,
         limit: int | None = None,
         instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
@@ -77,6 +78,11 @@ class QueryExecutor:
             filter: The filter to apply ahead of the search.
             search_properties: The properties to search. If None, all text properties are searched.
             sort: The sort order of the results.
+            operator: Controls how multiple search terms are combined when matching documents.
+                OR (default): A document matches if it contains any of the query terms in the searchable fields.
+                    This typically returns more results but with lower precision.
+                AND: A document matches only if it contains all of the query terms across the searchable fields.
+                    This typically returns fewer results but with higher relevance.
             limit: The maximum number of results to return. Max 1000.
             instance_types: The instance types to search. If None, defaults to the view's supported types.
 
@@ -89,7 +95,9 @@ class QueryExecutor:
 
         """
         filter = self._equals_none_to_not_exists(filter)
-        return self._execute_search(view, properties, query, filter, search_properties, sort, limit, instance_types)
+        return self._execute_search(
+            view, properties, query, filter, search_properties, sort, limit, operator, instance_types
+        )
 
     def _execute_search(
         self,
@@ -100,8 +108,12 @@ class QueryExecutor:
         search_properties: str | SequenceNotStr[str] | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
+        operator: Literal["AND", "OR"] | None = None,
         instance_types: list[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
+        # The SDK requires the operator to be set to AND or OR, however we want to
+        # just use the default if not specified as this is expected to change in the future.
+        operator_arg: dict[str, Any] = {"operator": operator} if operator is not None else {}
         view = self._get_view(view_id)
         flatten_props, are_flat_properties = self._as_property_list(properties, "list") if properties else (None, False)
         if properties is None or are_flat_properties:
@@ -119,6 +131,7 @@ class QueryExecutor:
                     filter=filter,
                     limit=limit or SEARCH_LIMIT,
                     sort=sort,
+                    **operator_arg,
                 )
                 all_results.extend(
                     self._prepare_list_result(search_instance_result, set(flatten_props) if flatten_props else None)
@@ -126,7 +139,7 @@ class QueryExecutor:
             return all_results
         elif view.used_for == "edge":
             raise ValueError("Nested properties are not supported for edges")
-        search_result = self._client.data_modeling.instances.search(  # type: ignore[call-overload]
+        search_result = self._client.data_modeling.instances.search(  # type: ignore[call-overload, misc]
             view_id,
             query,
             instance_type="node",
@@ -134,6 +147,7 @@ class QueryExecutor:
             filter=filter,
             limit=limit or SEARCH_LIMIT,
             sort=sort,
+            **operator_arg,
         )
         # Lookup nested properties:
         order_by_node_ids = {node.as_id(): no for no, node in enumerate(search_result)}
