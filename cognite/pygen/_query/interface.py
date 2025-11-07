@@ -136,13 +136,14 @@ class QueryExecutor:
             return all_results
         elif view.used_for == "edge":
             raise ValueError("Nested properties are not supported for edges")
-        search_result = self._client.data_modeling.instances.search(  # type: ignore[call-overload]
+        search_result = self._client.data_modeling.instances.search(  # type: ignore[call-overload, misc]
             view_id,
             query,
             instance_type="node",
             properties=search_properties,  # type: ignore[arg-type]
             filter=filter,
             limit=limit or SEARCH_LIMIT,
+            operator=operator,
             sort=sort,
         )
         # Lookup nested properties:
