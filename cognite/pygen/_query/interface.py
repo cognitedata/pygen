@@ -263,10 +263,10 @@ class QueryExecutor:
             return filters.Not(filters.Exists(filter._property))
         elif isinstance(filter, filters.And):
             return filters.And(
-                *[res for f in filter._filters if (res := cls._equals_none_to_not_exists(f)) is not None]
+                *(res for f in filter._filters if (res := cls._equals_none_to_not_exists(f)) is not None)
             )
         elif isinstance(filter, filters.Or):
-            return filters.Or(*[res for f in filter._filters if (res := cls._equals_none_to_not_exists(f)) is not None])
+            return filters.Or(*(res for f in filter._filters if (res := cls._equals_none_to_not_exists(f)) is not None))
         elif isinstance(filter, filters.Not) and filter._filters:
             if (res := cls._equals_none_to_not_exists(filter._filters[0])) is not None:
                 return filters.Not(res)
