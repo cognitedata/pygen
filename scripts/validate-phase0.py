@@ -49,7 +49,7 @@ def check_files_exist():
     
     required_files = [
         "legacy/README.md",
-        "cognite/__init__.py",
+        # Note: cognite/ should NOT have __init__.py (namespace package)
         "cognite/pygen/__init__.py",
         "tests/__init__.py",
         "tests/conftest.py",
@@ -126,7 +126,7 @@ def run_v2_tests():
     
     try:
         result = subprocess.run(
-            ["pytest", "tests/", "-v", "--tb=short"],
+            ["uv", "run", "pytest", "tests/", "-v", "--tb=short"],
             capture_output=True,
             text=True,
             timeout=30
@@ -155,20 +155,26 @@ def run_v1_tests():
     try:
         # Run just a few unit tests to verify structure
         result = subprocess.run(
-            ["pytest", "legacy/tests/test_unit/test_build.py", "-v", "--tb=short"],
+            ["uv", "run", "pytest", "legacy/tests/test_unit/", "-q", "--tb=line"],
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=120
         )
         
         if result.returncode == 0:
-            print("   [OK] V1 tests passed")
+            # Extract test count from output
+            import re
+            match = re.search(r'(\d+) passed', result.stdout)
+            if match:
+                print(f"   [OK] V1 tests passed ({match.group(1)} tests)")
+            else:
+                print("   [OK] V1 tests passed")
             return True
         else:
-            print(f"[WARN] V1 tests had failures (expected during migration):")
-            # V1 tests might fail due to missing dependencies or imports
-            # This is acceptable during Phase 0
-            print("   This is acceptable during Phase 0 migration")
+            print(f"[WARN] V1 tests had failures:")
+            print(result.stdout[-500:] if len(result.stdout) > 500 else result.stdout)
+            # V1 tests might fail due to missing dependencies or imports during migration
+            print("   This may be acceptable during Phase 0 migration")
             return True
     except subprocess.TimeoutExpired:
         print("[WARN] V1 tests timed out (acceptable during migration)")

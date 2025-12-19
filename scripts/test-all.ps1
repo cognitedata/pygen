@@ -4,12 +4,12 @@ Write-Host "Running All Tests (v1 + v2)..." -ForegroundColor Cyan
 Write-Host ""
 
 Write-Host "=== V2 Tests ===" -ForegroundColor Yellow
-pytest tests/ $args
+uv run pytest tests/ $args
 $v2Exit = $LASTEXITCODE
 
 Write-Host ""
 Write-Host "=== V1 (Legacy) Tests ===" -ForegroundColor Yellow
-pytest legacy/tests/ $args
+uv run pytest legacy/tests/ $args
 $v1Exit = $LASTEXITCODE
 
 Write-Host ""

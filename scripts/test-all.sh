@@ -4,12 +4,12 @@
 echo "Running All Tests (v1 + v2)..."
 echo ""
 echo "=== V2 Tests ==="
-pytest tests/ "$@"
+uv run pytest tests/ "$@"
 v2_exit=$?
 
 echo ""
 echo "=== V1 (Legacy) Tests ==="
-pytest legacy/tests/ "$@"
+uv run pytest legacy/tests/ "$@"
 v1_exit=$?
 
 echo ""

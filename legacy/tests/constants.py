@@ -6,11 +6,14 @@ from pathlib import Path
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelId
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-DATA_MODELS = REPO_ROOT / "tests" / "data" / "models"
-DATA_WRITE_DIR = REPO_ROOT / "tests" / "data" / "write"
-JSON_DIR = REPO_ROOT / "tests" / "data" / "json"
-EXAMPLES_DIR = REPO_ROOT / "examples"
+# For legacy tests: parent.parent.parent goes from constants.py -> tests -> legacy -> repo_root
+# This ensures REPO_ROOT points to the actual repository root, not the legacy folder
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+LEGACY_ROOT = REPO_ROOT / "legacy"
+DATA_MODELS = LEGACY_ROOT / "tests" / "data" / "models"
+DATA_WRITE_DIR = LEGACY_ROOT / "tests" / "data" / "write"
+JSON_DIR = LEGACY_ROOT / "tests" / "data" / "json"
+EXAMPLES_DIR = LEGACY_ROOT / "examples"
 
 
 @dataclass
