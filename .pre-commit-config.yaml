@@ -15,11 +15,13 @@ repos:
     rev: v0.6.2
 
 # Mypy must be run in the local system environment, not in the pre-commit environment.
+# Note: We exclude legacy/ from type checking to focus on v2 development
   - hooks:
     - id: mypy
       name: mypy
       entry: dmypy run -- cognite/ examples/ tests/
-      files: ^.*.(py|pyi)$
+      files: ^(cognite|examples|tests)/.*\.(py|pyi)$
+      exclude: ^legacy/
       language: system
       pass_filenames: false
     repo: local

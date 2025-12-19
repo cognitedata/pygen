@@ -1,19 +1,6 @@
-"""
-This is the main entry point for the pygen package. It contains the main functions for
-generating SDKs.
+"""Pygen v2 - Cognite Data Model SDK Generator.
+
+This is the v2 rewrite of Pygen with improved architecture and multi-language support.
 """
 
-from ._build import build_wheel
-from ._generator import generate_sdk, generate_sdk_notebook
-from ._query import QueryExecutor as _QueryExecutor
-from ._version import __version__
-from .utils.cdf import load_cognite_client_from_toml
-
-__all__ = [
-    "__version__",
-    "generate_sdk",
-    "generate_sdk_notebook",
-    "build_wheel",
-    "load_cognite_client_from_toml",
-    "_QueryExecutor",
-]
+__version__ = "2.0.0-dev"

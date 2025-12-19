@@ -11,6 +11,8 @@ Cognite Python SDK Generator
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=for-the-badge)](https://github.com/astral-sh/ruff)
 [![mypy](https://img.shields.io/badge/mypy-checked-000000.svg?style=for-the-badge&color=blue)](http://mypy-lang.org)
 
+> **📢 Important Notice**: Pygen is undergoing a major v2 rewrite to support multi-language SDK generation, improved validation, and better architecture. The v1 code is preserved in the `legacy/` folder while v2 is being developed. See [DEVELOPMENT.md](DEVELOPMENT.md) for details.
+
 This is the Cognite Python SDK Generator, `pygen`. The purpose of this package is to help developers to
 work with Cognite Data Fusion's (CDF) Data Models (DM) in Python.
 

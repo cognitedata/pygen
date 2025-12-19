@@ -1,3 +1,7 @@
+# This pyproject.toml supports both Pygen v1 (legacy/) and v2 (cognite/pygen/)
+# V1 code is preserved in legacy/ during the v2 rewrite
+# V2 is the active development version
+
 [project]
 name = "cognite-pygen"
 version = "0.0.0"
@@ -89,7 +93,7 @@ include = '\.py$'
 # See https://beta.ruff.rs/docs/rules for an overview of ruff rules
 line-length = 120
 target-version = "py310"
-exclude = ["examples", "scripts"]
+exclude = ["examples", "scripts", "legacy"]
 fix = true
 
 [tool.ruff.lint]
@@ -109,8 +113,10 @@ known-third-party = ["cognite.client"]
 
 [tool.mypy]
 explicit_package_bases = true
-mypy_path = "examples"
+mypy_path = "examples:legacy/examples"
 plugins = ["pydantic.mypy"]
+# Exclude legacy code from type checking unless explicitly running legacy tests
+exclude = ["^legacy/"]
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
@@ -147,13 +153,15 @@ addopts = [
 ]
 markers = [
     "full: Requiers all optional dependencies to run.",
+    "v1: Legacy v1 tests (in legacy/ folder)",
+    "v2: New v2 tests (in tests/ folder)",
 ]
-pythonpath = [".", "examples"]
-testpaths = ["tests", "cognite/pygen"]
+pythonpath = [".", "examples", "legacy/examples"]
+testpaths = ["tests", "legacy/tests", "cognite/pygen"]
 
 [tool.coverage.run]
 source = ["cognite.pygen"]
-omit = ["*/tests/*", "*/__pycache__/*", "examples/*"]
+omit = ["*/tests/*", "*/__pycache__/*", "examples/*", "legacy/*"]
 
 [tool.coverage.report]
 exclude_lines = [
