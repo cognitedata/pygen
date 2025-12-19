@@ -16,74 +16,84 @@ This document outlines the phased implementation approach for the Pygen rewrite.
 ## Phase Overview
 
 ```
-Phase 0: Foundation & Setup (1-2 weeks)
+Phase 0: Foundation & Setup (1 week)
     ↓
 Phase 1: Pygen Client Core (3-4 weeks)
     ↓
-Phase 2: Intermediate Representation (2-3 weeks)
+Phase 2: Validation & IR (3-4 weeks)
     ↓
 Phase 3: Python Generator MVP (3-4 weeks)
     ↓
-Phase 4: Lazy Evaluation & Runtime (3-4 weeks)
+Phase 4: Runtime & Lazy Evaluation (3-4 weeks)
     ↓
 Phase 5: Feature Parity (4-6 weeks)
     ↓
 Phase 6: Multi-Language Foundation (3-4 weeks)
     ↓
-Phase 7: Production Hardening (2-3 weeks)
+Phase 7: API Service (2-3 weeks)
     ↓
-Phase 8: Migration & Documentation (2-3 weeks)
+Phase 8: Production Hardening (2-3 weeks)
+    ↓
+Phase 9: Migration & Documentation (2-3 weeks)
 
-Total Estimated Time: 23-33 weeks
+Total Estimated Time: 24-36 weeks
 ```
 
 ## Phase 0: Foundation & Setup
 
-**Goal**: Establish project structure, tooling, and development environment.
+**Goal**: Organize existing foundation and prepare for v2 development alongside v1.
 
-**Duration**: 1-2 weeks
+**Duration**: 1 week
+
+**Note**: Foundation already exists in the repository. This phase focuses on organization for parallel development.
 
 ### Tasks
 
-1. **Project Structure Setup**
-   - Create new project structure alongside existing code
-   - Set up `pyproject.toml` with all dependencies
-   - Configure development tools (ruff, mypy, pytest)
-   - Set up CI/CD pipeline
-   - Configure pre-commit hooks
+1. **Project Reorganization**
+   - Move existing Pygen v1 code to `legacy/` folder
+   - Move existing tests to `legacy/tests/`
+   - Keep v1 functional during v2 development
+   - Set up new v2 structure alongside legacy
+   - Update `pyproject.toml` to support both versions
 
-2. **Development Environment**
-   - Document setup process
-   - Create development scripts
-   - Set up virtual environment template
-   - Configure IDE settings (VS Code, PyCharm)
+2. **Development Environment Validation**
+   - Verify existing development tools (ruff, mypy, pytest)
+   - Ensure CI/CD pipeline works for dual structure
+   - Update pre-commit hooks for new structure
+   - Document new development workflow
 
-3. **Testing Infrastructure**
-   - Set up pytest configuration
-   - Configure coverage reporting (target >90%)
-   - Set up mock server for API testing
-   - Create test fixtures and utilities
-   - Integration test framework
+3. **Testing Infrastructure Enhancement**
+   - Validate existing pytest configuration
+   - Ensure coverage reporting works with new structure
+   - Set up separate test suites for v1 (legacy) and v2
+   - Create mock server for API testing (if not exists)
+   - Enhance test fixtures and utilities
 
-4. **Documentation Setup**
-   - Set up MkDocs or Sphinx
-   - Create documentation structure
-   - Set up API reference generation
-   - Configure example notebooks
+4. **Documentation Structure**
+   - Validate existing documentation setup
+   - Create v2-specific documentation sections
+   - Set up API reference generation for v2
+   - Plan migration guide structure
 
 ### Deliverables
-- ✅ Clean project structure
-- ✅ All tooling configured and working
-- ✅ CI/CD pipeline running
-- ✅ Test infrastructure ready
-- ✅ Documentation framework set up
+- ✅ V1 code moved to legacy/ folder
+- ✅ Clean v2 project structure ready
+- ✅ Both v1 and v2 can coexist
+- ✅ CI/CD works for both versions
+- ✅ Test infrastructure supports parallel development
 
 ### Success Criteria
-- Can run tests with `pytest`
+- V1 tests still pass in legacy/
+- Can run v2 tests separately
 - Can format code with `ruff format`
 - Can check types with `mypy`
-- CI passes on empty project
-- Coverage reporting works
+- CI passes for both v1 and v2
+- Coverage reporting works for v2
+
+### Migration Plan
+- Keep v1 in legacy/ until v2 is complete
+- Delete legacy/ folder only after v2.0.0 release
+- Maintain v1 bug fixes if critical during development
 
 ---
 
@@ -96,12 +106,18 @@ Total Estimated Time: 23-33 weeks
 ### Tasks
 
 1. **HTTP Client Foundation**
-   - Implement base HTTP client using httpx
+   - Implement internal HTTPClient wrapper around httpx
    - Add authentication support
    - Implement rate limiting
    - Add retry logic with exponential backoff
    - Connection pooling configuration
    - Request/response logging
+
+1b. **Query Builder/Optimizer**
+   - Implement query builder for simplifying complex queries
+   - Add filter composition
+   - Add query optimization logic
+   - Support for common query patterns from v1
 
 2. **Pydantic Models for API Objects**
    - DataModel model
@@ -149,15 +165,23 @@ Total Estimated Time: 23-33 weeks
 
 ---
 
-## Phase 2: Intermediate Representation
+## Phase 2: Validation & Intermediate Representation
 
-**Goal**: Create language-agnostic representation of data models.
+**Goal**: Validate data models upfront, then create language-agnostic IR from validated models.
 
-**Duration**: 2-3 weeks
+**Duration**: 3-4 weeks
 
 ### Tasks
 
-1. **Type System**
+1. **Validation Layer (Goal 6 - Critical!)**
+   - Implement validation rules for data models
+   - Detect incomplete models (missing reverse relations, etc.)
+   - Generate warnings with actionable suggestions
+   - Implement filtering logic for problematic elements
+   - Graceful degradation decisions
+   - Clear, user-friendly error messages
+
+2. **Type System**
    - Define IRType hierarchy
    - Primitive types (string, int, float, bool, datetime, etc.)
    - Container types (list, dict)
@@ -165,28 +189,22 @@ Total Estimated Time: 23-33 weeks
    - Optional/nullable types
    - Custom types
 
-2. **IR Models**
+3. **IR Models**
    - IRProperty
    - IRClass
    - IRRelationship
    - IREnum
+   - IRModule
    - IRModel (top-level)
    - IRMethod (for generated methods)
 
-3. **Parser**
-   - Parse View to IRClass
-   - Parse Container to IRClass
-   - Parse DataModel to IRModel
+4. **Parser**
+   - Parse validated View to IRClass
+   - Parse validated Container to IRClass
+   - Parse validated DataModel to IRModel
    - Handle inheritance
    - Handle relationships
    - Extract metadata
-
-4. **Validator**
-   - Check naming conflicts
-   - Validate type references
-   - Check relationship consistency
-   - Validate inheritance chains
-   - Circular dependency detection
 
 5. **Transformer**
    - Flatten inheritance
@@ -195,33 +213,37 @@ Total Estimated Time: 23-33 weeks
    - Optimize structure
 
 6. **Testing**
-   - Unit tests for each component
+   - Unit tests for validation rules
+   - Unit tests for each IR component
    - Integration tests with real data models
+   - Test with intentionally incomplete models
    - Edge case handling
    - Test coverage >90%
 
 ### Deliverables
+- ✅ Complete validation layer with warning system
 - ✅ Complete IR model definitions
-- ✅ Parser from API models to IR
-- ✅ Validator for IR consistency
+- ✅ Parser from validated API models to IR
 - ✅ Transformer utilities
 - ✅ Comprehensive test suite
 
 ### Success Criteria
-- Can parse complex data models
-- Validation catches all known issues
+- Can validate complex data models
+- Can detect and handle incomplete models gracefully
+- Generates helpful warnings
+- Can parse complex validated models
 - All tests pass with >90% coverage
 - IR is truly language-agnostic
-- Well-documented IR structure
+- Well-documented validation and IR structure
 
 ### Dependencies
-- Phase 1 complete (need API models)
+- Phase 1 complete (need API models and client)
 
 ---
 
-## Phase 3: Python Generator MVP
+## Phase 3: Python Generator MVP (Client-Based)
 
-**Goal**: Generate basic Python SDK from IR.
+**Goal**: Generate basic Python SDK from IR using client-based design (not ORM).
 
 **Duration**: 3-4 weeks
 
@@ -235,18 +257,17 @@ Total Estimated Time: 23-33 weeks
    - Formatter integration (ruff)
 
 2. **Templates - Data Classes**
-   - Basic class template
-   - Property generation
-   - Type hints
+   - Simple Pydantic model template
+   - Property generation with type hints
    - Docstrings
-   - `__init__` method
-   - Basic serialization methods
+   - No ORM behavior (just data)
 
-3. **Templates - API Classes**
-   - API class template
-   - CRUD methods
-   - List/filter methods
-   - Query building
+3. **Templates - API Classes (Client-Based)**
+   - API class template that wraps PygenClient
+   - Constructor takes PygenClient instance
+   - CRUD methods delegate to client
+   - List/filter methods with lazy iteration
+   - Query building using client's query builder
    - Documentation
 
 4. **Package Structure**
@@ -287,69 +308,68 @@ Total Estimated Time: 23-33 weeks
 
 ---
 
-## Phase 4: Lazy Evaluation & Runtime
+## Phase 4: Runtime Support & Lazy Evaluation
 
-**Goal**: Implement lazy evaluation for scalable data access.
+**Goal**: Implement runtime support for generated SDKs with lazy evaluation (client-based).
 
 **Duration**: 3-4 weeks
 
 ### Tasks
 
-1. **Runtime Base Classes**
-   - PygenResource base class
-   - PygenRelation generic class
-   - PygenQuery class
-   - PygenFilter class
+1. **Runtime Base Classes (Client-Based)**
+   - Base API class for generated API classes
+   - Base data class (simple Pydantic BaseModel extension)
+   - Lazy iteration helpers
+   - Query helper utilities
 
 2. **Lazy Evaluation Mechanisms**
-   - Iterator protocol implementation
-   - Chunk-based fetching
-   - Transparent pagination
-   - Result caching strategies
+   - Iterator protocol implementation in API classes
+   - Chunk-based fetching through PygenClient
+   - Transparent pagination via client
+   - Optional result caching
 
-3. **Query Builder**
-   - Fluent query API
-   - Filter composition
-   - Sorting support
-   - Projection support
-   - Limit/offset handling
+3. **Query Helpers**
+   - Helper functions for filter composition
+   - Helpers for working with query builder
+   - Type-safe filter methods
+   - Pagination helpers
 
 4. **Integration with Generator**
-   - Update templates to use runtime classes
-   - Generate relationship properties
-   - Generate filter methods
-   - Add client injection
+   - Update templates to use runtime base classes
+   - Generate API classes with client injection
+   - Generate lazy list/filter methods
+   - Generate relationship traversal methods
 
 5. **Performance Optimization**
-   - Efficient batching
-   - Connection reuse
-   - Memory management
-   - Async support (if beneficial)
+   - Efficient batching through client
+   - Connection reuse (already in HTTPClient)
+   - Memory management in iterators
+   - Benchmark vs v1
 
 6. **Testing**
-   - Unit tests for runtime classes
+   - Unit tests for runtime base classes
    - Integration tests with generated code
-   - Performance tests
+   - Performance tests vs v1
    - Memory usage tests
    - Test coverage >90%
 
 ### Deliverables
-- ✅ Complete runtime support library
-- ✅ Lazy evaluation working
-- ✅ Query builder functional
-- ✅ Generated code uses lazy patterns
+- ✅ Complete runtime support library (client-based)
+- ✅ Lazy evaluation working through API classes
+- ✅ Query helpers functional
+- ✅ Generated code uses client-based lazy patterns
 - ✅ Performance benchmarks met
 
 ### Success Criteria
 - Can iterate over large datasets without loading all into memory
-- Query building is intuitive and type-safe
-- Performance is significantly better than eager loading
+- Client-based design is clear and intuitive
+- Performance is better than v1
 - All tests pass with >90% coverage
-- Memory usage is bounded
+- Memory usage is O(chunk_size)
 
 ### Dependencies
 - Phase 3 complete (need generator)
-- Phase 1 complete (need client)
+- Phase 1 complete (need client with query builder)
 
 ---
 
@@ -475,7 +495,69 @@ Total Estimated Time: 23-33 weeks
 
 ---
 
-## Phase 7: Production Hardening
+## Phase 7: API Service (Goal 5)
+
+**Goal**: Build Pygen backend service for generating SDKs on demand via API.
+
+**Duration**: 2-3 weeks
+
+### Tasks
+
+1. **API Service Framework**
+   - Choose framework (FastAPI recommended)
+   - Set up service structure
+   - API endpoint design
+   - Request/response models
+
+2. **Core Endpoints**
+   - POST `/generate` - Generate SDK from specification
+   - POST `/validate` - Validate data model
+   - GET `/health` - Service health check
+   - GET `/version` - Pygen version info
+
+3. **Generation Service**
+   - Async generation support
+   - Job queue for long-running generations
+   - Result caching (optional)
+   - Rate limiting
+
+4. **Output Formats**
+   - ZIP file of source files
+   - Tarball/package format
+   - Direct code response (for small SDKs)
+   - Support multiple languages
+
+5. **Security & Auth**
+   - API authentication
+   - Input validation
+   - Rate limiting
+   - Resource limits
+
+6. **Testing**
+   - API endpoint tests
+   - Integration tests
+   - Load tests
+   - Test coverage >90%
+
+### Deliverables
+- ✅ Working API service
+- ✅ All endpoints functional
+- ✅ Documentation (OpenAPI/Swagger)
+- ✅ Deployment guide
+
+### Success Criteria
+- Can generate SDK via API
+- Service is stable under load
+- All tests pass with >90% coverage
+- API documentation complete
+- Deployment is straightforward
+
+### Dependencies
+- Phase 6 complete (multi-language support)
+
+---
+
+## Phase 8: Production Hardening
 
 **Goal**: Prepare for production use.
 
@@ -537,7 +619,7 @@ Total Estimated Time: 23-33 weeks
 
 ---
 
-## Phase 8: Migration & Documentation
+## Phase 9: Migration & Documentation
 
 **Goal**: Enable users to migrate from old to new Pygen.
 
@@ -589,7 +671,12 @@ Total Estimated Time: 23-33 weeks
 - Release artifacts ready
 
 ### Dependencies
-- Phase 7 complete
+- Phase 8 complete
+
+### Post-Release
+- Delete legacy/ folder after v2.0.0 is stable
+- Archive v1 documentation
+- Sunset v1 support per deprecation plan
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the proposed architecture for the Pygen rewrite. The architecture is designed to address the four core problems: performance, lazy evaluation, multi-language support, and maintainability.
+This document outlines the proposed architecture for the Pygen rewrite. The architecture is designed to address the core problems: performance, lazy evaluation, multi-language support, maintainability, API service support, and upfront validation with graceful degradation.
 
 ## Core Architectural Principles
 
@@ -22,22 +22,30 @@ This document outlines the proposed architecture for the Pygen rewrite. The arch
 │                                                               │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │         1. Pygen Client (Runtime)                    │   │
-│  │  - HTTP client (httpx-based)                        │   │
+│  │  - HTTPClient wrapper (httpx-based)                 │   │
 │  │  - Authentication                                    │   │
 │  │  - CRUD operations for DM concepts                  │   │
 │  │  - Pydantic models for API objects                  │   │
+│  │  - Query builder/optimizer                          │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                           │                                  │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │         2. Intermediate Representation (IR)          │   │
+│  │         2. Validation Layer                          │   │
+│  │  - Schema validation (before IR)                    │   │
+│  │  - Incomplete model handling                        │   │
+│  │  - Warning generation                               │   │
+│  │  - Graceful degradation decisions                   │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │         3. Intermediate Representation (IR)          │   │
 │  │  - Language-agnostic model representation           │   │
 │  │  - Type system abstraction                          │   │
 │  │  - Relationship mapping                             │   │
-│  │  - Schema validation                                │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                           │                                  │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │         3. Code Generation Engine                    │   │
+│  │         4. Code Generation Engine                    │   │
 │  │  - Template system (Jinja2)                         │   │
 │  │  - Language-specific generators:                    │   │
 │  │    - Python Generator                               │   │
@@ -48,11 +56,11 @@ This document outlines the proposed architecture for the Pygen rewrite. The arch
 │  └─────────────────────────────────────────────────────┘   │
 │                           │                                  │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │         4. Generated Runtime Support                 │   │
-│  │  - Base classes for generated code                  │   │
-│  │  - Lazy evaluation mechanisms                       │   │
-│  │  - Query builders                                   │   │
-│  │  - Filtering/pagination helpers                     │   │
+│  │         5. Generated SDK Runtime                     │   │
+│  │  - Client-based design (not ORM)                    │   │
+│  │  - API classes with PygenClient reference           │   │
+│  │  - Lazy iteration via client methods                │   │
+│  │  - Query builder helpers                            │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                                                               │
 └─────────────────────────────────────────────────────────────┘
@@ -65,11 +73,12 @@ This document outlines the proposed architecture for the Pygen rewrite. The arch
 **Purpose**: Replace `cognite-sdk` with a lightweight, purpose-built client for data modeling operations.
 
 **Key Features**:
-- Built on `httpx` for modern async/sync support
+- Internal HTTPClient wrapper around `httpx` for modern async/sync support
 - Pydantic models for all API objects (DataModel, View, Container, Space)
 - Connection pooling and rate limiting
 - Automatic retry logic with exponential backoff
 - Streaming support for large datasets
+- Query builder/optimizer for simplifying complex API interactions
 - Full type hints for IDE support
 
 **Structure**:
@@ -78,7 +87,8 @@ pygen/client/
 ├── __init__.py
 ├── core.py              # Main PygenClient class
 ├── auth.py              # Authentication handlers
-├── http.py              # HTTP client wrapper (httpx)
+├── http_client.py       # Internal HTTPClient wrapper (httpx)
+├── query_builder.py     # Query builder/optimizer
 ├── models/              # Pydantic models for API objects
 │   ├── __init__.py
 │   ├── data_model.py
@@ -119,18 +129,58 @@ for instance in client.instances.list(
     chunk_size=1000
 ):
     process(instance)
+
+# Query builder simplifies complex queries
+query = client.query_builder(space="my_space", view="MyView")
+results = query.filter(status="active").select("name", "id").limit(100)
+for item in results:
+    process(item)
 ```
 
-### 2. Intermediate Representation (IR)
+### 2. Validation Layer
 
-**Purpose**: Create a language-agnostic representation of data models that can be transformed into any target language.
+**Purpose**: Validate data models upfront, handle incomplete models gracefully, and provide clear warnings.
+
+**Key Features**:
+- Pre-parsing validation of CDF data models
+- Detection of incomplete models (e.g., missing reverse relations)
+- Warning generation with actionable suggestions
+- Graceful degradation decisions (what to include/exclude)
+- Clear error messages for users
+
+**Structure**:
+```
+pygen/validation/
+├── __init__.py
+├── validator.py         # Main validation logic
+├── rules.py             # Validation rules
+├── warnings.py          # Warning types and messages
+└── filters.py           # Filtering logic for incomplete models
+```
+
+**Validation Flow**:
+```
+1. Fetch data model from CDF
+   ↓
+2. Run validation rules
+   ↓
+3. Generate warnings for issues
+   ↓
+4. Decide what to include/exclude
+   ↓
+5. Pass cleaned model to IR parser
+```
+
+### 3. Intermediate Representation (IR)
+
+**Purpose**: Create a language-agnostic representation of validated data models that can be transformed into any target language.
 
 **Key Features**:
 - Schema-independent type system
 - Relationship and inheritance mapping
 - Property metadata (required, nullable, default values)
-- Validation rules
 - Documentation strings
+- Only contains valid, processable models
 
 **Structure**:
 ```
@@ -138,8 +188,7 @@ pygen/ir/
 ├── __init__.py
 ├── models.py            # IR model definitions
 ├── types.py             # Type system abstraction
-├── parser.py            # Parse API models to IR
-├── validator.py         # Validate IR consistency
+├── parser.py            # Parse validated API models to IR
 └── transformer.py       # Transform IR (e.g., flattening)
 ```
 
@@ -174,7 +223,7 @@ class IRModel:
     metadata: dict[str, Any]
 ```
 
-### 3. Code Generation Engine
+### 4. Code Generation Engine
 
 **Purpose**: Transform IR into target language code with proper formatting and conventions.
 
@@ -230,58 +279,71 @@ class BaseGenerator(ABC):
         """Get file extension for this language"""
 ```
 
-### 4. Generated Runtime Support
+### 5. Generated SDK Runtime (Client-Based Design)
 
-**Purpose**: Provide base classes and utilities that generated code depends on.
+**Purpose**: Provide runtime support for generated SDKs using client-based pattern (not ORM-style).
 
 **Key Features**:
-- Lazy evaluation support
-- Query building
-- Filtering and pagination
-- Connection management
-- Serialization helpers
+- Client-based design (following Pygen v1 patterns)
+- Generated API classes that wrap PygenClient
+- Lazy iteration through client methods
+- Query builder helpers for filtering and pagination
+- No database-style ORM patterns
 
 **Structure**:
 ```
 pygen/runtime/
 ├── __init__.py
-├── base.py              # Base classes for generated code
-├── lazy.py              # Lazy evaluation support
-├── query.py             # Query builder
-├── filters.py           # Filter classes
-├── pagination.py        # Pagination helpers
-└── serialization.py     # Serialization utilities
+├── base_api.py          # Base class for generated API classes
+├── data_classes.py      # Base for generated data classes
+├── iterators.py         # Lazy iteration helpers
+└── query_helpers.py     # Query building helpers
 ```
 
-**Base Class Design**:
+**Client-Based Design Pattern**:
 ```python
-class PygenResource(BaseModel):
-    """Base class for all generated resources"""
-    _client: PygenClient | None = None
+# Generated API class (client-based, not ORM)
+class MyModelAPI:
+    """Generated API class for MyModel"""
     
-    def refresh(self) -> Self:
-        """Reload data from API"""
+    def __init__(self, client: PygenClient):
+        self._client = client
+        self._view_id = ViewReference(space="my_space", external_id="MyModel", version="1")
+    
+    def list(self, limit: int | None = None) -> Iterator[MyModel]:
+        """List instances with lazy iteration"""
+        for item in self._client.instances.list(
+            space=self._view_id.space,
+            view=self._view_id,
+            limit=limit
+        ):
+            yield MyModel.model_validate(item)
+    
+    def retrieve(self, external_id: str) -> MyModel | None:
+        """Retrieve single instance"""
+        item = self._client.instances.retrieve(
+            space=self._view_id.space,
+            view=self._view_id,
+            external_id=external_id
+        )
+        return MyModel.model_validate(item) if item else None
+    
+    def filter(self, **filters) -> Iterator[MyModel]:
+        """Filter instances"""
+        query = self._client.query_builder(
+            space=self._view_id.space,
+            view=self._view_id
+        ).filter(**filters)
         
-    def save(self) -> Self:
-        """Persist changes to API"""
-        
-    def delete(self) -> None:
-        """Delete this resource"""
+        for item in query.execute():
+            yield MyModel.model_validate(item)
 
-class PygenRelation(Generic[T]):
-    """Lazy relationship handler"""
-    _client: PygenClient
-    _query: Query
-    _cached: list[T] | None = None
-    
-    def __iter__(self) -> Iterator[T]:
-        """Lazy iteration over related objects"""
-        
-    def all(self) -> list[T]:
-        """Eager load all related objects"""
-        
-    def filter(self, **kwargs) -> Self:
-        """Add filters to query"""
+# Data class (simple pydantic model, no ORM behavior)
+class MyModel(BaseModel):
+    """Generated data class"""
+    external_id: str
+    name: str
+    value: float
 ```
 
 ## Data Flow
@@ -290,36 +352,58 @@ class PygenRelation(Generic[T]):
 ```
 1. User provides data model specification
    ↓
-2. Pygen Client fetches data model from API
+2. Pygen Client fetches data model from CDF API
    ↓
-3. Parser converts API models to IR
+3. Validation Layer validates model
+   - Checks for incomplete models
+   - Generates warnings
+   - Filters out problematic elements
    ↓
-4. Validator checks IR consistency
+4. Parser converts validated API models to IR
    ↓
 5. Generator transforms IR to target language
    ↓
 6. Formatter/linter processes generated code
    ↓
-7. Output files written to disk
+7. Output files written to disk (or returned via API)
 ```
 
-### Runtime Flow
+### Runtime Flow (Client-Based)
 ```
 1. User imports generated SDK
    ↓
-2. User creates client instance
+2. User creates PygenClient instance
    ↓
-3. User calls API methods on generated classes
+3. User creates generated API class (passing client)
    ↓
-4. Query is built (not executed)
+4. User calls methods on API class (e.g., list(), filter())
    ↓
-5. User iterates over results
+5. API class uses PygenClient to build query
    ↓
-6. PygenClient fetches data in chunks
+6. User iterates over results (lazy)
    ↓
-7. Data deserialized into generated classes
+7. PygenClient fetches data in chunks via HTTPClient
    ↓
-8. User processes data
+8. Data deserialized into generated data classes
+   ↓
+9. User processes data
+```
+
+### API Service Flow (New Goal 5)
+```
+1. HTTP request to Pygen API service
+   POST /generate with data model specification
+   ↓
+2. Service validates request
+   ↓
+3. Service runs generation flow (steps 2-6 from Generation Flow)
+   ↓
+4. Service returns generated SDK as:
+   - ZIP file of source files, or
+   - Package tarball, or
+   - Direct code response
+   ↓
+5. Client downloads and uses generated SDK
 ```
 
 ## Key Design Decisions
@@ -344,14 +428,29 @@ class PygenRelation(Generic[T]):
 - Better user experience (faster initial response)
 - Explicit eager loading when needed
 
-### 4. Why IR layer?
+### 4. Why validation before IR?
+- Catches issues early in the pipeline
+- Allows graceful degradation decisions before IR creation
+- Prevents invalid models from entering IR
+- Better error messages for users
+- Enables partial generation for incomplete models
+
+### 5. Why IR layer?
 - Decouples parsing from generation
 - Enables multi-language support
 - Easier to test each stage
 - Allows IR transformations
 - Version compatibility layer
 
-### 5. Why template-based generation?
+### 6. Why client-based design (not ORM)?
+- Maintains compatibility with Pygen v1 patterns
+- Simpler mental model (explicit client usage)
+- No hidden database-style magic
+- Clear separation between data and operations
+- Easier to test and mock
+- More flexible for API-centric operations
+
+### 7. Why template-based generation?
 - Easy to customize
 - Language-specific conventions
 - Maintainable
@@ -391,14 +490,27 @@ class PygenRelation(Generic[T]):
 ### Adding New API Operations
 1. Add pydantic model in `pygen/client/models/`
 2. Add resource methods in `pygen/client/resources/`
-3. Update IR if needed
-4. Update generators if new patterns needed
-5. Add tests
+3. Update validation rules if needed
+4. Update IR if needed
+5. Update generators if new patterns needed
+6. Add tests
+
+### Adding New Validation Rules
+1. Add rule in `pygen/validation/rules.py`
+2. Add warning type if needed
+3. Update filtering logic
+4. Add tests for edge cases
 
 ### Custom Templates
 1. Users can provide custom template directory
 2. Templates override defaults
 3. Full access to IR objects in templates
+
+### API Service Endpoints (Goal 5)
+1. `/generate` - Generate SDK from specification
+2. `/validate` - Validate data model
+3. `/health` - Service health check
+4. `/version` - Pygen version info
 
 ## Migration Strategy
 

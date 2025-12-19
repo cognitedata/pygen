@@ -66,7 +66,9 @@ The original Pygen has been successful but faces several limitations:
 2. **Scalability**: Handle arbitrary dataset sizes through lazy evaluation
 3. **Multi-Language**: Support Python, TypeScript, C#, PySpark
 4. **Quality**: >90% test coverage, professional-grade code
-5. **Maintainability**: Clean architecture, well-documented
+5. **API Service**: Support Pygen backend service for on-demand SDK generation
+6. **Validation**: Upfront validation with graceful degradation for incomplete models
+7. **Maintainability**: Clean architecture, well-documented
 
 ---
 
@@ -75,14 +77,17 @@ The original Pygen has been successful but faces several limitations:
 ### In Scope
 
 ✅ Complete rewrite of Pygen from scratch
-✅ Custom lightweight CDF client (replace cognite-sdk)
-✅ Lazy evaluation for scalability
+✅ Custom lightweight CDF client with HTTPClient wrapper (replace cognite-sdk)
+✅ Query builder/optimizer for simplified API usage
+✅ Upfront validation with graceful degradation
+✅ Lazy evaluation for scalability (client-based design)
 ✅ Python SDK generation (maintain parity)
 ✅ TypeScript SDK generation (new)
 ✅ Intermediate Representation (IR) for multi-language support
+✅ API service for on-demand SDK generation
 ✅ Comprehensive testing (>90% coverage)
 ✅ Documentation and migration guide
-✅ CLI and programmatic API
+✅ CLI (typer-based) and programmatic API
 
 ### Out of Scope
 
@@ -96,22 +101,22 @@ The original Pygen has been successful but faces several limitations:
 
 ## Project Structure
 
-This rewrite is organized into 8 phases over approximately 6-8 months:
+This rewrite is organized into 9 phases over approximately 6-9 months:
 
-### Phase 0: Foundation (1-2 weeks)
-Set up project structure, tooling, testing infrastructure
+### Phase 0: Foundation (1 week)
+Reorganize v1 to legacy/, set up v2 structure alongside
 
 ### Phase 1: Pygen Client (3-4 weeks)
-Build httpx-based client for CDF Data Modeling API
+Build httpx-based client with HTTPClient wrapper and query builder
 
-### Phase 2: Intermediate Representation (2-3 weeks)
-Create language-agnostic model representation
+### Phase 2: Validation & IR (3-4 weeks)
+Upfront validation layer and language-agnostic model representation
 
 ### Phase 3: Python Generator MVP (3-4 weeks)
-Generate basic Python SDKs from IR
+Generate basic Python SDKs from IR (client-based design)
 
-### Phase 4: Lazy Evaluation (3-4 weeks)
-Implement lazy loading for scalability
+### Phase 4: Runtime & Lazy Evaluation (3-4 weeks)
+Implement lazy loading for scalability with client-based pattern
 
 ### Phase 5: Feature Parity (4-6 weeks)
 Match all features of original Pygen
@@ -119,37 +124,56 @@ Match all features of original Pygen
 ### Phase 6: Multi-Language (3-4 weeks)
 Add TypeScript generator as proof of concept
 
-### Phase 7: Production Hardening (2-3 weeks)
+### Phase 7: API Service (2-3 weeks)
+Build Pygen backend service for on-demand generation
+
+### Phase 8: Production Hardening (2-3 weeks)
 Performance optimization, security, stability
 
-### Phase 8: Migration & Docs (2-3 weeks)
-Migration guide, complete documentation, release
+### Phase 9: Migration & Docs (2-3 weeks)
+Migration guide, complete documentation, release, delete legacy/
 
 ---
 
 ## Key Architectural Decisions
 
-### 1. Replace cognite-sdk with httpx
-**Why**: Better performance, HTTP/2, async/sync support
-**Impact**: Full control over HTTP layer
+### 1. Replace cognite-sdk with HTTPClient wrapper around httpx
+**Why**: Better performance, HTTP/2, full control
+**Impact**: Internal wrapper provides consistent interface
 
-### 2. Use Pydantic v2 for all models
+### 2. Validation before IR
+**Why**: Catches issues early, enables graceful degradation
+**Impact**: Better error messages, partial generation possible
+
+### 3. Client-based design (not ORM)
+**Why**: Maintains v1 patterns, simpler mental model
+**Impact**: Clear separation of data and operations
+
+### 4. Use Pydantic v2 for all models
 **Why**: 5-17x faster, excellent validation, type safety
 **Impact**: Better performance and developer experience
 
-### 3. Implement Intermediate Representation (IR)
+### 5. Implement Intermediate Representation (IR)
 **Why**: Enables multi-language support
 **Impact**: More complex but scalable architecture
 
-### 4. Lazy evaluation by default
+### 6. Lazy evaluation by default (client-based)
 **Why**: Solves scalability problem
 **Impact**: Can handle unlimited dataset sizes
 
-### 5. Template-based generation
+### 7. Template-based generation
 **Why**: Readable, maintainable, customizable
 **Impact**: Easy to add new languages and modify output
 
-### 6. Test-driven development
+### 8. API Service for on-demand generation
+**Why**: Enables SaaS model, easier user adoption
+**Impact**: Additional deployment complexity
+
+### 9. Typer for CLI
+**Why**: Modern, type-safe, better DX than click
+**Impact**: Better CLI experience
+
+### 10. Test-driven development
 **Why**: Quality and confidence
 **Impact**: >90% coverage from start
 
@@ -210,6 +234,8 @@ See [implementation-roadmap.md](./implementation-roadmap.md) for detailed risk m
 - **httpx**: HTTP client (async/sync, HTTP/2)
 - **Pydantic v2**: Data validation and serialization
 - **Jinja2**: Template engine for code generation
+- **FastAPI**: API service framework (for Goal 5)
+- **typer**: CLI framework
 
 ### Development Tools
 - **uv**: Dependency management
@@ -272,22 +298,23 @@ This project includes comprehensive planning documentation:
 
 ```
 Month 1-2: Foundation & Client
-├─ Week 1-2:   Phase 0 (Foundation)
-├─ Week 3-6:   Phase 1 (Pygen Client)
-└─ Week 7-9:   Phase 2 (IR)
+├─ Week 1:     Phase 0 (Reorganize to legacy/)
+├─ Week 2-5:   Phase 1 (Pygen Client + Query Builder)
+└─ Week 6-9:   Phase 2 (Validation + IR)
 
 Month 3-4: Generation
-├─ Week 10-13: Phase 3 (Python Generator)
-└─ Week 14-17: Phase 4 (Lazy Evaluation)
+├─ Week 10-13: Phase 3 (Python Generator MVP)
+└─ Week 14-17: Phase 4 (Runtime & Lazy Evaluation)
 
 Month 5-6: Feature Complete
 ├─ Week 18-23: Phase 5 (Feature Parity)
 └─ Week 24-27: Phase 6 (Multi-Language)
 
-Month 7-8: Release
-├─ Week 28-30: Phase 7 (Production Hardening)
-├─ Week 31-33: Phase 8 (Migration & Docs)
-└─ Week 34:    Release v2.0.0
+Month 7-9: Production & Release
+├─ Week 28-30: Phase 7 (API Service)
+├─ Week 31-33: Phase 8 (Production Hardening)
+├─ Week 34-36: Phase 9 (Migration & Docs)
+└─ Week 37:    Release v2.0.0, delete legacy/
 ```
 
 ---

@@ -8,7 +8,78 @@ This document provides detailed technical specifications for key components of t
 
 ## 1. Pygen Client API
 
-### 1.1 PygenClient Class
+### 1.1 HTTPClient (Internal Wrapper)
+
+**Purpose**: Internal wrapper around httpx for consistent HTTP operations.
+
+**Interface**:
+
+```python
+class HTTPClient:
+    """
+    Internal HTTP client wrapper around httpx.
+    
+    Provides consistent interface for HTTP operations with:
+    - Connection pooling
+    - Rate limiting
+    - Retry logic
+    - Request/response logging
+    
+    Args:
+        base_url: Base URL for API
+        timeout: Request timeout in seconds
+        max_retries: Maximum number of retries
+        rate_limit: Maximum requests per second
+        pool_size: Connection pool size
+    """
+    
+    def __init__(
+        self,
+        base_url: str,
+        timeout: int = 30,
+        max_retries: int = 3,
+        rate_limit: int | None = None,
+        pool_size: int = 10,
+    ) -> None: ...
+    
+    def get(
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> httpx.Response: ...
+    
+    def post(
+        self,
+        path: str,
+        json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> httpx.Response: ...
+    
+    def put(
+        self,
+        path: str,
+        json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> httpx.Response: ...
+    
+    def delete(
+        self,
+        path: str,
+        headers: dict[str, str] | None = None,
+    ) -> httpx.Response: ...
+    
+    def close(self) -> None:
+        """Close HTTP connections"""
+    
+    def __enter__(self) -> Self:
+        """Context manager support"""
+    
+    def __exit__(self, *args) -> None:
+        """Context manager support"""
+```
+
+### 1.2 PygenClient Class
 
 **Purpose**: Main entry point for interacting with CDF Data Modeling API.
 
@@ -46,7 +117,16 @@ class PygenClient:
         max_retries: int = 3,
         rate_limit: int | None = None,
         connection_pool_size: int = 10,
-    ) -> None: ...
+    ) -> None:
+        # Initializes internal HTTPClient
+        self._http_client = HTTPClient(
+            base_url=base_url,
+            timeout=timeout,
+            max_retries=max_retries,
+            rate_limit=rate_limit,
+            pool_size=connection_pool_size,
+        )
+        ...
     
     @property
     def spaces(self) -> SpacesAPI:
@@ -67,6 +147,9 @@ class PygenClient:
     @property
     def instances(self) -> InstancesAPI:
         """Access to Instances API"""
+    
+    def query_builder(self, space: str, view: str | ViewReference) -> QueryBuilder:
+        """Create a query builder for simplified querying"""
         
     def close(self) -> None:
         """Close HTTP connections"""
@@ -78,7 +161,47 @@ class PygenClient:
         """Context manager support"""
 ```
 
-### 1.2 Authentication
+### 1.3 Query Builder
+
+**Purpose**: Simplify complex query construction and optimize API calls.
+
+**Interface**:
+
+```python
+class QueryBuilder:
+    """
+    Query builder for constructing and executing CDF queries.
+    
+    Simplifies complex query patterns common in Pygen use cases.
+    """
+    
+    def __init__(
+        self,
+        client: HTTPClient,
+        space: str,
+        view: ViewReference,
+    ) -> None: ...
+    
+    def filter(self, **kwargs) -> Self:
+        """Add filters to query"""
+        
+    def select(self, *properties: str) -> Self:
+        """Select specific properties"""
+        
+    def limit(self, n: int) -> Self:
+        """Limit number of results"""
+        
+    def sort(self, *fields: str) -> Self:
+        """Sort results (prefix with - for descending)"""
+        
+    def execute(self) -> Iterator[dict[str, Any]]:
+        """Execute query and return lazy iterator"""
+        
+    def count(self) -> int:
+        """Get count of matching results"""
+```
+
+### 1.4 Authentication
 
 **Supported Auth Methods**:
 
@@ -125,7 +248,7 @@ class EnvironmentAuth(Credentials):
         ...
 ```
 
-### 1.3 Resource APIs
+### 1.5 Resource APIs
 
 #### SpacesAPI
 
@@ -254,7 +377,7 @@ class ViewsAPI:
         """Delete a view"""
 ```
 
-### 1.4 Pydantic Models
+### 1.6 Pydantic Models
 
 #### Space
 
@@ -351,9 +474,106 @@ class View(BaseModel):
 
 ---
 
-## 2. Intermediate Representation (IR)
+## 2. Validation Layer
 
-### 2.1 Type System
+### 2.1 Validator
+
+**Purpose**: Validate data models upfront and handle incomplete models gracefully.
+
+**Interface**:
+
+```python
+class DataModelValidator:
+    """
+    Validates CDF data models before IR creation.
+    
+    Detects issues like:
+    - Missing reverse relations
+    - Invalid type references
+    - Circular dependencies
+    - Naming conflicts
+    """
+    
+    def validate(
+        self,
+        data_model: DataModel,
+        strict: bool = False,
+    ) -> ValidationResult:
+        """
+        Validate a data model.
+        
+        Args:
+            data_model: DataModel to validate
+            strict: If True, treat warnings as errors
+            
+        Returns:
+            ValidationResult with errors, warnings, and filtered model
+        """
+    
+    def check_relationships(self, data_model: DataModel) -> list[ValidationIssue]:
+        """Check relationship consistency"""
+    
+    def check_type_references(self, data_model: DataModel) -> list[ValidationIssue]:
+        """Check type references are valid"""
+    
+    def check_circular_dependencies(self, data_model: DataModel) -> list[ValidationIssue]:
+        """Check for circular dependencies"""
+
+
+@dataclass
+class ValidationIssue:
+    """Represents a validation issue"""
+    
+    severity: Literal["error", "warning", "info"]
+    code: str  # e.g., "MISSING_REVERSE_RELATION"
+    message: str
+    location: str  # e.g., "my_space/MyView/my_property"
+    suggestion: str | None = None
+    can_auto_fix: bool = False
+
+
+@dataclass
+class ValidationResult:
+    """Result of validation"""
+    
+    errors: list[ValidationIssue]
+    warnings: list[ValidationIssue]
+    filtered_model: DataModel  # Model with problematic elements removed
+    is_valid: bool
+    
+    def print_summary(self) -> None:
+        """Print human-readable summary"""
+```
+
+### 2.2 Validation Rules
+
+Common validation rules include:
+
+1. **Relationship Validation**
+   - Direct relation must have reverse
+   - Reverse relation must point to valid direct relation
+   - Relationship targets must exist
+
+2. **Type Validation**
+   - All type references must point to valid types
+   - No undefined custom types
+   - Primitive types must be supported
+
+3. **Naming Validation**
+   - No reserved word conflicts
+   - No naming collisions
+   - Valid identifier names
+
+4. **Structural Validation**
+   - No circular inheritance
+   - No circular relationships (unless explicit)
+   - Valid view structure
+
+---
+
+## 3. Intermediate Representation (IR)
+
+### 3.1 Type System
 
 ```python
 class IRPrimitiveType(str, Enum):
@@ -399,7 +619,7 @@ class IREnum(IRType):
     values: list[str]
 ```
 
-### 2.2 IR Models
+### 3.2 IR Models
 
 ```python
 @dataclass
@@ -484,13 +704,13 @@ class IRModel:
     metadata: dict[str, Any] = field(default_factory=dict)
 ```
 
-### 2.3 Parser
+### 3.3 Parser
 
 ```python
 class IRParser:
-    """Parse CDF models to IR"""
+    """Parse validated CDF models to IR"""
     
-    def parse_data_model(self, data_model: DataModel) -> IRModel:
+    def parse_data_model(self, data_model: DataModel, validation_result: ValidationResult) -> IRModel:
         """
         Parse a DataModel to IR.
         
@@ -518,48 +738,27 @@ class IRParser:
         """Map CDF type to IR type"""
 ```
 
-### 2.4 Validator
+### 3.4 Transformer
 
 ```python
-class IRValidator:
-    """Validate IR consistency"""
+class IRTransformer:
+    """Transform IR for optimization"""
     
-    def validate(self, model: IRModel) -> list[ValidationError]:
-        """
-        Validate an IR model.
-        
-        Returns:
-            List of validation errors (empty if valid)
-        """
+    def flatten_inheritance(self, model: IRModel) -> IRModel:
+        """Flatten inheritance hierarchies"""
     
-    def _check_naming_conflicts(self, model: IRModel) -> list[ValidationError]:
-        """Check for naming conflicts"""
+    def resolve_relationships(self, model: IRModel) -> IRModel:
+        """Resolve all relationship references"""
     
-    def _check_type_references(self, model: IRModel) -> list[ValidationError]:
-        """Check that all type references are valid"""
-    
-    def _check_relationships(self, model: IRModel) -> list[ValidationError]:
-        """Check relationship consistency"""
-    
-    def _check_circular_dependencies(self, model: IRModel) -> list[ValidationError]:
-        """Check for circular dependencies"""
-
-
-@dataclass
-class ValidationError:
-    """Represents a validation error"""
-    
-    severity: Literal["error", "warning"]
-    message: str
-    location: str  # e.g., "module.class.property"
-    suggestion: str | None = None
+    def apply_naming_conventions(self, model: IRModel, conventions: dict) -> IRModel:
+        """Apply language-specific naming conventions"""
 ```
 
 ---
 
-## 3. Code Generation
+## 4. Code Generation
 
-### 3.1 Generator Interface
+### 4.1 Generator Interface
 
 ```python
 class BaseGenerator(ABC):
@@ -638,7 +837,7 @@ class GenerationResult:
     warnings: list[str] = field(default_factory=list)
 ```
 
-### 3.2 Python Generator
+### 4.2 Python Generator
 
 ```python
 class PythonGenerator(BaseGenerator):
@@ -675,7 +874,7 @@ class PythonGenerator(BaseGenerator):
         """Setup Jinja2 environment"""
 ```
 
-### 3.3 Template Structure
+### 4.3 Template Structure
 
 ```
 templates/python/
@@ -694,154 +893,190 @@ templates/python/
 
 ---
 
-## 4. Runtime Support
+## 5. Generated SDK Runtime (Client-Based)
 
-### 4.1 Base Classes
+### 5.1 Base Classes
+
+**Note**: Client-based design, not ORM-style.
 
 ```python
-class PygenResource(BaseModel):
-    """Base class for all generated data classes"""
+class BaseAPI:
+    """Base class for generated API classes (client-based)"""
+    
+    def __init__(
+        self,
+        client: PygenClient,
+        view_id: ViewReference,
+    ) -> None:
+        self._client = client
+        self._view_id = view_id
+    
+    def _build_query(self, **filters) -> QueryBuilder:
+        """Build query using client's query builder"""
+        return self._client.query_builder(
+            space=self._view_id.space,
+            view=self._view_id
+        ).filter(**filters)
+
+
+# Simple data class (no ORM behavior)
+class BaseDataClass(BaseModel):
+    """Base for generated data classes - just data, no client ref"""
     
     model_config = ConfigDict(
         validate_assignment=True,
-        arbitrary_types_allowed=True,
+        # NO arbitrary_types_allowed for _client
+        # NO private attributes for client
     )
     
-    # Private client reference (not serialized)
-    _client: PygenClient | None = PrivateAttr(default=None)
-    
-    def set_client(self, client: PygenClient) -> Self:
-        """Set client for lazy operations"""
-        self._client = client
-        return self
-    
-    def refresh(self) -> Self:
-        """Reload from API"""
-        if self._client is None:
-            raise RuntimeError("Client not set")
-        # Implementation depends on resource type
-        ...
-    
-    def save(self) -> Self:
-        """Save changes to API"""
-        if self._client is None:
-            raise RuntimeError("Client not set")
-        ...
-    
-    def delete(self) -> None:
-        """Delete this resource"""
-        if self._client is None:
-            raise RuntimeError("Client not set")
-        ...
-
-
-class PygenRelation(Generic[T]):
-    """Lazy relationship handler"""
-    
-    def __init__(
-        self,
-        client: PygenClient,
-        query: Query,
-        result_type: type[T],
-    ) -> None:
-        self._client = client
-        self._query = query
-        self._result_type = result_type
-        self._cached: list[T] | None = None
-    
-    def __iter__(self) -> Iterator[T]:
-        """Lazy iteration"""
-        for item in self._client.instances.query(self._query):
-            yield self._result_type.model_validate(item)
-    
-    def __len__(self) -> int:
-        """Get count (requires API call)"""
-        return self._query.count()
-    
-    def __getitem__(self, index: int | slice) -> T | list[T]:
-        """Get by index (loads if needed)"""
-        if self._cached is None:
-            self._cached = list(self)
-        return self._cached[index]
-    
-    def all(self) -> list[T]:
-        """Eager load all items"""
-        if self._cached is None:
-            self._cached = list(self)
-        return self._cached
-    
-    def filter(self, **kwargs) -> Self:
-        """Add filters to query"""
-        new_query = self._query.filter(**kwargs)
-        return PygenRelation(self._client, new_query, self._result_type)
-    
-    def first(self) -> T | None:
-        """Get first item"""
-        for item in self:
-            return item
-        return None
+    # Just data fields, no ORM methods
+    # No save(), delete(), refresh() - those are on API classes
 ```
 
-### 4.2 Query Builder
+### 5.2 Generated Code Pattern
+
+**Example Generated API Class**:
 
 ```python
-class Query:
-    """Query builder for instances"""
+# Generated file: my_model_api.py
+from pygen.runtime import BaseAPI
+from pygen.client import PygenClient, ViewReference
+from .data_classes import MyModel
+
+class MyModelAPI(BaseAPI):
+    """API for MyModel (client-based design)"""
     
-    def __init__(
-        self,
-        client: PygenClient,
-        space: str,
-        view: ViewReference,
-    ) -> None:
-        self._client = client
-        self._space = space
-        self._view = view
-        self._filters: list[Filter] = []
-        self._limit: int | None = None
-        self._sort: list[Sort] = []
+    def __init__(self, client: PygenClient):
+        super().__init__(
+            client=client,
+            view_id=ViewReference(
+                space="my_space",
+                external_id="MyModel",
+                version="1"
+            )
+        )
     
-    def filter(self, **kwargs) -> Self:
-        """Add filters"""
-        for key, value in kwargs.items():
-            self._filters.append(Filter(key, "equals", value))
-        return self
+    def list(self, limit: int | None = None) -> Iterator[MyModel]:
+        """List all MyModel instances (lazy)"""
+        for item in self._client.instances.list(
+            space=self._view_id.space,
+            view=self._view_id,
+            limit=limit
+        ):
+            yield MyModel.model_validate(item)
     
-    def limit(self, n: int) -> Self:
-        """Limit results"""
-        self._limit = n
-        return self
+    def retrieve(self, external_id: str) -> MyModel | None:
+        """Retrieve a single instance"""
+        item = self._client.instances.retrieve(
+            space=self._view_id.space,
+            view=self._view_id,
+            external_id=external_id
+        )
+        return MyModel.model_validate(item) if item else None
     
-    def sort(self, *fields: str) -> Self:
-        """Sort results"""
-        for field in fields:
-            desc = field.startswith("-")
-            field_name = field[1:] if desc else field
-            self._filters.append(Sort(field_name, "desc" if desc else "asc"))
-        return self
+    def filter(self, **filters) -> Iterator[MyModel]:
+        """Filter instances"""
+        query = self._build_query(**filters)
+        for item in query.execute():
+            yield MyModel.model_validate(item)
+
+
+# Generated file: data_classes.py
+from pygen.runtime import BaseDataClass
+
+class MyModel(BaseDataClass):
+    """Data class for MyModel (just data, no ORM)"""
     
-    def execute(self) -> Iterator[dict[str, Any]]:
-        """Execute query and return results"""
-        # Build CDF query
-        cdf_query = self._build_query()
-        
-        # Execute with pagination
-        yield from self._client.instances.query(cdf_query)
-    
-    def count(self) -> int:
-        """Get count of matching items"""
-        ...
-    
-    def _build_query(self) -> dict[str, Any]:
-        """Build CDF API query"""
-        ...
+    external_id: str
+    name: str
+    value: float | None = None
 ```
 
 ---
 
-## 5. Configuration
+## 6. API Service (Goal 5)
 
-### 5.1 Configuration File
+### 6.1 Service Architecture
+
+**Purpose**: Provide HTTP API for generating SDKs on demand.
+
+**Framework**: FastAPI (recommended)
+
+**Endpoints**:
+
+```python
+from fastapi import FastAPI, File, UploadFile
+from pydantic import BaseModel
+
+app = FastAPI(title="Pygen Service", version="2.0.0")
+
+class GenerateRequest(BaseModel):
+    """Request to generate SDK"""
+    space: str
+    external_id: str
+    version: str
+    language: Literal["python", "typescript", "csharp", "pyspark"] = "python"
+    output_format: Literal["zip", "tarball", "code"] = "zip"
+    cdf_url: str
+    cdf_credentials: dict[str, str]  # Encrypted/secured
+
+class GenerateResponse(BaseModel):
+    """Response from generate endpoint"""
+    job_id: str
+    status: Literal["queued", "processing", "completed", "failed"]
+    download_url: str | None = None
+    warnings: list[str] = []
+    errors: list[str] = []
+
+@app.post("/generate", response_model=GenerateResponse)
+async def generate_sdk(request: GenerateRequest):
+    """Generate SDK from data model"""
+    ...
+
+@app.get("/generate/{job_id}", response_model=GenerateResponse)
+async def get_generation_status(job_id: str):
+    """Get status of generation job"""
+    ...
+
+@app.post("/validate")
+async def validate_data_model(request: GenerateRequest):
+    """Validate data model without generating"""
+    ...
+
+@app.get("/health")
+async def health_check():
+    """Service health check"""
+    return {"status": "healthy"}
+
+@app.get("/version")
+async def version_info():
+    """Pygen version information"""
+    return {"version": "2.0.0", "supported_languages": [...]}
+```
+
+### 6.2 Job Queue
+
+For long-running generation jobs:
+
+```python
+from celery import Celery
+
+celery_app = Celery('pygen_service', broker='redis://localhost:6379/0')
+
+@celery_app.task
+def generate_sdk_task(request_data: dict) -> dict:
+    """Async task for SDK generation"""
+    # Run generation
+    # Store result
+    # Return download URL
+    ...
+```
+
+---
+
+## 7. Configuration
+
+### 7.1 Configuration File
 
 ```yaml
 # pygen.yaml
@@ -879,7 +1114,7 @@ model:
   exclude_views: []
 ```
 
-### 5.2 Configuration Loading
+### 7.2 Configuration Loading
 
 ```python
 @dataclass
@@ -903,56 +1138,101 @@ class PygenConfig:
 
 ---
 
-## 6. CLI Interface
+## 8. CLI Interface
+
+**Note**: Using typer, not click.
 
 ```python
 # pygen/cli.py
 
-import click
+import typer
+from typing import Optional
+from pathlib import Path
+from enum import Enum
 
-@click.group()
-@click.version_option()
-def cli():
-    """Pygen - Generate SDKs from CDF Data Models"""
-    pass
+app = typer.Typer(
+    name="pygen",
+    help="Generate SDKs from CDF Data Models",
+    add_completion=False
+)
 
+class Language(str, Enum):
+    python = "python"
+    typescript = "typescript"
+    csharp = "csharp"
+    pyspark = "pyspark"
 
-@cli.command()
-@click.option("--config", "-c", type=click.Path(), help="Configuration file")
-@click.option("--space", help="Space name")
-@click.option("--model", help="Data model external ID")
-@click.option("--version", help="Data model version")
-@click.option("--output", "-o", type=click.Path(), help="Output directory")
-@click.option("--language", type=click.Choice(["python", "typescript"]), default="python")
-def generate(config, space, model, version, output, language):
+@app.command()
+def generate(
+    space: str = typer.Option(..., "--space", "-s", help="Space name"),
+    model: str = typer.Option(..., "--model", "-m", help="Data model external ID"),
+    version: str = typer.Option("1", "--version", "-v", help="Data model version"),
+    output: Path = typer.Option("./generated", "--output", "-o", help="Output directory"),
+    language: Language = typer.Option(Language.python, "--language", "-l", help="Target language"),
+    config: Optional[Path] = typer.Option(None, "--config", "-c", help="Configuration file"),
+    strict: bool = typer.Option(False, "--strict", help="Treat warnings as errors"),
+):
     """Generate SDK from data model"""
+    typer.echo(f"Generating {language.value} SDK for {space}/{model}:{version}")
+    
+    # Validation
+    # Generation
+    # Output
+    
+    typer.secho("✓ Generation complete!", fg=typer.colors.GREEN)
+
+
+@app.command()
+def validate(
+    space: str = typer.Argument(..., help="Space name"),
+    model: str = typer.Argument(..., help="Data model external ID"),
+    version: str = typer.Option("1", "--version", "-v", help="Data model version"),
+    strict: bool = typer.Option(False, "--strict", help="Treat warnings as errors"),
+):
+    """Validate a data model"""
+    typer.echo(f"Validating {space}/{model}:{version}")
+    
+    # Run validation
+    # Print results
+    
+    typer.secho("✓ Validation complete!", fg=typer.colors.GREEN)
+
+
+@app.command()
+def inspect(
+    space: str = typer.Argument(..., help="Space name"),
+    model: str = typer.Argument(..., help="Data model external ID"),
+    version: str = typer.Option("1", "--version", "-v", help="Data model version"),
+):
+    """Inspect a data model structure"""
+    typer.echo(f"Inspecting {space}/{model}:{version}")
+    
+    # Fetch and display model structure
     ...
 
 
-@cli.command()
-@click.argument("space")
-@click.argument("model")
-@click.option("--version", default="1")
-def inspect(space, model, version):
-    """Inspect a data model"""
-    ...
-
-
-@cli.command()
-def validate():
-    """Validate configuration file"""
-    ...
+@app.command()
+def serve(
+    host: str = typer.Option("0.0.0.0", "--host", help="Host to bind to"),
+    port: int = typer.Option(8000, "--port", help="Port to bind to"),
+    reload: bool = typer.Option(False, "--reload", help="Enable auto-reload"),
+):
+    """Start Pygen API service (Goal 5)"""
+    typer.echo(f"Starting Pygen service on {host}:{port}")
+    
+    import uvicorn
+    uvicorn.run("pygen.service:app", host=host, port=port, reload=reload)
 
 
 if __name__ == "__main__":
-    cli()
+    app()
 ```
 
 ---
 
-## 7. Error Handling
+## 9. Error Handling
 
-### 7.1 Exception Hierarchy
+### 9.1 Exception Hierarchy
 
 ```python
 class PygenError(Exception):
@@ -1017,23 +1297,23 @@ class TemplateError(GenerationError):
 
 ---
 
-## 8. Performance Targets
+## 10. Performance Targets
 
-### 8.1 Client Performance
+### 10.1 Client Performance
 
 - **Requests per second**: >100 (with connection pooling)
 - **Latency**: <100ms (p95) for single item retrieval
 - **Memory**: <50MB for client instance
 - **Concurrent requests**: Support 10+ concurrent requests
 
-### 8.2 Generation Performance
+### 10.2 Generation Performance
 
 - **Small model** (<10 views): <5 seconds
 - **Medium model** (10-50 views): <30 seconds
 - **Large model** (50-200 views): <2 minutes
 - **Memory**: <500MB during generation
 
-### 8.3 Runtime Performance
+### 10.3 Runtime Performance
 
 - **Lazy iteration overhead**: <5% vs direct API calls
 - **Query building**: <1ms
@@ -1042,22 +1322,22 @@ class TemplateError(GenerationError):
 
 ---
 
-## 9. Versioning & Compatibility
+## 11. Versioning & Compatibility
 
-### 9.1 Semantic Versioning
+### 11.1 Semantic Versioning
 
 Follow semantic versioning (MAJOR.MINOR.PATCH):
 - **MAJOR**: Breaking changes
 - **MINOR**: New features (backward compatible)
 - **PATCH**: Bug fixes
 
-### 9.2 API Compatibility
+### 11.2 API Compatibility
 
 - Maintain backward compatibility within major version
 - Deprecation warnings for 1 major version
 - Clear migration guides for breaking changes
 
-### 9.3 Generated Code Versioning
+### 11.3 Generated Code Versioning
 
 Include version metadata in generated code:
 
@@ -1070,23 +1350,23 @@ __generated_at__ = "2025-01-15T10:30:00Z"
 
 ---
 
-## 10. Security
+## 12. Security
 
-### 10.1 Credential Handling
+### 12.1 Credential Handling
 
 - Never log credentials
 - Support environment variables
 - Support credential files (with proper permissions)
 - Support secret managers (Azure Key Vault, AWS Secrets Manager)
 
-### 10.2 Input Validation
+### 12.2 Input Validation
 
 - Validate all user inputs
 - Sanitize template inputs
 - Check file paths for traversal attacks
 - Validate API responses
 
-### 10.3 Dependencies
+### 12.3 Dependencies
 
 - Regular security audits
 - Pin dependency versions
