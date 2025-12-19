@@ -48,20 +48,10 @@ from cognite.pygen._version import __version__
 from cognite.pygen.exceptions import PygenImportError
 from cognite.pygen.utils.cdf import _find_first_node_type
 
-DataType = typing.Union[int, float, bool, str, dict, None]
-ListAbleDataType = typing.Union[
-    int,
-    float,
-    bool,
-    str,
-    dict,
-    list[int],
-    list[float],
-    list[bool],
-    list[str],
-    list[dict],
-    None,
-]
+DataType = int | float | bool | str | dict | None
+ListAbleDataType = (
+    int | float | bool | str | dict | list[int] | list[float] | list[bool] | list[str] | list[dict] | None
+)
 ResourceType = Literal["node", "edge", "timeseries", "sequence", "file"]
 _ResourceTypes = set(typing.get_args(ResourceType))
 
@@ -711,7 +701,7 @@ class ViewMockData:
         return table._repr_html_()  # type: ignore[operator]
 
 
-_T_ResourceList = typing.TypeVar("_T_ResourceList", bound=typing.Union[TimeSeriesList, SequenceList, FileMetadataList])
+_T_ResourceList = typing.TypeVar("_T_ResourceList", bound=TimeSeriesList | SequenceList | FileMetadataList)
 
 
 class MockData(UserList[ViewMockData]):

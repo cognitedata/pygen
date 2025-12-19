@@ -1,11 +1,23 @@
 [project]
 name = "cognite-pygen"
 version = "0.0.0"
-description = "Cognite Python SDK Generator"
+description = "Cognite Data Model SDK Generator"
 authors = [{name="Cognite", email ="support@cognite.com"}]
 readme="README.md"
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.10"
 license = "Apache-2.0"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Subject Matter Experts",
+    "Topic :: Data Modeling :: Code Generation",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "cognite-sdk>=7.86.0, <8.0.0",
     # pydantic 2.7.0 is the latest versoion supported by pyodide '0.26.2' which is what is used in the
@@ -39,12 +51,12 @@ dev = [
     "pre-commit>=4.0.0",
     "python-dotenv>=1.0.0",
     "pytest>=8.0.0",
-    "pytest-cov>=6.0.0",
-    "pytest-mock>=3.10.0",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.12.0",
     "pytest-rerunfailures>=14.0",
     "toml>=0.10",
     "pandas>=1.5.3",
-    "mypy>=1.5.0",
+    "mypy>=1.8.0",
     "mkdocs>=1.6.0",
     "mkdocs-material>=9.5.26",
     "mkdocs-jupyter>=0.24.7",
@@ -84,8 +96,6 @@ fix = true
 select = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
 fixable = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
 ignore = [
-    # This is causing issues for pydantic which does not support use of X | Y for type annotations before 3.10
-    "UP007", # Use X | Y for type annotations
     # Typer do function calls when setting up the CLI.
     "B008", # Do not perform function call {name} in argument defaults
     # This is done when setting the pygen configs, and useful for getting pretty docs.
@@ -127,12 +137,34 @@ pygen = "cognite.pygen.cli:main"
 filterwarnings = [
   "ignore::DeprecationWarning:pkg_resources",
 ]
-addopts = "--doctest-modules"
+addopts = [
+    "--doctest-modules",
+    "--cov=cognite.pygen",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "-v",
+]
 markers = [
     "full: Requiers all optional dependencies to run.",
 ]
-pythonpath = [".", "examples", "examples-pydantic-v1"]
+pythonpath = [".", "examples"]
 testpaths = ["tests", "cognite/pygen"]
+
+[tool.coverage.run]
+source = ["cognite.pygen"]
+omit = ["*/tests/*", "*/__pycache__/*", "examples/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
 
 [build-system]
 requires = ["uv_build>=0.9.15,<0.10.0"]

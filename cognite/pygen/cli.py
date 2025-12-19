@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated, Optional, cast
+from typing import Annotated, cast
 
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client.credentials import OAuthClientCredentials
@@ -140,10 +140,10 @@ if _has_typer:
             client_secret: Annotated[str, typer.Option(..., help="Client Secret for connecting to CDF")],
             cdf_cluster: Annotated[str, typer.Option(..., help=default_settings.cdf_cluster.help)],
             cdf_project: Annotated[str, typer.Option(..., help=default_settings.cdf_project.help)],
-            tenant_id: Annotated[Optional[str], typer.Option(..., help=default_settings.tenant_id.help)] = None,
-            token_url: Annotated[Optional[str], typer.Option(..., help=default_settings.token_url.help)] = None,
-            scopes: Annotated[Optional[str], typer.Option(..., help=default_settings.scopes.help)] = None,
-            audience: Annotated[Optional[str], typer.Option(..., help=default_settings.audience.help)] = None,
+            tenant_id: Annotated[str | None, typer.Option(..., help=default_settings.tenant_id.help)] = None,
+            token_url: Annotated[str | None, typer.Option(..., help=default_settings.token_url.help)] = None,
+            scopes: Annotated[str | None, typer.Option(..., help=default_settings.scopes.help)] = None,
+            audience: Annotated[str | None, typer.Option(..., help=default_settings.audience.help)] = None,
             output_dir: Path = typer.Option(None, help=default_settings.output_dir.help),
             top_level_package: str = typer.Option(
                 default_settings.top_level_package.default, help=default_settings.top_level_package.help
