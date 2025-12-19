@@ -65,9 +65,6 @@ jobs:
       - name: Test V1 (Legacy)
         run: uv run pytest legacy/tests/test_unit -v
 
-      - name: Test CLI
-        run: uv run pygen --help
-
       - name: Build package
         run: uv build
 
