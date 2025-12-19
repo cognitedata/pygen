@@ -74,7 +74,6 @@ import uuid as uuid_
 from collections import defaultdict
 from collections.abc import Callable
 from hashlib import sha256 as sha256_
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -169,7 +168,7 @@ class ExternalIdFactory:
     This is a factory class that can be used to create external ids for domain class instances.
     """
 
-    def __init__(self, factory: Callable[[type, dict], str], shorten_length: Optional[int] = None):
+    def __init__(self, factory: Callable[[type, dict], str], shorten_length: int | None = None):
         self.factory = factory
 
         if shorten_length is not None and shorten_length <= 0:
@@ -223,8 +222,8 @@ class ExternalIdFactory:
         self,
         override_external_id: bool = True,
         separator: str = ":",
-        prefix_ext_id_factory: Optional[Callable[[type, dict], str]] = None,
-        suffix_ext_id_factory: Optional[Callable[[type, dict], str]] = None,
+        prefix_ext_id_factory: Callable[[type, dict], str] | None = None,
+        suffix_ext_id_factory: Callable[[type, dict], str] | None = None,
     ) -> Callable[[type, dict], str]:
         """
         This creates an external id factory with a prefix:suffix format that can be set on the DomainModelWrite
@@ -262,8 +261,8 @@ class ExternalIdFactory:
         data: dict,
         override_external_id: bool = True,
         separator: str = ":",
-        prefix_callable: Optional[Callable[[type, dict], str]] = None,
-        suffix_callable: Optional[Callable[[type, dict], str]] = None,
+        prefix_callable: Callable[[type, dict], str] | None = None,
+        suffix_callable: Callable[[type, dict], str] | None = None,
     ) -> str:
         """
         This creates an external id for each domain class instance provided a custom configuration.

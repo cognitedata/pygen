@@ -10,7 +10,7 @@ import tempfile
 import warnings
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any, Literal, Optional, Union, cast, overload
+from typing import Any, Literal, cast, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -29,7 +29,7 @@ from cognite.pygen.exceptions import DataModelNotFound
 from cognite.pygen.utils.cdf import _reduce_model
 from cognite.pygen.utils.text import to_pascal, to_snake
 
-DataModel = Union[DataModelIdentifier, dm.DataModel[dm.View]]
+DataModel = DataModelIdentifier | dm.DataModel[dm.View]
 
 _ILLEGAL_CHARACTERS_IN_FOLDER_NAME = '/\\?%*:|"<>!'
 
@@ -37,15 +37,15 @@ _ILLEGAL_CHARACTERS_IN_FOLDER_NAME = '/\\?%*:|"<>!'
 @overload
 def generate_sdk(  # type: ignore[overload-overlap, misc]
     model_id: DataModel | Sequence[DataModel],
-    client: Optional[CogniteClient] = None,
-    top_level_package: Optional[str] = None,
-    client_name: Optional[str] = None,
+    client: CogniteClient | None = None,
+    top_level_package: str | None = None,
+    client_name: str | None = None,
     default_instance_space: str | None = None,
-    output_dir: Optional[Path] = None,
-    logger: Optional[Callable[[str], None]] = None,
+    output_dir: Path | None = None,
+    logger: Callable[[str], None] | None = None,
     overwrite: bool = False,
     format_code: bool = False,
-    config: Optional[PygenConfig] = None,
+    config: PygenConfig | None = None,
     return_sdk_files: Literal[False] = False,
     exclude_views: set[dm.ViewId | str] | None = None,
     exclude_spaces: set[str] | None = None,
@@ -55,15 +55,15 @@ def generate_sdk(  # type: ignore[overload-overlap, misc]
 @overload
 def generate_sdk(
     model_id: DataModel | Sequence[DataModel],
-    client: Optional[CogniteClient] = None,
-    top_level_package: Optional[str] = None,
-    client_name: Optional[str] = None,
+    client: CogniteClient | None = None,
+    top_level_package: str | None = None,
+    client_name: str | None = None,
     default_instance_space: str | None = None,
-    output_dir: Optional[Path] = None,
-    logger: Optional[Callable[[str], None]] = None,
+    output_dir: Path | None = None,
+    logger: Callable[[str], None] | None = None,
     overwrite: bool = False,
     format_code: bool = False,
-    config: Optional[PygenConfig] = None,
+    config: PygenConfig | None = None,
     return_sdk_files: Literal[True] = False,  # type: ignore[assignment]
     exclude_views: set[dm.ViewId | str] | None = None,
     exclude_spaces: set[str] | None = None,
@@ -72,15 +72,15 @@ def generate_sdk(
 
 def generate_sdk(
     model_id: DataModel | Sequence[DataModel],
-    client: Optional[CogniteClient] = None,
-    top_level_package: Optional[str] = None,
-    client_name: Optional[str] = None,
+    client: CogniteClient | None = None,
+    top_level_package: str | None = None,
+    client_name: str | None = None,
     default_instance_space: str | None = None,
-    output_dir: Optional[Path] = None,
-    logger: Optional[Callable[[str], None]] = None,
+    output_dir: Path | None = None,
+    logger: Callable[[str], None] | None = None,
     overwrite: bool = False,
     format_code: bool = False,
-    config: Optional[PygenConfig] = None,
+    config: PygenConfig | None = None,
     return_sdk_files: bool = False,
     exclude_views: set[dm.ViewId | str] | None = None,
     exclude_spaces: set[str] | None = None,
@@ -134,15 +134,15 @@ def generate_sdk(
 
 def _generate_sdk(
     model_id: DataModel | Sequence[DataModel],
-    client: Optional[CogniteClient] = None,
-    top_level_package: Optional[str] = None,
-    client_name: Optional[str] = None,
+    client: CogniteClient | None = None,
+    top_level_package: str | None = None,
+    client_name: str | None = None,
     default_instance_space: str | None = None,
-    output_dir: Optional[Path] = None,
-    logger: Optional[Callable[[str], None]] = None,
+    output_dir: Path | None = None,
+    logger: Callable[[str], None] | None = None,
     overwrite: bool = False,
     format_code: bool = False,
-    config: Optional[PygenConfig] = None,
+    config: PygenConfig | None = None,
     return_sdk_files: bool = False,
     exclude_views: set[dm.ViewId | str] | None = None,
     exclude_spaces: set[str] | None = None,
@@ -195,11 +195,11 @@ def _generate_sdk(
 
 def generate_sdk_notebook(
     model_id: DataModel | Sequence[DataModel],
-    client: Optional[CogniteClient] = None,
-    top_level_package: Optional[str] = None,
-    client_name: Optional[str] = None,
+    client: CogniteClient | None = None,
+    top_level_package: str | None = None,
+    client_name: str | None = None,
     default_instance_space: str | None = None,
-    config: Optional[PygenConfig] = None,
+    config: PygenConfig | None = None,
     clean_pygen_temp_dir: bool = True,
     exclude_views: set[dm.ViewId | str] | None = None,
     exclude_spaces: set[str] | None = None,
@@ -462,7 +462,7 @@ def write_sdk_to_disk(
     sdk: dict[Path, str],
     output_dir: Path,
     overwrite: bool,
-    logger: Optional[Callable[[str], None]],
+    logger: Callable[[str], None] | None,
     format_code: bool = True,
 ) -> None:
     """Write a generated SDK to disk.
@@ -511,7 +511,7 @@ def write_sdk_to_disk(
 def generate_typed(
     model_id: DataModel,
     output_file: Path,
-    client: Optional[CogniteClient] = None,
+    client: CogniteClient | None = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
     implements: Literal["inheritance", "composition"] = "composition",
@@ -524,7 +524,7 @@ def generate_typed(
 def generate_typed(
     model_id: DataModel,
     output_file: None,
-    client: Optional[CogniteClient] = None,
+    client: CogniteClient | None = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
     implements: Literal["inheritance", "composition"] = "composition",
@@ -535,8 +535,8 @@ def generate_typed(
 
 def generate_typed(
     model_id: DataModel,
-    output_file: Optional[Path] = None,
-    client: Optional[CogniteClient] = None,
+    output_file: Path | None = None,
+    client: CogniteClient | None = None,
     format_code: bool = True,
     include_views: set[dm.ViewId] | None = None,
     implements: Literal["inheritance", "composition"] = "composition",

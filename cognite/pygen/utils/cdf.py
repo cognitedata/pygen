@@ -8,7 +8,7 @@ from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
 from time import sleep
-from typing import Any, Optional, Protocol, Union, get_args, get_origin, get_type_hints
+from typing import Any, Protocol, Union, get_args, get_origin, get_type_hints
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -82,8 +82,8 @@ def load_cognite_client_from_toml(
 class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
     def retrieve_multiple(
         self,
-        ids: Optional[Sequence[int]] = None,
-        external_ids: Optional[SequenceNotStr[str]] = None,
+        ids: Sequence[int] | None = None,
+        external_ids: SequenceNotStr[str] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> T_CogniteResourceList: ...
 
@@ -91,8 +91,8 @@ class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
 
     def delete(
         self,
-        id: Optional[Union[int, Sequence[int]]] = None,
-        external_id: Optional[Union[str, SequenceNotStr[str]]] = None,
+        id: int | Sequence[int] | None = None,
+        external_id: str | SequenceNotStr[str] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> None: ...
 
@@ -103,8 +103,8 @@ class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
 
     def retrieve_multiple(
         self,
-        ids: Optional[Sequence[int]] = None,
-        external_ids: Optional[SequenceNotStr[str]] = None,
+        ids: Sequence[int] | None = None,
+        external_ids: SequenceNotStr[str] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> FileMetadataList:
         return self._files_api.retrieve_multiple(
@@ -119,8 +119,8 @@ class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
 
     def delete(
         self,
-        id: Optional[Union[int, Sequence[int]]] = None,
-        external_id: Optional[Union[str, SequenceNotStr[str]]] = None,
+        id: int | Sequence[int] | None = None,
+        external_id: str | SequenceNotStr[str] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> None:
         with suppress(CogniteNotFoundError):
@@ -144,7 +144,7 @@ class CSVLoader:
     def __init__(
         self,
         source_dir: pathlib.Path,
-        echo: Optional[Callable[[str], None]] = None,
+        echo: Callable[[str], None] | None = None,
         data_set_id: int | None = None,
         data_model: DataModel[View] | None = None,
     ):
