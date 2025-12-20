@@ -15,8 +15,6 @@ class DummyCredentials(Credentials):
     def authorization_header(self) -> tuple[str, str]:
         return "Authorization", "Bearer dummy_token"
 
-    def refresh_if_needed(self) -> None: ...
-
 
 @pytest.fixture(scope="module")
 def pygen_client_config() -> PygenClientConfig:
