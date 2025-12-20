@@ -10,7 +10,7 @@
 
 **Timeline**: 23-33 weeks (6-8 months)
 
-**Status**: Planning Complete ✅
+**Status**: Phase 0 Complete ✅ - Ready for Phase 1
 
 ---
 
@@ -24,19 +24,20 @@
 
 ---
 
-## 📅 8-Phase Roadmap
+## 📅 9-Phase Roadmap
 
-| Phase | Name | Duration | Key Deliverable |
-|-------|------|----------|-----------------|
-| 0 | Foundation | 1-2 weeks | Project setup, tooling, CI/CD |
-| 1 | Pygen Client | 3-4 weeks | httpx-based CDF client |
-| 2 | IR | 2-3 weeks | Language-agnostic representation |
-| 3 | Python Generator | 3-4 weeks | Basic Python SDK generation |
-| 4 | Lazy Evaluation | 3-4 weeks | Scalable data access |
-| 5 | Feature Parity | 4-6 weeks | Match original Pygen |
-| 6 | Multi-Language | 3-4 weeks | TypeScript generator |
-| 7 | Production | 2-3 weeks | Hardening, optimization |
-| 8 | Release | 2-3 weeks | Migration guide, docs |
+| Phase | Name | Duration | Status | Key Deliverable |
+|-------|------|----------|--------|-----------------|
+| 0 | Foundation | 1 week | ✅ Complete | Project reorganized, v1 in legacy/ |
+| 1 | Pygen Client | 3-4 weeks | ⏳ Next | httpx-based CDF client with HTTPClient |
+| 2 | Validation & IR | 3-4 weeks | ⏳ Pending | Validation + Language-agnostic IR |
+| 3 | Python Generator | 3-4 weeks | ⏳ Pending | Basic Python SDK generation |
+| 4 | Runtime & Lazy | 3-4 weeks | ⏳ Pending | Client-based lazy evaluation |
+| 5 | Feature Parity | 4-6 weeks | ⏳ Pending | Match original Pygen |
+| 6 | Multi-Language | 3-4 weeks | ⏳ Pending | TypeScript generator |
+| 7 | API Service | 2-3 weeks | ⏳ Pending | On-demand SDK generation |
+| 8 | Production | 2-3 weeks | ⏳ Pending | Hardening, optimization |
+| 9 | Release | 2-3 weeks | ⏳ Pending | Migration guide, docs |
 
 ---
 
@@ -44,13 +45,16 @@
 
 ```
 ┌─────────────────────────────────────┐
-│  1. Pygen Client (httpx + Pydantic) │  ← Replace cognite-sdk
+│  1. Pygen Client                    │  ← HTTPClient wrapper + QueryBuilder
+│     (httpx + Pydantic)              │     Replace cognite-sdk
 ├─────────────────────────────────────┤
-│  2. Intermediate Representation     │  ← Language-agnostic
+│  2. Validation Layer                │  ← Validate before IR creation
 ├─────────────────────────────────────┤
-│  3. Code Generation (Jinja2)        │  ← Multi-language
+│  3. Intermediate Representation     │  ← Language-agnostic
 ├─────────────────────────────────────┤
-│  4. Generated Runtime Support       │  ← Lazy evaluation
+│  4. Code Generation (Jinja2)        │  ← Multi-language
+├─────────────────────────────────────┤
+│  5. Generated Runtime Support       │  ← Client-based lazy evaluation
 └─────────────────────────────────────┘
 ```
 
@@ -60,12 +64,16 @@
 
 | Decision | Rationale |
 |----------|-----------|
+| HTTPClient wrapper | Internal consistency, easy mocking/testing |
+| Validation first | Catch issues early, enable graceful degradation |
+| Client-based design | Follows v1 patterns, clear separation |
 | httpx over requests | Async/sync, HTTP/2, better performance |
 | Pydantic v2 | 5-17x faster, excellent validation |
 | IR layer | Enables multi-language support |
 | Lazy by default | Solves scalability issues |
 | Template-based | Readable, maintainable, customizable |
 | Python 3.10+ | Modern features, type hints |
+| Typer for CLI | Modern, type-safe CLI |
 | >90% coverage | Professional-grade quality |
 
 ---
@@ -77,6 +85,8 @@
 - httpx (HTTP client)
 - Pydantic v2 (data models)
 - Jinja2 (templates)
+- FastAPI (API service)
+- typer (CLI)
 
 **Development**:
 - uv (dependencies)
@@ -118,28 +128,39 @@
 ## 📁 Project Structure
 
 ```
-pygen/
-├── client/              # Pygen Client (Phase 1)
+cognite/pygen/
+├── legacy/             # V1 code (delete after v2.0.0)
+│   └── ...
+├── client/             # Pygen Client (Phase 1)
+│   ├── http.py         # HTTPClient wrapper
+│   ├── query.py        # Query builder
 │   ├── core.py
 │   ├── auth.py
-│   ├── http.py
 │   ├── models/
 │   └── resources/
-├── ir/                  # Intermediate Representation (Phase 2)
+├── validation/         # Validation Layer (Phase 2)
+│   ├── validator.py
+│   ├── rules.py
+│   └── issues.py
+├── ir/                 # Intermediate Representation (Phase 2)
 │   ├── models.py
 │   ├── types.py
 │   ├── parser.py
-│   └── validator.py
-├── generation/          # Code Generation (Phase 3+)
+│   └── transformer.py
+├── generation/         # Code Generation (Phase 3+)
 │   ├── base.py
 │   ├── python/
 │   ├── typescript/
 │   └── ...
-├── runtime/             # Generated Runtime (Phase 4)
+├── runtime/            # Generated Runtime (Phase 4)
 │   ├── base.py
 │   ├── lazy.py
 │   └── query.py
-└── cli.py               # CLI Interface
+├── api/                # API Service (Phase 7)
+│   ├── app.py
+│   ├── endpoints.py
+│   └── models.py
+└── cli.py              # CLI Interface (typer)
 ```
 
 ---
@@ -186,6 +207,7 @@ pygen generate --config pygen.yaml
 ## 📊 Success Metrics
 
 ### Technical
+- [x] Phase 0 complete (Foundation)
 - [ ] Test coverage >90%
 - [ ] 5-10x performance improvement
 - [ ] Memory usage O(chunk_size)
@@ -248,6 +270,8 @@ pygen generate --config pygen.yaml
 | **testing-strategy.md** | Testing approach |
 | **technical-specifications.md** | API specs and interfaces |
 | **decisions-and-tradeoffs.md** | Architectural decisions log |
+| **UPDATES.md** | Change history and updates |
+| **PROGRESS.md** | Implementation progress tracking |
 | **quick-reference.md** | This document |
 
 ---
@@ -268,13 +292,14 @@ pygen generate --config pygen.yaml
 
 ## 📅 Key Milestones
 
-| Milestone | Description | Target |
-|-----------|-------------|--------|
-| **M1** | Phase 1 complete (Client works) | Month 1-2 |
-| **M2** | Phase 3 complete (Can generate Python) | Month 3 |
-| **M3** | Phase 5 complete (Feature parity) | Month 5 |
-| **M4** | Phase 7 complete (Beta) | Month 7 |
-| **M5** | Phase 8 complete (v2.0.0) | Month 8 |
+| Milestone | Description | Target | Status |
+|-----------|-------------|--------|--------|
+| **M0** | Phase 0 complete (Foundation) | Week 1 | ✅ Complete |
+| **M1** | Phase 1 complete (Client works) | Month 1-2 | ⏳ Next |
+| **M2** | Phase 3 complete (Can generate Python) | Month 3 | ⏳ Pending |
+| **M3** | Phase 5 complete (Feature parity) | Month 5 | ⏳ Pending |
+| **M4** | Phase 7 complete (Beta) | Month 7 | ⏳ Pending |
+| **M5** | Phase 9 complete (v2.0.0) | Month 8 | ⏳ Pending |
 
 ---
 
@@ -414,17 +439,26 @@ A: Modern type hints, pattern matching, performance.
 
 ## ✅ Current Status
 
-**Planning Phase**: ✅ Complete
+**Phase 0**: ✅ Complete (December 20, 2025)
+
+**Current Progress**:
+- ✅ V1 code moved to `cognite/pygen/legacy/`
+- ✅ Project reorganized for parallel v1/v2 development
+- ✅ Development environment validated
+- ✅ CI/CD pipeline working
+- ✅ Test infrastructure ready
+
+**Next Phase**: Phase 1 - Pygen Client Core (3-4 weeks)
 
 **Next Steps**:
-1. Review and approve plans
-2. Begin Phase 0 (Foundation)
-3. Set up development environment
-4. Start implementation!
+1. Begin HTTPClient wrapper implementation
+2. Implement Query Builder/Optimizer
+3. Create Pydantic models for CDF API objects
+4. Build resource clients (Spaces, DataModels, Views, etc.)
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: December 19, 2025
+**Document Version**: 1.1
+**Last Updated**: December 20, 2025
 **For Details**: See full planning documents in `plan/` folder
 

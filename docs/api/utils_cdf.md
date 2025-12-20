@@ -1,1 +1,1 @@
-::: cognite.pygen.utils.cdf
+::: cognite.pygen.legacy.utils.cdf

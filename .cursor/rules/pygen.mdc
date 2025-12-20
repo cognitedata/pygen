@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+Pygen is has a namespace `cognite`. You should never add a `__init__.py` to the `cognite` folder. It should always only contain `pygen`.

@@ -355,7 +355,8 @@ tests/
 
 import pytest
 from pygen.client import PygenClient
-from tests.fixtures.mock_server import MockCDFServer
+from tests import MockCDFServer
+
 
 @pytest.fixture
 def mock_cdf_server():
@@ -365,6 +366,7 @@ def mock_cdf_server():
     yield server
     server.stop()
 
+
 @pytest.fixture
 def pygen_client(mock_cdf_server):
     """Provide PygenClient connected to mock server"""
@@ -372,6 +374,7 @@ def pygen_client(mock_cdf_server):
         base_url=mock_cdf_server.url,
         credentials="test_token"
     )
+
 
 @pytest.fixture
 def sample_view():
@@ -382,6 +385,7 @@ def sample_view():
         version="1",
         properties={...}
     )
+
 
 @pytest.fixture
 def sample_ir_model():

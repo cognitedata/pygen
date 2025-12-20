@@ -96,7 +96,7 @@ git checkout -b my-new-feature
 
 1. Write a test for one of the example SDKs for the feature you are implementing. Or in the case of a bugfix,
    write a test that fails without your changes. Check which of the generated SDK files that are manually maintained
-   in [constants.py](/tests/constants.py).
+   in [constants.py](/tests/legacy/constants.py).
 2. Implement the fix/feature in the example SDK.
 3. Ensure there is a generation test that checks that the SDK is generated as expected.
 4. Update the `pygen` itself to support generating the SDK.
