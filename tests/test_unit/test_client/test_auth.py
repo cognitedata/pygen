@@ -14,12 +14,12 @@ class TestOAuth2ClientCredentials:
     """Tests for OAuth2ClientCredentials class."""
 
     @pytest.fixture
-    def token_url(self):
+    def token_url(self) -> str:
         """Token endpoint URL."""
         return "https://example.com/oauth2/token"
 
     @pytest.fixture
-    def mock_token_response(self):
+    def mock_token_response(self) -> dict[str, str | int]:
         """Mock successful token response."""
         return {
             "access_token": "mock_access_token_12345",
@@ -28,7 +28,7 @@ class TestOAuth2ClientCredentials:
         }
 
     @pytest.fixture
-    def credentials(self, token_url):
+    def credentials(self, token_url: str) -> OAuth2ClientCredentials:
         """Create OAuth2ClientCredentials instance."""
         return OAuth2ClientCredentials(
             token_url=token_url,
@@ -39,7 +39,9 @@ class TestOAuth2ClientCredentials:
         )
 
     @respx.mock
-    def test_get_headers_success(self, credentials, token_url, mock_token_response):
+    def test_get_headers_success(
+        self, credentials: OAuth2ClientCredentials, token_url: str, mock_token_response: dict[str, str | int]
+    ) -> None:
         """Test successful token acquisition and header generation."""
         route = respx.post(token_url).mock(return_value=httpx.Response(200, json=mock_token_response))
 
@@ -60,7 +62,9 @@ class TestOAuth2ClientCredentials:
         assert "audience=https%3A%2F%2Fapi.example.com" in body
 
     @respx.mock
-    def test_get_headers_without_optional_params(self, token_url, mock_token_response):
+    def test_get_headers_without_optional_params(
+        self, token_url: str, mock_token_response: dict[str, str | int]
+    ) -> None:
         """Test token acquisition without optional parameters."""
         credentials = OAuth2ClientCredentials(
             token_url=token_url,
@@ -82,7 +86,9 @@ class TestOAuth2ClientCredentials:
         assert "audience=" not in body
 
     @respx.mock
-    def test_token_caching(self, credentials, token_url, mock_token_response):
+    def test_token_caching(
+        self, credentials: OAuth2ClientCredentials, token_url: str, mock_token_response: dict[str, str | int]
+    ) -> None:
         """Test that token is cached and not requested again if still valid."""
         route = respx.post(token_url).mock(return_value=httpx.Response(200, json=mock_token_response))
 
@@ -96,7 +102,9 @@ class TestOAuth2ClientCredentials:
         assert header1 == header2
 
     @respx.mock
-    def test_token_refresh_when_expired(self, credentials, token_url, mock_token_response):
+    def test_token_refresh_when_expired(
+        self, credentials: OAuth2ClientCredentials, token_url: str, mock_token_response: dict[str, str | int]
+    ) -> None:
         """Test that token is refreshed when it expires."""
         route = respx.post(token_url).mock(return_value=httpx.Response(200, json=mock_token_response))
 
@@ -112,7 +120,9 @@ class TestOAuth2ClientCredentials:
         assert route.call_count == 2
 
     @respx.mock
-    def test_token_refresh_within_margin(self, credentials, token_url, mock_token_response):
+    def test_token_refresh_within_margin(
+        self, credentials: OAuth2ClientCredentials, token_url: str, mock_token_response: dict[str, str | int]
+    ) -> None:
         """Test that token is refreshed when within refresh margin."""
         route = respx.post(token_url).mock(return_value=httpx.Response(200, json=mock_token_response))
 
@@ -131,7 +141,7 @@ class TestOAuth2ClientCredentials:
         assert route.call_count == 2
 
     @respx.mock
-    def test_http_error(self, credentials, token_url):
+    def test_http_error(self, credentials: OAuth2ClientCredentials, token_url: str) -> None:
         """Test handling of HTTP errors during token request."""
         respx.post(token_url).mock(return_value=httpx.Response(401, text="Unauthorized"))
 
@@ -142,7 +152,7 @@ class TestOAuth2ClientCredentials:
         assert "Unauthorized" in str(exc_info.value)
 
     @respx.mock
-    def test_request_error(self, credentials, token_url):
+    def test_request_error(self, credentials: OAuth2ClientCredentials, token_url: str) -> None:
         """Test handling of request errors during token request."""
         respx.post(token_url).mock(side_effect=httpx.ConnectError("Connection failed"))
 
@@ -152,7 +162,7 @@ class TestOAuth2ClientCredentials:
         assert "Token request failed" in str(exc_info.value)
 
     @respx.mock
-    def test_missing_access_token(self, credentials, token_url):
+    def test_missing_access_token(self, credentials: OAuth2ClientCredentials, token_url: str) -> None:
         """Test handling of response missing access_token field."""
         respx.post(token_url).mock(
             return_value=httpx.Response(200, json={"token_type": "Bearer"})  # Missing access_token
@@ -164,7 +174,7 @@ class TestOAuth2ClientCredentials:
         assert "missing access_token field" in str(exc_info.value)
 
     @respx.mock
-    def test_default_expiry(self, credentials, token_url):
+    def test_default_expiry(self, credentials: OAuth2ClientCredentials, token_url: str) -> None:
         """Test that default expiry is used when expires_in is missing."""
         respx.post(token_url).mock(
             return_value=httpx.Response(
@@ -185,7 +195,7 @@ class TestOAuth2ClientCredentials:
         assert 3590 < time_until_expiry < 3610  # Around 1 hour (with small tolerance)
 
     @respx.mock
-    def test_multiple_scopes(self, token_url, mock_token_response):
+    def test_multiple_scopes(self, token_url: str, mock_token_response: dict[str, str | int]) -> None:
         """Test token request with multiple scopes."""
         credentials = OAuth2ClientCredentials(
             token_url=token_url,
@@ -204,7 +214,7 @@ class TestOAuth2ClientCredentials:
         assert "scope=scope1+scope2+scope3" in body
 
     @respx.mock
-    def test_context_manager(self, token_url, mock_token_response):
+    def test_context_manager(self, token_url: str, mock_token_response: dict[str, str | int]) -> None:
         """Test context manager usage."""
         respx.post(token_url).mock(return_value=httpx.Response(200, json=mock_token_response))
 
@@ -221,16 +231,18 @@ class TestOAuth2ClientCredentials:
         assert credentials._http_client.is_closed
 
     @respx.mock
-    def test_thread_safety(self, credentials, token_url, mock_token_response):
+    def test_thread_safety(
+        self, credentials: OAuth2ClientCredentials, token_url: str, mock_token_response: dict[str, str | int]
+    ) -> None:
         """Test that token refresh is thread-safe."""
         route = respx.post(token_url).mock(return_value=httpx.Response(200, json=mock_token_response))
 
         # Simulate concurrent access
         import threading
 
-        results = []
+        results: list[tuple[str, str]] = []
 
-        def get_token():
+        def get_token() -> None:
             results.append(credentials.authorization_header())
 
         threads = [threading.Thread(target=get_token) for _ in range(10)]
@@ -247,7 +259,7 @@ class TestOAuth2ClientCredentials:
         # but definitely not 10 times
         assert route.call_count < 5
 
-    def test_close(self, credentials):
+    def test_close(self, credentials: OAuth2ClientCredentials) -> None:
         """Test close method."""
         # Client should be open initially
         assert not credentials._http_client.is_closed
@@ -258,7 +270,9 @@ class TestOAuth2ClientCredentials:
         assert credentials._http_client.is_closed
 
     @respx.mock
-    def test_refresh_if_needed_explicit(self, credentials, token_url, mock_token_response):
+    def test_refresh_if_needed_explicit(
+        self, credentials: OAuth2ClientCredentials, token_url: str, mock_token_response: dict[str, str | int]
+    ) -> None:
         """Test explicit refresh_if_needed call."""
         route = respx.post(token_url).mock(return_value=httpx.Response(200, json=mock_token_response))
 
