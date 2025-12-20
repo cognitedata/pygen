@@ -6,7 +6,8 @@ from unittest.mock import Mock, patch
 import httpx
 import pytest
 
-from cognite.pygen._client.auth import OAuth2ClientCredentials, OAuth2Error
+from cognite.pygen._client.auth import OAuth2ClientCredentials
+from cognite.pygen._client.exceptions import OAuth2Error
 
 
 class TestOAuth2ClientCredentials:

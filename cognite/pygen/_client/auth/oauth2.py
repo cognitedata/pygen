@@ -6,6 +6,7 @@ from threading import Lock
 import httpx
 
 from cognite.pygen._client.auth.credentials import Credentials
+from cognite.pygen._client.exceptions import OAuth2Error
 
 
 class OAuth2ClientCredentials(Credentials):
@@ -30,7 +31,7 @@ class OAuth2ClientCredentials(Credentials):
         ...     client_secret="my-client-secret",
         ...     scopes=["https://api.cognitedata.com/.default"],
         ... )
-        >>> headers = credentials.get_headers()
+        >>> headers = credentials.authorization_header()
     """
 
     def __init__(
@@ -57,7 +58,7 @@ class OAuth2ClientCredentials(Credentials):
         # HTTP client for token requests
         self._http_client = httpx.Client(timeout=30.0)
 
-    def get_headers(self) -> dict[str, str]:
+    def authorization_header(self) -> tuple[str, str]:
         """
         Get authentication headers with a valid access token.
 
@@ -72,7 +73,7 @@ class OAuth2ClientCredentials(Credentials):
         self.refresh_if_needed()
         if not self._access_token:
             raise OAuth2Error("Failed to acquire access token")
-        return {"Authorization": f"Bearer {self._access_token}"}
+        return "Authorization", f"Bearer {self._access_token}"
 
     def refresh_if_needed(self) -> None:
         """
@@ -149,9 +150,3 @@ class OAuth2ClientCredentials(Credentials):
             self.close()
         except Exception:
             pass  # Ignore errors during cleanup
-
-
-class OAuth2Error(Exception):
-    """Exception raised for OAuth2 authentication errors."""
-
-    pass
