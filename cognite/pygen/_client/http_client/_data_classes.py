@@ -33,7 +33,7 @@ class SuccessResponse(HTTPResult):
     @property
     def body_json(self) -> dict[str, Any]:
         """Parse the response body as JSON."""
-        return TypeAdapter(dict[str, JsonValue]).validate_json(self.body)
+        return _BODY_SERIALIZER.validate_json(self.body)
 
 
 class ErrorDetails(BaseModel):
