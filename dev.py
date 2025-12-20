@@ -14,10 +14,10 @@ import typer
 from cognite.client import data_modeling as dm
 from packaging.version import Version, parse
 
-from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
-from cognite.pygen.utils import MockGenerator
-from cognite.pygen.utils.cdf import load_cognite_client_from_toml
-from tests.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
+from legacy.cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
+from legacy.cognite.pygen.utils import MockGenerator
+from legacy.cognite.pygen.utils.cdf import load_cognite_client_from_toml
+from legacy.tests.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
 
 app = typer.Typer(
     add_completion=False,
