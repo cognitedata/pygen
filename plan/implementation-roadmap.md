@@ -28,15 +28,17 @@ Phase 4: Runtime & Lazy Evaluation (3-4 weeks)
     ↓
 Phase 5: Feature Parity (4-6 weeks)
     ↓
-Phase 6: Multi-Language Foundation (3-4 weeks)
+Phase 6: Query Builder & Optimizer (2-3 weeks)
     ↓
-Phase 7: API Service (2-3 weeks)
+Phase 7: Multi-Language Foundation (3-4 weeks)
     ↓
-Phase 8: Production Hardening (2-3 weeks)
+Phase 8: API Service (2-3 weeks)
     ↓
-Phase 9: Migration & Documentation (2-3 weeks)
+Phase 9: Production Hardening (2-3 weeks)
+    ↓
+Phase 10: Migration & Documentation (2-3 weeks)
 
-Total Estimated Time: 24-36 weeks
+Total Estimated Time: 26-39 weeks
 ```
 
 ## Phase 0: Foundation & Setup
@@ -109,19 +111,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Connection pooling configuration
    - Request/response logging
 
-1b. **Query Builder/Optimizer**
-   - Implement query builder for simplifying complex queries
-   - Add filter composition
-   - Add query optimization logic
-   - Support for common query patterns from v1
-
 2. **Pydantic Models for API Objects**
    - DataModel model
    - View model
    - Container model
    - Space model
-   - Instance model
-   - Query models
    - Error response models
 
 3. **Resource Clients**
@@ -365,7 +359,6 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 ### Dependencies
 - Phase 3 complete (need generator)
-- Phase 1 complete (need client with query builder)
 
 ---
 
@@ -436,7 +429,65 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 ---
 
-## Phase 6: Multi-Language Foundation
+## Phase 6: Query Builder & Optimizer
+
+**Goal**: Build a comprehensive query builder and optimizer for complex CDF queries.
+
+**Duration**: 2-3 weeks
+
+### Tasks
+
+1. **Query Builder Foundation**
+   - Implement fluent query builder API
+   - Support for filter composition
+   - Support for nested filters and logical operators
+   - Type-safe filter building
+
+2. **Query Optimization**
+   - Query optimization logic for efficient CDF queries
+   - Automatic query simplification
+   - Cost-based optimization hints
+   - Query plan analysis
+
+3. **Common Query Patterns**
+   - Support for common query patterns from v1
+   - Relationship traversal queries
+   - Aggregation query helpers
+   - Pagination and sorting helpers
+
+4. **Integration**
+   - Integrate query builder with PygenClient
+   - Update generated API classes to use query builder
+   - Add query builder helpers to runtime base classes
+
+5. **Testing**
+   - Unit tests for query builder
+   - Unit tests for query optimizer
+   - Integration tests with PygenClient
+   - Performance benchmarks vs manual queries
+   - Test coverage >90%
+
+### Deliverables
+- ✅ Complete query builder implementation
+- ✅ Query optimization working
+- ✅ Integration with client and generated code
+- ✅ Comprehensive test suite
+- ✅ Documentation and examples
+
+### Success Criteria
+- Can build complex queries programmatically
+- Query optimization improves performance
+- Type-safe query building works
+- All tests pass with >90% coverage
+- Better DX than v1 query building
+
+### Dependencies
+- Phase 1 complete (need PygenClient)
+- Phase 4 complete (need runtime base classes)
+
+---
+
+## Phase 7: Multi-Language Foundation
 
 **Goal**: Enable generation of TypeScript SDKs (proof of concept).
 
@@ -488,10 +539,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 ### Dependencies
 - Phase 5 complete
+- Phase 6 complete (query builder may be used in generated code)
 
 ---
 
-## Phase 7: API Service (Goal 5)
+## Phase 8: API Service (Goal 5)
 
 **Goal**: Build Pygen backend service for generating SDKs on demand via API.
 
@@ -549,11 +601,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - Deployment is straightforward
 
 ### Dependencies
-- Phase 6 complete (multi-language support)
+- Phase 7 complete (multi-language support)
 
 ---
 
-## Phase 8: Production Hardening
+## Phase 9: Production Hardening
 
 **Goal**: Prepare for production use.
 
@@ -611,11 +663,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - Ready for beta release
 
 ### Dependencies
-- Phase 6 complete
+- Phase 7 complete
 
 ---
 
-## Phase 9: Migration & Documentation
+## Phase 10: Migration & Documentation
 
 **Goal**: Enable users to migrate from old to new Pygen.
 
@@ -667,7 +719,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - Release artifacts ready
 
 ### Dependencies
-- Phase 8 complete
+- Phase 9 complete
 
 ### Post-Release
 - Delete legacy/ folder after v2.0.0 is stable
@@ -738,7 +790,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 ### Team Composition (Ideal)
 - 1-2 Senior Python developers
-- 1 TypeScript developer (Phase 6+)
+- 1 TypeScript developer (Phase 7+)
 - 1 QA/Testing specialist
 - 1 Technical writer (part-time)
 
