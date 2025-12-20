@@ -75,6 +75,7 @@ dev = [
     "jupyterlab>=3.0.0",
     "cognite-toolkit==0.5.87",
     "marko>=2.1.0, <3.0.0",
+    "respx>=0.22.0",
 ]
 
 [tool.uv]

@@ -59,7 +59,7 @@ def build_wheel(
         config: The configuration used to control how to generate the SDK.
     """
     try:
-        from build import ProjectBuilder
+        from build import ProjectBuilder  # type: ignore[import-not-found]
     except ImportError:
         raise ImportError(
             "'build' is required to build wheel. Install pygen with `pip install pygen[cli] or "
