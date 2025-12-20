@@ -7,6 +7,7 @@ import respx
 
 from cognite.pygen._client.auth.credentials import Credentials
 from cognite.pygen._client.config import PygenClientConfig
+from cognite.pygen._client.exceptions import PygenAPIError
 from cognite.pygen._client.http_client import FailedRequest, FailedResponse, HTTPClient, RequestMessage, SuccessResponse
 
 
@@ -159,3 +160,53 @@ class TestHTTPClient:
         assert isinstance(response, SuccessResponse)
         assert response.status_code == 200
         assert respx_mock.calls[-1].request.headers["cdf-version"] == "alpha"
+
+    def test_request_gzip(self, http_client: HTTPClient, respx_mock: respx.MockRouter) -> None:
+        respx_mock.post("https://example.com/api/resource").respond(json={"key": "value"}, status_code=200)
+        response = http_client.request(
+            RequestMessage(
+                endpoint_url="https://example.com/api/resource",
+                method="POST",
+                disable_gzip=False,
+                body_content={"data": "test"},
+            )
+        )
+        assert isinstance(response, SuccessResponse)
+        assert response.status_code == 200
+        assert respx_mock.calls[-1].request.headers.get("accept-encoding") == "gzip, deflate"
+        request_content = respx_mock.calls[-1].request.content
+        assert isinstance(request_content, bytes)
+        assert request_content.startswith(b"\x1f\x8b")  # Gzip magic number
+
+    def test_get_success_or_raise(self, respx_mock: respx.MockRouter, http_client_one_retry: HTTPClient) -> None:
+        respx_mock.get("https://example.com/api/resource").respond(
+            json={"error": {"message": "bad request", "code": 400}}, status_code=400
+        )
+
+        result = http_client_one_retry.request_with_retries(
+            RequestMessage(endpoint_url="https://example.com/api/resource", method="GET")
+        )
+        with pytest.raises(PygenAPIError) as exc_info:
+            result.get_success_or_raise()
+
+        assert str(exc_info.value) == "Request failed with status code 400: bad request"
+
+    def test_get_success_or_raise_failed_request(
+        self, respx_mock: respx.MockRouter, http_client_one_retry: HTTPClient
+    ) -> None:
+        respx_mock.get("https://example.com/api/resource").mock(
+            side_effect=httpx.ConnectError("Simulated connection error")
+        )
+
+        with patch(f"{HTTPClient.__module__}.time"):
+            # Patch time to avoid actual sleep
+            result = http_client_one_retry.request_with_retries(
+                RequestMessage(endpoint_url="https://example.com/api/resource", method="GET")
+            )
+        with pytest.raises(PygenAPIError) as exc_info:
+            result.get_success_or_raise()
+
+        assert (
+            str(exc_info.value) == "Request failed with error: RequestException after 1 attempts (connect error): "
+            "Simulated connection error"
+        )
