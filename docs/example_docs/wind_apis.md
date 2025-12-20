@@ -1,1 +1,1 @@
-::: examples.wind_turbine._api
+::: legacy.examples.wind_turbine._api

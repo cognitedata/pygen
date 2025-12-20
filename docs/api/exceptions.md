@@ -1,1 +1,1 @@
-::: cognite.pygen.exceptions
+::: legacy.cognite.pygen.exceptions

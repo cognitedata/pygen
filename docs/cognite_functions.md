@@ -15,10 +15,10 @@ A few useful links for Cognite Functions:
 ## Deploying your generated SDK to Cognite Functions
 
 Cognite Functions supports private packages in your function deployment, and `pygen` can generate a `wheel` package of
-your data model SDK. To generate a `wheel` package, use the [build_wheel](api/api.html#cognite.pygen.build_wheel) function.
+your data model SDK. To generate a `wheel` package, use the [build_wheel](api/api.md#legacy.cognite.pygen.build_wheel) function.
 
 For example, given the data model (`power-models`, `Windmill`, `1`) we generated in the
-[Generation](usage/generation.html) guide,
+[Generation](usage/generation.ipynb) guide,
 we can build a `wheel` package with the following code:
 
 ```python

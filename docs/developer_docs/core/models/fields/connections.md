@@ -1,1 +1,1 @@
-::: cognite.pygen._core.models.fields.connections
+::: legacy.cognite.pygen._core.models.fields.connections

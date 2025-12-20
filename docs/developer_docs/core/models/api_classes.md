@@ -1,1 +1,1 @@
-::: cognite.pygen._core.models.api_classes
+::: legacy.cognite.pygen._core.models.api_classes

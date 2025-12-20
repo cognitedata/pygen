@@ -1,1 +1,1 @@
-::: examples.cognite_core._api
+::: legacy.examples.cognite_core._api

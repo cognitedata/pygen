@@ -1,1 +1,1 @@
-::: cognite.pygen._core.models.fields.cdf_reference
+::: legacy.cognite.pygen._core.models.fields.cdf_reference

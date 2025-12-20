@@ -1,1 +1,1 @@
-::: cognite.pygen.utils
+::: legacy.cognite.pygen.utils

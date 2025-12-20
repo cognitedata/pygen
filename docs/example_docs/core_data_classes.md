@@ -1,1 +1,1 @@
-::: examples.cognite_core.data_classes
+::: legacy.examples.cognite_core.data_classes

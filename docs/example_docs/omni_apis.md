@@ -1,1 +1,1 @@
-::: examples.omni._api
+::: legacy.examples.omni._api

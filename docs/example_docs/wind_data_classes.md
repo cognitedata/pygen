@@ -1,1 +1,1 @@
-::: examples.wind_turbine.data_classes
+::: legacy.examples.wind_turbine.data_classes

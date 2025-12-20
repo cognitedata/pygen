@@ -1,1 +1,1 @@
-::: cognite.pygen.demo
+::: legacy.cognite.pygen.demo

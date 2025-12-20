@@ -1,1 +1,1 @@
-::: cognite.pygen._core.models.fields.base
+::: legacy.cognite.pygen._core.models.fields.base

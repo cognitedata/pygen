@@ -1,1 +1,1 @@
-::: cognite.pygen.utils.external_id_factories
+::: legacy.cognite.pygen.utils.external_id_factories
