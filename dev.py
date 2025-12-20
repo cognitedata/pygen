@@ -17,7 +17,7 @@ from packaging.version import Version, parse
 from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
 from cognite.pygen.utils import MockGenerator
 from cognite.pygen.utils.cdf import load_cognite_client_from_toml
-from tests.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
+from tests.legacy.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
 
 app = typer.Typer(
     add_completion=False,
