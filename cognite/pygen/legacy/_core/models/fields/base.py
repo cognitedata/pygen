@@ -12,12 +12,12 @@ from cognite.client.data_classes.data_modeling.views import (
     ViewProperty,
 )
 
-from cognite.pygen import config as pygen_config
-from cognite.pygen.config.reserved_words import is_reserved_word
-from cognite.pygen.utils.text import create_name, to_words
+from cognite.pygen.legacy import config as pygen_config
+from cognite.pygen.legacy.config.reserved_words import is_reserved_word
+from cognite.pygen.legacy.utils.text import create_name, to_words
 
 if TYPE_CHECKING:
-    from cognite.pygen._core.models.data_classes import EdgeDataClass, NodeDataClass
+    from cognite.pygen.legacy._core.models.data_classes import EdgeDataClass, NodeDataClass
 
 _PRIMITIVE_TYPES = (dm.Text, dm.Boolean, dm.Float32, dm.Float64, dm.Int32, dm.Int64, dm.Timestamp, dm.Date, dm.Json)
 _EXTERNAL_TYPES = (dm.TimeSeriesReference, dm.FileReference, dm.SequenceReference)

@@ -1,7 +1,7 @@
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.utils.mock_generator import MockGenerator, ViewMockConfig
+from cognite.pygen.legacy.utils.mock_generator import MockGenerator, ViewMockConfig
 from tests.legacy.omni_constants import OmniClasses, OmniView
 
 

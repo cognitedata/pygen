@@ -16,8 +16,8 @@ from cognite.client.data_classes.data_modeling.instances import (
     Properties,
 )
 
-from cognite.pygen._query.processing import QueryUnpacker
-from cognite.pygen._query.step import QueryResultStep, ViewPropertyId
+from cognite.pygen.legacy._query.processing import QueryUnpacker
+from cognite.pygen.legacy._query.step import QueryResultStep, ViewPropertyId
 
 DEFAULT_INSTANCE_ARGS: Mapping = dict(
     version=1,

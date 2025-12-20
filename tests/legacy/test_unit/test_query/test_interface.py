@@ -11,8 +11,8 @@ from cognite.client.data_classes.aggregations import (
 )
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResult, InstanceAggregationResultList
 
-from cognite.pygen._query.interface import QueryExecutor
 from cognite.pygen._version import __version__
+from cognite.pygen.legacy._query.interface import QueryExecutor
 
 
 class TestQueryInterface:

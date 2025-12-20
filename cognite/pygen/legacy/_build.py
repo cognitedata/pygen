@@ -13,7 +13,7 @@ from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen.config import PygenConfig
+from cognite.pygen.legacy.config import PygenConfig
 
 from ._generator import (
     DataModel,

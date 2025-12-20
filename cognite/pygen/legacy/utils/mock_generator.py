@@ -43,10 +43,10 @@ from cognite.client.data_classes.data_modeling.views import (
 )
 from cognite.client.exceptions import CogniteNotFoundError
 
-from cognite.pygen._constants import is_readonly_property
 from cognite.pygen._version import __version__
-from cognite.pygen.exceptions import PygenImportError
-from cognite.pygen.utils.cdf import _find_first_node_type
+from cognite.pygen.legacy._constants import is_readonly_property
+from cognite.pygen.legacy.exceptions import PygenImportError
+from cognite.pygen.legacy.utils.cdf import _find_first_node_type
 
 DataType = int | float | bool | str | dict | None
 ListAbleDataType = (

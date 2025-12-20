@@ -5,9 +5,9 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.testing import monkeypatch_cognite_client
 
-from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
-from cognite.pygen._generator import CodeFormatter
-from cognite.pygen.config import PygenConfig
+from cognite.pygen.legacy._core.generators import MultiAPIGenerator, SDKGenerator
+from cognite.pygen.legacy._generator import CodeFormatter
+from cognite.pygen.legacy.config import PygenConfig
 from tests.legacy.constants import CORE_SDK, OMNI_SDK, OMNI_SUB_SDK, WIND_TURBINE
 
 

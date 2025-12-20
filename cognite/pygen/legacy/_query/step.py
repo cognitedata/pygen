@@ -11,7 +11,7 @@ from cognite.client.data_classes._base import CogniteObject
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 
-from cognite.pygen._query.constants import (
+from cognite.pygen.legacy._query.constants import (
     ACTUAL_INSTANCE_QUERY_LIMIT,
     NODE_PROPERTIES,
     NotSetSentinel,

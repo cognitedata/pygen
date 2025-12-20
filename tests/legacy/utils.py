@@ -12,8 +12,8 @@ from cognite.client import data_modeling as dm
 from cognite.client.config import global_config
 from cognite.client.credentials import CredentialProvider, OAuthClientCredentials, OAuthInteractive, Token
 
-from cognite.pygen._core.models import DataClass, EdgeDataClass, NodeDataClass
-from cognite.pygen.config import PygenConfig
+from cognite.pygen.legacy._core.models import DataClass, EdgeDataClass, NodeDataClass
+from cognite.pygen.legacy.config import PygenConfig
 
 _LOGIN_FLOW: TypeAlias = Literal["infer", "client_credentials", "interactive", "token"]
 _VALID_LOGIN_FLOWS = get_args(_LOGIN_FLOW)

@@ -5,9 +5,8 @@ from typing import Any, cast
 
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.exceptions import NameConflict
-
-from .models import APIClass, DataClass, MultiAPIClass
+from cognite.pygen.legacy._core.models import APIClass, DataClass, MultiAPIClass
+from cognite.pygen.legacy.exceptions import NameConflict
 
 _DATACLASS_UNIQUE_PROPERTIES = [
     "file_name",

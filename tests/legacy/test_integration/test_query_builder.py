@@ -4,9 +4,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from omni import data_classes as dc
 
-from cognite.pygen._query.builder import QueryBuilder, QueryBuildStep
-from cognite.pygen._query.processing import QueryUnpacker
-from cognite.pygen._query.step import ViewPropertyId
+from cognite.pygen.legacy._query.builder import QueryBuilder, QueryBuildStep
+from cognite.pygen.legacy._query.processing import QueryUnpacker
+from cognite.pygen.legacy._query.step import ViewPropertyId
 
 
 class TestQueryBuilder:

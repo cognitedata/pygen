@@ -9,10 +9,10 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import TypedNode, TypedNodeApply
 from omni_typed import typed
 
-from cognite.pygen._core.generators import MultiAPIGenerator, SDKGenerator
-from cognite.pygen._generator import _get_data_model
-from cognite.pygen.config import PygenConfig
-from cognite.pygen.utils import MockGenerator
+from cognite.pygen.legacy._core.generators import MultiAPIGenerator, SDKGenerator
+from cognite.pygen.legacy._generator import _get_data_model
+from cognite.pygen.legacy.config import PygenConfig
+from cognite.pygen.legacy.utils import MockGenerator
 from tests.legacy.constants import OMNI_TYPED
 
 

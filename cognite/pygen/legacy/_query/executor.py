@@ -9,15 +9,15 @@ from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.aggregations import Count
 from cognite.client.exceptions import CogniteAPIError
 
-from cognite.pygen._query.constants import (
+from cognite.pygen.legacy._query.constants import (
     IN_FILTER_CHUNK_SIZE,
     INSTANCE_QUERY_LIMIT,
     MINIMUM_ESTIMATED_SECONDS_BEFORE_PRINT_PROGRESS,
     PRINT_PROGRESS_PER_N_NODES,
     SEARCH_LIMIT,
 )
-from cognite.pygen._query.processing import QueryResultCleaner
-from cognite.pygen._query.step import QueryBuildStep, QueryResultStep, QueryResultStepList
+from cognite.pygen.legacy._query.processing import QueryResultCleaner
+from cognite.pygen.legacy._query.step import QueryBuildStep, QueryResultStep, QueryResultStepList
 
 
 class QueryReducingBatchSize(UserWarning):

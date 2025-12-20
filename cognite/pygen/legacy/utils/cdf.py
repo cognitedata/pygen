@@ -38,7 +38,7 @@ from cognite.client.data_classes.data_modeling.views import EdgeConnection, Reve
 from cognite.client.exceptions import CogniteNotFoundError
 from cognite.client.utils.useful_types import SequenceNotStr
 
-from cognite.pygen.utils.text import to_snake
+from cognite.pygen.legacy.utils.text import to_snake
 
 
 def load_cognite_client_from_toml(

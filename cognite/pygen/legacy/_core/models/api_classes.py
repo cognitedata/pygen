@@ -8,15 +8,15 @@ from typing import TYPE_CHECKING, Literal, cast
 
 from cognite.client.data_classes import data_modeling as dm
 
-from cognite.pygen import config as pygen_config
-from cognite.pygen.utils.text import create_name
+from cognite.pygen.legacy import config as pygen_config
+from cognite.pygen.legacy.utils.text import create_name
 
 from .data_classes import DataClass, EdgeDataClass, NodeDataClass
 from .fields import BaseConnectionField, CDFExternalField
 from .filter_methods import FilterMethod, FilterParameter
 
 if TYPE_CHECKING:
-    from cognite.pygen._core.generators import APIGenerator
+    from cognite.pygen.legacy._core.generators import APIGenerator
 
 
 @dataclass(frozen=True)

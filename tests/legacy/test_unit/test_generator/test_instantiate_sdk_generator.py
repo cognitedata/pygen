@@ -1,9 +1,9 @@
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.generators import SDKGenerator
-from cognite.pygen.config import APIClassNaming, Case, Naming, Number, PygenConfig
-from cognite.pygen.exceptions import NameConflict
+from cognite.pygen.legacy._core.generators import SDKGenerator
+from cognite.pygen.legacy.config import APIClassNaming, Case, Naming, Number, PygenConfig
+from cognite.pygen.legacy.exceptions import NameConflict
 from tests.legacy.constants import OMNI_MULTI_SDK
 
 

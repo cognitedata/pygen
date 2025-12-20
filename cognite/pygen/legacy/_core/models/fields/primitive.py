@@ -10,7 +10,7 @@ from typing import Literal
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.data_types import Enum, ListablePropertyType
 
-from cognite.pygen._constants import is_readonly_property
+from cognite.pygen.legacy._constants import is_readonly_property
 
 from .base import Field
 

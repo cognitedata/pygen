@@ -1,6 +1,6 @@
 import pytest
 
-from cognite.pygen.utils.text import to_camel, to_pascal, to_snake
+from cognite.pygen.legacy.utils.text import to_camel, to_pascal, to_snake
 
 
 @pytest.mark.parametrize(

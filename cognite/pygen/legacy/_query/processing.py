@@ -6,8 +6,8 @@ from typing import Any, Literal
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Instance
 
-from cognite.pygen._query.constants import DATA_RECORD_PROPERTIES
-from cognite.pygen._query.step import QueryResultStep
+from cognite.pygen.legacy._query.constants import DATA_RECORD_PROPERTIES
+from cognite.pygen.legacy._query.step import QueryResultStep
 
 
 class QueryResultCleaner:

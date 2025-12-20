@@ -20,7 +20,7 @@ from pydantic import TypeAdapter
 from wind_turbine.data_classes import DomainModelWrite as WindDomainModelWrite
 from wind_turbine.data_classes import ResourcesWrite, WindTurbineWrite
 
-from cognite.pygen.utils.external_id_factories import (
+from cognite.pygen.legacy.utils.external_id_factories import (
     ExternalIdFactory,
 )
 from tests.legacy.constants import JSON_DIR, OMNI_SDK

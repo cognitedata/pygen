@@ -7,16 +7,16 @@ import pytest
 from cognite.client import data_modeling as dm
 from omni.data_classes import DomainModel, DomainModelWrite
 
-from cognite.pygen._core.models import (
+from cognite.pygen.legacy._core.models import (
     EndNodeField,
     Field,
     NodeDataClass,
 )
-from cognite.pygen._core.models.fields import EdgeClass
-from cognite.pygen._warnings import (
+from cognite.pygen.legacy._core.models.fields import EdgeClass
+from cognite.pygen.legacy._warnings import (
     NameCollisionViewPropertyWarning,
 )
-from cognite.pygen.config import PygenConfig
+from cognite.pygen.legacy.config import PygenConfig
 
 
 @pytest.mark.parametrize(

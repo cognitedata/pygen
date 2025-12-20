@@ -2,8 +2,8 @@ import difflib
 
 from cognite.client import data_modeling as dm
 
-from cognite.pygen._core.generators import MultiAPIGenerator
-from cognite.pygen._generator import CodeFormatter
+from cognite.pygen.legacy._core.generators import MultiAPIGenerator
+from cognite.pygen.legacy._generator import CodeFormatter
 from tests.legacy.constants import OmniFiles, OmniSubFiles
 from tests.legacy.omni_constants import OMNI_SPACE
 

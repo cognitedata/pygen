@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from cognite.pygen._build import build_wheel
+from cognite.pygen.legacy._build import build_wheel
 from tests.legacy.constants import OMNI_SDK
 
 
