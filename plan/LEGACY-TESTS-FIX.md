@@ -137,3 +137,4 @@ Date: December 19, 2025
 Issue: Legacy tests failing to execute
 Resolution: Use `uv run`, fix paths, skip outdated test
 
+
