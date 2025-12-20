@@ -116,6 +116,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Token refresh logic
    - Support for different authentication providers
    - Integration with CDF authentication
+   - The authentication code should be placed under `cognite/pygen/_client/auth/`
 
 3. **Pydantic Models for API Objects**
    - DataModel model
