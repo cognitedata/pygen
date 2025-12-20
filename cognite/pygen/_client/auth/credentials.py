@@ -19,4 +19,14 @@ class Credentials(ABC):
         Returns:
             A tuple containing the header name and header value.
         """
-        pass
+        ...
+
+    @abstractmethod
+    def refresh_if_needed(self) -> None:
+        """
+        Refresh credentials if they are expired or about to expire.
+
+        This method should be called before making API requests to ensure
+        credentials are valid.
+        """
+        ...
