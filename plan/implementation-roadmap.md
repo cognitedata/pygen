@@ -105,33 +105,41 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 1. **HTTP Client Foundation**
    - Implement internal HTTPClient wrapper around httpx
-   - Add authentication support
    - Implement rate limiting
    - Add retry logic with exponential backoff
    - Connection pooling configuration
    - Request/response logging
 
-2. **Pydantic Models for API Objects**
+2. **Authentication Support**
+   - Token-based authentication
+   - OAuth2 flow support
+   - API key authentication
+   - Credential management and secure storage
+   - Token refresh logic
+   - Support for different authentication providers
+   - Integration with CDF authentication
+
+3. **Pydantic Models for API Objects**
    - DataModel model
    - View model
    - Container model
    - Space model
    - Error response models
 
-3. **Resource Clients**
+4. **Resource Clients**
    - SpacesAPI (list, create, retrieve, delete)
    - DataModelsAPI (list, create, retrieve, delete)
    - ViewsAPI (list, create, retrieve, delete)
    - ContainersAPI (list, create, retrieve, delete)
    - InstancesAPI (list, create, retrieve, delete, query)
 
-4. **Error Handling**
+5. **Error Handling**
    - Custom exception hierarchy
    - API error mapping
    - Detailed error messages
    - Retry logic for transient errors
 
-5. **Testing**
+6. **Testing**
    - Unit tests for each component
    - Integration tests with mock API
    - Test coverage >90%
