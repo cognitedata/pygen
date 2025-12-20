@@ -23,7 +23,7 @@ we can build a `wheel` package with the following code:
 
 ```python
 from cognite.client import CogniteClient
-from cognite.pygen import build_wheel
+from cognite.pygen.legacy import build_wheel
 
 client = CogniteClient()
 

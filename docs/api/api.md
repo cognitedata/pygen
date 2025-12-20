@@ -1,2 +1,2 @@
 
-::: cognite.pygen
+::: cognite.pygen.legacy

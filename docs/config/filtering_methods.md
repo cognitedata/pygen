@@ -1,1 +1,1 @@
-::: cognite.pygen.config.Filtering
+::: cognite.pygen.legacy.config.Filtering
