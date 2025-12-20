@@ -113,8 +113,6 @@ All tasks, deliverables, and success criteria have been met. The project is read
 2. **Authentication Support**
    - Token-based authentication
    - OAuth2 flow support
-   - API key authentication
-   - Credential management and secure storage
    - Token refresh logic
    - Support for different authentication providers
    - Integration with CDF authentication
