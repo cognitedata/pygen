@@ -1,18 +1,24 @@
 from collections.abc import Iterator
-from collections.abc import Iterator
 from unittest.mock import patch
 
 import httpx
 import pytest
 import respx
 
+from cognite.pygen._client.auth.credentials import Credentials
 from cognite.pygen._client.config import PygenClientConfig
-from cognite.pygen._client.http_client import HTTPClient, RequestMessage, SuccessResponse, FailedResponse, FailedRequest
+from cognite.pygen._client.http_client import FailedRequest, FailedResponse, HTTPClient, RequestMessage, SuccessResponse
+
+
+class DummyCredentials(Credentials):
+    def authorization_header(self) -> tuple[str, str]:
+        return "Authorization", "Bearer dummy_token"
 
 
 @pytest.fixture(scope="module")
-def pygen_client_config()  -> PygenClientConfig:
-    return PygenClientConfig()
+def pygen_client_config() -> PygenClientConfig:
+    return PygenClientConfig(DummyCredentials())
+
 
 @pytest.fixture
 def http_client(pygen_client_config: PygenClientConfig) -> Iterator[HTTPClient]:
@@ -26,34 +32,36 @@ def http_client_one_retry(pygen_client_config: PygenClientConfig) -> Iterator[HT
         yield client
 
 
-
 class TestHTTPClient:
-    def test_get_request(self, rsps: respx.MockRouter, http_client: HTTPClient) -> None:
-        rsps.get("https://example.com/api/resource").respond(json={"key": "value"}, status_code=200)
+    def test_get_request(self, respx_mock: respx.MockRouter, http_client: HTTPClient) -> None:
+        respx_mock.get("https://example.com/api/resource").respond(json={"key": "value"}, status_code=200)
         response = http_client.request(
             RequestMessage(endpoint_url="https://example.com/api/resource", method="GET", parameters={"query": "test"})
         )
         assert isinstance(response, SuccessResponse)
         assert response.status_code == 200
         assert response.body == '{"key":"value"}'
-        assert rsps.calls[-1].request.url == "https://example.com/api/resource?query=test"
+        assert respx_mock.calls[-1].request.url == "https://example.com/api/resource?query=test"
 
-    def test_post_request(self, rsps: respx.MockRouter, http_client: HTTPClient) -> None:
-        rsps.post("https://example.com/api/resource").respond(json={"id": 123, "status": "created"}, status_code=201)
+    def test_post_request(self, respx_mock: respx.MockRouter, http_client: HTTPClient) -> None:
+        respx_mock.post("https://example.com/api/resource").respond(
+            json={"id": 123, "status": "created"}, status_code=201
+        )
         response = http_client.request(
             RequestMessage(
                 endpoint_url="https://example.com/api/resource",
                 method="POST",
                 body_content={"values": [float("nan")], "other": float("inf")},
+                disable_gzip=True,
             )
         )
         assert isinstance(response, SuccessResponse)
         assert response.status_code == 201
         assert response.body == '{"id":123,"status":"created"}'
-        assert rsps.calls[-1].request.content == b'{"values":[null],"other":null}'
+        assert respx_mock.calls[-1].request.content == b'{"values":[null],"other":null}'
 
-    def test_failed_request(self, rsps: respx.MockRouter, http_client: HTTPClient) -> None:
-        rsps.get("https://example.com/api/resource").respond(
+    def test_failed_request(self, respx_mock: respx.MockRouter, http_client: HTTPClient) -> None:
+        respx_mock.get("https://example.com/api/resource").respond(
             json={"error": {"message": "bad request", "code": 400}}, status_code=400
         )
         response = http_client.request(
@@ -63,19 +71,19 @@ class TestHTTPClient:
         assert response.status_code == 400
         assert response.error.message == "bad request"
 
-    def test_retry_then_success(self, rsps: respx.MockRouter, http_client: HTTPClient) -> None:
+    def test_retry_then_success(self, respx_mock: respx.MockRouter, http_client: HTTPClient) -> None:
         url = "https://example.com/api/resource"
-        rsps.get(url).respond(json={"error": "service unavailable"}, status_code=503)
-        rsps.get(url).respond(json={"key": "value"}, status_code=200)
+        respx_mock.get(url).respond(json={"error": "service unavailable"}, status_code=503)
+        respx_mock.get(url).respond(json={"key": "value"}, status_code=200)
         response = http_client.request_with_retries(RequestMessage(endpoint_url=url, method="GET", disable_gzip=True))
         assert isinstance(response, SuccessResponse)
         assert response.status_code == 200
         assert response.body == '{"key":"value"}'
 
-    def test_retry_exhausted(self, http_client_one_retry: HTTPClient, rsps: respx.MockRouter) -> None:
+    def test_retry_exhausted(self, http_client_one_retry: HTTPClient, respx_mock: respx.MockRouter) -> None:
         client = http_client_one_retry
         for _ in range(2):
-            rsps.get("https://example.com/api/resource").respond(
+            respx_mock.get("https://example.com/api/resource").respond(
                 json={"error": {"message": "service unavailable", "code": 503}}, status_code=503
             )
         with patch("time.sleep"):  # Patch sleep to speed up the test
@@ -87,9 +95,9 @@ class TestHTTPClient:
         assert response.status_code == 503
         assert response.error.message == "service unavailable"
 
-    def test_connection_error(self, http_client_one_retry: HTTPClient, rsps: respx.MockRouter) -> None:
+    def test_connection_error(self, http_client_one_retry: HTTPClient, respx_mock: respx.MockRouter) -> None:
         http_client = http_client_one_retry
-        rsps.get("http://nonexistent.domain/api/resource").mock(
+        respx_mock.get("http://nonexistent.domain/api/resource").mock(
             side_effect=httpx.ConnectError("Simulated connection error")
         )
         with patch(f"{HTTPClient.__module__}.time"):
@@ -100,9 +108,9 @@ class TestHTTPClient:
         assert isinstance(response, FailedRequest)
         assert "RequestException after 1 attempts (connect error): Simulated connection error" == response.error
 
-    def test_read_timeout_error(self, http_client_one_retry: HTTPClient, rsps: respx.MockRouter) -> None:
+    def test_read_timeout_error(self, http_client_one_retry: HTTPClient, respx_mock: respx.MockRouter) -> None:
         http_client = http_client_one_retry
-        rsps.get("https://example.com/api/resource").mock(side_effect=httpx.ReadTimeout("Simulated read timeout"))
+        respx_mock.get("https://example.com/api/resource").mock(side_effect=httpx.ReadTimeout("Simulated read timeout"))
         with patch(f"{HTTPClient.__module__}.time"):
             # Patch time to avoid actual sleep
             response = http_client.request_with_retries(
@@ -111,9 +119,9 @@ class TestHTTPClient:
         assert isinstance(response, FailedRequest)
         assert "RequestException after 1 attempts (read error): Simulated read timeout" == response.error
 
-    def test_zero_retries(self, pygen_client_config: PygenClientConfig, rsps: respx.MockRouter) -> None:
+    def test_zero_retries(self, pygen_client_config: PygenClientConfig, respx_mock: respx.MockRouter) -> None:
         client = HTTPClient(pygen_client_config, max_retries=0)
-        rsps.get("https://example.com/api/resource").respond(
+        respx_mock.get("https://example.com/api/resource").respond(
             json={"error": {"message": "service unavailable", "code": 503}}, status_code=503
         )
         with patch("time.sleep"):  # Patch sleep to speed up the test
@@ -123,7 +131,7 @@ class TestHTTPClient:
         assert isinstance(response, FailedResponse)
         assert response.status_code == 503
         assert response.error.message == "service unavailable"
-        assert len(rsps.calls) == 1
+        assert len(respx_mock.calls) == 1
 
     def test_raise_if_already_retied(self, http_client_one_retry: HTTPClient) -> None:
         http_client = http_client_one_retry
@@ -131,17 +139,15 @@ class TestHTTPClient:
         with pytest.raises(RuntimeError, match=r"RequestMessage has already been attempted 3 times."):
             http_client.request_with_retries(bad_request)
 
-    def test_error_text(self, http_client: HTTPClient, rsps: respx.MockRouter) -> None:
-        rsps.get("https://example.com/api/resource").respond(json={"message": "plain_text"}, status_code=401)
-        response = http_client.request(
-            RequestMessage(endpoint_url="https://example.com/api/resource", method="GET")
-        )
+    def test_error_text(self, http_client: HTTPClient, respx_mock: respx.MockRouter) -> None:
+        respx_mock.get("https://example.com/api/resource").respond(json={"message": "plain_text"}, status_code=401)
+        response = http_client.request(RequestMessage(endpoint_url="https://example.com/api/resource", method="GET"))
         assert isinstance(response, FailedResponse)
         assert response.status_code == 401
         assert response.error.message == '{"message":"plain_text"}'
 
-    def test_request_alpha(self, http_client: HTTPClient, rsps: respx.MockRouter) -> None:
-        rsps.get("https://example.com/api/alpha/endpoint").respond(json={"key": "value"}, status_code=200)
+    def test_request_alpha(self, http_client: HTTPClient, respx_mock: respx.MockRouter) -> None:
+        respx_mock.get("https://example.com/api/alpha/endpoint").respond(json={"key": "value"}, status_code=200)
         response = http_client.request(
             RequestMessage(
                 endpoint_url="https://example.com/api/alpha/endpoint",
@@ -152,4 +158,4 @@ class TestHTTPClient:
         )
         assert isinstance(response, SuccessResponse)
         assert response.status_code == 200
-        assert rsps.calls[-1].request.headers["cdf-version"] == "alpha"
+        assert respx_mock.calls[-1].request.headers["cdf-version"] == "alpha"

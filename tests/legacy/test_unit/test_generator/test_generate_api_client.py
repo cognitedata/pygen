@@ -1,7 +1,5 @@
 import difflib
 
-from black import InvalidInput
-
 from cognite.pygen.legacy._core.generators import SDKGenerator
 from cognite.pygen.legacy._generator import CodeFormatter
 from tests.legacy.constants import OMNI_MULTI_SDK, OMNI_SUB_SDK, OmniMultiFiles, OmniSubFiles
@@ -38,7 +36,7 @@ def test_generate_multi_model_api_client_default_instance_space_valid_python_syn
 
     try:
         _ = code_formatter.format_code(actual)
-    except InvalidInput as e:
+    except Exception as e:
         raise AssertionError(f"Code formatting failed: {e!s}") from None
     assert True
 

@@ -6,22 +6,21 @@ from typing import Literal
 
 import httpx
 
+from cognite.pygen._client.config import PygenClientConfig
 from cognite.pygen._client.http_client._data_classes import (
-    RequestMessage,
-    HTTPResult,
-    FailedRequest,
     ErrorDetails,
+    FailedRequest,
+    FailedResponse,
+    HTTPResult,
+    RequestMessage,
     SuccessResponse,
-    FailedResponse
 )
 from cognite.pygen._client.http_client._header import get_current_pygen_version, get_user_agent
-from cognite.pygen._client.config import PygenClientConfig
 
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
     from typing_extensions import Self
-
 
 
 class HTTPClient:
@@ -115,7 +114,6 @@ class HTTPClient:
         backoff_time = 0.5 * (2**attempts)
         return min(backoff_time, self._max_retry_backoff) * random.uniform(0, 1.0)
 
-
     def request(self, message: RequestMessage) -> RequestMessage | HTTPResult:
         """Send an HTTP request and return the response.
 
@@ -125,7 +123,7 @@ class HTTPClient:
             HTTPMessage: The response message.
         """
         try:
-            response = self._make_request2(message)
+            response = self._make_request(message)
             result = self._handle_response(response, message)
         except Exception as e:
             result = self._handle_error(e, message)
@@ -169,9 +167,7 @@ class HTTPClient:
             follow_redirects=False,
         )
 
-    def _handle_response(
-        self, response: httpx.Response, request: RequestMessage
-    ) -> RequestMessage | HTTPResult:
+    def _handle_response(self, response: httpx.Response, request: RequestMessage) -> RequestMessage | HTTPResult:
         if 200 <= response.status_code < 300:
             return SuccessResponse(
                 status_code=response.status_code,
