@@ -50,49 +50,38 @@ Total Estimated Time: 24-36 weeks
 ### Tasks
 
 1. **Project Reorganization**
-   - Move existing Pygen v1 code to `legacy/` folder
-   - Move existing tests to `legacy/tests/`
+   - Move existing Pygen v1 code to `cognite/pygen/legacy/` folder. However, keep the top-level `cognite/pygen/__init__.py` for v1 installation.
+   - Move existing tests to `tests/legacy/` folder.
    - Keep v1 functional during v2 development
    - Set up new v2 structure alongside legacy
-   - Update `pyproject.toml` to support both versions
 
 2. **Development Environment Validation**
    - Verify existing development tools (ruff, mypy, pytest)
    - Ensure CI/CD pipeline works for dual structure
    - Update pre-commit hooks for new structure
-   - Document new development workflow
 
 3. **Testing Infrastructure Enhancement**
    - Validate existing pytest configuration
    - Ensure coverage reporting works with new structure
-   - Set up separate test suites for v1 (legacy) and v2
-   - Create mock server for API testing (if not exists)
    - Enhance test fixtures and utilities
 
 4. **Documentation Structure**
    - Validate existing documentation setup
-   - Create v2-specific documentation sections
-   - Set up API reference generation for v2
    - Plan migration guide structure
 
 ### Deliverables
-- ✅ V1 code moved to legacy/ folder
-- ✅ Clean v2 project structure ready
-- ✅ Both v1 and v2 can coexist
-- ✅ CI/CD works for both versions
+- ✅ V1 code moved to cognite/pygen/legacy/
+- ✅ CI/CD works
 - ✅ Test infrastructure supports parallel development
 
 ### Success Criteria
-- V1 tests still pass in legacy/
-- Can run v2 tests separately
 - Can format code with `ruff format`
 - Can check types with `mypy`
-- CI passes for both v1 and v2
-- Coverage reporting works for v2
+- Coverage reporting works
 
 ### Migration Plan
-- Keep v1 in legacy/ until v2 is complete
-- Delete legacy/ folder only after v2.0.0 release
+- Keep v1 in cognite/pygen/legacy/ until v2 is complete
+- Delete cognite/pygen/legacy/  folder only after v2.0.0 release
 - Maintain v1 bug fixes if critical during development
 
 ---
