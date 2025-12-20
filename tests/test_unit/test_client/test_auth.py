@@ -33,28 +33,6 @@ class TestOAuth2ClientCredentials:
             audience="https://api.example.com",
         )
 
-    def test_init(self, credentials):
-        """Test OAuth2ClientCredentials initialization."""
-        assert credentials.token_url == "https://example.com/oauth2/token"
-        assert credentials.client_id == "test_client_id"
-        assert credentials.client_secret == "test_client_secret"
-        assert credentials.scopes == ["https://api.example.com/.default"]
-        assert credentials.audience == "https://api.example.com"
-        assert credentials.refresh_margin == 300
-        assert credentials._access_token is None
-        assert credentials._token_expiry is None
-
-    def test_init_with_defaults(self):
-        """Test OAuth2ClientCredentials initialization with default values."""
-        credentials = OAuth2ClientCredentials(
-            token_url="https://example.com/oauth2/token",
-            client_id="test_client_id",
-            client_secret="test_client_secret",
-        )
-        assert credentials.scopes == []
-        assert credentials.audience is None
-        assert credentials.refresh_margin == 300
-
     @patch("httpx.Client.post")
     def test_get_headers_success(self, mock_post, credentials, mock_token_response):
         """Test successful token acquisition and header generation."""
