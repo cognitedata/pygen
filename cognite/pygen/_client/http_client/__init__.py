@@ -1,3 +1,4 @@
+from ._client import HTTPClient
 from ._data_classes import (
     ErrorDetails,
     FailedRequest,
@@ -6,6 +7,13 @@ from ._data_classes import (
     RequestMessage,
     SuccessResponse,
 )
-from ._client import HTTPClient
 
-__all__ = ["ErrorDetails", "FailedRequest", "FailedResponse", "HTTPResult", "RequestMessage", "SuccessResponse", "HTTPClient"]
+__all__ = [
+    "ErrorDetails",
+    "FailedRequest",
+    "FailedResponse",
+    "HTTPResult",
+    "RequestMessage",
+    "SuccessResponse",
+    "HTTPClient",
+]
