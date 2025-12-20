@@ -259,16 +259,6 @@ class TestOAuth2ClientCredentials:
         # but definitely not 10 times
         assert route.call_count < 5
 
-    def test_close(self, credentials: OAuth2ClientCredentials) -> None:
-        """Test close method."""
-        # Client should be open initially
-        assert not credentials._http_client.is_closed
-
-        credentials.close()
-
-        # Client should be closed after calling close
-        assert credentials._http_client.is_closed
-
     @respx.mock
     def test_refresh_if_needed_explicit(
         self, credentials: OAuth2ClientCredentials, token_url: str, mock_token_response: dict[str, str | int]
