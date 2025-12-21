@@ -5,6 +5,7 @@ import pytest
 from cognite.pygen._client.models import (
     Constraint,
     ConstraintDefinition,
+    ContainerDirectReference,
     ContainerReference,
     ContainerRequest,
     ContainerResponse,
@@ -18,6 +19,7 @@ from cognite.pygen._client.models import (
     SpaceReference,
     SpaceRequest,
     SpaceResponse,
+    ViewDirectReference,
     ViewPropertyDefinition,
     ViewReference,
     ViewRequest,
@@ -146,6 +148,19 @@ class TestView:
             "missing from the ViewResponseProperty/ViewRequestProperty union:"
             f" {humanize_collection([cls.__name__ for cls in missing])}"
         )
+
+    def test_view_request_without_properties_in_data(self) -> None:
+        """Test that ViewRequest validates even when properties is missing from the raw data."""
+        view_data: dict[str, Any] = {
+            "space": "my_space",
+            "externalId": "my_view",
+            "version": "v1",
+            "filter": None,
+            "properties": {},
+        }
+        # The validator should handle this gracefully
+        view_request = ViewRequest.model_validate(view_data)
+        assert view_request.properties == {}
 
     def test_view_request_used_containers(self) -> None:
         """Test that ViewRequest.used_containers returns all container references from core properties."""
@@ -455,3 +470,21 @@ class TestDataModel:
         data_model_response = DataModelResponse.model_validate(data_model_data)
         dumped = data_model_response.model_dump(by_alias=True)
         assert dumped["views"] is None
+
+
+class TestDirectReferences:
+    def test_container_direct_reference_str(self) -> None:
+        """Test that ContainerDirectReference __str__ returns the expected format."""
+        ref = ContainerDirectReference(
+            source=ContainerReference(space="my_space", external_id="my_container"),
+            identifier="my_property",
+        )
+        assert str(ref) == "my_space:my_container.my_property"
+
+    def test_view_direct_reference_str(self) -> None:
+        """Test that ViewDirectReference __str__ returns the expected format."""
+        ref = ViewDirectReference(
+            source=ViewReference(space="my_space", external_id="my_view", version="v1"),
+            identifier="my_property",
+        )
+        assert str(ref) == "my_space:my_view(version=v1).my_property"
