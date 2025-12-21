@@ -6,9 +6,9 @@ from cognite.pygen._version import __version__
 
 @dataclass
 class PygenClientConfig:
-    credentials: Credentials
     cdf_url: str
     project: str
+    credentials: Credentials
     client_name: str = f"CognitePygen:{__version__}:GenerateSDK"
 
     api_subversion: str = "20230101"
@@ -22,9 +22,9 @@ class PygenClientConfig:
             str: The base API URL.
 
         Examples:
-            >>> config = PygenClientConfig(cdf_url="https://bluefield.cognitedata.com", ...)
+            >>> config = PygenClientConfig("https://bluefield.cognitedata.com", "my_project", ...)
             >>> config.base_api_url
-            "https://bluefield.cognitedata.com/api/v1/my_project"
+            'https://bluefield.cognitedata.com/api/v1/projects/my_project'
         """
         return f"{self.cdf_url}/api/v1/projects/{self.project}"
 
@@ -38,9 +38,13 @@ class PygenClientConfig:
             str: The full API URL.
 
         Examples:
-            >>> config = PygenClientConfig(...)
+            >>> config = PygenClientConfig(
+            ...     cdf_url="https://bluefield.cognitedata.com",
+            ...     project="my_project",
+            ...     credentials=...,
+            ... )
             >>> config.create_api_url("/models/instances")
-            "https://bluefield.cognitedata.com/api/v1/my_project/models/instances"
+            'https://bluefield.cognitedata.com/api/v1/projects/my_project/models/instances'
         """
         if not endpoint.startswith("/"):
             endpoint = f"/{endpoint}"

@@ -18,7 +18,7 @@ class DummyCredentials(Credentials):
 
 @pytest.fixture(scope="module")
 def pygen_client_config() -> PygenClientConfig:
-    return PygenClientConfig(DummyCredentials(), "https://example.com", "test_project")
+    return PygenClientConfig("https://example.com", "test_project", DummyCredentials())
 
 
 @pytest.fixture

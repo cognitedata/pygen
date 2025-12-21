@@ -24,14 +24,6 @@ class OAuth2ClientCredentials(Credentials):
         audience: Optional audience parameter for the token request
         refresh_margin: Time in seconds before expiry to refresh the token (default: 300)
 
-    Example:
-        >>> credentials = OAuth2ClientCredentials(
-        ...     token_url="https://login.microsoftonline.com/tenant/oauth2/v2.0/token",
-        ...     client_id="my-client-id",
-        ...     client_secret="my-client-secret",
-        ...     scopes=["https://api.cognitedata.com/.default"],
-        ... )
-        >>> headers = credentials.authorization_header()
     """
 
     def __init__(
