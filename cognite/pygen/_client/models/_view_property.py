@@ -26,9 +26,7 @@ class ViewCoreProperty(ViewPropertyDefinition, ABC):
     @field_serializer("container", mode="plain")
     @classmethod
     def serialize_container(cls, container: ContainerReference, info: FieldSerializationInfo) -> dict[str, Any]:
-        output = container.model_dump(**vars(info))
-        output["type"] = "container"
-        return output
+        return {**container.model_dump(**vars(info)), "type": "container"}
 
 
 class ViewCorePropertyRequest(ViewCoreProperty):
@@ -39,9 +37,7 @@ class ViewCorePropertyRequest(ViewCoreProperty):
     def serialize_source(cls, source: ViewReference | None, info: FieldSerializationInfo) -> dict[str, Any] | None:
         if source is None:
             return None
-        output = source.model_dump(**vars(info))
-        output["type"] = "view"
-        return output
+        return {**source.model_dump(**vars(info)), "type": "view"}
 
 
 class ConstraintOrIndexState(BaseModelObject):

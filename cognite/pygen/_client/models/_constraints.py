@@ -25,9 +25,7 @@ class RequiresConstraintDefinition(ConstraintDefinition):
     @field_serializer("require", mode="plain")
     @classmethod
     def serialize_require(cls, require: ContainerReference, info: FieldSerializationInfo) -> dict[str, Any]:
-        output = require.model_dump(**vars(info))
-        output["type"] = "container"
-        return output
+        return {**require.model_dump(**vars(info)), "type": "container"}
 
 
 Constraint = Annotated[

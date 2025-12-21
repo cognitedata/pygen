@@ -36,12 +36,7 @@ class DataModel(APIResource[DataModelReference], ABC):
     ) -> list[dict[str, Any]] | None:
         if views is None:
             return None
-        output: list[dict[str, Any]] = []
-        for view in views:
-            dumped = view.model_dump(**vars(info))
-            dumped["type"] = "view"
-            output.append(dumped)
-        return output
+        return [{**view.model_dump(**vars(info)), "type": "view"} for view in views]
 
 
 class DataModelRequest(DataModel): ...
