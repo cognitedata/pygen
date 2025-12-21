@@ -33,7 +33,7 @@ class APIResource(BaseModelObject, Generic[T_Reference], ABC):
 T_APIResource = TypeVar("T_APIResource", bound=APIResource)
 
 
-class ResponseResource(APIResource, Generic[T_APIResource], ABC):
+class ResponseResource(APIResource[T_Reference], Generic[T_Reference, T_APIResource], ABC):
     """Base class for all writeable data modeling resources."""
 
     @abstractmethod

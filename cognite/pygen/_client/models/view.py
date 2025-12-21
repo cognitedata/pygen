@@ -81,7 +81,7 @@ class ViewRequest(View):
         return {prop.container for prop in self.properties.values() if isinstance(prop, ViewCorePropertyRequest)}
 
 
-class ViewResponse(View, ResponseResource[ViewRequest]):
+class ViewResponse(View, ResponseResource[ViewReference, ViewRequest]):
     properties: dict[str, ViewResponseProperty]
 
     created_time: int

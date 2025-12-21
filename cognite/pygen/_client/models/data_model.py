@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Any
 
-from pydantic import Field, field_serializer
+from pydantic import field_serializer
 from pydantic_core.core_schema import FieldSerializationInfo
 
 from .references import DataModelReference, ViewReference
@@ -20,11 +20,7 @@ class DataModel(APIResource[DataModelReference], ABC):
     external_id: str
     version: str
     description: str | None = None
-    # The API supports View here, but in Neat we will only use ViewReference
-    views: list[ViewReference] | None = Field(
-        description="List of views included in this data model.",
-        default=None,
-    )
+    views: list[ViewReference] | None = None
 
     def as_reference(self) -> DataModelReference:
         return DataModelReference(
@@ -51,7 +47,7 @@ class DataModel(APIResource[DataModelReference], ABC):
 class DataModelRequest(DataModel): ...
 
 
-class DataModelResponse(DataModel, ResponseResource[DataModelRequest]):
+class DataModelResponse(DataModel, ResponseResource[DataModelReference, DataModelRequest]):
     created_time: int
     last_updated_time: int
     is_global: bool

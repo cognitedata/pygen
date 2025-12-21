@@ -40,7 +40,7 @@ class Container(APIResource[ContainerReference], ABC):
 class ContainerRequest(Container): ...
 
 
-class ContainerResponse(Container, ResponseResource[ContainerRequest]):
+class ContainerResponse(Container, ResponseResource[ContainerReference, ContainerRequest]):
     created_time: int
     last_updated_time: int
     is_global: bool

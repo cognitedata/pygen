@@ -16,7 +16,7 @@ class Space(APIResource[SpaceReference], ABC):
 class SpaceRequest(Space): ...
 
 
-class SpaceResponse(Space, ResponseResource[Space]):
+class SpaceResponse(Space, ResponseResource[SpaceReference, Space]):
     created_time: int
     last_updated_time: int
     is_global: bool
