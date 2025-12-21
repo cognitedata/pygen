@@ -1,7 +1,7 @@
 from abc import ABC
 
-from .references import SpaceReference
-from .resource import APIResource, ResponseResource
+from ._references import SpaceReference
+from ._resource import APIResource, ResponseResource
 
 
 class Space(APIResource[SpaceReference], ABC):

@@ -3,11 +3,11 @@ from typing import Literal
 
 from pydantic import JsonValue
 
-from .constraints import Constraint
-from .data_types import DataType
-from .indexes import Index
-from .references import ContainerReference
-from .resource import APIResource, BaseModelObject, ResponseResource
+from ._constraints import Constraint
+from ._data_types import DataType
+from ._indexes import Index
+from ._references import ContainerReference
+from ._resource import APIResource, BaseModelObject, ResponseResource
 
 
 class ContainerPropertyDefinition(BaseModelObject):

@@ -4,8 +4,8 @@ from typing import Annotated, Any, Literal
 from pydantic import Field, TypeAdapter, field_serializer
 from pydantic_core.core_schema import FieldSerializationInfo
 
-from .references import ContainerReference
-from .resource import BaseModelObject
+from ._references import ContainerReference
+from ._resource import BaseModelObject
 
 
 class ConstraintDefinition(BaseModelObject, ABC):

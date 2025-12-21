@@ -4,10 +4,10 @@ from typing import Any, Literal
 from pydantic import Field, JsonValue, field_serializer, model_validator
 from pydantic_core.core_schema import FieldSerializationInfo
 
-from .data_types import DirectNodeRelation
-from .references import ContainerReference, ViewReference
-from .resource import APIResource, ResponseResource
-from .view_property import (
+from ._data_types import DirectNodeRelation
+from ._references import ContainerReference, ViewReference
+from ._resource import APIResource, ResponseResource
+from ._view_property import (
     MultiReverseDirectRelationPropertyResponse,
     SingleReverseDirectRelationPropertyResponse,
     ViewCorePropertyRequest,

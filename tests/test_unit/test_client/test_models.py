@@ -1,8 +1,13 @@
 from typing import get_args
 
-from cognite.pygen._client.models.constraints import Constraint, ConstraintDefinition
-from cognite.pygen._client.models.data_types import DataType, PropertyTypeDefinition
-from cognite.pygen._client.models.indexes import Index, IndexDefinition
+from cognite.pygen._client.models._constraints import Constraint, ConstraintDefinition
+from cognite.pygen._client.models._data_types import DataType, PropertyTypeDefinition
+from cognite.pygen._client.models._indexes import Index, IndexDefinition
+from cognite.pygen._client.models._view_property import (
+    ViewPropertyDefinition,
+    ViewRequestProperty,
+    ViewResponseProperty,
+)
 from cognite.pygen._utils.collection import humanize_collection
 from tests.utils import get_concrete_subclasses
 
@@ -36,4 +41,14 @@ class TestContainer:
         )
 
 
-class TestView: ...
+class TestView:
+    def test_all_view_properties_are_in_union(self) -> None:
+        all_view_properties = get_concrete_subclasses(ViewPropertyDefinition, exclude_direct_abc_inheritance=True)
+        all_response_properties = get_args(ViewResponseProperty.__args__[0])
+        all_request_properties = get_args(ViewRequestProperty.__args__[0])
+        missing = set(all_view_properties) - set(all_response_properties) - set(all_request_properties)
+        assert not missing, (
+            "The following ViewPropertyDefinition subclasses are "
+            "missing from the ViewResponseProperty/ViewRequestProperty union:"
+            f" {humanize_collection([cls.__name__ for cls in missing])}"
+        )

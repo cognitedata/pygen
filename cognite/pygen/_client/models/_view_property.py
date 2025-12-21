@@ -4,9 +4,9 @@ from typing import Annotated, Any, Literal
 from pydantic import Field, Json, TypeAdapter, field_serializer
 from pydantic_core.core_schema import FieldSerializationInfo
 
-from .data_types import DataType
-from .references import ContainerDirectReference, ContainerReference, NodeReference, ViewDirectReference, ViewReference
-from .resource import BaseModelObject
+from ._data_types import DataType
+from ._references import ContainerDirectReference, ContainerReference, NodeReference, ViewDirectReference, ViewReference
+from ._resource import BaseModelObject
 
 
 class ViewPropertyDefinition(BaseModelObject, ABC):

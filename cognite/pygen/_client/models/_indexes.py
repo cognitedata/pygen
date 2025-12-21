@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field, TypeAdapter
 
-from .resource import BaseModelObject
+from ._resource import BaseModelObject
 
 
 class IndexDefinition(BaseModelObject, ABC):

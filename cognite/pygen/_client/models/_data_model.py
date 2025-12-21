@@ -4,8 +4,8 @@ from typing import Any
 from pydantic import field_serializer
 from pydantic_core.core_schema import FieldSerializationInfo
 
-from .references import DataModelReference, ViewReference
-from .resource import APIResource, ResponseResource
+from ._references import DataModelReference, ViewReference
+from ._resource import APIResource, ResponseResource
 
 
 class DataModel(APIResource[DataModelReference], ABC):

@@ -3,8 +3,8 @@ from typing import Annotated, Literal
 
 from pydantic import Field, TypeAdapter
 
-from .references import ContainerReference, ViewReference
-from .resource import BaseModelObject
+from ._references import ContainerReference, ViewReference
+from ._resource import BaseModelObject
 
 
 class PropertyTypeDefinition(BaseModelObject, ABC):

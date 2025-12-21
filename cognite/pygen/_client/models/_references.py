@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import Field
 
-from .resource import ReferenceObject
+from ._resource import ReferenceObject
 
 
 class SpaceReference(ReferenceObject):
