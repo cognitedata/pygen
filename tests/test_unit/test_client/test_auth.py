@@ -1,5 +1,7 @@
 """Tests for OAuth2 authentication."""
 
+# Simulate concurrent access
+import threading
 from datetime import datetime, timedelta
 
 import httpx
@@ -171,7 +173,7 @@ class TestOAuth2ClientCredentials:
         with pytest.raises(OAuth2Error) as exc_info:
             credentials.authorization_header()
 
-        assert "missing access_token field" in str(exc_info.value)
+        assert "Invalid token response from server" in str(exc_info.value)
 
     @respx.mock
     def test_default_expiry(self, credentials: OAuth2ClientCredentials, token_url: str) -> None:
@@ -237,9 +239,6 @@ class TestOAuth2ClientCredentials:
         """Test that token refresh is thread-safe."""
         route = respx.post(token_url).mock(return_value=httpx.Response(200, json=mock_token_response))
 
-        # Simulate concurrent access
-        import threading
-
         results: list[tuple[str, str]] = []
 
         def get_token() -> None:
@@ -255,9 +254,8 @@ class TestOAuth2ClientCredentials:
         assert len(results) == 10
         assert all(r == results[0] for r in results)
 
-        # Token should only be requested once (or a few times due to race conditions)
-        # but definitely not 10 times
-        assert route.call_count < 5
+        # Token should only be requested once
+        assert route.call_count == 1
 
     @respx.mock
     def test_refresh_if_needed_explicit(

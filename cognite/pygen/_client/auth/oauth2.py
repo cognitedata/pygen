@@ -4,9 +4,15 @@ from datetime import datetime, timedelta
 from threading import Lock
 
 import httpx
+from pydantic import BaseModel, ValidationError
 
 from cognite.pygen._client.auth.credentials import Credentials
 from cognite.pygen._client.exceptions import OAuth2Error
+
+
+class _TokenResponse(BaseModel):
+    access_token: str
+    expires_in: int = 3600
 
 
 class OAuth2ClientCredentials(Credentials):
@@ -98,10 +104,8 @@ class OAuth2ClientCredentials(Credentials):
             "client_id": self.client_id,
             "client_secret": self.client_secret,
         }
-
         if self.scopes:
             data["scope"] = " ".join(self.scopes)
-
         if self.audience:
             data["audience"] = self.audience
 
@@ -113,16 +117,13 @@ class OAuth2ClientCredentials(Credentials):
         except httpx.RequestError as e:
             raise OAuth2Error(f"Token request failed: {e}") from e
 
-        token_data = response.json()
+        try:
+            token_data = _TokenResponse.model_validate_json(response.text)
+        except ValidationError as e:
+            raise OAuth2Error(f"Invalid token response from server: {e}") from e
+        self._access_token = token_data.access_token
 
-        if "access_token" not in token_data:
-            raise OAuth2Error("Response missing access_token field")
-
-        self._access_token = token_data["access_token"]
-
-        # Calculate token expiry
-        expires_in = token_data.get("expires_in", 3600)  # Default to 1 hour
-        self._token_expiry = datetime.now() + timedelta(seconds=expires_in)
+        self._token_expiry = datetime.now() + timedelta(seconds=token_data.expires_in)
 
     def close(self) -> None:
         """Close the HTTP client used for token requests."""
@@ -135,10 +136,3 @@ class OAuth2ClientCredentials(Credentials):
     def __exit__(self, *args) -> None:
         """Context manager support - closes HTTP client."""
         self.close()
-
-    def __del__(self) -> None:
-        """Cleanup HTTP client on deletion."""
-        try:
-            self.close()
-        except Exception:
-            pass  # Ignore errors during cleanup
