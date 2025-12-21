@@ -19,4 +19,4 @@ class Credentials(ABC):
         Returns:
             A tuple containing the header name and header value.
         """
-        pass
+        raise NotImplementedError()

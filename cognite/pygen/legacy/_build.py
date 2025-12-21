@@ -7,7 +7,6 @@ import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 
-import pandas as pd
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client._version import __version__ as cognite_sdk_version
@@ -59,7 +58,7 @@ def build_wheel(
         config: The configuration used to control how to generate the SDK.
     """
     try:
-        from build import ProjectBuilder  # type: ignore[import-not-found]
+        from build import ProjectBuilder  # type: ignore[import-not-found, attr-defined]
     except ImportError:
         raise ImportError(
             "'build' is required to build wheel. Install pygen with `pip install pygen[cli] or "
@@ -104,6 +103,8 @@ def build_wheel(
 
 
 def generate_pyproject_toml(build_dir: Path, package_name: str, version: str) -> None:
+    import pandas as pd
+
     pyproject_toml = build_dir / "pyproject.toml"
     pyproject_toml.write_text(
         f"""[project]

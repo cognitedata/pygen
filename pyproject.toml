@@ -154,7 +154,7 @@ testpaths = ["tests", "cognite/pygen"]
 
 [tool.coverage.run]
 source = ["cognite.pygen"]
-omit = ["*/tests/*", "*/__pycache__/*", "examples/*"]
+omit = ["*/tests/*", "*/__pycache__/*", "examples/*", "*/legacy/*"]
 
 [tool.coverage.report]
 exclude_lines = [

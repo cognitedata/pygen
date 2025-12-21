@@ -1,6 +1,6 @@
 # Pygen Rewrite - Progress Tracking
 
-**Last Updated**: December 20, 2025
+**Last Updated**: December 21, 2025
 
 This document tracks the actual progress of the Pygen rewrite implementation.
 
@@ -11,15 +11,16 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 | Phase | Status | Start Date | End Date | Duration |
 |-------|--------|------------|----------|----------|
 | Phase 0: Foundation & Setup | ✅ Complete | Dec 2025 | Dec 20, 2025 | ~1 week |
-| Phase 1: Pygen Client Core | ⏳ Not Started | - | - | 3-4 weeks (planned) |
+| Phase 1: Pygen Client Core | 🔄 In Progress (33%) | Dec 21, 2025 | - | 3-4 weeks (planned) |
 | Phase 2: Validation & IR | ⏳ Not Started | - | - | 3-4 weeks (planned) |
 | Phase 3: Python Generator MVP | ⏳ Not Started | - | - | 3-4 weeks (planned) |
 | Phase 4: Runtime & Lazy Evaluation | ⏳ Not Started | - | - | 3-4 weeks (planned) |
 | Phase 5: Feature Parity | ⏳ Not Started | - | - | 4-6 weeks (planned) |
-| Phase 6: Multi-Language Foundation | ⏳ Not Started | - | - | 3-4 weeks (planned) |
-| Phase 7: API Service | ⏳ Not Started | - | - | 2-3 weeks (planned) |
-| Phase 8: Production Hardening | ⏳ Not Started | - | - | 2-3 weeks (planned) |
-| Phase 9: Migration & Documentation | ⏳ Not Started | - | - | 2-3 weeks (planned) |
+| Phase 6: Query Builder & Optimizer | ⏳ Not Started | - | - | 2-3 weeks (planned) |
+| Phase 7: Multi-Language Foundation | ⏳ Not Started | - | - | 3-4 weeks (planned) |
+| Phase 8: API Service | ⏳ Not Started | - | - | 2-3 weeks (planned) |
+| Phase 9: Production Hardening | ⏳ Not Started | - | - | 2-3 weeks (planned) |
+| Phase 10: Migration & Documentation | ⏳ Not Started | - | - | 2-3 weeks (planned) |
 
 ---
 
@@ -76,27 +77,31 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 
 ---
 
-## Phase 1: Pygen Client Core ⏳
+## Phase 1: Pygen Client Core 🔄
 
-**Status**: Not Started  
+**Status**: In Progress  
 **Planned Duration**: 3-4 weeks  
-**Start Date**: TBD
+**Start Date**: December 21, 2025
 
-### Planned Tasks
+### Completed Tasks
 
-1. **HTTP Client Foundation**
-   - [ ] Implement internal HTTPClient wrapper around httpx
-   - [ ] Add authentication support
-   - [ ] Implement rate limiting
-   - [ ] Add retry logic with exponential backoff
-   - [ ] Connection pooling configuration
-   - [ ] Request/response logging
+1. **HTTP Client Foundation** ✅
+   - ✅ Implemented internal HTTPClient wrapper around httpx
+   - ✅ Added authentication support (integrated with Task 2)
+   - ✅ Implemented rate limiting
+   - ✅ Added retry logic with exponential backoff
+   - ✅ Connection pooling configuration
+   - ✅ Request/response logging
 
-2. **Query Builder/Optimizer**
-   - [ ] Implement query builder for simplifying complex queries
-   - [ ] Add filter composition
-   - [ ] Add query optimization logic
-   - [ ] Support for common query patterns from v1
+2. **Authentication Support** ✅
+   - ✅ Token-based authentication
+   - ✅ OAuth2 flow support
+   - ✅ Token refresh logic
+   - ✅ Support for different authentication providers
+   - ✅ Integration with CDF authentication
+   - ✅ Authentication code placed under `cognite/pygen/_client/auth/`
+
+### In Progress Tasks
 
 3. **Pydantic Models for API Objects**
    - [ ] DataModel model
@@ -126,8 +131,13 @@ This document tracks the actual progress of the Pygen rewrite implementation.
    - [ ] Test coverage >90%
    - [ ] Performance benchmarks
 
-### Deliverables (Pending)
+### Note on Query Builder
+Query Builder/Optimizer implementation has been moved to Phase 6 as per the updated roadmap structure.
 
+### Deliverables
+
+- ✅ HTTPClient wrapper with retry, rate limiting, and connection pooling
+- ✅ Authentication system with OAuth2 support
 - [ ] Working PygenClient class
 - [ ] All CRUD operations implemented
 - [ ] Comprehensive test suite
@@ -144,7 +154,8 @@ Details for Phases 2-9 will be updated as they are started and completed.
 ## Key Milestones
 
 - ✅ **M0**: Phase 0 Complete - Project reorganized and ready (Dec 20, 2025)
-- ⏳ **M1**: Phase 1 Complete - Working client with HTTPClient and QueryBuilder
+- 🔄 **M0.5**: Phase 1 Tasks 1-2 Complete - HTTPClient and Authentication working (Dec 21, 2025)
+- ⏳ **M1**: Phase 1 Complete - Working client with HTTPClient and full resource APIs
 - ⏳ **M2**: Phase 3 Complete - Can generate Python SDK
 - ⏳ **M3**: Phase 5 Complete - Feature parity achieved
 - ⏳ **M4**: Phase 7 Complete - Beta release
@@ -154,9 +165,10 @@ Details for Phases 2-9 will be updated as they are started and completed.
 
 ## Overall Progress
 
-**Phases Complete**: 1 / 9 (11%)  
-**Estimated Time Remaining**: 23-35 weeks  
-**Current Phase**: Phase 1 (Not Started)
+**Phases Complete**: 1 / 10 (10%)  
+**Current Phase**: Phase 1 - Pygen Client Core (33% complete)  
+**Tasks Complete This Phase**: 2 / 6 tasks  
+**Estimated Time Remaining**: 21-33 weeks  
 
 ---
 
@@ -169,12 +181,31 @@ Details for Phases 2-9 will be updated as they are started and completed.
 3. CI/CD pipeline adapted smoothly to the dual structure
 4. Ready to begin Phase 1 implementation
 
+### Phase 1 Progress Notes
+
+#### Task 1: HTTP Client Foundation ✅ (Completed Dec 21, 2025)
+- Implemented robust HTTPClient wrapper around httpx
+- Rate limiting with token bucket algorithm
+- Exponential backoff retry logic with jitter
+- Configurable connection pooling
+- Comprehensive request/response logging
+- Full test coverage for all HTTP operations
+
+#### Task 2: Authentication Support ✅ (Completed Dec 21, 2025)
+- Token-based authentication implemented
+- OAuth2 Client Credentials flow fully supported
+- Automatic token refresh with thread-safe locking
+- Support for multiple authentication providers (Token, OAuth2 Client Credentials, OAuth2 Interactive)
+- Seamless integration with CDF authentication patterns
+- Well-organized code structure in `cognite/pygen/_client/auth/`
+- Comprehensive test coverage including integration tests
+
 ### Next Steps
 
-1. Begin Phase 1: HTTPClient wrapper implementation
-2. Set up basic project structure for v2 core
-3. Implement authentication and basic HTTP operations
-4. Start building Pydantic models for CDF API objects
+1. Continue Phase 1: Implement Pydantic models for API objects
+2. Build resource clients (Spaces, DataModels, Views, Containers, Instances)
+3. Implement error handling hierarchy
+4. Complete test suite for remaining Phase 1 components
 
 ---
 
