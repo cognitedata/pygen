@@ -82,23 +82,16 @@ from ._view_property import (
 )
 
 __all__ = [
-    # Resource
     "APIResource",
     "BaseModelObject",
-    # Data Types
     "BooleanProperty",
-    # Indexes
     "BtreeIndex",
-    # View Property
     "ConnectionPropertyDefinition",
-    # Constraints
     "Constraint",
     "ConstraintAdapter",
     "ConstraintDefinition",
     "ConstraintOrIndexState",
-    # Container
     "Container",
-    # References
     "ContainerConstraintReference",
     "ContainerDirectReference",
     "ContainerIndexReference",
@@ -107,7 +100,6 @@ __all__ = [
     "ContainerRequest",
     "ContainerResponse",
     "DataModelReference",
-    # Data Model
     "DataModelRequest",
     "DataModelResponse",
     "DataType",
@@ -142,7 +134,6 @@ __all__ = [
     "SingleEdgeProperty",
     "SingleReverseDirectRelationPropertyRequest",
     "SingleReverseDirectRelationPropertyResponse",
-    # Space
     "Space",
     "SpaceReference",
     "SpaceRequest",
@@ -152,7 +143,6 @@ __all__ = [
     "TimestampProperty",
     "UniquenessConstraintDefinition",
     "Unit",
-    # View
     "View",
     "ViewCoreProperty",
     "ViewCorePropertyRequest",

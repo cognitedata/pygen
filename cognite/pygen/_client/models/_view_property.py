@@ -76,9 +76,7 @@ class EdgeProperty(ConnectionPropertyDefinition, ABC):
     def serialize_source(cls, source: ViewReference | None, info: FieldSerializationInfo) -> dict[str, Any] | None:
         if source is None:
             return None
-        output = source.model_dump(**vars(info))
-        output["type"] = "view"
-        return output
+        return {**source.model_dump(**vars(info)), "type": "view"}
 
 
 class SingleEdgeProperty(EdgeProperty):
@@ -95,10 +93,8 @@ class ReverseDirectRelationProperty(ConnectionPropertyDefinition, ABC):
 
     @field_serializer("source", mode="plain")
     @classmethod
-    def serialize_source(cls, source: ViewReference, info: FieldSerializationInfo) -> dict[str, Any] | None:
-        output = source.model_dump(**vars(info))
-        output["type"] = "view"
-        return output
+    def serialize_source(cls, source: ViewReference, info: FieldSerializationInfo) -> dict[str, Any]:
+        return {**source.model_dump(**vars(info)), "type": "view"}
 
     @field_serializer("through", mode="plain")
     @classmethod
