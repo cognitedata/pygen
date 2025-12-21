@@ -11,7 +11,7 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 | Phase | Status | Start Date | End Date | Duration |
 |-------|--------|------------|----------|----------|
 | Phase 0: Foundation & Setup | ✅ Complete | Dec 2025 | Dec 20, 2025 | ~1 week |
-| Phase 1: Pygen Client Core | 🔄 In Progress (33%) | Dec 21, 2025 | - | 3-4 weeks (planned) |
+| Phase 1: Pygen Client Core | 🔄 In Progress (50%) | Dec 21, 2025 | - | 3-4 weeks (planned) |
 | Phase 2: Validation & IR | ⏳ Not Started | - | - | 3-4 weeks (planned) |
 | Phase 3: Python Generator MVP | ⏳ Not Started | - | - | 3-4 weeks (planned) |
 | Phase 4: Runtime & Lazy Evaluation | ⏳ Not Started | - | - | 3-4 weeks (planned) |
@@ -101,16 +101,16 @@ This document tracks the actual progress of the Pygen rewrite implementation.
    - ✅ Integration with CDF authentication
    - ✅ Authentication code placed under `cognite/pygen/_client/auth/`
 
-### In Progress Tasks
+3. **Pydantic Models for API Objects** ✅
+   - ✅ DataModel model
+   - ✅ View model
+   - ✅ Container model
+   - ✅ Space model
+   - ✅ Instance model
+   - ✅ Query models
+   - ✅ Error response models
 
-3. **Pydantic Models for API Objects**
-   - [ ] DataModel model
-   - [ ] View model
-   - [ ] Container model
-   - [ ] Space model
-   - [ ] Instance model
-   - [ ] Query models
-   - [ ] Error response models
+### In Progress Tasks
 
 4. **Resource Clients**
    - [ ] SpacesAPI (list, create, retrieve, delete)
@@ -154,7 +154,8 @@ Details for Phases 2-9 will be updated as they are started and completed.
 ## Key Milestones
 
 - ✅ **M0**: Phase 0 Complete - Project reorganized and ready (Dec 20, 2025)
-- 🔄 **M0.5**: Phase 1 Tasks 1-2 Complete - HTTPClient and Authentication working (Dec 21, 2025)
+- ✅ **M0.5**: Phase 1 Tasks 1-2 Complete - HTTPClient and Authentication working (Dec 21, 2025)
+- 🔄 **M0.75**: Phase 1 Task 3 Complete - Pydantic models for API objects ready (Dec 21, 2025)
 - ⏳ **M1**: Phase 1 Complete - Working client with HTTPClient and full resource APIs
 - ⏳ **M2**: Phase 3 Complete - Can generate Python SDK
 - ⏳ **M3**: Phase 5 Complete - Feature parity achieved
@@ -166,8 +167,8 @@ Details for Phases 2-9 will be updated as they are started and completed.
 ## Overall Progress
 
 **Phases Complete**: 1 / 10 (10%)  
-**Current Phase**: Phase 1 - Pygen Client Core (33% complete)  
-**Tasks Complete This Phase**: 2 / 6 tasks  
+**Current Phase**: Phase 1 - Pygen Client Core (50% complete)  
+**Tasks Complete This Phase**: 3 / 6 tasks  
 **Estimated Time Remaining**: 21-33 weeks  
 
 ---
@@ -200,12 +201,19 @@ Details for Phases 2-9 will be updated as they are started and completed.
 - Well-organized code structure in `cognite/pygen/_client/auth/`
 - Comprehensive test coverage including integration tests
 
+#### Task 3: Pydantic Models for API Objects ✅ (Completed Dec 21, 2025)
+- Complete Pydantic models for all CDF Data Modeling API objects
+- DataModel, View, Container, Space models implemented
+- Instance and Query models implemented
+- Error response models implemented
+- All models use Pydantic v2 with proper validation
+- Models are ready for use in resource clients
+
 ### Next Steps
 
-1. Continue Phase 1: Implement Pydantic models for API objects
-2. Build resource clients (Spaces, DataModels, Views, Containers, Instances)
-3. Implement error handling hierarchy
-4. Complete test suite for remaining Phase 1 components
+1. Continue Phase 1: Build resource clients (Spaces, DataModels, Views, Containers, Instances)
+2. Implement error handling hierarchy
+3. Complete test suite for remaining Phase 1 components
 
 ---
 

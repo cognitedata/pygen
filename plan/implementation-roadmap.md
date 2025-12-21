@@ -118,12 +118,12 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - ✅ Integration with CDF authentication
    - ✅ The authentication code should be placed under `cognite/pygen/_client/auth/`
 
-3. **Pydantic Models for API Objects**
-   - [ ] DataModel model
-   - [ ] View model
-   - [ ] Container model
-   - [ ] Space model
-   - [ ] Error response models
+3. **Pydantic Models for API Objects** ✅
+   - ✅ DataModel model
+   - ✅ View model
+   - ✅ Container model
+   - ✅ Space model
+   - ✅ Error response models
 
 4. **Resource Clients**
    - [ ] SpacesAPI (list, create, retrieve, delete)
@@ -162,12 +162,12 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 - ✅ Task 1: HTTP Client Foundation - Complete
 - ✅ Task 2: Authentication Support - Complete  
-- ⏳ Task 3: Pydantic Models for API Objects - Not Started
+- ✅ Task 3: Pydantic Models for API Objects - Complete
 - ⏳ Task 4: Resource Clients - Not Started
 - ⏳ Task 5: Error Handling - Not Started
 - ⏳ Task 6: Testing - Not Started
 
-**Progress**: 2/6 tasks complete (33%)
+**Progress**: 3/6 tasks complete (50%)
 
 ### Dependencies
 - Phase 0 complete
