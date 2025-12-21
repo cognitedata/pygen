@@ -1,0 +1,116 @@
+from abc import ABC
+from typing import Any, Literal
+
+from pydantic import Field, JsonValue, field_serializer, model_validator
+from pydantic_core.core_schema import FieldSerializationInfo
+
+from .data_types import DirectNodeRelation
+from .references import ContainerReference, ViewReference
+from .resource import APIResource, ResponseResource
+from .view_property import (
+    MultiReverseDirectRelationPropertyResponse,
+    SingleReverseDirectRelationPropertyResponse,
+    ViewCorePropertyRequest,
+    ViewCorePropertyResponse,
+    ViewRequestProperty,
+    ViewResponseProperty,
+)
+
+
+class View(APIResource[ViewReference], ABC):
+    space: str
+    external_id: str
+    version: str
+    name: str | None = None
+    description: str | None = None
+    filter: JsonValue | None
+    implements: list[ViewReference] | None = None
+
+    def as_reference(self) -> ViewReference:
+        return ViewReference(space=self.space, external_id=self.external_id, version=self.version)
+
+    @model_validator(mode="before")
+    def set_connection_type_on_primary_properties(cls, data: dict) -> dict:
+        if "properties" not in data:
+            return data
+        properties = data["properties"]
+        if not isinstance(properties, dict):
+            return data
+        # We assume all properties without connectionType are core properties.
+        # The reason we set connectionType it easy for pydantic to discriminate the union.
+        # This also leads to better error messages, as if there is a union and pydantic do not know which
+        # type to pick it will give errors from all type in the union.
+        new_properties: dict[str, Any] = {}
+        for prop_id, prop in properties.items():
+            if isinstance(prop, dict) and "connectionType" not in prop:
+                prop_copy = prop.copy()
+                prop_copy["connectionType"] = "primary_property"
+                new_properties[prop_id] = prop_copy
+            else:
+                new_properties[prop_id] = prop
+        if new_properties:
+            new_data = data.copy()
+            new_data["properties"] = new_properties
+            return new_data
+
+        return data
+
+    @field_serializer("implements", mode="plain")
+    @classmethod
+    def serialize_implements(
+        cls, implements: list[ViewReference] | None, info: FieldSerializationInfo
+    ) -> list[dict[str, Any]] | None:
+        if implements is None:
+            return None
+        output: list[dict[str, Any]] = []
+        for view in implements:
+            dumped = view.model_dump(**vars(info))
+            dumped["type"] = "view"
+            output.append(dumped)
+        return output
+
+
+class ViewRequest(View):
+    properties: dict[str, ViewRequestProperty] = Field(
+        description="View with included properties and expected edges, indexed by a unique space-local identifier."
+    )
+
+    @property
+    def used_containers(self) -> set[ContainerReference]:
+        """Get all containers referenced by this view."""
+        return {prop.container for prop in self.properties.values() if isinstance(prop, ViewCorePropertyRequest)}
+
+
+class ViewResponse(View, ResponseResource[ViewRequest]):
+    properties: dict[str, ViewResponseProperty]
+
+    created_time: int
+    last_updated_time: int
+    writable: bool
+    queryable: bool
+    used_for: Literal["node", "edge", "all"]
+    is_global: bool
+    mapped_containers: list[ContainerReference]
+
+    def as_request(self) -> ViewRequest:
+        dumped = self.model_dump(by_alias=True, exclude={"properties"})
+        properties: dict[str, Any] = {}
+        for key, value in self.properties.items():
+            if isinstance(value, ViewCorePropertyResponse) and isinstance(value.type, DirectNodeRelation):
+                # Special case. In the request the source of DirectNodeRelation is set on the Property object,
+                # while in the response it is set on the DirectNodeRelation object.
+                request_object = value.as_request().model_dump(by_alias=True)
+                request_object["source"] = value.type.source.model_dump(by_alias=True) if value.type.source else None
+                properties[key] = request_object
+            elif isinstance(
+                value,
+                ViewCorePropertyResponse
+                | SingleReverseDirectRelationPropertyResponse
+                | MultiReverseDirectRelationPropertyResponse,
+            ):
+                properties[key] = value.as_request().model_dump(by_alias=True)
+            else:
+                properties[key] = value.model_dump(by_alias=True)
+
+        dumped["properties"] = properties
+        return ViewRequest.model_validate(dumped)
