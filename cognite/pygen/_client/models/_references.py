@@ -8,6 +8,9 @@ from ._resource import ReferenceObject
 class SpaceReference(ReferenceObject):
     space: str
 
+    def __str__(self) -> str:
+        return self.space
+
 
 class ContainerReference(ReferenceObject):
     type: Literal["container"] = Field("container", exclude=True)
