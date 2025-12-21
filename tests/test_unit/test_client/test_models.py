@@ -1,15 +1,42 @@
-from typing import get_args
+from typing import Any, get_args
 
-from cognite.pygen._client.models._constraints import Constraint, ConstraintDefinition
-from cognite.pygen._client.models._data_types import DataType, PropertyTypeDefinition
-from cognite.pygen._client.models._indexes import Index, IndexDefinition
-from cognite.pygen._client.models._view_property import (
+import pytest
+
+from cognite.pygen._client.models import (
+    Constraint,
+    ConstraintDefinition,
+    DataType,
+    Index,
+    IndexDefinition,
+    PropertyTypeDefinition,
+    SpaceReference,
+    SpaceRequest,
+    SpaceResponse,
     ViewPropertyDefinition,
     ViewRequestProperty,
     ViewResponseProperty,
 )
 from cognite.pygen._utils.collection import humanize_collection
 from tests.utils import get_concrete_subclasses
+
+
+@pytest.fixture(scope="module")
+def example_space_resource() -> dict[str, Any]:
+    return {
+        "space": "my_space",
+        "name": "example_space",
+        "description": "An example space for testing.",
+        "createdTime": 1625247600000,
+        "lastUpdatedTime": 1625247600000,
+        "isGlobal": False,
+    }
+
+
+class TestSpace:
+    def test_space_response(self, example_space_resource: dict[str, Any]) -> None:
+        space_response = SpaceResponse.model_validate(example_space_resource)
+        assert isinstance(space_response.as_reference(), SpaceReference)
+        assert isinstance(space_response.as_request(), SpaceRequest)
 
 
 class TestContainer:
