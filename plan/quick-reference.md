@@ -8,9 +8,9 @@
 
 **Goal**: Rewrite Pygen from scratch for better performance, scalability, and multi-language support
 
-**Timeline**: 23-33 weeks (6-8 months)
+**Timeline**: 26-39 weeks (6-9 months)
 
-**Status**: Phase 0 Complete ✅ - Ready for Phase 1
+**Status**: Phase 1 In Progress (33% complete) 🔄
 
 ---
 
@@ -24,20 +24,21 @@
 
 ---
 
-## 📅 9-Phase Roadmap
+## 📅 10-Phase Roadmap
 
 | Phase | Name | Duration | Status | Key Deliverable |
 |-------|------|----------|--------|-----------------|
 | 0 | Foundation | 1 week | ✅ Complete | Project reorganized, v1 in legacy/ |
-| 1 | Pygen Client | 3-4 weeks | ⏳ Next | httpx-based CDF client with HTTPClient |
+| 1 | Pygen Client | 3-4 weeks | 🔄 In Progress (33%) | httpx-based CDF client with HTTPClient |
 | 2 | Validation & IR | 3-4 weeks | ⏳ Pending | Validation + Language-agnostic IR |
 | 3 | Python Generator | 3-4 weeks | ⏳ Pending | Basic Python SDK generation |
 | 4 | Runtime & Lazy | 3-4 weeks | ⏳ Pending | Client-based lazy evaluation |
 | 5 | Feature Parity | 4-6 weeks | ⏳ Pending | Match original Pygen |
-| 6 | Multi-Language | 3-4 weeks | ⏳ Pending | TypeScript generator |
-| 7 | API Service | 2-3 weeks | ⏳ Pending | On-demand SDK generation |
-| 8 | Production | 2-3 weeks | ⏳ Pending | Hardening, optimization |
-| 9 | Release | 2-3 weeks | ⏳ Pending | Migration guide, docs |
+| 6 | Query Builder & Optimizer | 2-3 weeks | ⏳ Pending | Query builder/optimizer |
+| 7 | Multi-Language | 3-4 weeks | ⏳ Pending | TypeScript generator |
+| 8 | API Service | 2-3 weeks | ⏳ Pending | On-demand SDK generation |
+| 9 | Production | 2-3 weeks | ⏳ Pending | Hardening, optimization |
+| 10 | Release | 2-3 weeks | ⏳ Pending | Migration guide, docs |
 
 ---
 
@@ -208,6 +209,8 @@ pygen generate --config pygen.yaml
 
 ### Technical
 - [x] Phase 0 complete (Foundation)
+- [x] Phase 1 Tasks 1-2 complete (HTTPClient + Auth)
+- [ ] Phase 1 complete (Full client)
 - [ ] Test coverage >90%
 - [ ] 5-10x performance improvement
 - [ ] Memory usage O(chunk_size)
@@ -295,11 +298,12 @@ pygen generate --config pygen.yaml
 | Milestone | Description | Target | Status |
 |-----------|-------------|--------|--------|
 | **M0** | Phase 0 complete (Foundation) | Week 1 | ✅ Complete |
-| **M1** | Phase 1 complete (Client works) | Month 1-2 | ⏳ Next |
+| **M0.5** | Phase 1 Tasks 1-2 (HTTPClient + Auth) | Week 2 | ✅ Complete |
+| **M1** | Phase 1 complete (Client works) | Month 1-2 | 🔄 In Progress |
 | **M2** | Phase 3 complete (Can generate Python) | Month 3 | ⏳ Pending |
 | **M3** | Phase 5 complete (Feature parity) | Month 5 | ⏳ Pending |
 | **M4** | Phase 7 complete (Beta) | Month 7 | ⏳ Pending |
-| **M5** | Phase 9 complete (v2.0.0) | Month 8 | ⏳ Pending |
+| **M5** | Phase 10 complete (v2.0.0) | Month 9 | ⏳ Pending |
 
 ---
 
@@ -441,24 +445,36 @@ A: Modern type hints, pattern matching, performance.
 
 **Phase 0**: ✅ Complete (December 20, 2025)
 
-**Current Progress**:
-- ✅ V1 code moved to `cognite/pygen/legacy/`
-- ✅ Project reorganized for parallel v1/v2 development
-- ✅ Development environment validated
-- ✅ CI/CD pipeline working
-- ✅ Test infrastructure ready
+**Phase 1**: 🔄 In Progress (Started December 21, 2025)
 
-**Next Phase**: Phase 1 - Pygen Client Core (3-4 weeks)
+**Current Progress**:
+- ✅ Phase 0 complete - Project reorganized
+- ✅ V1 code moved to `cognite/pygen/legacy/`
+- ✅ Task 1: HTTP Client Foundation complete
+  - HTTPClient wrapper with rate limiting and retry logic
+  - Connection pooling and request/response logging
+  - Full test coverage
+- ✅ Task 2: Authentication Support complete
+  - Token-based authentication
+  - OAuth2 Client Credentials flow
+  - Automatic token refresh with thread safety
+  - Comprehensive test coverage
+- ⏳ Task 3: Pydantic models for API objects (next)
+- ⏳ Task 4: Resource clients
+- ⏳ Task 5: Error handling
+- ⏳ Task 6: Testing
+
+**Next Phase**: Phase 2 - Validation & IR (after Phase 1 complete)
 
 **Next Steps**:
-1. Begin HTTPClient wrapper implementation
-2. Implement Query Builder/Optimizer
-3. Create Pydantic models for CDF API objects
-4. Build resource clients (Spaces, DataModels, Views, etc.)
+1. Continue Phase 1: Implement Pydantic models for CDF API objects
+2. Build resource clients (Spaces, DataModels, Views, Containers, Instances)
+3. Implement custom error handling hierarchy
+4. Complete comprehensive test suite
 
 ---
 
-**Document Version**: 1.1
-**Last Updated**: December 20, 2025
+**Document Version**: 1.2
+**Last Updated**: December 21, 2025
 **For Details**: See full planning documents in `plan/` folder
 
