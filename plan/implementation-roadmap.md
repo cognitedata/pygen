@@ -200,35 +200,83 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 2. **Type System**
    - Define IRType hierarchy based on ViewResponse property types:
-     - Primitive types from DataType variants:
+     - **Primitive types from DataType variants:**
        - TextProperty → IRTextType
-       - Float32Property, Float64Property → IRFloatType (with unit support)
+         - Maps to Python `str`
+         - Supports max_text_size and collation constraints
+       - Float32Property, Float64Property → IRFloatType
+         - Maps to Python `float`
+         - Supports unit metadata (Unit with external_id and source_unit)
        - BooleanProperty → IRBoolType
+         - Maps to Python `bool`
        - Int32Property, Int64Property → IRIntType
+         - Maps to Python `int`
        - TimestampProperty → IRTimestampType
+         - Maps to Python `datetime.datetime` (read/write)
+         - Maps to `datetime` in typed hints
+         - ISO format serialization with milliseconds
        - DateProperty → IRDateType
+         - Maps to Python `datetime.date` (read/write)
+         - Maps to `date` in typed hints
+         - ISO format serialization
        - JSONProperty → IRJSONType
-     - CDF Reference types (external IDs):
+         - Maps to Python `dict`
+     - **CDF Reference types (external IDs):**
        - TimeseriesCDFExternalIdReference → IRTimeseriesReferenceType
+         - Read: `Union[TimeSeries, str, None]`
+         - Write: `Union[TimeSeriesWrite, str, None]`
+         - GraphQL: `Optional[TimeSeriesGraphQL]`
+         - Always nullable
        - FileCDFExternalIdReference → IRFileReferenceType
+         - Read: `Union[FileMetadata, str, None]`
+         - Write: `Union[FileMetadataWrite, str, None]`
+         - GraphQL: `Optional[FileMetadataGraphQL]`
+         - Always nullable
        - SequenceCDFExternalIdReference → IRSequenceReferenceType
-     - Container types:
+         - Read: `Union[SequenceRead, str, None]`
+         - Write: `Union[SequenceWrite, str, None]`
+         - GraphQL: `Optional[SequenceGraphQL]`
+         - Always nullable
+     - **Container types:**
        - Support for list types via `list` property on ListablePropertyTypeDefinition
        - Support for `max_list_size` constraint
-     - Connection types (derived from ViewResponseProperty variants):
-       - DirectNodeRelation → IRDirectRelationType (with source view reference)
-       - SingleEdgeProperty/MultiEdgeProperty → IREdgeType (deprecated, map to connections)
+       - Lists wrap the inner type: `list[T]` or `Optional[list[T]]`
+     - **Connection types (derived from ViewResponseProperty variants):**
+       - DirectNodeRelation → IRDirectRelationType
+         - One-to-one: Write: `DirectRelationReference | tuple[str, str] | None`, Read: `DirectRelationReference | None`
+         - One-to-many: Write: `list[DirectRelationReference | tuple[str, str]] | None`, Read: `list[DirectRelationReference] | None`
+         - With source: includes target class in Union
+         - Without source: only dm.NodeId or str (if has_default_instance_space)
+       - SingleEdgeProperty/MultiEdgeProperty → IREdgeType
+         - Single: `Union[TargetClass, str, dm.NodeId, None]`
+         - Multi: `Optional[list[Union[TargetClass, str, dm.NodeId]]]`
+         - With edge class: includes edge class in Union
        - SingleReverseDirectRelationPropertyResponse/MultiReverseDirectRelationPropertyResponse → IRReverseDirectRelationType
-     - Enum types:
-       - EnumProperty → IREnumType (with values and unknown_value handling)
-     - Optional/nullable types based on ViewCorePropertyResponse.nullable
-     - Cardinality tracking (single vs multi) from connection_type
+         - Single: `Union[TargetClass, str, dm.NodeId, None]`
+         - Multi: `Optional[list[Union[TargetClass, str, dm.NodeId]]]`
+         - Always read-only (not in write classes)
+     - **Enum types:**
+       - EnumProperty → IREnumType
+         - Maps to `Literal[value1, value2, ...]` with all enum keys
+         - Read type includes `| str` to handle unknown values
+         - Stores unknown_value handling
+     - **Type Modifiers:**
+       - Optional/nullable types based on ViewCorePropertyResponse.nullable
+       - Cardinality tracking (single vs multi) from connection_type
+       - Each IRType has methods:
+         - as_python_type() -> str (base Python type)
+         - as_read_type_hint() -> str (for read data classes)
+         - as_write_type_hint() -> str (for write data classes)
+         - as_graphql_type_hint() -> str (for GraphQL data classes)
+         - as_typed_hint(operation: Literal["read", "write"]) -> str (for TypedNode/TypedEdge)
 
 3. **IR Models**
    - **IRProperty** - Represents a property in a class
      - Source: ViewCorePropertyResponse
      - Fields:
-       - name: str (from ViewCoreProperty.name or property key)
+       - name: str (from ViewCoreProperty.name or property key, transformed per naming config)
+       - prop_name: str (original property identifier in data model)
+       - doc_name: str (human-readable name for documentation)
        - description: str | None (from ViewCoreProperty.description)
        - type: IRType (parsed from ViewCorePropertyResponse.type)
        - nullable: bool (from ViewCorePropertyResponse.nullable)
@@ -237,32 +285,130 @@ All tasks, deliverables, and success criteria have been met. The project is read
        - default_value: Any | None (from ViewCorePropertyResponse.default_value)
        - container_reference: ContainerReference (from ViewCoreProperty.container)
        - container_property_identifier: str (from ViewCoreProperty.container_property_identifier)
+       - is_read_only: bool (computed from container/property in readonly list)
+       - need_alias: bool (whether name != prop_name, requiring pydantic alias)
+     - Methods (for code generation):
+       - as_read_type_hint() -> str (type hint for read data class)
+       - as_write_type_hint() -> str (type hint for write data class)
+       - as_graphql_type_hint() -> str (type hint for GraphQL data class)
+       - as_typed_hint(operation: Literal["read", "write"]) -> str (type hint for typed init)
+       - support_filtering() -> bool (whether property can be filtered)
+       - get_filtering_class() -> str (DMS filter class name like "IntFilter", "StringFilter")
    - **IRConnection** - Represents a connection/relationship in a class
      - Source: SingleEdgeProperty, MultiEdgeProperty, ReverseDirectRelationProperty, DirectNodeRelation
      - Fields:
        - name: str (from property key or ConnectionPropertyDefinition.name)
+       - prop_name: str (original property identifier)
+       - doc_name: str (human-readable name)
+       - variable: str (variable name for iteration)
        - description: str | None (from ConnectionPropertyDefinition.description)
        - connection_type: IRConnectionType (parsed from connection_type discriminator)
-       - target_class: IRClassReference (resolved from source/through references)
+       - target_class: IRClassReference | None (resolved from source, can be None for direct relation without source)
+       - edge_class: IRClassReference | None (for edge connections with properties)
        - is_list: bool (from multi vs single connection type)
-       - direction: Literal["outwards", "inwards"] | None (from EdgeProperty.direction)
+       - direction: Literal["outwards", "inwards"] (from EdgeProperty.direction)
+       - edge_type: DirectRelationReference | None (from EdgeProperty.type)
        - edge_source: ViewReference | None (from EdgeProperty.edge_source)
+       - through: PropertyId | None (for reverse direct relations)
+       - container_reference: ContainerReference | None (for direct relations)
+       - container_property_identifier: str | None
+       - type_hint_node_reference: list[str] (like ["str", "dm.NodeId"] for direct relations)
+       - need_alias: bool
+     - Properties (computed):
+       - is_direct_relation: bool (edge_type is None and through is None)
+       - is_direct_relation_no_source: bool (is direct relation without target_class)
+       - is_reverse_direct_relation: bool (through is not None)
+       - is_edge: bool (edge_type is not None)
+       - is_edge_without_properties: bool (is edge and edge_class is None)
+       - is_edge_with_properties: bool (is edge and edge_class is not None)
+       - is_write_field: bool (not reverse direct relation and not read-only)
+     - Methods (for code generation):
+       - as_read_type_hint() -> str
+       - as_write_type_hint() -> str
+       - as_graphql_type_hint() -> str
+       - as_typed_hint(operation: Literal["read", "write"]) -> str
+       - support_filtering() -> bool (only direct relations support filtering)
+       - get_filtering_class() -> str (returns "DirectRelationFilter")
    - **IRClass** - Represents a generated class (from View)
      - Source: ViewResponse
      - Fields:
-       - name: str (from ViewResponse.external_id, transformed to PascalCase)
+       - read_name: str (class name for read operations, PascalCase)
+       - write_name: str (class name for write operations, e.g., "{read_name}Write")
+       - graphql_name: str (class name for GraphQL operations, e.g., "{read_name}GraphQL")
+       - read_list_name: str (list class name, e.g., "{read_name}List")
+       - write_list_name: str (write list class name, e.g., "{read_name}WriteList")
+       - doc_name: str (human-readable singular name)
+       - doc_list_name: str (human-readable plural name)
+       - variable: str (variable name for instances)
+       - variable_list: str (variable name for lists)
+       - file_name: str (file name for the class module)
        - space: str (from ViewResponse.space)
        - external_id: str (from ViewResponse.external_id)
        - version: str (from ViewResponse.version)
        - description: str | None (from ViewResponse.description)
        - properties: list[IRProperty] (parsed from ViewResponse.properties dict)
        - connections: list[IRConnection] (parsed from ViewResponse.properties dict)
-       - implements: list[IRClassReference] (from ViewResponse.implements)
+       - implements: list[IRClassReference] (from ViewResponse.implements, parent classes)
+       - direct_children: list[IRClassReference] (child classes that implement this class)
        - is_writable: bool (from ViewResponse.writable)
-       - is_interface: bool (computed from usage pattern)
+       - is_interface: bool (computed: true if has children and not writable)
+       - used_for: Literal["node", "edge", "all"] (from ViewResponse.used_for)
+       - node_type: DirectRelationReference | None (for node classes with filter)
+       - has_edge_class: bool (if used_for == "all" and this is node class)
+       - has_node_class: bool (if used_for == "all" and this is edge class)
+     - Properties (computed):
+       - pydantic_field: Literal["Field", "pydantic.Field"] (use "pydantic.Field" if class named "Field")
+       - dependencies: list[IRClass] (all classes referenced by connections)
+       - has_container_fields: bool (any field has container reference)
+     - Methods (for iteration):
+       - __iter__() -> Iterator[IRProperty | IRConnection] (iterate all fields)
+       - get_field(name: str) -> IRProperty | IRConnection | None
+   - **IRAPIClass** - Represents a generated API class
+     - Fields:
+       - parent_attribute: str (attribute name on parent client)
+       - name: str (API class name, e.g., "{class_name}API")
+       - file_name: str (file name for the API class)
+       - data_class: IRClass (the data class this API serves)
+       - filter_method: IRFilterMethod (main filter method)
+       - is_edge_class: bool (whether this API serves an edge class)
+   - **IREdgeAPIClass** - Represents a generated edge API class
+     - Extends IRAPIClass
+     - Fields:
+       - start_class: IRClass (source node class)
+       - end_class: IRClass (target node class)
+       - edge_class: IRClass | None (edge properties class if exists)
+       - field_name: str (field name on start class)
+       - edge_type: DirectRelationReference (edge type identifier)
+       - direction: Literal["outwards", "inwards"]
+       - end_filter_method: IRFilterMethod (filter for end nodes)
+       - has_default_instance_space: bool
+   - **IRFilterMethod** - Represents a generated filter/list method
+     - Fields:
+       - name: str (method name, usually "list")
+       - parameters: list[IRFilterParameter]
+       - implementations: list[IRFilterImplementation]
+       - return_type: str (return type hint)
+   - **IRFilterParameter** - Represents a filter method parameter
+     - Fields:
+       - name: str (parameter name)
+       - type_: str (type hint)
+       - description: str (parameter description)
+       - default: str | None (default value)
+       - is_nullable: bool
+       - is_time: bool (computed from type)
+       - is_timestamp: bool (computed from type)
+   - **IRFilterImplementation** - Represents a DMS filter implementation
+     - Fields:
+       - filter_class: str (DMS filter class like "dm.filters.Equals", "dm.filters.Range")
+       - prop_name: str (property to filter on)
+       - keyword_arguments: dict[str, IRFilterParameter]
+       - is_edge_class: bool
+     - Methods:
+       - get_condition() -> str (condition to check if filter should be applied)
+       - get_arguments() -> str (arguments to pass to filter constructor)
    - **IRMethod** - Represents a generated method on API classes
      - Fields:
-       - name: str (method name like "list", "retrieve", "apply", "delete")
+       - name: str (method name like "retrieve", "apply", "delete", "search")
        - description: str | None (docstring content)
        - arguments: list[IRMethodArgument]
        - return_type: IRType
@@ -289,8 +435,14 @@ All tasks, deliverables, and success criteria have been met. The project is read
      - Fields:
        - name: str (module name)
        - classes: list[IRClass]
+       - api_classes: list[IRAPIClass]
        - enums: list[IREnum]
        - imports: list[IRImport]
+   - **IRImport** - Represents an import statement
+     - Fields:
+       - module: str (module to import from)
+       - names: list[str] (names to import)
+       - alias: str | None (import alias)
    - **IRModel** - Top-level representation of entire data model
      - Source: DataModelResponse (containing multiple ViewResponse objects)
      - Fields:
@@ -301,21 +453,102 @@ All tasks, deliverables, and success criteria have been met. The project is read
        - description: str | None
        - modules: list[IRModule] (organized views into modules)
        - classes: list[IRClass] (all classes across modules)
+       - api_classes: list[IRAPIClass] (all API classes)
+       - edge_api_classes: list[IREdgeAPIClass] (edge-specific API classes)
        - view_mapping: dict[ViewReference, IRClass] (for resolving references)
+       - has_default_instance_space: bool (whether default instance space is set)
 
 4. **Parser**
-   - Parse validated View to IRClass
-   - Parse validated Container to IRClass
-   - Parse validated DataModel to IRModel
-   - Handle inheritance
-   - Handle relationships
-   - Extract metadata
+   - **ViewResponse → IRClass Parser**
+     - First pass: Create IRClass structure from ViewResponse
+       - Extract view metadata (space, external_id, version, description)
+       - Apply naming conventions based on config (PygenConfig)
+       - Determine class variants (read_name, write_name, graphql_name, list names)
+       - Generate variable names (variable, variable_list)
+       - Determine file_name for module placement
+       - Extract implements relationships (parent views)
+       - Determine is_writable, used_for, node_type
+       - Handle reserved word conflicts (append "_" suffix)
+     - Second pass: Populate fields after all classes exist
+       - Parse ViewCorePropertyResponse → IRProperty
+         - Extract property metadata (name, description, nullable, etc.)
+         - Parse DataType to IRType
+         - Determine container references
+         - Check if property is read-only
+         - Handle enum types (extract EnumProperty → IREnum)
+       - Parse connection properties → IRConnection
+         - DirectNodeRelation → one-to-one or one-to-many direct relation
+         - SingleEdgeProperty/MultiEdgeProperty → edge connections
+         - ReverseDirectRelationProperty → reverse direct relations
+         - Resolve target_class from view_mapping
+         - Resolve edge_class from edge_class_mapping
+         - Determine cardinality (single vs multi)
+         - Handle missing sources (target_class = None)
+       - Build EdgeClass instances (for edge type tracking)
+       - Handle EndNodeField for edge classes (special multi-type connection)
+       - Detect pydantic.Field vs Field naming conflicts
+     - Third pass: Resolve inheritance and dependencies
+       - Link parent classes via implements
+       - Link child classes via direct_children
+       - Determine is_interface (has children and not writable)
+       - Build dependency graph
+   - **DataModelResponse → IRModel Parser**
+     - Extract data model metadata
+     - Parse all views to IRClass instances
+     - Build view_mapping: dict[ViewReference, IRClass]
+     - Build edge_class_by_view_id mapping
+     - Build node_class_by_view_id mapping
+     - Determine has_default_instance_space
+     - Organize classes into modules
+   - **Helper Parsers**
+     - DataType → IRType parser
+       - Handle all primitive types with proper Python type mapping
+       - Handle list types with cardinality
+       - Handle enum types with literal generation
+       - Handle CDF reference types
+       - Handle DirectNodeRelation
+     - Build direct_relations_by_view_id mapping (for validation)
+     - Build view_property_by_container_direct_relation mapping (for reverse relations)
 
 5. **Transformer**
-   - Flatten inheritance
-   - Resolve relationships
-   - Apply naming conventions
-   - Optimize structure
+   - **API Class Generation**
+     - Generate IRAPIClass for each IRClass
+       - Determine parent_attribute on client
+       - Generate API class name and file name
+       - Create IRFilterMethod for list/filter operations
+         - Build IRFilterParameter for each filterable property
+         - Build IRFilterImplementation for each filter type
+         - Support Equals, In, Range, Prefix filters
+         - Handle time/timestamp conversions
+     - Generate IREdgeAPIClass for each edge connection
+       - Link start_class and end_class
+       - Include edge_class if edge has properties
+       - Create filter methods for both endpoints
+       - Support from/to node filtering with optional space parameters
+   - **Filter Method Generation**
+     - For each primitive field that supports filtering:
+       - Generate appropriate filter parameters (min/max for ranges, equals, prefix for text)
+       - Generate filter implementations with proper DMS filter mapping
+     - For direct relation fields:
+       - Generate DirectRelationFilter support
+       - Handle space parameters if has_default_instance_space
+   - **Method Generation**
+     - Generate standard CRUD methods: retrieve, list, apply, delete, search
+     - Generate aggregate methods if applicable
+     - Generate query builder methods
+   - **Naming Convention Application**
+     - Apply field naming (name vs variable vs doc_name)
+     - Apply class naming (PascalCase for classes, snake_case for variables)
+     - Apply file naming conventions
+     - Handle reserved word collisions
+   - **Inheritance Flattening**
+     - Collect all properties from parent classes
+     - Handle property overrides
+     - Maintain proper MRO (Method Resolution Order)
+   - **Optimization**
+     - Eliminate duplicate imports
+     - Optimize class organization into modules
+     - Determine minimal set of dependencies
 
 6. **Testing**
    - Unit tests for validation rules
