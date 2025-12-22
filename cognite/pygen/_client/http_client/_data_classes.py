@@ -30,11 +30,6 @@ class SuccessResponse(HTTPResult):
     body: str
     content: bytes
 
-    @property
-    def body_json(self) -> dict[str, Any]:
-        """Parse the response body as JSON."""
-        return _BODY_SERIALIZER.validate_json(self.body)
-
 
 class ErrorDetails(BaseModel):
     """This is the expected structure of error details in the CDF API"""

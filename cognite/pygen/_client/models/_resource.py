@@ -40,3 +40,6 @@ class ResponseResource(APIResource[T_Reference], Generic[T_Reference, T_APIResou
     def as_request(self) -> T_APIResource:
         """Convert the response model to a request model by removing read-only fields."""
         raise NotImplementedError()
+
+
+T_ResponseResource = TypeVar("T_ResponseResource", bound=ResponseResource)

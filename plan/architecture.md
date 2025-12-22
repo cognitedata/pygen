@@ -70,71 +70,99 @@ This document outlines the proposed architecture for the Pygen rewrite. The arch
 
 ### 1. Pygen Client (Runtime)
 
-**Purpose**: Replace `cognite-sdk` with a lightweight, purpose-built client for data modeling operations.
+**Purpose**: Replace `cognite-sdk` with a lightweight, purpose-built client for data modeling operations. This
+lightweight client will not be exposed to end users directly but will be used to fetch data models, views,
+containers, and spaces from the CDF API to drive code generation and runtime operations.
 
 **Key Features**:
 - Internal HTTPClient wrapper around `httpx` for modern async/sync support
 - Pydantic models for all API objects (DataModel, View, Container, Space)
-- Connection pooling and rate limiting
+- Connection pooling and rate limiting. Note that read, write and delete will have different concurrency limits.
 - Automatic retry logic with exponential backoff
 - Streaming support for large datasets
 - Query builder/optimizer for simplifying complex API interactions
 - Full type hints for IDE support
 
 **Structure**:
+This is a simplified representation of the client structure, the actual implementation will be more detailed.
 ```
 pygen/client/
 ├── __init__.py
 ├── core.py              # Main PygenClient class
-├── auth.py              # Authentication handlers
-├── http_client.py       # Internal HTTPClient wrapper (httpx)
+├── auth/              # Authentication handlers
+├── http_client/       # Internal HTTPClient wrapper (httpx)
 ├── query_builder.py     # Query builder/optimizer
 ├── models/              # Pydantic models for API objects
 │   ├── __init__.py
 │   ├── data_model.py
 │   ├── view.py
 │   ├── container.py
-│   ├── space.py
-│   ├── instance.py
-│   └── query.py
+│   └── space.py
 ├── resources/           # Resource-specific clients
 │   ├── __init__.py
+│   ├── resources.py    # This file contains the common logic for the iterate, list, create, delete, retrieve methods for all resources.
 │   ├── data_models.py
 │   ├── views.py
 │   ├── containers.py
-│   ├── spaces.py
-│   └── instances.py
+│   └── spaces.py
 └── exceptions.py        # Custom exceptions
 ```
 
 **API Design Example**:
 ```python
-from pygen.client import PygenClient
+from cognite.pygen._client import PygenClient
+from cognite.pygen._client.config import PygenClientConfig
+from cognite.pygen._client.models import DataModelReference, DataModelRequest
 
-client = PygenClient(
-    base_url="https://api.cognitedata.com",
-    credentials=...
-)
+client = PygenClient(config = PygenClientConfig(...))
 
-# CRUD operations with pydantic models
+# CRUD operations with pydantic models, all CRUD methods support Sequence inputs
 data_model = client.data_models.retrieve(
+    [
+        DataModelReference(
+            space="my_space",
+            external_id="my_model",
+            version="v1",
+        )
+    ]
+)
+delete_result = client.data_models.delete(
+    [
+        DataModelReference(
+            space="my_space",
+            external_id="my_model",
+            version="v1",
+        )
+    ]
+)
+create_result = client.data_models.create(
+    [
+        DataModelRequest(
+            space="my_space",
+            external_id="my_model",
+            version="v1",
+            
+        )
+    ]
+)
+page = client.data_models.iterate(
     space="my_space",
-    external_id="my_model"
+    include_global=True,
+    cursor=None,
+    limit=100,
+)
+print(page.cursor)
+print(page.items)
+
+all_models = client.data_models.list(
+    space="my_space",
+    include_global=True,
+    limit=None,
 )
 
-# Lazy iteration over instances
-for instance in client.instances.list(
-    space="my_space",
-    view_id="my_view",
-    chunk_size=1000
-):
-    process(instance)
 
-# Query builder simplifies complex queries
-query = client.query_builder(space="my_space", view="MyView")
-results = query.filter(status="active").select("name", "id").limit(100)
-for item in results:
-    process(item)
+
+
 ```
 
 ### 2. Validation Layer

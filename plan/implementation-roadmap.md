@@ -125,12 +125,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - ✅ Space model
    - ✅ Error response models
 
-4. **Resource Clients**
-   - [ ] SpacesAPI (list, create, retrieve, delete)
-   - [ ] DataModelsAPI (list, create, retrieve, delete)
-   - [ ] ViewsAPI (list, create, retrieve, delete)
-   - [ ] ContainersAPI (list, create, retrieve, delete)
-   - [ ] InstancesAPI (list, create, retrieve, delete, query)
+4. **Resource Clients** ✅
+   - ✅ SpacesAPI (iterate, list, create, retrieve, delete)
+   - ✅ DataModelsAPI (iterate, list, create, retrieve, delete)
+   - ✅ ViewsAPI (iterate, list, create, retrieve, delete)
+   - ✅ ContainersAPI (iterate, list, create, retrieve, delete)
 
 5. **Error Handling**
    - [ ] Custom exception hierarchy
@@ -163,11 +162,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - ✅ Task 1: HTTP Client Foundation - Complete
 - ✅ Task 2: Authentication Support - Complete  
 - ✅ Task 3: Pydantic Models for API Objects - Complete
-- ⏳ Task 4: Resource Clients - Not Started
+- ✅ Task 4: Resource Clients - Complete (December 22, 2025)
 - ⏳ Task 5: Error Handling - Not Started
 - ⏳ Task 6: Testing - Not Started
 
-**Progress**: 3/6 tasks complete (50%)
+**Progress**: 4/6 tasks complete (67%)
 
 ### Dependencies
 - Phase 0 complete

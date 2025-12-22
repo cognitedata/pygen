@@ -58,6 +58,9 @@ from ._resource import (
     BaseModelObject,
     ReferenceObject,
     ResponseResource,
+    T_APIResource,
+    T_Reference,
+    T_ResponseResource,
 )
 from ._space import Space, SpaceRequest, SpaceResponse
 from ._view import View, ViewRequest, ViewResponse
@@ -155,4 +158,7 @@ __all__ = [
     "ViewRequestPropertyAdapter",
     "ViewResponse",
     "ViewResponseProperty",
+    "T_APIResource",
+    "T_Reference",
+    "T_ResponseResource",
 ]
