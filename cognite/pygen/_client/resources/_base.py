@@ -4,9 +4,6 @@ This module provides the base infrastructure for resource-specific clients
 that handle CRUD operations for CDF Data Modeling API resources.
 """
 
-from __future__ import annotations
-
-import builtins
 from collections.abc import Iterator, Sequence
 from typing import Any, Generic
 
@@ -14,6 +11,7 @@ from pydantic import BaseModel, TypeAdapter
 
 from cognite.pygen._client.http_client import HTTPClient, RequestMessage, SuccessResponse
 from cognite.pygen._client.models import (
+    T_APIResource,
     T_Reference,
     T_ResponseResource,
 )
@@ -27,7 +25,7 @@ class Page(BaseModel, Generic[T_ResponseResource]):
         cursor: The cursor for the next page, or None if this is the last page.
     """
 
-    items: builtins.list[Any]  # Will be typed through Generic usage
+    items: list[T_ResponseResource]
     cursor: str | None = None
 
 
@@ -42,9 +40,9 @@ class BaseResourceAPI(Generic[T_Reference, T_ResponseResource]):
         self,
         http_client: HTTPClient,
         endpoint: str,
-        reference_cls: type,
-        request_cls: type,
-        response_cls: type,
+        reference_cls: type[T_Reference],
+        request_cls: type[T_APIResource],
+        response_cls: type[T_ResponseResource],
     ) -> None:
         """Initialize the resource API.
 
@@ -57,21 +55,105 @@ class BaseResourceAPI(Generic[T_Reference, T_ResponseResource]):
         """
         self._http_client = http_client
         self._endpoint = endpoint
-        # Use Any for TypeAdapter since we can't use runtime types as type parameters
-        # The actual type safety comes from the class-level Generic parameters
-        self._response_adapter: TypeAdapter[builtins.list[Any]] = TypeAdapter(
-            builtins.list[response_cls]  # type: ignore[valid-type]
-        )
-        self._reference_adapter: TypeAdapter[builtins.list[Any]] = TypeAdapter(
-            builtins.list[reference_cls]  # type: ignore[valid-type]
-        )
-        self._request_adapter: TypeAdapter[builtins.list[Any]] = TypeAdapter(
-            builtins.list[request_cls]  # type: ignore[valid-type]
-        )
+        self._response_adapter = TypeAdapter(list[response_cls])
+        self._reference_adapter = TypeAdapter(list[reference_cls])
+        self._request_adapter = TypeAdapter(list[request_cls])
 
     def _make_url(self) -> str:
         """Create the full URL for this resource endpoint."""
         return self._http_client.config.create_api_url(self._endpoint)
+
+    def create(self, items: Sequence[Any]) -> list[T_ResponseResource]:
+        """Create or update resources.
+
+        Args:
+            items: A sequence of request objects defining the resources to create/update.
+
+        Returns:
+            A list of the created/updated resource objects.
+        """
+        if not items:
+            return []
+
+        body = {"items": self._request_adapter.dump_python(list(items), mode="json", by_alias=True)}
+
+        request = RequestMessage(
+            endpoint_url=self._make_url(),
+            method="POST",
+            body_content=body,
+        )
+
+        result = self._http_client.request_with_retries(request)
+        response = result.get_success_or_raise()
+
+        body_json = response.body_json
+        items_data = body_json.get("items", [])
+        return self._response_adapter.validate_python(items_data)
+
+    def retrieve(
+        self,
+        references: Sequence[T_Reference],
+        extra_params: dict[str, str | int | bool] | None = None,
+    ) -> list[T_ResponseResource]:
+        """Retrieve specific resources by their references.
+
+        Args:
+            references: A sequence of reference objects identifying the resources to retrieve.
+            extra_params: Additional query parameters to include in the request.
+
+        Returns:
+            A list of resource objects. Resources that don't exist are not included.
+        """
+        if not references:
+            return []
+
+        body = {"items": self._reference_adapter.dump_python(list(references), mode="json", by_alias=True)}
+
+        # Convert extra_params to the expected type
+        params: dict[str, str | int | float | bool] | None = None
+        if extra_params:
+            params = dict(extra_params)
+
+        request = RequestMessage(
+            endpoint_url=f"{self._make_url()}/byids",
+            method="POST",
+            body_content=body,
+            parameters=params,
+        )
+
+        result = self._http_client.request_with_retries(request)
+        response = result.get_success_or_raise()
+
+        body_json = response.body_json
+        items_data = body_json.get("items", [])
+        return self._response_adapter.validate_python(items_data)
+
+    def delete(self, references: Sequence[T_Reference]) -> list[T_Reference]:
+        """Delete resources by their references.
+
+        Args:
+            references: A sequence of reference objects identifying the resources to delete.
+
+        Returns:
+            A list of references to the deleted resources.
+        """
+        if not references:
+            return []
+
+        body = {"items": self._reference_adapter.dump_python(list(references), mode="json", by_alias=True)}
+
+        request = RequestMessage(
+            endpoint_url=f"{self._make_url()}/delete",
+            method="POST",
+            body_content=body,
+        )
+
+        result = self._http_client.request_with_retries(request)
+        response = result.get_success_or_raise()
+
+        body_json = response.body_json
+        items_data = body_json.get("items", [])
+        return self._reference_adapter.validate_python(items_data)
 
     def iterate(
         self,
@@ -167,95 +249,3 @@ class BaseResourceAPI(Generic[T_Reference, T_ResponseResource]):
             if page.cursor is None:
                 break
             cursor = page.cursor
-
-    def retrieve(
-        self,
-        references: Sequence[T_Reference],
-        extra_params: dict[str, str | int | bool] | None = None,
-    ) -> builtins.list[T_ResponseResource]:
-        """Retrieve specific resources by their references.
-
-        Args:
-            references: A sequence of reference objects identifying the resources to retrieve.
-            extra_params: Additional query parameters to include in the request.
-
-        Returns:
-            A list of resource objects. Resources that don't exist are not included.
-        """
-        if not references:
-            return []
-
-        body = {"items": self._reference_adapter.dump_python(builtins.list(references), mode="json", by_alias=True)}
-
-        # Convert extra_params to the expected type
-        params: dict[str, str | int | float | bool] | None = None
-        if extra_params:
-            params = dict(extra_params)
-
-        request = RequestMessage(
-            endpoint_url=f"{self._make_url()}/byids",
-            method="POST",
-            body_content=body,
-            parameters=params,
-        )
-
-        result = self._http_client.request_with_retries(request)
-        response = result.get_success_or_raise()
-
-        body_json = response.body_json
-        items_data = body_json.get("items", [])
-        return self._response_adapter.validate_python(items_data)
-
-    def create(self, items: Sequence[Any]) -> builtins.list[T_ResponseResource]:
-        """Create or update resources.
-
-        Args:
-            items: A sequence of request objects defining the resources to create/update.
-
-        Returns:
-            A list of the created/updated resource objects.
-        """
-        if not items:
-            return []
-
-        body = {"items": self._request_adapter.dump_python(builtins.list(items), mode="json", by_alias=True)}
-
-        request = RequestMessage(
-            endpoint_url=self._make_url(),
-            method="POST",
-            body_content=body,
-        )
-
-        result = self._http_client.request_with_retries(request)
-        response = result.get_success_or_raise()
-
-        body_json = response.body_json
-        items_data = body_json.get("items", [])
-        return self._response_adapter.validate_python(items_data)
-
-    def delete(self, references: Sequence[T_Reference]) -> builtins.list[T_Reference]:
-        """Delete resources by their references.
-
-        Args:
-            references: A sequence of reference objects identifying the resources to delete.
-
-        Returns:
-            A list of references to the deleted resources.
-        """
-        if not references:
-            return []
-
-        body = {"items": self._reference_adapter.dump_python(builtins.list(references), mode="json", by_alias=True)}
-
-        request = RequestMessage(
-            endpoint_url=f"{self._make_url()}/delete",
-            method="POST",
-            body_content=body,
-        )
-
-        result = self._http_client.request_with_retries(request)
-        response = result.get_success_or_raise()
-
-        body_json = response.body_json
-        items_data = body_json.get("items", [])
-        return self._reference_adapter.validate_python(items_data)
