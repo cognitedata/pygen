@@ -126,10 +126,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - ✅ Error response models
 
 4. **Resource Clients**
-   - [ ] SpacesAPI (list, create, retrieve, delete)
-   - [ ] DataModelsAPI (list, create, retrieve, delete)
-   - [ ] ViewsAPI (list, create, retrieve, delete)
-   - [ ] ContainersAPI (list, create, retrieve, delete)
+   - [ ] SpacesAPI (iterate, list, create, retrieve, delete)
+   - [ ] DataModelsAPI (iterate, list, create, retrieve, delete)
+   - [ ] ViewsAPI (iterate, list, create, retrieve, delete)
+   - [ ] ContainersAPI (iterate, list, create, retrieve, delete)
+   - 
 
 5. **Error Handling**
    - [ ] Custom exception hierarchy
