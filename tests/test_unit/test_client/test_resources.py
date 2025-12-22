@@ -54,7 +54,9 @@ class TestSpacesAPI:
         respx_mock: respx.MockRouter,
         example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.com/api/v1/projects/test_project/models/spaces").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.get(config.create_api_url("/models/spaces")).respond(
             json={"items": [example_space_resource], "nextCursor": "cursor123"}
         )
         page = pygen_client.spaces.iterate(limit=1)
@@ -67,6 +69,8 @@ class TestSpacesAPI:
         respx_mock: respx.MockRouter,
         example_space_resource: dict[str, Any],
     ) -> None:
+        client = pygen_client
+        config = client.config
         # Use side_effect to return different responses for consecutive calls
         space1 = {**example_space_resource, "space": "space1"}
         space2 = {**example_space_resource, "space": "space2"}
@@ -76,9 +80,7 @@ class TestSpacesAPI:
                 Response(200, json={"items": [space2], "nextCursor": None}),
             ]
         )
-        respx_mock.get("https://example.com/api/v1/projects/test_project/models/spaces").mock(
-            side_effect=lambda request: next(responses)
-        )
+        respx_mock.get(config.create_api_url("/models/spaces")).mock(side_effect=lambda request: next(responses))
         spaces = list(pygen_client.spaces.list())
         assert len(spaces) == 2
         assert spaces[0].space == "space1"
@@ -90,10 +92,12 @@ class TestSpacesAPI:
         respx_mock: respx.MockRouter,
         example_space_resource: dict[str, Any],
     ) -> None:
+        client = pygen_client
+        config = client.config
         # The list method fetches pages until it has at least `limit` items,
         # then returns all items from fetched pages (may exceed limit).
         # This test verifies basic list functionality with a limit parameter.
-        respx_mock.get("https://example.com/api/v1/projects/test_project/models/spaces").respond(
+        respx_mock.get(config.create_api_url("/models/spaces")).respond(
             json={
                 "items": [{**example_space_resource, "space": f"space{i}"} for i in range(5)],
                 "nextCursor": None,
@@ -110,9 +114,9 @@ class TestSpacesAPI:
         respx_mock: respx.MockRouter,
         example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.com/api/v1/projects/test_project/models/spaces/byids").respond(
-            json={"items": [example_space_resource]}
-        )
+        client = pygen_client
+        config = client.config
+        respx_mock.post(config.create_api_url("/models/spaces/byids")).respond(json={"items": [example_space_resource]})
         spaces = pygen_client.spaces.retrieve([SpaceReference(space=example_space_resource["space"])])
         assert len(spaces) == 1
         assert spaces[0].space == example_space_resource["space"]
@@ -127,9 +131,9 @@ class TestSpacesAPI:
         respx_mock: respx.MockRouter,
         example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.com/api/v1/projects/test_project/models/spaces").respond(
-            json={"items": [example_space_resource]}
-        )
+        client = pygen_client
+        config = client.config
+        respx_mock.post(config.create_api_url("/models/spaces")).respond(json={"items": [example_space_resource]})
         request = SpaceRequest(
             space=example_space_resource["space"],
             name=example_space_resource["name"],
@@ -150,7 +154,9 @@ class TestSpacesAPI:
         respx_mock: respx.MockRouter,
         example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.com/api/v1/projects/test_project/models/spaces/delete").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.post(config.create_api_url("/models/spaces/delete")).respond(
             json={"items": [{"space": example_space_resource["space"]}]}
         )
         deleted = pygen_client.spaces.delete([SpaceReference(space=example_space_resource["space"])])
@@ -169,7 +175,9 @@ class TestDataModelsAPI:
         respx_mock: respx.MockRouter,
         example_data_model_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.com/api/v1/projects/test_project/models/datamodels").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.get(config.create_api_url("/models/datamodels")).respond(
             json={"items": [example_data_model_resource], "nextCursor": None}
         )
         page = pygen_client.data_models.iterate(limit=100)
@@ -185,8 +193,10 @@ class TestDataModelsAPI:
         respx_mock: respx.MockRouter,
         example_data_model_resource: dict[str, Any],
     ) -> None:
+        client = pygen_client
+        config = client.config
         response_model = {**example_data_model_resource, "views": []}
-        route = respx_mock.post("https://example.com/api/v1/projects/test_project/models/datamodels/byids").respond(
+        route = respx_mock.post(config.create_api_url("/models/datamodels/byids")).respond(
             json={"items": [response_model]}
         )
         ref = DataModelReference(
@@ -206,9 +216,11 @@ class TestDataModelsAPI:
         respx_mock: respx.MockRouter,
         example_data_model_resource: dict[str, Any],
     ) -> None:
+        client = pygen_client
+        config = client.config
         model_v1 = {**example_data_model_resource, "version": "v1", "views": None}
         model_v2 = {**example_data_model_resource, "version": "v2", "views": None}
-        route = respx_mock.get("https://example.com/api/v1/projects/test_project/models/datamodels").respond(
+        route = respx_mock.get(config.create_api_url("/models/datamodels")).respond(
             json={"items": [model_v1, model_v2], "nextCursor": None}
         )
         models = list(pygen_client.data_models.list(all_versions=True))
@@ -223,10 +235,10 @@ class TestDataModelsAPI:
         respx_mock: respx.MockRouter,
         example_data_model_resource: dict[str, Any],
     ) -> None:
+        client = pygen_client
+        config = client.config
         response_model = {**example_data_model_resource, "views": None}
-        respx_mock.post("https://example.com/api/v1/projects/test_project/models/datamodels").respond(
-            json={"items": [response_model]}
-        )
+        respx_mock.post(config.create_api_url("/models/datamodels")).respond(json={"items": [response_model]})
         request = DataModelRequest(
             space=example_data_model_resource["space"],
             external_id=example_data_model_resource["externalId"],
@@ -244,7 +256,9 @@ class TestViewsAPI:
         respx_mock: respx.MockRouter,
         example_view_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.com/api/v1/projects/test_project/models/views").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.get(config.create_api_url("/models/views")).respond(
             json={"items": [example_view_resource], "nextCursor": None}
         )
         page = pygen_client.views.iterate(limit=100)
@@ -258,7 +272,9 @@ class TestViewsAPI:
         respx_mock: respx.MockRouter,
         example_view_resource: dict[str, Any],
     ) -> None:
-        route = respx_mock.get("https://example.com/api/v1/projects/test_project/models/views").respond(
+        client = pygen_client
+        config = client.config
+        route = respx_mock.get(config.create_api_url("/models/views")).respond(
             json={"items": [example_view_resource], "nextCursor": None}
         )
         views = pygen_client.views.list(include_inherited_properties=False)
@@ -273,9 +289,9 @@ class TestViewsAPI:
         respx_mock: respx.MockRouter,
         example_view_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.com/api/v1/projects/test_project/models/views/byids").respond(
-            json={"items": [example_view_resource]}
-        )
+        client = pygen_client
+        config = client.config
+        respx_mock.post(config.create_api_url("/models/views/byids")).respond(json={"items": [example_view_resource]})
         ref = ViewReference(
             space=example_view_resource["space"],
             external_id=example_view_resource["externalId"],
@@ -293,7 +309,9 @@ class TestContainersAPI:
         respx_mock: respx.MockRouter,
         example_container_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.com/api/v1/projects/test_project/models/containers").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.get(config.create_api_url("/models/containers")).respond(
             json={"items": [example_container_resource], "nextCursor": None}
         )
         page = pygen_client.containers.iterate(limit=100)
@@ -307,7 +325,9 @@ class TestContainersAPI:
         respx_mock: respx.MockRouter,
         example_container_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.com/api/v1/projects/test_project/models/containers").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.get(config.create_api_url("/models/containers")).respond(
             json={"items": [example_container_resource], "nextCursor": None}
         )
         containers = list(pygen_client.containers.list())
@@ -320,7 +340,9 @@ class TestContainersAPI:
         respx_mock: respx.MockRouter,
         example_container_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.com/api/v1/projects/test_project/models/containers/byids").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.post(config.create_api_url("/models/containers/byids")).respond(
             json={"items": [example_container_resource]}
         )
         ref = ContainerReference(
@@ -336,7 +358,9 @@ class TestContainersAPI:
         respx_mock: respx.MockRouter,
         example_container_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.com/api/v1/projects/test_project/models/containers/delete").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.post(config.create_api_url("/models/containers/delete")).respond(
             json={
                 "items": [
                     {
