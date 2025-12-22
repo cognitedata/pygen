@@ -45,6 +45,39 @@ class ContainersAPI:
             response_cls=ContainerResponse,
         )
 
+    def create(self, items: Sequence[ContainerRequest]) -> builtins.list[ContainerResponse]:
+        """Create or update containers.
+
+        Args:
+            items: A sequence of request objects defining the containers to create/update.
+
+        Returns:
+            A list of the created/updated container objects.
+        """
+        return self._api.create(items)
+
+    def retrieve(self, references: Sequence[ContainerReference]) -> builtins.list[ContainerResponse]:
+        """Retrieve specific containers by their references.
+
+        Args:
+            references: A sequence of reference objects identifying the containers to retrieve.
+
+        Returns:
+            A list of container objects. Containers that don't exist are not included.
+        """
+        return self._api.retrieve(references)
+
+    def delete(self, references: Sequence[ContainerReference]) -> builtins.list[ContainerReference]:
+        """Delete containers by their references.
+
+        Args:
+            references: A sequence of reference objects identifying the containers to delete.
+
+        Returns:
+            A list of references to the deleted containers.
+        """
+        return self._api.delete(references)
+
     def iterate(
         self,
         *,
@@ -95,36 +128,3 @@ class ContainersAPI:
             include_global=include_global,
             limit=limit,
         )
-
-    def retrieve(self, references: Sequence[ContainerReference]) -> builtins.list[ContainerResponse]:
-        """Retrieve specific containers by their references.
-
-        Args:
-            references: A sequence of reference objects identifying the containers to retrieve.
-
-        Returns:
-            A list of container objects. Containers that don't exist are not included.
-        """
-        return self._api.retrieve(references)
-
-    def create(self, items: Sequence[ContainerRequest]) -> builtins.list[ContainerResponse]:
-        """Create or update containers.
-
-        Args:
-            items: A sequence of request objects defining the containers to create/update.
-
-        Returns:
-            A list of the created/updated container objects.
-        """
-        return self._api.create(items)
-
-    def delete(self, references: Sequence[ContainerReference]) -> builtins.list[ContainerReference]:
-        """Delete containers by their references.
-
-        Args:
-            references: A sequence of reference objects identifying the containers to delete.
-
-        Returns:
-            A list of references to the deleted containers.
-        """
-        return self._api.delete(references)

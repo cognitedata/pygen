@@ -63,7 +63,7 @@ class BaseResourceAPI(Generic[T_Reference, T_ResponseResource]):
         """Create the full URL for this resource endpoint."""
         return self._http_client.config.create_api_url(self._endpoint)
 
-    def create(self, items: Sequence[Any]) -> list[T_ResponseResource]:
+    def create(self, items: Sequence[T_APIResource]) -> list[T_ResponseResource]:
         """Create or update resources.
 
         Args:
