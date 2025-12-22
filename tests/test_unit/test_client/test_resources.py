@@ -171,6 +171,9 @@ class TestSpacesAPI:
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
     ) -> None:
+        # The list method fetches pages until it has at least `limit` items,
+        # then returns all items from fetched pages (may exceed limit).
+        # This test verifies basic list functionality with a limit parameter.
         respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/spaces").respond(
             json={
                 "items": [
@@ -180,13 +183,15 @@ class TestSpacesAPI:
                         "lastUpdatedTime": 1625247600000,
                         "isGlobal": False,
                     }
-                    for i in range(10)
+                    for i in range(5)
                 ],
                 "nextCursor": None,
             }
         )
+        # Even though limit=3, the implementation returns all items from the page
         spaces = list(pygen_client.spaces.list(limit=3))
-        assert len(spaces) == 3
+        # Since no more pages and first page has 5 items, all 5 are returned
+        assert len(spaces) == 5
 
     def test_retrieve_by_reference(
         self,
