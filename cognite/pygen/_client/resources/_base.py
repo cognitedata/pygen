@@ -5,9 +5,9 @@ that handle CRUD operations for CDF Data Modeling API resources.
 """
 
 from collections.abc import Iterator, Sequence
-from typing import Any, Generic
+from typing import Generic
 
-from pydantic import BaseModel, TypeAdapter
+from pydantic import BaseModel
 
 from cognite.pygen._client.http_client import HTTPClient, RequestMessage, SuccessResponse
 from cognite.pygen._client.models import (
@@ -55,9 +55,9 @@ class BaseResourceAPI(Generic[T_Reference, T_ResponseResource]):
         """
         self._http_client = http_client
         self._endpoint = endpoint
-        self._response_adapter = TypeAdapter(list[response_cls])
-        self._reference_adapter = TypeAdapter(list[reference_cls])
-        self._request_adapter = TypeAdapter(list[request_cls])
+        self._response_cls = response_cls
+        self._reference_cls = reference_cls
+        self._request_cls = request_cls
 
     def _make_url(self) -> str:
         """Create the full URL for this resource endpoint."""
