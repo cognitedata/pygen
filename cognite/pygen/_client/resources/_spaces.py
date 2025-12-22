@@ -17,18 +17,6 @@ class SpacesAPI(BaseResourceAPI[SpaceReference, SpaceRequest, SpaceResponse]):
     Spaces are containers that organize data modeling resources like
     data models, views, and containers.
 
-    Example:
-        >>> from cognite.pygen._client import PygenClient
-        >>> client = PygenClient(config)
-        >>> # List all spaces
-        >>> for space in client.spaces.list():
-        ...     print(space.space)
-        >>> # Retrieve specific spaces
-        >>> spaces = client.spaces.retrieve([SpaceReference(space="my_space")])
-        >>> # Create a space
-        >>> created = client.spaces.create([SpaceRequest(space="new_space", name="New Space")])
-        >>> # Delete a space
-        >>> deleted = client.spaces.delete([SpaceReference(space="my_space")])
     """
 
     def __init__(self, http_client: HTTPClient, limits: ResourceLimits | None = None) -> None:

@@ -17,15 +17,6 @@ class ContainersAPI(BaseResourceAPI[ContainerReference, ContainerRequest, Contai
     Containers define the storage schema for nodes and edges.
     They specify the properties and their types that can be stored.
 
-    Example:
-        >>> from cognite.pygen._client import PygenClient
-        >>> client = PygenClient(config)
-        >>> # List all containers
-        >>> for container in client.containers.list():
-        ...     print(f"{container.space}:{container.external_id}")
-        >>> # Retrieve specific containers
-        >>> ref = ContainerReference(space="my_space", external_id="my_container")
-        >>> containers = client.containers.retrieve([ref])
     """
 
     def __init__(self, http_client: HTTPClient, limits: ResourceLimits | None = None) -> None:

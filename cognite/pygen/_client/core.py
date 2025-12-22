@@ -26,32 +26,6 @@ class PygenClient:
     The client is designed as an internal utility for Pygen and is not
     intended for direct use by end users.
 
-    Example:
-        >>> from cognite.pygen._client import PygenClient
-        >>> from cognite.pygen._client.config import PygenClientConfig
-        >>> from cognite.pygen._client.auth import OAuth2ClientCredentials
-        >>>
-        >>> credentials = OAuth2ClientCredentials(
-        ...     token_url="https://login.microsoftonline.com/tenant/oauth2/v2.0/token",
-        ...     client_id="your-client-id",
-        ...     client_secret="your-secret",
-        ...     scopes=["https://bluefield.cognitedata.com/.default"],
-        ... )
-        >>> config = PygenClientConfig(
-        ...     cdf_url="https://bluefield.cognitedata.com",
-        ...     project="my-project",
-        ...     credentials=credentials,
-        ... )
-        >>> with PygenClient(config) as client:
-        ...     # List all spaces
-        ...     for space in client.spaces.list():
-        ...         print(space.space)
-        ...
-        ...     # Retrieve a specific data model
-        ...     from cognite.pygen._client.models import DataModelReference
-        ...     ref = DataModelReference(space="my_space", external_id="my_model", version="v1")
-        ...     models = client.data_models.retrieve([ref], inline_views=True)
-
     Attributes:
         spaces: API for managing spaces.
         data_models: API for managing data models.

@@ -18,15 +18,6 @@ class DataModelsAPI(BaseResourceAPI[DataModelReference, DataModelRequest, DataMo
     A data model contains a set of views where the node types can
     refer to each other with direct relations and edges.
 
-    Example:
-        >>> from cognite.pygen._client import PygenClient
-        >>> client = PygenClient(config)
-        >>> # List all data models
-        >>> for model in client.data_models.list():
-        ...     print(f"{model.space}:{model.external_id}")
-        >>> # Retrieve specific data models with inline views
-        >>> ref = DataModelReference(space="my_space", external_id="my_model", version="v1")
-        >>> models = client.data_models.retrieve([ref], inline_views=True)
     """
 
     def __init__(self, http_client: HTTPClient, limits: ResourceLimits | None = None) -> None:

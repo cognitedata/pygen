@@ -17,15 +17,6 @@ class ViewsAPI(BaseResourceAPI[ViewReference, ViewRequest, ViewResponse]):
     Views define the structure and properties that can be queried on nodes and edges.
     They provide a schema layer on top of containers.
 
-    Example:
-        >>> from cognite.pygen._client import PygenClient
-        >>> client = PygenClient(config)
-        >>> # List all views
-        >>> for view in client.views.list():
-        ...     print(f"{view.space}:{view.external_id}")
-        >>> # Retrieve specific views
-        >>> ref = ViewReference(space="my_space", external_id="my_view", version="v1")
-        >>> views = client.views.retrieve([ref])
     """
 
     def __init__(self, http_client: HTTPClient, limits: ResourceLimits | None = None) -> None:
