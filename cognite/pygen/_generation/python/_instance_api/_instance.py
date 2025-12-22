@@ -1,15 +1,24 @@
-import datetime
-from typing import Any, Literal, TypeVar
+from datetime import datetime
+from typing import Any, Literal, TypeVar, ClassVar, Annotated
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator, model_serializer
+from ._utils import ms_to_datetime,datetime_to_ms
+from pydantic.functional_serializers import PlainSerializer
 
-from ._utils import ms_to_datetime
+DateTimeMS = Annotated[datetime, PlainSerializer(datetime_to_ms, return_type=int, when_used="always")]
 
 
-class InstanceModel(BaseModel):
-    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
+class ViewRef(BaseModel, populate_by_name=True):
+    """Reference to a view.
+
+    Args:
+        space: The space of the view.
+        external_id: The external ID of the view.
+    """
+
     space: str
     external_id: str = Field(alias="externalId")
+    version: str
 
 
 class DataRecord(BaseModel, populate_by_name=True):
@@ -23,9 +32,9 @@ class DataRecord(BaseModel, populate_by_name=True):
     """
 
     version: int
-    last_updated_time: datetime.datetime = Field(alias="lastUpdatedTime")
-    created_time: datetime.datetime = Field(alias="createdTime")
-    deleted_time: datetime.datetime | None = Field(None, alias="deletedTime")
+    last_updated_time: DateTimeMS = Field(alias="lastUpdatedTime")
+    created_time: DateTimeMS = Field(alias="createdTime")
+    deleted_time: DateTimeMS | None = Field(None, alias="deletedTime")
 
     @field_validator("created_time", "last_updated_time", "deleted_time", mode="before")
     @classmethod
@@ -48,7 +57,41 @@ class DataRecordWrite(BaseModel):
             the ingestion request.
     """
 
-    existing_version: int | None = None
+    existing_version: int | None = Field(None, alias="existingVersion")
+
+
+class InstanceModel(BaseModel):
+    _view_id: ClassVar[ViewRef]
+    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
+    space: str
+    external_id: str = Field(alias="externalId")
+
+    def dump(self, camel_case: bool = True, format: Literal["model", "instance"] = "model") -> dict[str, Any]:
+        """Dump the model to a dictionary.
+
+        Args:
+            camel_case: Whether to use camel case for the keys. Defaults to True.
+
+
+        Returns:
+            The dictionary representation of the model.
+        """
+        if format == "model":
+            return self.model_dump(by_alias=camel_case)
+        elif format == "instance":
+            data = self.model_dump(by_alias=camel_case)
+            data_record = data.pop('data_record', {})
+            property_values: dict[str, Any] = {}
+            for key in list(data.keys()):
+                if key not in InstanceModel.model_fields and key not in _INSTANCE_MODEL_ALIASES:
+                    property_values[key] = data.pop(key)
+            data["properties"] = {self._view_id.space: {f"{self._view_id.external_id}/{self._view_id.version}": property_values}}
+            data.update(data_record)
+            return data
+        else:
+            raise ValueError(f"Unknown format: {format}")
+
+_INSTANCE_MODEL_ALIASES = frozenset({field_.alias for field_ in InstanceModel.model_fields.values() if field_.alias is not None})
 
 
 class InstanceId(InstanceModel): ...
@@ -64,6 +107,22 @@ class InstanceResult(BaseModel):
 class Instance(InstanceModel):
     data_record: DataRecord
 
+    @model_validator(mode="before")
+    def reshape_structure(cls, data: dict[str, Any]) -> dict[str, Any]:
+        data = data.copy()
+        data.pop("instanceType", None)
+        record_data = {field_.alias or field_id: data.pop(field_.alias or field_id) for field_id, field_ in DataRecord.model_fields.items() if (field_.alias or field_id) in data}
+        if record_data:
+            data["data_record"] = record_data
+        if "properties" in data:
+            properties = data.pop("properties")
+            if isinstance(properties, dict):
+                view_data = next(iter(properties.values()))
+                if isinstance(view_data, dict):
+                    data_values = next(iter(view_data.values()))
+                    if isinstance(data_values, dict):
+                        data.update(data_values)
+        return data
 
 class InstanceWrite(InstanceModel):
     data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
