@@ -199,21 +199,109 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Clear, user-friendly error messages
 
 2. **Type System**
-   - Define IRType hierarchy
-   - Primitive types (string, int, float, bool, datetime, etc.)
-   - Container types (list, dict)
-   - Reference types (relationships)
-   - Optional/nullable types
-   - Custom types
+   - Define IRType hierarchy based on ViewResponse property types:
+     - Primitive types from DataType variants:
+       - TextProperty → IRTextType
+       - Float32Property, Float64Property → IRFloatType (with unit support)
+       - BooleanProperty → IRBoolType
+       - Int32Property, Int64Property → IRIntType
+       - TimestampProperty → IRTimestampType
+       - DateProperty → IRDateType
+       - JSONProperty → IRJSONType
+     - CDF Reference types (external IDs):
+       - TimeseriesCDFExternalIdReference → IRTimeseriesReferenceType
+       - FileCDFExternalIdReference → IRFileReferenceType
+       - SequenceCDFExternalIdReference → IRSequenceReferenceType
+     - Container types:
+       - Support for list types via `list` property on ListablePropertyTypeDefinition
+       - Support for `max_list_size` constraint
+     - Connection types (derived from ViewResponseProperty variants):
+       - DirectNodeRelation → IRDirectRelationType (with source view reference)
+       - SingleEdgeProperty/MultiEdgeProperty → IREdgeType (deprecated, map to connections)
+       - SingleReverseDirectRelationPropertyResponse/MultiReverseDirectRelationPropertyResponse → IRReverseDirectRelationType
+     - Enum types:
+       - EnumProperty → IREnumType (with values and unknown_value handling)
+     - Optional/nullable types based on ViewCorePropertyResponse.nullable
+     - Cardinality tracking (single vs multi) from connection_type
 
 3. **IR Models**
-   - IRProperty
-   - IRClass
-   - IRRelationship
-   - IREnum
-   - IRModule
-   - IRModel (top-level)
-   - IRMethod (for generated methods)
+   - **IRProperty** - Represents a property in a class
+     - Source: ViewCorePropertyResponse
+     - Fields:
+       - name: str (from ViewCoreProperty.name or property key)
+       - description: str | None (from ViewCoreProperty.description)
+       - type: IRType (parsed from ViewCorePropertyResponse.type)
+       - nullable: bool (from ViewCorePropertyResponse.nullable)
+       - immutable: bool | None (from ViewCorePropertyResponse.immutable)
+       - auto_increment: bool | None (from ViewCorePropertyResponse.auto_increment)
+       - default_value: Any | None (from ViewCorePropertyResponse.default_value)
+       - container_reference: ContainerReference (from ViewCoreProperty.container)
+       - container_property_identifier: str (from ViewCoreProperty.container_property_identifier)
+   - **IRConnection** - Represents a connection/relationship in a class
+     - Source: SingleEdgeProperty, MultiEdgeProperty, ReverseDirectRelationProperty, DirectNodeRelation
+     - Fields:
+       - name: str (from property key or ConnectionPropertyDefinition.name)
+       - description: str | None (from ConnectionPropertyDefinition.description)
+       - connection_type: IRConnectionType (parsed from connection_type discriminator)
+       - target_class: IRClassReference (resolved from source/through references)
+       - is_list: bool (from multi vs single connection type)
+       - direction: Literal["outwards", "inwards"] | None (from EdgeProperty.direction)
+       - edge_source: ViewReference | None (from EdgeProperty.edge_source)
+   - **IRClass** - Represents a generated class (from View)
+     - Source: ViewResponse
+     - Fields:
+       - name: str (from ViewResponse.external_id, transformed to PascalCase)
+       - space: str (from ViewResponse.space)
+       - external_id: str (from ViewResponse.external_id)
+       - version: str (from ViewResponse.version)
+       - description: str | None (from ViewResponse.description)
+       - properties: list[IRProperty] (parsed from ViewResponse.properties dict)
+       - connections: list[IRConnection] (parsed from ViewResponse.properties dict)
+       - implements: list[IRClassReference] (from ViewResponse.implements)
+       - is_writable: bool (from ViewResponse.writable)
+       - is_interface: bool (computed from usage pattern)
+   - **IRMethod** - Represents a generated method on API classes
+     - Fields:
+       - name: str (method name like "list", "retrieve", "apply", "delete")
+       - description: str | None (docstring content)
+       - arguments: list[IRMethodArgument]
+       - return_type: IRType
+       - is_async: bool
+   - **IRMethodArgument** - Represents a method parameter
+     - Fields:
+       - name: str (parameter name)
+       - type: IRType (parameter type)
+       - default: Any | None (default value)
+       - is_required: bool
+       - description: str | None
+   - **IREnum** - Represents an enum type
+     - Source: EnumProperty
+     - Fields:
+       - name: str (generated from context)
+       - values: dict[str, IREnumValue] (from EnumProperty.values)
+       - unknown_value: str | None (from EnumProperty.unknown_value)
+   - **IREnumValue** - Represents an enum value
+     - Source: EnumValue
+     - Fields:
+       - name: str (from EnumValue.name or key)
+       - description: str | None (from EnumValue.description)
+   - **IRModule** - Represents a Python module/file
+     - Fields:
+       - name: str (module name)
+       - classes: list[IRClass]
+       - enums: list[IREnum]
+       - imports: list[IRImport]
+   - **IRModel** - Top-level representation of entire data model
+     - Source: DataModelResponse (containing multiple ViewResponse objects)
+     - Fields:
+       - name: str (data model name)
+       - space: str (data model space)
+       - external_id: str (data model external_id)
+       - version: str (data model version)
+       - description: str | None
+       - modules: list[IRModule] (organized views into modules)
+       - classes: list[IRClass] (all classes across modules)
+       - view_mapping: dict[ViewReference, IRClass] (for resolving references)
 
 4. **Parser**
    - Parse validated View to IRClass
