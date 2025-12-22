@@ -70,7 +70,7 @@ class PygenClient:
             config: Configuration for the client including URL, project, and credentials.
             max_retries: Maximum number of retries for failed requests. Default is 10.
         """
-        self._config = config
+        self.config = config
         self._http_client = HTTPClient(config, max_retries=max_retries)
 
         # Initialize resource APIs as attributes (not properties)

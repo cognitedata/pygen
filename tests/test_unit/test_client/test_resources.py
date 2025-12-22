@@ -42,64 +42,30 @@ class TestPygenClient:
 
 
 class TestSpacesAPI:
-    @pytest.fixture
-    def space_list_response(self) -> dict[str, Any]:
-        return {
-            "items": [
-                {
-                    "space": "space1",
-                    "name": "Space 1",
-                    "description": "First space",
-                    "createdTime": 1625247600000,
-                    "lastUpdatedTime": 1625247600000,
-                    "isGlobal": False,
-                },
-                {
-                    "space": "space2",
-                    "name": "Space 2",
-                    "description": "Second space",
-                    "createdTime": 1625247600000,
-                    "lastUpdatedTime": 1625247600000,
-                    "isGlobal": False,
-                },
-            ],
-            "nextCursor": None,
-        }
-
     def test_iterate_returns_page(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        space_list_response: dict[str, Any],
+        example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/spaces").respond(
-            json=space_list_response
+        respx_mock.get("https://example.com/api/v1/projects/test_project/models/spaces").respond(
+            json={"items": [example_space_resource], "nextCursor": None}
         )
         page = pygen_client.spaces.iterate(limit=100)
         assert isinstance(page, Page)
-        assert len(page.items) == 2
+        assert len(page.items) == 1
         assert page.cursor is None
         assert all(isinstance(item, SpaceResponse) for item in page.items)
-        assert page.items[0].space == "space1"
-        assert page.items[1].space == "space2"
+        assert page.items[0].space == example_space_resource["space"]
 
     def test_iterate_with_pagination(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/spaces").respond(
-            json={
-                "items": [
-                    {
-                        "space": "space1",
-                        "createdTime": 1625247600000,
-                        "lastUpdatedTime": 1625247600000,
-                        "isGlobal": False,
-                    }
-                ],
-                "nextCursor": "cursor123",
-            }
+        respx_mock.get("https://example.com/api/v1/projects/test_project/models/spaces").respond(
+            json={"items": [example_space_resource], "nextCursor": "cursor123"}
         )
         page = pygen_client.spaces.iterate(limit=1)
         assert page.cursor == "cursor123"
@@ -109,41 +75,18 @@ class TestSpacesAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_space_resource: dict[str, Any],
     ) -> None:
         # Use side_effect to return different responses for consecutive calls
+        space1 = {**example_space_resource, "space": "space1"}
+        space2 = {**example_space_resource, "space": "space2"}
         responses = iter(
             [
-                Response(
-                    200,
-                    json={
-                        "items": [
-                            {
-                                "space": "space1",
-                                "createdTime": 1625247600000,
-                                "lastUpdatedTime": 1625247600000,
-                                "isGlobal": False,
-                            }
-                        ],
-                        "nextCursor": "cursor123",
-                    },
-                ),
-                Response(
-                    200,
-                    json={
-                        "items": [
-                            {
-                                "space": "space2",
-                                "createdTime": 1625247600000,
-                                "lastUpdatedTime": 1625247600000,
-                                "isGlobal": False,
-                            }
-                        ],
-                        "nextCursor": None,
-                    },
-                ),
+                Response(200, json={"items": [space1], "nextCursor": "cursor123"}),
+                Response(200, json={"items": [space2], "nextCursor": None}),
             ]
         )
-        respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/spaces").mock(
+        respx_mock.get("https://example.com/api/v1/projects/test_project/models/spaces").mock(
             side_effect=lambda request: next(responses)
         )
         spaces = list(pygen_client.spaces.list())
@@ -155,21 +98,14 @@ class TestSpacesAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_space_resource: dict[str, Any],
     ) -> None:
         # The list method fetches pages until it has at least `limit` items,
         # then returns all items from fetched pages (may exceed limit).
         # This test verifies basic list functionality with a limit parameter.
-        respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/spaces").respond(
+        respx_mock.get("https://example.com/api/v1/projects/test_project/models/spaces").respond(
             json={
-                "items": [
-                    {
-                        "space": f"space{i}",
-                        "createdTime": 1625247600000,
-                        "lastUpdatedTime": 1625247600000,
-                        "isGlobal": False,
-                    }
-                    for i in range(5)
-                ],
+                "items": [{**example_space_resource, "space": f"space{i}"} for i in range(5)],
                 "nextCursor": None,
             }
         )
@@ -182,23 +118,14 @@ class TestSpacesAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.cognitedata.com/api/v1/projects/test_project/models/spaces/byids").respond(
-            json={
-                "items": [
-                    {
-                        "space": "space1",
-                        "name": "Space 1",
-                        "createdTime": 1625247600000,
-                        "lastUpdatedTime": 1625247600000,
-                        "isGlobal": False,
-                    }
-                ]
-            }
+        respx_mock.post("https://example.com/api/v1/projects/test_project/models/spaces/byids").respond(
+            json={"items": [example_space_resource]}
         )
-        spaces = pygen_client.spaces.retrieve([SpaceReference(space="space1")])
+        spaces = pygen_client.spaces.retrieve([SpaceReference(space=example_space_resource["space"])])
         assert len(spaces) == 1
-        assert spaces[0].space == "space1"
+        assert spaces[0].space == example_space_resource["space"]
 
     def test_retrieve_empty_list(self, pygen_client: PygenClient) -> None:
         spaces = pygen_client.spaces.retrieve([])
@@ -208,26 +135,20 @@ class TestSpacesAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.cognitedata.com/api/v1/projects/test_project/models/spaces").respond(
-            json={
-                "items": [
-                    {
-                        "space": "new_space",
-                        "name": "New Space",
-                        "description": "A new space",
-                        "createdTime": 1625247600000,
-                        "lastUpdatedTime": 1625247600000,
-                        "isGlobal": False,
-                    }
-                ]
-            }
+        respx_mock.post("https://example.com/api/v1/projects/test_project/models/spaces").respond(
+            json={"items": [example_space_resource]}
         )
-        request = SpaceRequest(space="new_space", name="New Space", description="A new space")
+        request = SpaceRequest(
+            space=example_space_resource["space"],
+            name=example_space_resource["name"],
+            description=example_space_resource["description"],
+        )
         created = pygen_client.spaces.create([request])
         assert len(created) == 1
-        assert created[0].space == "new_space"
-        assert created[0].name == "New Space"
+        assert created[0].space == example_space_resource["space"]
+        assert created[0].name == example_space_resource["name"]
 
     def test_create_empty_list(self, pygen_client: PygenClient) -> None:
         created = pygen_client.spaces.create([])
@@ -237,13 +158,14 @@ class TestSpacesAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.cognitedata.com/api/v1/projects/test_project/models/spaces/delete").respond(
-            json={"items": [{"space": "space_to_delete"}]}
+        respx_mock.post("https://example.com/api/v1/projects/test_project/models/spaces/delete").respond(
+            json={"items": [{"space": example_space_resource["space"]}]}
         )
-        deleted = pygen_client.spaces.delete([SpaceReference(space="space_to_delete")])
+        deleted = pygen_client.spaces.delete([SpaceReference(space=example_space_resource["space"])])
         assert len(deleted) == 1
-        assert deleted[0].space == "space_to_delete"
+        assert deleted[0].space == example_space_resource["space"]
 
     def test_delete_empty_list(self, pygen_client: PygenClient) -> None:
         deleted = pygen_client.spaces.delete([])
@@ -251,37 +173,19 @@ class TestSpacesAPI:
 
 
 class TestDataModelsAPI:
-    @pytest.fixture
-    def data_model_response(self) -> dict[str, Any]:
-        return {
-            "items": [
-                {
-                    "space": "my_space",
-                    "externalId": "my_model",
-                    "version": "v1",
-                    "description": "Test model",
-                    "createdTime": 1625247600000,
-                    "lastUpdatedTime": 1625247600000,
-                    "isGlobal": False,
-                    "views": [{"space": "my_space", "externalId": "my_view", "version": "v1", "type": "view"}],
-                }
-            ],
-            "nextCursor": None,
-        }
-
     def test_iterate_returns_page(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        data_model_response: dict[str, Any],
+        example_data_model_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/datamodels").respond(
-            json=data_model_response
+        respx_mock.get("https://example.com/api/v1/projects/test_project/models/datamodels").respond(
+            json={"items": [example_data_model_resource], "nextCursor": None}
         )
         page = pygen_client.data_models.iterate(limit=100)
         assert isinstance(page, Page)
         assert len(page.items) == 1
-        assert page.items[0].external_id == "my_model"
+        assert page.items[0].external_id == example_data_model_resource["externalId"]
         assert page.items[0].views is not None
         assert len(page.items[0].views) == 1
 
@@ -289,25 +193,17 @@ class TestDataModelsAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_data_model_resource: dict[str, Any],
     ) -> None:
-        route = respx_mock.post(
-            "https://example.cognitedata.com/api/v1/projects/test_project/models/datamodels/byids"
-        ).respond(
-            json={
-                "items": [
-                    {
-                        "space": "my_space",
-                        "externalId": "my_model",
-                        "version": "v1",
-                        "createdTime": 1625247600000,
-                        "lastUpdatedTime": 1625247600000,
-                        "isGlobal": False,
-                        "views": [],
-                    }
-                ]
-            }
+        response_model = {**example_data_model_resource, "views": []}
+        route = respx_mock.post("https://example.com/api/v1/projects/test_project/models/datamodels/byids").respond(
+            json={"items": [response_model]}
         )
-        ref = DataModelReference(space="my_space", external_id="my_model", version="v1")
+        ref = DataModelReference(
+            space=example_data_model_resource["space"],
+            external_id=example_data_model_resource["externalId"],
+            version=example_data_model_resource["version"],
+        )
         models = pygen_client.data_models.retrieve([ref], inline_views=True)
         assert len(models) == 1
         # Check that inlineViews parameter was sent (lowercase 'true' in URL)
@@ -318,31 +214,12 @@ class TestDataModelsAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_data_model_resource: dict[str, Any],
     ) -> None:
-        route = respx_mock.get(
-            "https://example.cognitedata.com/api/v1/projects/test_project/models/datamodels"
-        ).respond(
-            json={
-                "items": [
-                    {
-                        "space": "my_space",
-                        "externalId": "my_model",
-                        "version": "v1",
-                        "createdTime": 1625247600000,
-                        "lastUpdatedTime": 1625247600000,
-                        "isGlobal": False,
-                    },
-                    {
-                        "space": "my_space",
-                        "externalId": "my_model",
-                        "version": "v2",
-                        "createdTime": 1625247600000,
-                        "lastUpdatedTime": 1625247600000,
-                        "isGlobal": False,
-                    },
-                ],
-                "nextCursor": None,
-            }
+        model_v1 = {**example_data_model_resource, "version": "v1", "views": None}
+        model_v2 = {**example_data_model_resource, "version": "v2", "views": None}
+        route = respx_mock.get("https://example.com/api/v1/projects/test_project/models/datamodels").respond(
+            json={"items": [model_v1, model_v2], "nextCursor": None}
         )
         models = list(pygen_client.data_models.list(all_versions=True))
         assert len(models) == 2
@@ -354,73 +231,45 @@ class TestDataModelsAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_data_model_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.cognitedata.com/api/v1/projects/test_project/models/datamodels").respond(
-            json={
-                "items": [
-                    {
-                        "space": "my_space",
-                        "externalId": "new_model",
-                        "version": "v1",
-                        "createdTime": 1625247600000,
-                        "lastUpdatedTime": 1625247600000,
-                        "isGlobal": False,
-                    }
-                ]
-            }
+        response_model = {**example_data_model_resource, "views": None}
+        respx_mock.post("https://example.com/api/v1/projects/test_project/models/datamodels").respond(
+            json={"items": [response_model]}
         )
-        request = DataModelRequest(space="my_space", external_id="new_model", version="v1")
+        request = DataModelRequest(
+            space=example_data_model_resource["space"],
+            external_id=example_data_model_resource["externalId"],
+            version=example_data_model_resource["version"],
+        )
         created = pygen_client.data_models.create([request])
         assert len(created) == 1
-        assert created[0].external_id == "new_model"
+        assert created[0].external_id == example_data_model_resource["externalId"]
 
 
 class TestViewsAPI:
-    @pytest.fixture
-    def view_response(self) -> dict[str, Any]:
-        return {
-            "items": [
-                {
-                    "space": "my_space",
-                    "externalId": "my_view",
-                    "version": "v1",
-                    "name": "My View",
-                    "createdTime": 1625247600000,
-                    "lastUpdatedTime": 1625247600000,
-                    "isGlobal": False,
-                    "writable": True,
-                    "queryable": True,
-                    "usedFor": "node",
-                    "filter": None,
-                    "properties": {},
-                    "mappedContainers": [],
-                }
-            ],
-            "nextCursor": None,
-        }
-
     def test_iterate_returns_page(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        view_response: dict[str, Any],
+        example_view_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/views").respond(
-            json=view_response
+        respx_mock.get("https://example.com/api/v1/projects/test_project/models/views").respond(
+            json={"items": [example_view_resource], "nextCursor": None}
         )
         page = pygen_client.views.iterate(limit=100)
         assert isinstance(page, Page)
         assert len(page.items) == 1
-        assert page.items[0].external_id == "my_view"
+        assert page.items[0].external_id == example_view_resource["externalId"]
 
     def test_list_with_include_inherited_properties(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        view_response: dict[str, Any],
+        example_view_resource: dict[str, Any],
     ) -> None:
-        route = respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/views").respond(
-            json=view_response
+        route = respx_mock.get("https://example.com/api/v1/projects/test_project/models/views").respond(
+            json={"items": [example_view_resource], "nextCursor": None}
         )
         views = list(pygen_client.views.list(include_inherited_properties=False))
         assert len(views) == 1
@@ -432,90 +281,88 @@ class TestViewsAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        view_response: dict[str, Any],
+        example_view_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.cognitedata.com/api/v1/projects/test_project/models/views/byids").respond(
-            json=view_response
+        respx_mock.post("https://example.com/api/v1/projects/test_project/models/views/byids").respond(
+            json={"items": [example_view_resource]}
         )
-        ref = ViewReference(space="my_space", external_id="my_view", version="v1")
+        ref = ViewReference(
+            space=example_view_resource["space"],
+            external_id=example_view_resource["externalId"],
+            version=example_view_resource["version"],
+        )
         views = pygen_client.views.retrieve([ref])
         assert len(views) == 1
-        assert views[0].external_id == "my_view"
+        assert views[0].external_id == example_view_resource["externalId"]
 
 
 class TestContainersAPI:
-    @pytest.fixture
-    def container_response(self) -> dict[str, Any]:
-        return {
-            "items": [
-                {
-                    "space": "my_space",
-                    "externalId": "my_container",
-                    "name": "My Container",
-                    "createdTime": 1625247600000,
-                    "lastUpdatedTime": 1625247600000,
-                    "isGlobal": False,
-                    "usedFor": "node",
-                    "properties": {
-                        "name": {
-                            "type": {"type": "text", "list": False, "collation": "ucs_basic"},
-                            "nullable": True,
-                        }
-                    },
-                }
-            ],
-            "nextCursor": None,
-        }
-
     def test_iterate_returns_page(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        container_response: dict[str, Any],
+        example_container_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/containers").respond(
-            json=container_response
+        respx_mock.get("https://example.com/api/v1/projects/test_project/models/containers").respond(
+            json={"items": [example_container_resource], "nextCursor": None}
         )
         page = pygen_client.containers.iterate(limit=100)
         assert isinstance(page, Page)
         assert len(page.items) == 1
-        assert page.items[0].external_id == "my_container"
+        assert page.items[0].external_id == example_container_resource["externalId"]
 
     def test_list_containers(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        container_response: dict[str, Any],
+        example_container_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.cognitedata.com/api/v1/projects/test_project/models/containers").respond(
-            json=container_response
+        respx_mock.get("https://example.com/api/v1/projects/test_project/models/containers").respond(
+            json={"items": [example_container_resource], "nextCursor": None}
         )
         containers = list(pygen_client.containers.list())
         assert len(containers) == 1
-        assert containers[0].external_id == "my_container"
+        assert containers[0].external_id == example_container_resource["externalId"]
 
     def test_retrieve_containers(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        container_response: dict[str, Any],
+        example_container_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post("https://example.cognitedata.com/api/v1/projects/test_project/models/containers/byids").respond(
-            json=container_response
+        respx_mock.post("https://example.com/api/v1/projects/test_project/models/containers/byids").respond(
+            json={"items": [example_container_resource]}
         )
-        ref = ContainerReference(space="my_space", external_id="my_container")
+        ref = ContainerReference(
+            space=example_container_resource["space"], external_id=example_container_resource["externalId"]
+        )
         containers = pygen_client.containers.retrieve([ref])
         assert len(containers) == 1
-        assert containers[0].external_id == "my_container"
+        assert containers[0].external_id == example_container_resource["externalId"]
 
     def test_delete_container(
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
+        example_container_resource: dict[str, Any],
     ) -> None:
-        respx_mock.post(
-            "https://example.cognitedata.com/api/v1/projects/test_project/models/containers/delete"
-        ).respond(json={"items": [{"space": "my_space", "externalId": "my_container", "type": "container"}]})
-        deleted = pygen_client.containers.delete([ContainerReference(space="my_space", external_id="my_container")])
+        respx_mock.post("https://example.com/api/v1/projects/test_project/models/containers/delete").respond(
+            json={
+                "items": [
+                    {
+                        "space": example_container_resource["space"],
+                        "externalId": example_container_resource["externalId"],
+                        "type": "container",
+                    }
+                ]
+            }
+        )
+        deleted = pygen_client.containers.delete(
+            [
+                ContainerReference(
+                    space=example_container_resource["space"], external_id=example_container_resource["externalId"]
+                )
+            ]
+        )
         assert len(deleted) == 1
-        assert deleted[0].external_id == "my_container"
+        assert deleted[0].external_id == example_container_resource["externalId"]
