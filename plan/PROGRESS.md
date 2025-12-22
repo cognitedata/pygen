@@ -1,6 +1,6 @@
 # Pygen Rewrite - Progress Tracking
 
-**Last Updated**: December 21, 2025
+**Last Updated**: December 22, 2025
 
 This document tracks the actual progress of the Pygen rewrite implementation.
 
@@ -11,7 +11,7 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 | Phase | Status | Start Date | End Date | Duration |
 |-------|--------|------------|----------|----------|
 | Phase 0: Foundation & Setup | ✅ Complete | Dec 2025 | Dec 20, 2025 | ~1 week |
-| Phase 1: Pygen Client Core | 🔄 In Progress (50%) | Dec 21, 2025 | - | 3-4 weeks (planned) |
+| Phase 1: Pygen Client Core | 🔄 In Progress (67%) | Dec 21, 2025 | - | 3-4 weeks (planned) |
 | Phase 2: Validation & IR | ⏳ Not Started | - | - | 3-4 weeks (planned) |
 | Phase 3: Python Generator MVP | ⏳ Not Started | - | - | 3-4 weeks (planned) |
 | Phase 4: Runtime & Lazy Evaluation | ⏳ Not Started | - | - | 3-4 weeks (planned) |
@@ -110,14 +110,13 @@ This document tracks the actual progress of the Pygen rewrite implementation.
    - ✅ Query models
    - ✅ Error response models
 
-### In Progress Tasks
+4. **Resource Clients** ✅
+   - ✅ SpacesAPI (iterate, list, create, retrieve, delete)
+   - ✅ DataModelsAPI (iterate, list, create, retrieve, delete)
+   - ✅ ViewsAPI (iterate, list, create, retrieve, delete)
+   - ✅ ContainersAPI (iterate, list, create, retrieve, delete)
 
-4. **Resource Clients**
-   - [ ] SpacesAPI (list, create, retrieve, delete)
-   - [ ] DataModelsAPI (list, create, retrieve, delete)
-   - [ ] ViewsAPI (list, create, retrieve, delete)
-   - [ ] ContainersAPI (list, create, retrieve, delete)
-   - [ ] InstancesAPI (list, create, retrieve, delete, query)
+### Remaining Tasks
 
 5. **Error Handling**
    - [ ] Custom exception hierarchy
@@ -138,8 +137,8 @@ Query Builder/Optimizer implementation has been moved to Phase 6 as per the upda
 
 - ✅ HTTPClient wrapper with retry, rate limiting, and connection pooling
 - ✅ Authentication system with OAuth2 support
-- [ ] Working PygenClient class
-- [ ] All CRUD operations implemented
+- ✅ Working PygenClient class
+- ✅ All CRUD operations implemented
 - [ ] Comprehensive test suite
 - [ ] API documentation
 
@@ -155,7 +154,8 @@ Details for Phases 2-9 will be updated as they are started and completed.
 
 - ✅ **M0**: Phase 0 Complete - Project reorganized and ready (Dec 20, 2025)
 - ✅ **M0.5**: Phase 1 Tasks 1-2 Complete - HTTPClient and Authentication working (Dec 21, 2025)
-- 🔄 **M0.75**: Phase 1 Task 3 Complete - Pydantic models for API objects ready (Dec 21, 2025)
+- ✅ **M0.75**: Phase 1 Task 3 Complete - Pydantic models for API objects ready (Dec 21, 2025)
+- ✅ **M0.8**: Phase 1 Task 4 Complete - Resource clients implemented (Dec 22, 2025)
 - ⏳ **M1**: Phase 1 Complete - Working client with HTTPClient and full resource APIs
 - ⏳ **M2**: Phase 3 Complete - Can generate Python SDK
 - ⏳ **M3**: Phase 5 Complete - Feature parity achieved
@@ -167,9 +167,9 @@ Details for Phases 2-9 will be updated as they are started and completed.
 ## Overall Progress
 
 **Phases Complete**: 1 / 10 (10%)  
-**Current Phase**: Phase 1 - Pygen Client Core (50% complete)  
-**Tasks Complete This Phase**: 3 / 6 tasks  
-**Estimated Time Remaining**: 21-33 weeks  
+**Current Phase**: Phase 1 - Pygen Client Core (67% complete)  
+**Tasks Complete This Phase**: 4 / 6 tasks  
+**Estimated Time Remaining**: 20-32 weeks  
 
 ---
 
@@ -209,11 +209,20 @@ Details for Phases 2-9 will be updated as they are started and completed.
 - All models use Pydantic v2 with proper validation
 - Models are ready for use in resource clients
 
+#### Task 4: Resource Clients ✅ (Completed Dec 22, 2025)
+- Implemented all resource client APIs
+- SpacesAPI with iterate, list, create, retrieve, delete operations
+- DataModelsAPI with iterate, list, create, retrieve, delete operations
+- ViewsAPI with iterate, list, create, retrieve, delete operations
+- ContainersAPI with iterate, list, create, retrieve, delete operations
+- All APIs follow consistent patterns and integrate with HTTPClient
+- Full CRUD operations available through PygenClient
+
 ### Next Steps
 
-1. Continue Phase 1: Build resource clients (Spaces, DataModels, Views, Containers, Instances)
-2. Implement error handling hierarchy
-3. Complete test suite for remaining Phase 1 components
+1. Implement error handling hierarchy (custom exceptions, API error mapping)
+2. Complete comprehensive test suite for all Phase 1 components
+3. Write API documentation
 
 ---
 
