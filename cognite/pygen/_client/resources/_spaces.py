@@ -41,10 +41,10 @@ class SpacesAPI(BaseResourceAPI[SpaceReference, SpaceRequest, SpaceResponse]):
         super().__init__(http_client, "/models/spaces", limits)
 
     def _page_response(self, response: SuccessResponse) -> Page[SpaceResponse]:
-        return Page[SpaceResponse].model_validate(response.body)
+        return Page[SpaceResponse].model_validate_json(response.body)
 
     def _reference_response(self, response: SuccessResponse) -> ReferenceResponseItems[SpaceReference]:
-        return ReferenceResponseItems[SpaceReference].model_validate(response.body)
+        return ReferenceResponseItems[SpaceReference].model_validate_json(response.body)
 
     def create(self, items: Sequence[SpaceRequest]) -> list[SpaceResponse]:
         """Create or update spaces.

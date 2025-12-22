@@ -9,7 +9,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Generic
 
-from pydantic import BaseModel, JsonValue
+from pydantic import BaseModel, Field, JsonValue
 
 from cognite.pygen._client.http_client import HTTPClient, RequestMessage, SuccessResponse
 from cognite.pygen._client.models import (
@@ -49,7 +49,7 @@ class Page(BaseModel, Generic[T_ResponseResource]):
     """
 
     items: list[T_ResponseResource]
-    cursor: str | None = None
+    cursor: str | None = Field(default=None, alias="nextCursor")
 
 
 class ReferenceResponseItems(BaseModel, Generic[T_Reference]):
