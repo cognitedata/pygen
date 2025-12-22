@@ -130,7 +130,6 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - [ ] DataModelsAPI (list, create, retrieve, delete)
    - [ ] ViewsAPI (list, create, retrieve, delete)
    - [ ] ContainersAPI (list, create, retrieve, delete)
-   - [ ] InstancesAPI (list, create, retrieve, delete, query)
 
 5. **Error Handling**
    - [ ] Custom exception hierarchy
