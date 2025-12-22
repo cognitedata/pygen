@@ -184,10 +184,16 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 1. **Validation Layer (Goal 6 - Critical!)**
    - Implement validation rules for data models
-   - Detect incomplete models (missing reverse relations, etc.)
-   - Generate warnings with actionable suggestions
-   - Implement filtering logic for problematic elements
-   - Graceful degradation decisions
+   - Check data model for the following:
+     - Existance of reverse direct relation target.
+     - `source` is defined for direct relations.
+     - No name conflicts with Python or Pydantic reserved words for
+       properties, classes, methods, and method parameters.
+   - Generate warnings for any issues found.
+   - Graceful degradation decisions. 
+     - For missing reverse direct relation target,exclude the reverse direct relation property.
+     - For missing `source` in direct relations, only use a node reference.
+     - For name conflicts, append a `_` suffix to the conflicting name.
    - Clear, user-friendly error messages
 
 2. **Type System**
