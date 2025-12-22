@@ -3,15 +3,12 @@
 This module provides the ViewsAPI class for managing CDF views.
 """
 
-from __future__ import annotations
-
-import builtins
 from collections.abc import Iterator, Sequence
 
 from cognite.pygen._client.http_client import HTTPClient
 from cognite.pygen._client.models import ViewReference, ViewRequest, ViewResponse
 
-from ._base import BaseResourceAPI, Page
+from ._base import BaseResourceAPI, Page, ResourceLimits
 
 
 class ViewsAPI:
@@ -31,11 +28,12 @@ class ViewsAPI:
         >>> views = client.views.retrieve([ref])
     """
 
-    def __init__(self, http_client: HTTPClient) -> None:
+    def __init__(self, http_client: HTTPClient, limits: ResourceLimits | None = None) -> None:
         """Initialize the Views API.
 
         Args:
             http_client: The HTTP client to use for API requests.
+            limits: Configuration for API endpoint limits. Uses defaults if not provided.
         """
         self._api = BaseResourceAPI[ViewReference, ViewResponse](
             http_client=http_client,
@@ -43,93 +41,10 @@ class ViewsAPI:
             reference_cls=ViewReference,
             request_cls=ViewRequest,
             response_cls=ViewResponse,
+            limits=limits,
         )
 
-    def iterate(
-        self,
-        *,
-        space: str | None = None,
-        cursor: str | None = None,
-        limit: int = 100,
-        include_global: bool = False,
-        all_versions: bool = False,
-        include_inherited_properties: bool = True,
-    ) -> Page[ViewResponse]:
-        """Fetch a single page of views.
-
-        Args:
-            space: Filter by space. If None, returns views from all spaces.
-            cursor: Cursor for pagination. If None, starts from the beginning.
-            limit: Maximum number of items to return per page. Default is 100.
-            include_global: Whether to include global views. Default is False.
-            all_versions: Whether to return all versions of each view. Default is False.
-            include_inherited_properties: Whether to include inherited properties. Default is True.
-
-        Returns:
-            A Page containing the views and the cursor for the next page.
-        """
-        extra_params: dict[str, str | int | bool] = {}
-        if all_versions:
-            extra_params["allVersions"] = True
-        if not include_inherited_properties:
-            extra_params["includeInheritedProperties"] = False
-
-        return self._api.iterate(
-            space=space,
-            cursor=cursor,
-            limit=limit,
-            include_global=include_global,
-            extra_params=extra_params if extra_params else None,
-        )
-
-    def list(
-        self,
-        *,
-        space: str | None = None,
-        include_global: bool = False,
-        limit: int | None = None,
-        all_versions: bool = False,
-        include_inherited_properties: bool = True,
-    ) -> Iterator[ViewResponse]:
-        """List all views, handling pagination automatically.
-
-        This method lazily iterates over all views, fetching pages as needed.
-
-        Args:
-            space: Filter by space. If None, returns views from all spaces.
-            include_global: Whether to include global views. Default is False.
-            limit: Maximum total number of items to return. If None, returns all items.
-            all_versions: Whether to return all versions of each view. Default is False.
-            include_inherited_properties: Whether to include inherited properties. Default is True.
-
-        Yields:
-            ViewResponse objects from the API.
-        """
-        extra_params: dict[str, str | int | bool] = {}
-        if all_versions:
-            extra_params["allVersions"] = True
-        if not include_inherited_properties:
-            extra_params["includeInheritedProperties"] = False
-
-        return self._api.list(
-            space=space,
-            include_global=include_global,
-            limit=limit,
-            extra_params=extra_params if extra_params else None,
-        )
-
-    def retrieve(self, references: Sequence[ViewReference]) -> builtins.list[ViewResponse]:
-        """Retrieve specific views by their references.
-
-        Args:
-            references: A sequence of reference objects identifying the views to retrieve.
-
-        Returns:
-            A list of view objects. Views that don't exist are not included.
-        """
-        return self._api.retrieve(references)
-
-    def create(self, items: Sequence[ViewRequest]) -> builtins.list[ViewResponse]:
+    def create(self, items: Sequence[ViewRequest]) -> list[ViewResponse]:
         """Create or update views.
 
         Args:
@@ -140,7 +55,18 @@ class ViewsAPI:
         """
         return self._api.create(items)
 
-    def delete(self, references: Sequence[ViewReference]) -> builtins.list[ViewReference]:
+    def retrieve(self, references: Sequence[ViewReference]) -> list[ViewResponse]:
+        """Retrieve specific views by their references.
+
+        Args:
+            references: A sequence of reference objects identifying the views to retrieve.
+
+        Returns:
+            A list of view objects. Views that don't exist are not included.
+        """
+        return self._api.retrieve(references)
+
+    def delete(self, references: Sequence[ViewReference]) -> list[ViewReference]:
         """Delete views by their references.
 
         Args:
@@ -150,3 +76,44 @@ class ViewsAPI:
             A list of references to the deleted views.
         """
         return self._api.delete(references)
+
+    def iterate(
+        self,
+        params: dict | None = None,
+    ) -> Page[ViewResponse]:
+        """Fetch a single page of views.
+
+        Args:
+            params: Query parameters for the request. Supported parameters:
+                - cursor: Cursor for pagination
+                - limit: Maximum number of items per page (default: 1000)
+                - space: Filter by space
+                - includeGlobal: Whether to include global views (default: False)
+                - allVersions: Whether to return all versions (default: False)
+                - includeInheritedProperties: Whether to include inherited properties (default: True)
+
+        Returns:
+            A Page containing the views and the cursor for the next page.
+        """
+        return self._api.iterate(params)
+
+    def list(
+        self,
+        params: dict | None = None,
+    ) -> Iterator[ViewResponse]:
+        """List all views, handling pagination automatically.
+
+        This method lazily iterates over all views, fetching pages as needed.
+
+        Args:
+            params: Query parameters for the request. Supported parameters:
+                - space: Filter by space
+                - includeGlobal: Whether to include global views (default: False)
+                - limit: Maximum total number of items to return
+                - allVersions: Whether to return all versions (default: False)
+                - includeInheritedProperties: Whether to include inherited properties (default: True)
+
+        Yields:
+            ViewResponse objects from the API.
+        """
+        return self._api.list(params)

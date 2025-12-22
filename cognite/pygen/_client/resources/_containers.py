@@ -3,15 +3,12 @@
 This module provides the ContainersAPI class for managing CDF containers.
 """
 
-from __future__ import annotations
-
-import builtins
 from collections.abc import Iterator, Sequence
 
 from cognite.pygen._client.http_client import HTTPClient
 from cognite.pygen._client.models import ContainerReference, ContainerRequest, ContainerResponse
 
-from ._base import BaseResourceAPI, Page
+from ._base import BaseResourceAPI, Page, ResourceLimits
 
 
 class ContainersAPI:
@@ -31,11 +28,12 @@ class ContainersAPI:
         >>> containers = client.containers.retrieve([ref])
     """
 
-    def __init__(self, http_client: HTTPClient) -> None:
+    def __init__(self, http_client: HTTPClient, limits: ResourceLimits | None = None) -> None:
         """Initialize the Containers API.
 
         Args:
             http_client: The HTTP client to use for API requests.
+            limits: Configuration for API endpoint limits. Uses defaults if not provided.
         """
         self._api = BaseResourceAPI[ContainerReference, ContainerResponse](
             http_client=http_client,
@@ -43,9 +41,10 @@ class ContainersAPI:
             reference_cls=ContainerReference,
             request_cls=ContainerRequest,
             response_cls=ContainerResponse,
+            limits=limits,
         )
 
-    def create(self, items: Sequence[ContainerRequest]) -> builtins.list[ContainerResponse]:
+    def create(self, items: Sequence[ContainerRequest]) -> list[ContainerResponse]:
         """Create or update containers.
 
         Args:
@@ -56,7 +55,7 @@ class ContainersAPI:
         """
         return self._api.create(items)
 
-    def retrieve(self, references: Sequence[ContainerReference]) -> builtins.list[ContainerResponse]:
+    def retrieve(self, references: Sequence[ContainerReference]) -> list[ContainerResponse]:
         """Retrieve specific containers by their references.
 
         Args:
@@ -67,7 +66,7 @@ class ContainersAPI:
         """
         return self._api.retrieve(references)
 
-    def delete(self, references: Sequence[ContainerReference]) -> builtins.list[ContainerReference]:
+    def delete(self, references: Sequence[ContainerReference]) -> list[ContainerReference]:
         """Delete containers by their references.
 
         Args:
@@ -80,51 +79,37 @@ class ContainersAPI:
 
     def iterate(
         self,
-        *,
-        space: str | None = None,
-        cursor: str | None = None,
-        limit: int = 100,
-        include_global: bool = False,
+        params: dict | None = None,
     ) -> Page[ContainerResponse]:
         """Fetch a single page of containers.
 
         Args:
-            space: Filter by space. If None, returns containers from all spaces.
-            cursor: Cursor for pagination. If None, starts from the beginning.
-            limit: Maximum number of items to return per page. Default is 100.
-            include_global: Whether to include global containers. Default is False.
+            params: Query parameters for the request. Supported parameters:
+                - cursor: Cursor for pagination
+                - limit: Maximum number of items per page (default: 1000)
+                - space: Filter by space
+                - includeGlobal: Whether to include global containers (default: False)
 
         Returns:
             A Page containing the containers and the cursor for the next page.
         """
-        return self._api.iterate(
-            space=space,
-            cursor=cursor,
-            limit=limit,
-            include_global=include_global,
-        )
+        return self._api.iterate(params)
 
     def list(
         self,
-        *,
-        space: str | None = None,
-        include_global: bool = False,
-        limit: int | None = None,
+        params: dict | None = None,
     ) -> Iterator[ContainerResponse]:
         """List all containers, handling pagination automatically.
 
         This method lazily iterates over all containers, fetching pages as needed.
 
         Args:
-            space: Filter by space. If None, returns containers from all spaces.
-            include_global: Whether to include global containers. Default is False.
-            limit: Maximum total number of items to return. If None, returns all items.
+            params: Query parameters for the request. Supported parameters:
+                - space: Filter by space
+                - includeGlobal: Whether to include global containers (default: False)
+                - limit: Maximum total number of items to return
 
         Yields:
             ContainerResponse objects from the API.
         """
-        return self._api.list(
-            space=space,
-            include_global=include_global,
-            limit=limit,
-        )
+        return self._api.list(params)
