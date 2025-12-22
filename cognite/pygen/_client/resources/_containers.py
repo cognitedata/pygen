@@ -5,17 +5,16 @@ This module provides the ContainersAPI class for managing CDF containers.
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+import builtins
+from collections.abc import Iterator, Sequence
 
-from pydantic import TypeAdapter
-
-from cognite.pygen._client.http_client import HTTPClient, RequestMessage
+from cognite.pygen._client.http_client import HTTPClient
 from cognite.pygen._client.models import ContainerReference, ContainerRequest, ContainerResponse
 
 from ._base import BaseResourceAPI, Page
 
 
-class ContainersAPI(BaseResourceAPI[ContainerReference, ContainerRequest, ContainerResponse]):
+class ContainersAPI:
     """API client for CDF Container resources.
 
     Containers define the storage schema for nodes and edges.
@@ -38,26 +37,13 @@ class ContainersAPI(BaseResourceAPI[ContainerReference, ContainerRequest, Contai
         Args:
             http_client: The HTTP client to use for API requests.
         """
-        super().__init__(http_client)
-        self._response_type_adapter = TypeAdapter(list[ContainerResponse])
-        self._reference_type_adapter = TypeAdapter(list[ContainerReference])
-        self._request_type_adapter = TypeAdapter(list[ContainerRequest])
-
-    @property
-    def _endpoint(self) -> str:
-        return "/models/containers"
-
-    @property
-    def _response_adapter(self) -> TypeAdapter[list[ContainerResponse]]:
-        return self._response_type_adapter
-
-    @property
-    def _reference_adapter(self) -> TypeAdapter[list[ContainerReference]]:
-        return self._reference_type_adapter
-
-    @property
-    def _request_adapter(self) -> TypeAdapter[list[ContainerRequest]]:
-        return self._request_type_adapter
+        self._api = BaseResourceAPI[ContainerReference, ContainerResponse](
+            http_client=http_client,
+            endpoint="/models/containers",
+            reference_cls=ContainerReference,
+            request_cls=ContainerRequest,
+            response_cls=ContainerResponse,
+        )
 
     def iterate(
         self,
@@ -78,24 +64,12 @@ class ContainersAPI(BaseResourceAPI[ContainerReference, ContainerRequest, Contai
         Returns:
             A Page containing the containers and the cursor for the next page.
         """
-        params: dict[str, str | int | bool] = {"limit": limit}
-        if cursor is not None:
-            params["cursor"] = cursor
-        if space is not None:
-            params["space"] = space
-        if include_global:
-            params["includeGlobal"] = True
-
-        request = RequestMessage(
-            endpoint_url=self._make_url(),
-            method="GET",
-            parameters=params,
+        return self._api.iterate(
+            space=space,
+            cursor=cursor,
+            limit=limit,
+            include_global=include_global,
         )
-
-        result = self._http_client.request_with_retries(request)
-        response = result.get_success_or_raise()
-
-        return self._parse_list_response(response)
 
     def list(
         self,
@@ -116,24 +90,41 @@ class ContainersAPI(BaseResourceAPI[ContainerReference, ContainerRequest, Contai
         Yields:
             ContainerResponse objects from the API.
         """
-        cursor: str | None = None
-        count = 0
-        page_limit = min(limit, 1000) if limit is not None else 1000
+        return self._api.list(
+            space=space,
+            include_global=include_global,
+            limit=limit,
+        )
 
-        while True:
-            page = self.iterate(
-                space=space,
-                cursor=cursor,
-                limit=page_limit,
-                include_global=include_global,
-            )
+    def retrieve(self, references: Sequence[ContainerReference]) -> builtins.list[ContainerResponse]:
+        """Retrieve specific containers by their references.
 
-            for item in page.items:
-                yield item
-                count += 1
-                if limit is not None and count >= limit:
-                    return
+        Args:
+            references: A sequence of reference objects identifying the containers to retrieve.
 
-            if page.cursor is None:
-                break
-            cursor = page.cursor
+        Returns:
+            A list of container objects. Containers that don't exist are not included.
+        """
+        return self._api.retrieve(references)
+
+    def create(self, items: Sequence[ContainerRequest]) -> builtins.list[ContainerResponse]:
+        """Create or update containers.
+
+        Args:
+            items: A sequence of request objects defining the containers to create/update.
+
+        Returns:
+            A list of the created/updated container objects.
+        """
+        return self._api.create(items)
+
+    def delete(self, references: Sequence[ContainerReference]) -> builtins.list[ContainerReference]:
+        """Delete containers by their references.
+
+        Args:
+            references: A sequence of reference objects identifying the containers to delete.
+
+        Returns:
+            A list of references to the deleted containers.
+        """
+        return self._api.delete(references)

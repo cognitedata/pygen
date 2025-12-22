@@ -5,17 +5,16 @@ This module provides the ViewsAPI class for managing CDF views.
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+import builtins
+from collections.abc import Iterator, Sequence
 
-from pydantic import TypeAdapter
-
-from cognite.pygen._client.http_client import HTTPClient, RequestMessage
+from cognite.pygen._client.http_client import HTTPClient
 from cognite.pygen._client.models import ViewReference, ViewRequest, ViewResponse
 
 from ._base import BaseResourceAPI, Page
 
 
-class ViewsAPI(BaseResourceAPI[ViewReference, ViewRequest, ViewResponse]):
+class ViewsAPI:
     """API client for CDF View resources.
 
     Views define the structure and properties that can be queried on nodes and edges.
@@ -38,26 +37,13 @@ class ViewsAPI(BaseResourceAPI[ViewReference, ViewRequest, ViewResponse]):
         Args:
             http_client: The HTTP client to use for API requests.
         """
-        super().__init__(http_client)
-        self._response_type_adapter = TypeAdapter(list[ViewResponse])
-        self._reference_type_adapter = TypeAdapter(list[ViewReference])
-        self._request_type_adapter = TypeAdapter(list[ViewRequest])
-
-    @property
-    def _endpoint(self) -> str:
-        return "/models/views"
-
-    @property
-    def _response_adapter(self) -> TypeAdapter[list[ViewResponse]]:
-        return self._response_type_adapter
-
-    @property
-    def _reference_adapter(self) -> TypeAdapter[list[ViewReference]]:
-        return self._reference_type_adapter
-
-    @property
-    def _request_adapter(self) -> TypeAdapter[list[ViewRequest]]:
-        return self._request_type_adapter
+        self._api = BaseResourceAPI[ViewReference, ViewResponse](
+            http_client=http_client,
+            endpoint="/models/views",
+            reference_cls=ViewReference,
+            request_cls=ViewRequest,
+            response_cls=ViewResponse,
+        )
 
     def iterate(
         self,
@@ -82,28 +68,19 @@ class ViewsAPI(BaseResourceAPI[ViewReference, ViewRequest, ViewResponse]):
         Returns:
             A Page containing the views and the cursor for the next page.
         """
-        params: dict[str, str | int | bool] = {"limit": limit}
-        if cursor is not None:
-            params["cursor"] = cursor
-        if space is not None:
-            params["space"] = space
-        if include_global:
-            params["includeGlobal"] = True
+        extra_params: dict[str, str | int | bool] = {}
         if all_versions:
-            params["allVersions"] = True
+            extra_params["allVersions"] = True
         if not include_inherited_properties:
-            params["includeInheritedProperties"] = False
+            extra_params["includeInheritedProperties"] = False
 
-        request = RequestMessage(
-            endpoint_url=self._make_url(),
-            method="GET",
-            parameters=params,
+        return self._api.iterate(
+            space=space,
+            cursor=cursor,
+            limit=limit,
+            include_global=include_global,
+            extra_params=extra_params if extra_params else None,
         )
-
-        result = self._http_client.request_with_retries(request)
-        response = result.get_success_or_raise()
-
-        return self._parse_list_response(response)
 
     def list(
         self,
@@ -128,26 +105,48 @@ class ViewsAPI(BaseResourceAPI[ViewReference, ViewRequest, ViewResponse]):
         Yields:
             ViewResponse objects from the API.
         """
-        cursor: str | None = None
-        count = 0
-        page_limit = min(limit, 1000) if limit is not None else 1000
+        extra_params: dict[str, str | int | bool] = {}
+        if all_versions:
+            extra_params["allVersions"] = True
+        if not include_inherited_properties:
+            extra_params["includeInheritedProperties"] = False
 
-        while True:
-            page = self.iterate(
-                space=space,
-                cursor=cursor,
-                limit=page_limit,
-                include_global=include_global,
-                all_versions=all_versions,
-                include_inherited_properties=include_inherited_properties,
-            )
+        return self._api.list(
+            space=space,
+            include_global=include_global,
+            limit=limit,
+            extra_params=extra_params if extra_params else None,
+        )
 
-            for item in page.items:
-                yield item
-                count += 1
-                if limit is not None and count >= limit:
-                    return
+    def retrieve(self, references: Sequence[ViewReference]) -> builtins.list[ViewResponse]:
+        """Retrieve specific views by their references.
 
-            if page.cursor is None:
-                break
-            cursor = page.cursor
+        Args:
+            references: A sequence of reference objects identifying the views to retrieve.
+
+        Returns:
+            A list of view objects. Views that don't exist are not included.
+        """
+        return self._api.retrieve(references)
+
+    def create(self, items: Sequence[ViewRequest]) -> builtins.list[ViewResponse]:
+        """Create or update views.
+
+        Args:
+            items: A sequence of request objects defining the views to create/update.
+
+        Returns:
+            A list of the created/updated view objects.
+        """
+        return self._api.create(items)
+
+    def delete(self, references: Sequence[ViewReference]) -> builtins.list[ViewReference]:
+        """Delete views by their references.
+
+        Args:
+            references: A sequence of reference objects identifying the views to delete.
+
+        Returns:
+            A list of references to the deleted views.
+        """
+        return self._api.delete(references)

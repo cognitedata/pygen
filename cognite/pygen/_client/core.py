@@ -73,31 +73,11 @@ class PygenClient:
         self._config = config
         self._http_client = HTTPClient(config, max_retries=max_retries)
 
-        # Initialize resource APIs
-        self._spaces = SpacesAPI(self._http_client)
-        self._data_models = DataModelsAPI(self._http_client)
-        self._views = ViewsAPI(self._http_client)
-        self._containers = ContainersAPI(self._http_client)
-
-    @property
-    def spaces(self) -> SpacesAPI:
-        """API for managing CDF spaces."""
-        return self._spaces
-
-    @property
-    def data_models(self) -> DataModelsAPI:
-        """API for managing CDF data models."""
-        return self._data_models
-
-    @property
-    def views(self) -> ViewsAPI:
-        """API for managing CDF views."""
-        return self._views
-
-    @property
-    def containers(self) -> ContainersAPI:
-        """API for managing CDF containers."""
-        return self._containers
+        # Initialize resource APIs as attributes (not properties)
+        self.spaces = SpacesAPI(self._http_client)
+        self.data_models = DataModelsAPI(self._http_client)
+        self.views = ViewsAPI(self._http_client)
+        self.containers = ContainersAPI(self._http_client)
 
     def __enter__(self) -> Self:
         """Enter context manager."""
