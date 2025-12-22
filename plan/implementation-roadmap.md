@@ -192,8 +192,10 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Generate warnings for any issues found.
    - Graceful degradation decisions. 
      - For missing reverse direct relation target,exclude the reverse direct relation property.
-     - For missing `source` in direct relations, only use a node reference.
-     - For name conflicts, append a `_` suffix to the conflicting name.
+     - For missing `source` in direct relations, only use a node reference. Note this requires
+       no action in the validation layer, but must be handled in the parser/transformer.
+     - For name conflicts, append a `_` suffix to the conflicting name. Note this requires
+       no action in the validation layer, but must be handled in the parser/transformer.
    - Clear, user-friendly error messages
 
 2. **Type System**
