@@ -5,20 +5,9 @@ import httpx
 import pytest
 import respx
 
-from cognite.pygen._client.auth.credentials import Credentials
 from cognite.pygen._client.config import PygenClientConfig
 from cognite.pygen._client.exceptions import PygenAPIError
 from cognite.pygen._client.http_client import FailedRequest, FailedResponse, HTTPClient, RequestMessage, SuccessResponse
-
-
-class DummyCredentials(Credentials):
-    def authorization_header(self) -> tuple[str, str]:
-        return "Authorization", "Bearer dummy_token"
-
-
-@pytest.fixture(scope="module")
-def pygen_client_config() -> PygenClientConfig:
-    return PygenClientConfig("https://example.com", "test_project", DummyCredentials())
 
 
 @pytest.fixture

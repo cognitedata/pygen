@@ -16,7 +16,6 @@ from cognite.pygen._client import (
     SpacesAPI,
     ViewsAPI,
 )
-from cognite.pygen._client.auth.credentials import Credentials
 from cognite.pygen._client.models import (
     ContainerReference,
     DataModelReference,
@@ -26,20 +25,6 @@ from cognite.pygen._client.models import (
     SpaceResponse,
     ViewReference,
 )
-
-
-class DummyCredentials(Credentials):
-    def authorization_header(self) -> tuple[str, str]:
-        return "Authorization", "Bearer dummy_token"
-
-
-@pytest.fixture(scope="module")
-def pygen_client_config() -> PygenClientConfig:
-    return PygenClientConfig(
-        cdf_url="https://example.cognitedata.com",
-        project="test_project",
-        credentials=DummyCredentials(),
-    )
 
 
 @pytest.fixture
