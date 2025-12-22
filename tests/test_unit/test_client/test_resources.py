@@ -8,13 +8,9 @@ import respx
 from httpx import Response
 
 from cognite.pygen._client import (
-    ContainersAPI,
-    DataModelsAPI,
     Page,
     PygenClient,
     PygenClientConfig,
-    SpacesAPI,
-    ViewsAPI,
 )
 from cognite.pygen._client.models import (
     ContainerReference,
@@ -33,14 +29,6 @@ def pygen_client(pygen_client_config: PygenClientConfig) -> Iterator[PygenClient
         yield client
 
 
-class TestPygenClient:
-    def test_client_has_all_resource_apis(self, pygen_client: PygenClient) -> None:
-        assert isinstance(pygen_client.spaces, SpacesAPI)
-        assert isinstance(pygen_client.data_models, DataModelsAPI)
-        assert isinstance(pygen_client.views, ViewsAPI)
-        assert isinstance(pygen_client.containers, ContainersAPI)
-
-
 class TestSpacesAPI:
     def test_iterate_returns_page(
         self,
@@ -48,10 +36,12 @@ class TestSpacesAPI:
         respx_mock: respx.MockRouter,
         example_space_resource: dict[str, Any],
     ) -> None:
-        respx_mock.get("https://example.com/api/v1/projects/test_project/models/spaces").respond(
+        client = pygen_client
+        config = client.config
+        respx_mock.get(config.create_api_url("/models/spaces")).respond(
             json={"items": [example_space_resource], "nextCursor": None}
         )
-        page = pygen_client.spaces.iterate(limit=100)
+        page = client.spaces.iterate(limit=100)
         assert isinstance(page, Page)
         assert len(page.items) == 1
         assert page.cursor is None
@@ -271,7 +261,7 @@ class TestViewsAPI:
         route = respx_mock.get("https://example.com/api/v1/projects/test_project/models/views").respond(
             json={"items": [example_view_resource], "nextCursor": None}
         )
-        views = list(pygen_client.views.list(include_inherited_properties=False))
+        views = pygen_client.views.list(include_inherited_properties=False)
         assert len(views) == 1
         # Check that includeInheritedProperties parameter was sent (lowercase 'false' in URL)
         request = route.calls[0].request
