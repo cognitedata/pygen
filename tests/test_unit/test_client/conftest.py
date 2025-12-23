@@ -2,10 +2,6 @@ from typing import Any
 
 import pytest
 
-from cognite.pygen._client.auth.credentials import Credentials
-from cognite.pygen._client.config import PygenClientConfig
-
-
 
 @pytest.fixture(scope="session")
 def example_space_resource() -> dict[str, Any]:

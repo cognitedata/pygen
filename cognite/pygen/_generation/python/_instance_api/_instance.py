@@ -199,6 +199,9 @@ class InstanceList(UserList[T_Instance]):
         return self.to_pandas(dropna_columns=True)._repr_html_()  # type: ignore[operator]
 
 
+T_InstanceList = TypeVar("T_InstanceList", bound=InstanceList)
+
+
 class Page(BaseModel, Generic[T_Instance], populate_by_name=True):
     """A page of results from a paginated API response.
 

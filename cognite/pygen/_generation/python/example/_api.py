@@ -2,13 +2,17 @@ from collections.abc import Sequence
 
 from cognite.pygen._generation.python._instance_api._api import InstanceAPI
 from cognite.pygen._generation.python._instance_api._instance import InstanceId, Page
-from cognite.pygen._generation.python.example._data_class import PrimitiveNullable, PrimitiveNullableWrite
+from cognite.pygen._generation.python.example._data_class import (
+    PrimitiveNullable,
+    PrimitiveNullableList,
+    PrimitiveNullableWrite,
+)
 
 
-class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable]):
+class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable, PrimitiveNullableList]):
     """API client for PrimitiveNullable instances in the example space."""
 
-    def retrieve(self, ids: Sequence[InstanceId]) -> list[PrimitiveNullable]:
+    def retrieve(self, ids: Sequence[InstanceId]) -> PrimitiveNullable | PrimitiveNullableList | None:
         """Retrieve specific PrimitiveNullable instances by their IDs.
 
         Args:
@@ -17,7 +21,7 @@ class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable
         Returns:
             A list of PrimitiveNullable instances. Instances that don't exist are not included.
         """
-        return self._retrieve(ids)
+        raise NotImplementedError()
 
     def iterate(self) -> Page[PrimitiveNullable]:
         """Fetch a single page of PrimitiveNullable instances.
@@ -27,7 +31,7 @@ class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable
         """
         raise NotImplementedError()
 
-    def list(self) -> list[PrimitiveNullable]:
+    def list(self) -> PrimitiveNullableList:
         """List all PrimitiveNullable instances, handling pagination automatically.
 
         This method lazily iterates over all PrimitiveNullable instances, fetching pages as needed.

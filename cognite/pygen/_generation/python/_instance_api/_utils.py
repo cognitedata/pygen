@@ -22,6 +22,7 @@ def ms_to_datetime(ms: int | float) -> datetime.datetime:
     # Note: We don't use fromtimestamp because it typically fails for negative values on Windows
     return datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc) + datetime.timedelta(milliseconds=ms)
 
+
 def datetime_to_ms(dt: datetime.datetime) -> int:
     """Converts a datetime object to Cognite timestamp, i.e. milliseconds since epoch.
 
