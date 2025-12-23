@@ -8,8 +8,8 @@ from cognite.pygen._generation.python.instance_api._instance import (
     Instance,
     InstanceList,
     InstanceWrite,
-    ViewRef,
 )
+from cognite.pygen._generation.python.instance_api._references import ViewReference
 
 
 class PrimitiveNullableWrite(InstanceWrite):
@@ -26,7 +26,7 @@ class PrimitiveNullableWrite(InstanceWrite):
 
 
 class PrimitiveNullable(Instance):
-    _view_id = ViewRef(space="sp_pygen_models", external_id="PrimitiveNullable", version="v1")
+    _view_id = ViewReference(space="sp_pygen_models", external_id="PrimitiveNullable", version="v1")
     instance_type: Literal["node"] = Field("node", alias="instanceType")
     text: str | None
     boolean: bool | None

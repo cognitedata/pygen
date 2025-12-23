@@ -5,8 +5,8 @@ from cognite.pygen._generation.python.instance_api._instance import (
     T_Instance,
     T_InstanceList,
     T_InstanceWrite,
-    ViewRef,
 )
+from cognite.pygen._generation.python.instance_api._references import ViewReference
 from cognite.pygen._generation.python.instance_api.http_client import HTTPClient
 
 
@@ -19,7 +19,9 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
 
     ENDPOINT = "/models/instances"
 
-    def __init__(self, http_client: HTTPClient, view_ref: ViewRef, instance_type: Literal["node", "edge"]) -> None:
+    def __init__(
+        self, http_client: HTTPClient, view_ref: ViewReference, instance_type: Literal["node", "edge"]
+    ) -> None:
         """Initialize the resource API.
 
         Args:
