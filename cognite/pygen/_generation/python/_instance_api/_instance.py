@@ -122,11 +122,15 @@ class InstanceModel(BaseModel):
         if "properties" in data:
             properties = data.pop("properties")
             if isinstance(properties, dict):
-                view_data = next(iter(properties.values()))
-                if isinstance(view_data, dict):
-                    data_values = next(iter(view_data.values()))
-                    if isinstance(data_values, dict):
-                        data.update(data_values)
+                try:
+                    view_data = next(iter(properties.values()))
+                    if isinstance(view_data, dict):
+                        data_values = next(iter(view_data.values()))
+                        if isinstance(data_values, dict):
+                            data.update(data_values)
+                except StopIteration:
+                    # This can happen if an instance has no properties, which is valid.
+                    pass
         return data
 
 
