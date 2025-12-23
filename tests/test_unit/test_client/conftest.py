@@ -2,19 +2,6 @@ from typing import Any
 
 import pytest
 
-from cognite.pygen._client.auth.credentials import Credentials
-from cognite.pygen._client.config import PygenClientConfig
-
-
-class DummyCredentials(Credentials):
-    def authorization_header(self) -> tuple[str, str]:
-        return "Authorization", "Bearer dummy_token"
-
-
-@pytest.fixture(scope="session")
-def pygen_client_config() -> PygenClientConfig:
-    return PygenClientConfig("https://example.com", "test_project", DummyCredentials())
-
 
 @pytest.fixture(scope="session")
 def example_space_resource() -> dict[str, Any]:
