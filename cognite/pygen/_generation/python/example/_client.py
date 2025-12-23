@@ -1,7 +1,7 @@
 from cognite.pygen._client import PygenClientConfig
 from cognite.pygen._generation.python.example._api import PrimitiveNullableAPI
 from cognite.pygen._generation.python.instance_api._client import InstanceClient
-from cognite.pygen._generation.python.instance_api._instance import ViewRef
+from cognite.pygen._generation.python.instance_api._references import ViewReference
 
 
 class ExampleClient(InstanceClient):
@@ -17,6 +17,6 @@ class ExampleClient(InstanceClient):
         super().__init__(config)
         self.primitive_nullable = PrimitiveNullableAPI(
             self._http_client,
-            view_ref=ViewRef(space="example_space", external_id="PrimitiveNullable", version="v1"),
+            view_ref=ViewReference(space="example_space", external_id="PrimitiveNullable", version="v1"),
             instance_type="node",
         )
