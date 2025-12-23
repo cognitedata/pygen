@@ -56,7 +56,12 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
     def _aggregate(self) -> None:
         raise NotImplementedError
 
-    def _search(self) -> None:
+    def _search(
+        self,
+        query: str | None = None,
+        properties: list[str] | None = None,
+        target_units: list[dict] | None = None,
+    ) -> None:
         raise NotImplementedError
 
     def _sync(self) -> None:
