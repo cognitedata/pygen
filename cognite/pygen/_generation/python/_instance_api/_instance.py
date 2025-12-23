@@ -2,11 +2,12 @@ import itertools
 from collections import UserList
 from collections.abc import Collection
 from datetime import date, datetime
-from typing import Annotated, Any, ClassVar, Generic, Literal, TypeVar
+from typing import Annotated, Any, ClassVar, Generic, Literal, TypeVar, get_args
 
 import pandas as pd
-from pydantic import BaseModel, BeforeValidator, Field, model_validator
+from pydantic import BaseModel, BeforeValidator, Field, GetCoreSchemaHandler, model_validator
 from pydantic.functional_serializers import PlainSerializer
+from pydantic_core import CoreSchema, core_schema
 
 from ._utils import datetime_to_ms, ms_to_datetime
 
@@ -161,6 +162,24 @@ class InstanceList(UserList[T_Instance]):
 
     def __init__(self, collection: Collection[T_Instance] | None = None) -> None:
         super().__init__(collection or [])
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler: GetCoreSchemaHandler) -> CoreSchema:
+        # Get the type argument (e.g., T_Instance) from the generic alias
+        args = get_args(source_type)
+        if args:
+            item_type = args[0]
+        else:
+            item_type = Instance
+
+        # Get the schema for the item type
+        item_schema = handler.generate_schema(item_type)
+
+        # Create a schema that validates a list of items and wraps it in InstanceList
+        return core_schema.no_info_after_validator_function(
+            cls,
+            core_schema.list_schema(item_schema),
+        )
 
     def dump(self) -> list[dict[str, Any]]:
         return [node.model_dump() for node in self.data]
