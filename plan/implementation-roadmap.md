@@ -20,17 +20,17 @@ Phase 0: Foundation & Setup (1 week)
     ↓
 Phase 1: Pygen Client Core (3-4 weeks)
     ↓
-Phase 2: Validation & IR (3-4 weeks)
+Phase 2: Generic Instance API & Example SDK - Python (3-4 weeks)
     ↓
-Phase 3: Python Generator MVP (3-4 weeks)
+Phase 3: Generic Instance API & Example SDK - TypeScript (3-4 weeks)
     ↓
-Phase 4: Runtime & Lazy Evaluation (3-4 weeks)
+Phase 4: Intermediate Representation (IR) for Multi-Language (3-4 weeks)
     ↓
-Phase 5: Feature Parity (4-6 weeks)
+Phase 5: Code Generation from IR (Python & TypeScript) (4-6 weeks)
     ↓
-Phase 6: Query Builder & Optimizer (2-3 weeks)
+Phase 6: Feature Parity & Advanced Features (4-6 weeks)
     ↓
-Phase 7: Multi-Language Foundation (3-4 weeks)
+Phase 7: Query Builder & Optimizer (2-3 weeks)
     ↓
 Phase 8: API Service (2-3 weeks)
     ↓
@@ -38,7 +38,7 @@ Phase 9: Production Hardening (2-3 weeks)
     ↓
 Phase 10: Migration & Documentation (2-3 weeks)
 
-Total Estimated Time: 26-39 weeks
+Total Estimated Time: 28-42 weeks
 ```
 
 ## Phase 0: Foundation & Setup
@@ -171,610 +171,438 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 ---
 
-## Phase 2: Validation & Intermediate Representation
+## Phase 2: Generic Instance API & Example SDK (Python)
 
-**Goal**: Validate data models upfront, then create language-agnostic IR from validated models.
+**Goal**: Build a generic instance API with InstanceClient and InstanceAPI, then create an example SDK that extends these generic classes to demonstrate the pattern.
 
 **Duration**: 3-4 weeks
 
 ### Tasks
 
-1. **Validation Layer (Goal 6 - Critical!)**
-   - Implement validation rules for data models
-   - Check data model for the following:
-     - Existence of reverse direct relation target.
-     - `source` is defined for direct relations.
-     - No name conflicts with Python or Pydantic reserved words for
-       properties, classes, methods, and method parameters.
-   - Generate warnings for any issues found.
-   - Graceful degradation decisions. 
-     - For missing reverse direct relation target,exclude the reverse direct relation property.
-     - For missing `source` in direct relations, only use a node reference. Note this requires
-       no action in the validation layer, but must be handled in the parser/transformer.
-     - For name conflicts, append a `_` suffix to the conflicting name. Note this requires
-       no action in the validation layer, but must be handled in the parser/transformer.
+1. **Generic Instance Models (Foundation)** ✅
+   - Complete generic `InstanceModel`, `Instance`, `InstanceWrite` base classes
+   - Implement `InstanceList` with pagination support
+   - Implement `ViewRef` for view references
+   - Implement `DataRecord` and `DataRecordWrite` for metadata
+   - Generic serialization/deserialization (to/from CDF API format)
+   - Support for both `node` and `edge` instance types
+   - Pandas integration for data analysis
+
+2. **Generic InstanceClient**
+   - Build `InstanceClient` class for instance CRUD operations
+   - Implement `upsert()` method (create and update modes)
+   - Implement `delete()` method
+   - Use a three different thread pool executors, one for writing, one for deleting, and one for retrieving. They
+     will have different concurrency limits.
+   - Integration with HTTPClient from Phase 1
+   - Proper error handling and validation
+   - Return `InstanceResult` with created/updated/unchanged/deleted items
+
+
+3.a **Generic InstanceAPI Part 1**
+   - Build `InstanceAPI` base class for view-specific operations
+   - Implement `list()` with lazy iteration
+   - Implement `iterate()` for pagination
+   - Implement `search()` for full-text search
+   - Introduce Filtering data structures.
+
+3.b  **Generic InstanceAPI Part 2**
+   - Implement `retrieve()` with single/batch support
+   - Implement `aggregate()` for aggregations
+   - Support different connection retrieval modes (skip/identifier/full)
+
+4. **Example Data Classes**
+   - Create example view-specific data classes extending `Instance`
+   - Create example write classes extending `InstanceWrite`
+   - Create example list classes extending `InstanceList`
+   - Demonstrate property type mappings (text, int, float, bool, datetime, etc.)
+   - Demonstrate nullable and required fields
+   - Include comprehensive docstrings
+
+5. **Example API Classes**
+   - Create `ExampleClient` extending `InstanceClient`
+   - Create view-specific API classes extending `InstanceAPI`
+   - Demonstrate how to initialize API classes with HTTPClient and ViewRef
+   - Implement type-safe retrieve/list/iterate methods
+   - Show proper type hints with generics (T_Instance, T_InstanceWrite, T_InstanceList)
+   - Include examples of different view types (nodes with various property types)
+
+6. **Testing**
+   - Unit tests for generic InstanceModel/Instance/InstanceWrite
+   - Unit tests for InstanceClient CRUD operations
+   - Unit tests for InstanceAPI methods
+   - Integration tests with mock CDF API
+   - Test example SDK end-to-end
+   - Test coverage >90%
+
+### Deliverables
+- ✅ Complete generic InstanceModel/Instance/InstanceWrite base classes
+- ✅ Generic InstanceClient with CRUD operations
+- ✅ Generic InstanceAPI with retrieve/list/iterate/aggregate/search
+- ✅ Example data classes demonstrating various property types
+- ✅ Example API classes showing proper usage patterns
+- ✅ Example client demonstrating how to compose API classes
+- ✅ Comprehensive test suite with >90% coverage
+- ✅ Documentation and usage examples
+
+### Success Criteria
+- Can perform CRUD operations on instances using generic InstanceClient
+- Can retrieve, list, and filter instances using view-specific API classes
+- Example SDK demonstrates clear patterns for extending generic classes
+- Type safety maintained throughout with proper generics
+- All tests pass with >90% coverage
+- Generated code is clean and well-documented
+- Pandas integration works for data analysis
+
+### Dependencies
+- Phase 1 complete (need HTTPClient and PygenClient)
+
+
+---
+
+## Phase 3: Generic Instance API & Example SDK (TypeScript)
+
+**Goal**: Build TypeScript equivalent of Phase 2 - generic instance API with InstanceClient and InstanceAPI, plus an example SDK.
+
+**Duration**: 3-4 weeks
+
+### Tasks
+
+1. **Generic Instance Models (TypeScript)**
+   - Create `InstanceModel`, `Instance`, `InstanceWrite` base interfaces/classes
+   - Implement `InstanceList` with pagination support
+   - Implement `ViewRef` interface for view references
+   - Implement `DataRecord` and `DataRecordWrite` interfaces
+   - Generic serialization/deserialization (to/from CDF API format)
+   - Support for both `node` and `edge` instance types
+   - Proper TypeScript type definitions
+
+2. **Generic InstanceClient (TypeScript)**
+   - Build `InstanceClient` class for instance CRUD operations
+   - Implement `upsert()` method (create and update modes)
+   - Implement `delete()` method
+   - Support batch operations for efficiency
+   - Integration with HTTP client (fetch or axios)
+   - Proper error handling and validation
+   - Return `InstanceResult` with created/updated/unchanged/deleted items
+
+3. **Generic InstanceAPI (TypeScript)**
+   - Build `InstanceAPI` base class for view-specific operations
+   - Implement `retrieve()` with single/batch support
+   - Implement `list()` with async iteration
+   - Implement `iterate()` for pagination
+   - Implement `aggregate()` for aggregations
+   - Implement `search()` for full-text search
+   - Generic filtering support
+   - Support different connection retrieval modes
+
+4. **Example Data Classes (TypeScript)**
+   - Create example view-specific interfaces/classes extending `Instance`
+   - Create example write interfaces extending `InstanceWrite`
+   - Create example list classes
+   - Demonstrate property type mappings (string, number, boolean, Date, etc.)
+   - Demonstrate optional and required fields
+   - Include comprehensive JSDoc comments
+
+5. **Example API Classes (TypeScript)**
+   - Create example client extending `InstanceClient`
+   - Create view-specific API classes extending `InstanceAPI`
+   - Demonstrate how to initialize API classes with HTTP client and ViewRef
+   - Implement type-safe retrieve/list/iterate methods
+   - Show proper type hints with TypeScript generics
+   - Include examples of different view types
+
+6. **Testing**
+   - Unit tests for generic InstanceModel/Instance/InstanceWrite
+   - Unit tests for InstanceClient CRUD operations
+   - Unit tests for InstanceAPI methods
+   - Integration tests with mock CDF API
+   - Test example SDK end-to-end
+   - Test coverage >90%
+
+### Deliverables
+- ✅ Complete generic TypeScript instance models
+- ✅ Generic InstanceClient with CRUD operations
+- ✅ Generic InstanceAPI with retrieve/list/iterate/aggregate/search
+- ✅ Example TypeScript data classes
+- ✅ Example TypeScript API classes
+- ✅ Example TypeScript client
+- ✅ Comprehensive test suite with >90% coverage
+- ✅ Documentation and usage examples
+
+### Success Criteria
+- Can perform CRUD operations using TypeScript InstanceClient
+- Can retrieve, list, and filter instances using TypeScript API classes
+- Example SDK demonstrates clear patterns for extending generic classes
+- Type safety maintained throughout with TypeScript generics
+- All tests pass with >90% coverage
+- Generated code is clean and well-documented
+- Follows TypeScript best practices
+
+### Dependencies
+- Phase 1 complete (need to understand client patterns)
+- Phase 2 complete (need Python patterns to mirror)
+
+---
+
+## Phase 4: Intermediate Representation (IR) for Multi-Language Support
+
+**Goal**: Create a language-agnostic intermediate representation that can support code generation for both Python and TypeScript.
+
+**Duration**: 3-4 weeks
+
+### Tasks
+
+1. **Validation Layer (Foundation for IR)**
+   - Implement validation rules for data models before IR creation
+   - Check data model for:
+     - Existence of reverse direct relation targets
+     - `source` is defined for direct relations
+     - No name conflicts with language reserved words (Python, TypeScript)
+   - Generate warnings for any issues found
+   - Graceful degradation decisions
    - Clear, user-friendly error messages
 
-2. **Type System**
-   - Define IRType hierarchy based on ViewResponse property types:
-     - **Primitive types from DataType variants:**
-       - TextProperty → IRTextType
-         - Maps to Python `str`
-         - Supports max_text_size and collation constraints
-       - Float32Property, Float64Property → IRFloatType
-         - Maps to Python `float`
-         - Supports unit metadata (Unit with external_id and source_unit)
-       - BooleanProperty → IRBoolType
-         - Maps to Python `bool`
-       - Int32Property, Int64Property → IRIntType
-         - Maps to Python `int`
-       - TimestampProperty → IRTimestampType
-         - Maps to Python `datetime.datetime` (read/write)
-         - Maps to `datetime` in typed hints
-         - ISO format serialization with milliseconds
-       - DateProperty → IRDateType
-         - Maps to Python `datetime.date` (read/write)
-         - Maps to `date` in typed hints
-         - ISO format serialization
-       - JSONProperty → IRJSONType
-         - Maps to Python `dict`
-     - **CDF Reference types (external IDs):**
-       - TimeseriesCDFExternalIdReference → IRTimeseriesReferenceType
-         - Read: `Union[TimeSeries, str, None]`
-         - Write: `Union[TimeSeriesWrite, str, None]`
-         - GraphQL: `Optional[TimeSeriesGraphQL]`
-         - Always nullable
-       - FileCDFExternalIdReference → IRFileReferenceType
-         - Read: `Union[FileMetadata, str, None]`
-         - Write: `Union[FileMetadataWrite, str, None]`
-         - GraphQL: `Optional[FileMetadataGraphQL]`
-         - Always nullable
-       - SequenceCDFExternalIdReference → IRSequenceReferenceType
-         - Read: `Union[SequenceRead, str, None]`
-         - Write: `Union[SequenceWrite, str, None]`
-         - GraphQL: `Optional[SequenceGraphQL]`
-         - Always nullable
-     - **Container types:**
-       - Support for list types via `list` property on ListablePropertyTypeDefinition
-       - Support for `max_list_size` constraint
-       - Lists wrap the inner type: `list[T]` or `Optional[list[T]]`
-     - **Connection types (derived from ViewResponseProperty variants):**
-       - DirectNodeRelation → IRDirectRelationType
-         - One-to-one: Write: `DirectRelationReference | tuple[str, str] | None`, Read: `DirectRelationReference | None`
-         - One-to-many: Write: `list[DirectRelationReference | tuple[str, str]] | None`, Read: `list[DirectRelationReference] | None`
-         - With source: includes target class in Union
-         - Without source: only dm.NodeId or str (if has_default_instance_space)
-       - SingleEdgeProperty/MultiEdgeProperty → IREdgeType
-         - Single: `Union[TargetClass, str, dm.NodeId, None]`
-         - Multi: `Optional[list[Union[TargetClass, str, dm.NodeId]]]`
-         - With edge class: includes edge class in Union
-       - SingleReverseDirectRelationPropertyResponse/MultiReverseDirectRelationPropertyResponse → IRReverseDirectRelationType
-         - Single: `Union[TargetClass, str, dm.NodeId, None]`
-         - Multi: `Optional[list[Union[TargetClass, str, dm.NodeId]]]`
-         - Always read-only (not in write classes)
-     - **Enum types:**
-       - EnumProperty → IREnumType
-         - Maps to `Literal[value1, value2, ...]` with all enum keys
-         - Read type includes `| str` to handle unknown values
-         - Stores unknown_value handling
-     - **Type Modifiers:**
-       - Optional/nullable types based on ViewCorePropertyResponse.nullable
-       - Cardinality tracking (single vs multi) from connection_type
-       - Each IRType has methods:
-         - as_python_type() -> str (base Python type)
-         - as_read_type_hint() -> str (for read data classes)
-         - as_write_type_hint() -> str (for write data classes)
-         - as_graphql_type_hint() -> str (for GraphQL data classes)
-         - as_typed_hint(operation: Literal["read", "write"]) -> str (for TypedNode/TypedEdge)
+2. **Type System (Language-Agnostic)**
+   - Define IRType hierarchy based on CDF property types:
+     - Primitive types: text → string, int → integer, float, boolean, datetime, date, json
+     - CDF reference types: timeseries, file, sequence references
+     - Container types: list types with cardinality
+     - Connection types: direct relations, edges, reverse direct relations
+     - Enum types with literal values
+   - Type modifiers: nullable, required, default values
+   - Each IRType has methods to generate language-specific type hints:
+     - `as_python_type()` → Python type hint
+     - `as_typescript_type()` → TypeScript type
+     - `as_read_type_hint(lang)` → Read operation type
+     - `as_write_type_hint(lang)` → Write operation type
 
 3. **IR Models**
-   - **IRProperty** - Represents a property in a class
-     - Source: ViewCorePropertyResponse
-     - Fields:
-       - name: str (from ViewCoreProperty.name or property key, transformed per naming config)
-       - prop_name: str (original property identifier in data model)
-       - doc_name: str (human-readable name for documentation)
-       - description: str | None (from ViewCoreProperty.description)
-       - type: IRType (parsed from ViewCorePropertyResponse.type)
-       - nullable: bool (from ViewCorePropertyResponse.nullable)
-       - immutable: bool | None (from ViewCorePropertyResponse.immutable)
-       - auto_increment: bool | None (from ViewCorePropertyResponse.auto_increment)
-       - default_value: Any | None (from ViewCorePropertyResponse.default_value)
-       - container_reference: ContainerReference (from ViewCoreProperty.container)
-       - container_property_identifier: str (from ViewCoreProperty.container_property_identifier)
-       - is_read_only: bool (computed from container/property in readonly list)
-       - need_alias: bool (whether name != prop_name, requiring pydantic alias)
-     - Methods (for code generation):
-       - as_read_type_hint() -> str (type hint for read data class)
-       - as_write_type_hint() -> str (type hint for write data class)
-       - as_graphql_type_hint() -> str (type hint for GraphQL data class)
-       - as_typed_hint(operation: Literal["read", "write"]) -> str (type hint for typed init)
-       - support_filtering() -> bool (whether property can be filtered)
-       - get_filtering_class() -> str (DMS filter class name like "IntFilter", "StringFilter")
-   - **IRConnection** - Represents a connection/relationship in a class
-     - Source: SingleEdgeProperty, MultiEdgeProperty, ReverseDirectRelationProperty, DirectNodeRelation
-     - Fields:
-       - name: str (from property key or ConnectionPropertyDefinition.name)
-       - prop_name: str (original property identifier)
-       - doc_name: str (human-readable name)
-       - variable: str (variable name for iteration)
-       - description: str | None (from ConnectionPropertyDefinition.description)
-       - connection_type: IRConnectionType (parsed from connection_type discriminator)
-       - target_class: IRClassReference | None (resolved from source, can be None for direct relation without source)
-       - edge_class: IRClassReference | None (for edge connections with properties)
-       - is_list: bool (from multi vs single connection type)
-       - direction: Literal["outwards", "inwards"] (from EdgeProperty.direction)
-       - edge_type: DirectRelationReference | None (from EdgeProperty.type)
-       - edge_source: ViewReference | None (from EdgeProperty.edge_source)
-       - through: PropertyId | None (for reverse direct relations)
-       - container_reference: ContainerReference | None (for direct relations)
-       - container_property_identifier: str | None
-       - type_hint_node_reference: list[str] (like ["str", "dm.NodeId"] for direct relations)
-       - need_alias: bool
-     - Properties (computed):
-       - is_direct_relation: bool (edge_type is None and through is None)
-       - is_direct_relation_no_source: bool (is direct relation without target_class)
-       - is_reverse_direct_relation: bool (through is not None)
-       - is_edge: bool (edge_type is not None)
-       - is_edge_without_properties: bool (is edge and edge_class is None)
-       - is_edge_with_properties: bool (is edge and edge_class is not None)
-       - is_write_field: bool (not reverse direct relation and not read-only)
-     - Methods (for code generation):
-       - as_read_type_hint() -> str
-       - as_write_type_hint() -> str
-       - as_graphql_type_hint() -> str
-       - as_typed_hint(operation: Literal["read", "write"]) -> str
-       - support_filtering() -> bool (only direct relations support filtering)
-       - get_filtering_class() -> str (returns "DirectRelationFilter")
-   - **IRClass** - Represents a generated class (from View)
-     - Source: ViewResponse
-     - Fields:
-       - read_name: str (class name for read operations, PascalCase)
-       - write_name: str (class name for write operations, e.g., "{read_name}Write")
-       - graphql_name: str (class name for GraphQL operations, e.g., "{read_name}GraphQL")
-       - read_list_name: str (list class name, e.g., "{read_name}List")
-       - write_list_name: str (write list class name, e.g., "{read_name}WriteList")
-       - doc_name: str (human-readable singular name)
-       - doc_list_name: str (human-readable plural name)
-       - variable: str (variable name for instances)
-       - variable_list: str (variable name for lists)
-       - file_name: str (file name for the class module)
-       - space: str (from ViewResponse.space)
-       - external_id: str (from ViewResponse.external_id)
-       - version: str (from ViewResponse.version)
-       - description: str | None (from ViewResponse.description)
-       - properties: list[IRProperty] (parsed from ViewResponse.properties dict)
-       - connections: list[IRConnection] (parsed from ViewResponse.properties dict)
-       - implements: list[IRClassReference] (from ViewResponse.implements, parent classes)
-       - direct_children: list[IRClassReference] (child classes that implement this class)
-       - is_writable: bool (from ViewResponse.writable)
-       - is_interface: bool (computed: true if has children and not writable)
-       - used_for: Literal["node", "edge", "all"] (from ViewResponse.used_for)
-       - node_type: DirectRelationReference | None (for node classes with filter)
-       - has_edge_class: bool (if used_for == "all" and this is node class)
-       - has_node_class: bool (if used_for == "all" and this is edge class)
-     - Properties (computed):
-       - pydantic_field: Literal["Field", "pydantic.Field"] (use "pydantic.Field" if class named "Field")
-       - dependencies: list[IRClass] (all classes referenced by connections)
-       - has_container_fields: bool (any field has container reference)
-     - Methods (for iteration):
-       - __iter__() -> Iterator[IRProperty | IRConnection] (iterate all fields)
-       - get_field(name: str) -> IRProperty | IRConnection | None
-   - **IRAPIClass** - Represents a generated API class
-     - Fields:
-       - parent_attribute: str (attribute name on parent client)
-       - name: str (API class name, e.g., "{class_name}API")
-       - file_name: str (file name for the API class)
-       - data_class: IRClass (the data class this API serves)
-       - filter_method: IRFilterMethod (main filter method)
-       - is_edge_class: bool (whether this API serves an edge class)
-   - **IREdgeAPIClass** - Represents a generated edge API class
-     - Extends IRAPIClass
-     - Fields:
-       - start_class: IRClass (source node class)
-       - end_class: IRClass (target node class)
-       - edge_class: IRClass | None (edge properties class if exists)
-       - field_name: str (field name on start class)
-       - edge_type: DirectRelationReference (edge type identifier)
-       - direction: Literal["outwards", "inwards"]
-       - end_filter_method: IRFilterMethod (filter for end nodes)
-       - has_default_instance_space: bool
-   - **IRFilterMethod** - Represents a generated filter/list method
-     - Fields:
-       - name: str (method name, usually "list")
-       - parameters: list[IRFilterParameter]
-       - implementations: list[IRFilterImplementation]
-       - return_type: str (return type hint)
-   - **IRFilterParameter** - Represents a filter method parameter
-     - Fields:
-       - name: str (parameter name)
-       - type_: str (type hint)
-       - description: str (parameter description)
-       - default: str | None (default value)
-       - is_nullable: bool
-       - is_time: bool (computed from type)
-       - is_timestamp: bool (computed from type)
-   - **IRFilterImplementation** - Represents a DMS filter implementation
-     - Fields:
-       - filter_class: str (DMS filter class like "dm.filters.Equals", "dm.filters.Range")
-       - prop_name: str (property to filter on)
-       - keyword_arguments: dict[str, IRFilterParameter]
-       - is_edge_class: bool
-     - Methods:
-       - get_condition() -> str (condition to check if filter should be applied)
-       - get_arguments() -> str (arguments to pass to filter constructor)
-   - **IRMethod** - Represents a generated method on API classes
-     - Fields:
-       - name: str (method name like "retrieve", "apply", "delete", "search")
-       - description: str | None (docstring content)
-       - arguments: list[IRMethodArgument]
-       - return_type: IRType
-       - is_async: bool
-   - **IRMethodArgument** - Represents a method parameter
-     - Fields:
-       - name: str (parameter name)
-       - type: IRType (parameter type)
-       - default: Any | None (default value)
-       - is_required: bool
-       - description: str | None
-   - **IREnum** - Represents an enum type
-     - Source: EnumProperty
-     - Fields:
-       - name: str (generated from context)
-       - values: dict[str, IREnumValue] (from EnumProperty.values)
-       - unknown_value: str | None (from EnumProperty.unknown_value)
-   - **IREnumValue** - Represents an enum value
-     - Source: EnumValue
-     - Fields:
-       - name: str (from EnumValue.name or key)
-       - description: str | None (from EnumValue.description)
-   - **IRModule** - Represents a Python module/file
-     - Fields:
-       - name: str (module name)
-       - classes: list[IRClass]
-       - api_classes: list[IRAPIClass]
-       - enums: list[IREnum]
-       - imports: list[IRImport]
-   - **IRImport** - Represents an import statement
-     - Fields:
-       - module: str (module to import from)
-       - names: list[str] (names to import)
-       - alias: str | None (import alias)
-   - **IRModel** - Top-level representation of entire data model
-     - Source: DataModelResponse (containing multiple ViewResponse objects)
-     - Fields:
-       - name: str (data model name)
-       - space: str (data model space)
-       - external_id: str (data model external_id)
-       - version: str (data model version)
-       - description: str | None
-       - modules: list[IRModule] (organized views into modules)
-       - classes: list[IRClass] (all classes across modules)
-       - api_classes: list[IRAPIClass] (all API classes)
-       - edge_api_classes: list[IREdgeAPIClass] (edge-specific API classes)
-       - view_mapping: dict[ViewReference, IRClass] (for resolving references)
-       - has_default_instance_space: bool (whether default instance space is set)
+   - **IRProperty**: Represents a property in a class
+     - Fields: name, type, description, nullable, default, metadata
+     - Methods: `as_python_property()`, `as_typescript_property()`
+   - **IRConnection**: Represents a relationship/connection
+     - Fields: name, connection_type, target_class, cardinality, direction
+     - Methods: `as_python_connection()`, `as_typescript_connection()`
+   - **IRClass**: Represents a view as a class
+     - Fields: name, properties, connections, parent, description, metadata
+     - Methods: `as_python_class()`, `as_typescript_class()`
+   - **IRAPIClass**: Represents an API class for a view
+     - Fields: name, data_class, methods (retrieve, list, iterate, etc.)
+   - **IRModule**: Represents a module/file grouping
+   - **IRModel**: Top-level representation of entire data model
 
-4. **Parser**
-   - **ViewResponse → IRClass Parser**
-     - First pass: Create IRClass structure from ViewResponse
-       - Extract view metadata (space, external_id, version, description)
-       - Apply naming conventions based on config (PygenConfig)
-       - Determine class variants (read_name, write_name, graphql_name, list names)
-       - Generate variable names (variable, variable_list)
-       - Determine file_name for module placement
-       - Extract implements relationships (parent views)
-       - Determine is_writable, used_for, node_type
-       - Handle reserved word conflicts (append "_" suffix)
-     - Second pass: Populate fields after all classes exist
-       - Parse ViewCorePropertyResponse → IRProperty
-         - Extract property metadata (name, description, nullable, etc.)
-         - Parse DataType to IRType
-         - Determine container references
-         - Check if property is read-only
-         - Handle enum types (extract EnumProperty → IREnum)
-       - Parse connection properties → IRConnection
-         - DirectNodeRelation → one-to-one or one-to-many direct relation
-         - SingleEdgeProperty/MultiEdgeProperty → edge connections
-         - ReverseDirectRelationProperty → reverse direct relations
-         - Resolve target_class from view_mapping
-         - Resolve edge_class from edge_class_mapping
-         - Determine cardinality (single vs multi)
-         - Handle missing sources (target_class = None)
-       - Build EdgeClass instances (for edge type tracking)
-       - Handle EndNodeField for edge classes (special multi-type connection)
-       - Detect pydantic.Field vs Field naming conflicts
-     - Third pass: Resolve inheritance and dependencies
-       - Link parent classes via implements
-       - Link child classes via direct_children
-       - Determine is_interface (has children and not writable)
-       - Build dependency graph
-   - **DataModelResponse → IRModel Parser**
-     - Extract data model metadata
-     - Parse all views to IRClass instances
-     - Build view_mapping: dict[ViewReference, IRClass]
-     - Build edge_class_by_view_id mapping
-     - Build node_class_by_view_id mapping
-     - Determine has_default_instance_space
-     - Organize classes into modules
-   - **Helper Parsers**
-     - DataType → IRType parser
-       - Handle all primitive types with proper Python type mapping
-       - Handle list types with cardinality
-       - Handle enum types with literal generation
-       - Handle CDF reference types
-       - Handle DirectNodeRelation
-     - Build direct_relations_by_view_id mapping (for validation)
-     - Build view_property_by_container_direct_relation mapping (for reverse relations)
+4. **Parser (CDF → IR)**
+   - Parse CDF ViewResponse to IRClass
+   - Parse properties to IRProperty
+   - Parse connections to IRConnection
+   - Resolve view references and relationships
+   - Handle inheritance (implements)
+   - Build complete IRModel from DataModelResponse
 
-5. **Transformer**
-   - **API Class Generation**
-     - Generate IRAPIClass for each IRClass
-       - Determine parent_attribute on client
-       - Generate API class name and file name
-       - Create IRFilterMethod for list/filter operations
-         - Build IRFilterParameter for each filterable property
-         - Build IRFilterImplementation for each filter type
-         - Support Equals, In, Range, Prefix filters
-         - Handle time/timestamp conversions
-     - Generate IREdgeAPIClass for each edge connection
-       - Link start_class and end_class
-       - Include edge_class if edge has properties
-       - Create filter methods for both endpoints
-       - Support from/to node filtering with optional space parameters
-   - **Filter Method Generation**
-     - For each primitive field that supports filtering:
-       - Generate appropriate filter parameters (min/max for ranges, equals, prefix for text)
-       - Generate filter implementations with proper DMS filter mapping
-     - For direct relation fields:
-       - Generate DirectRelationFilter support
-       - Handle space parameters if has_default_instance_space
-   - **Method Generation**
-     - Generate standard CRUD methods: retrieve, list, apply, delete, search
-     - Generate aggregate methods if applicable
-     - Generate query builder methods
-   - **Naming Convention Application**
-     - Apply field naming (name vs variable vs doc_name)
-     - Apply class naming (PascalCase for classes, snake_case for variables)
-     - Apply file naming conventions
-     - Handle reserved word collisions
-   - **Inheritance Flattening**
-     - Collect all properties from parent classes
-     - Handle property overrides
-     - Maintain proper MRO (Method Resolution Order)
-   - **Optimization**
-     - Eliminate duplicate imports
-     - Optimize class organization into modules
-     - Determine minimal set of dependencies
+5. **Transformer (IR → Language-Specific IR)**
+   - Apply language-specific naming conventions
+     - Python: snake_case for variables, PascalCase for classes
+     - TypeScript: camelCase for variables, PascalCase for classes
+   - Handle language-specific reserved words
+   - Flatten inheritance if needed
+   - Resolve all dependencies
+   - Organize into language-appropriate module structure
 
 6. **Testing**
    - Unit tests for validation rules
    - Unit tests for each IR component
+   - Parser tests with various CDF data models
+   - Transformer tests for both Python and TypeScript
    - Integration tests with real data models
-   - Test with intentionally incomplete models
-   - Edge case handling
    - Test coverage >90%
 
 ### Deliverables
-- ✅ Complete validation layer with warning system
+- ✅ Complete validation layer
+- ✅ Language-agnostic IR type system
 - ✅ Complete IR model definitions
-- ✅ Parser from validated API models to IR
-- ✅ Transformer utilities
+- ✅ Parser from CDF models to IR
+- ✅ Transformer for language-specific adaptations
 - ✅ Comprehensive test suite
+- ✅ Documentation of IR structure
 
 ### Success Criteria
-- Can validate complex data models
-- Can detect and handle incomplete models gracefully
-- Generates helpful warnings
-- Can parse complex validated models
-- All tests pass with >90% coverage
+- Can parse complex CDF data models to IR
+- Can transform IR to Python-specific IR
+- Can transform IR to TypeScript-specific IR
 - IR is truly language-agnostic
-- Well-documented validation and IR structure
+- Validation catches common issues
+- All tests pass with >90% coverage
+- Well-documented IR structure
 
 ### Dependencies
-- Phase 1 complete (need API models and client)
+- Phase 1 complete (need CDF API models)
+- Phase 2 complete (understand Python patterns)
+- Phase 3 complete (understand TypeScript patterns)
 
 ---
 
-## Phase 3: Python Generator MVP (Client-Based)
+## Phase 5: Code Generation from IR (Python & TypeScript)
 
-**Goal**: Generate basic Python SDK from IR using client-based design (not ORM).
+**Goal**: Use the IR to generate example SDKs for both Python and TypeScript from view and container definitions.
 
-**Duration**: 3-4 weeks
+**Duration**: 4-6 weeks
 
 ### Tasks
 
 1. **Generator Infrastructure**
-   - BaseGenerator abstract class
-   - PythonGenerator implementation
-   - Jinja2 template environment
+   - BaseGenerator abstract class for language generators
+   - Template system setup (Jinja2 for Python, TypeScript template system)
    - File writing utilities
-   - Formatter integration (ruff)
+   - Code formatting integration (ruff for Python, prettier for TypeScript)
 
-2. **Templates - Data Classes**
-   - Simple Pydantic model template
-   - Property generation with type hints
-   - Docstrings
-   - No ORM behavior (just data)
+2. **Python Generator (IR-Based)**
+   - PythonGenerator implementation using IR
+   - Templates for data classes:
+     - Instance subclass template
+     - InstanceWrite subclass template
+     - InstanceList subclass template
+   - Templates for API classes:
+     - InstanceAPI subclass template
+     - Type-safe retrieve/list/iterate methods
+   - Templates for client:
+     - InstanceClient subclass with API composition
+   - Package structure generation (`__init__.py`, imports, etc.)
+   - Post-processing with ruff format/check
+   - Mypy type checking validation
 
-3. **Templates - API Classes (Client-Based)**
-   - API class template that wraps PygenClient
-   - Constructor takes PygenClient instance
-   - CRUD methods delegate to client
-   - List/filter methods with lazy iteration
-   - Query building using client's query builder
-   - Documentation
+3. **TypeScript Generator (IR-Based)**
+   - TypeScriptGenerator implementation using IR
+   - Templates for data classes:
+     - Instance interface/class template
+     - InstanceWrite interface template
+     - InstanceList class template
+   - Templates for API classes:
+     - InstanceAPI subclass template
+     - Type-safe retrieve/list/iterate methods
+   - Templates for client:
+     - InstanceClient subclass with API composition
+   - Package structure generation (index.ts, exports, etc.)
+   - Post-processing with prettier
+   - TypeScript compilation validation
 
-4. **Package Structure**
-   - `__init__.py` generation
-   - Module organization
-   - Import management
-   - Version information
+4. **Generation Pipeline**
+   - Fetch data model from CDF → Parse to IR → Transform IR → Generate code
+   - Support for both Python and TypeScript targets
+   - Configuration system for generation options
+   - CLI integration for generation commands
+   - Progress reporting and logging
 
-5. **Post-Processing**
-   - Run ruff format
-   - Run ruff check
-   - Validate generated code syntax
-   - Run mypy on generated code
+5. **Generated Code Quality**
+   - Comprehensive docstrings/JSDoc comments
+   - Type hints throughout (Python type hints, TypeScript types)
+   - Proper error handling
+   - Clean, readable code structure
+   - Follow language best practices (PEP8, TypeScript style guide)
 
 6. **Testing**
-   - Test generation from IR
-   - Test generated code quality
-   - Test generated code functionality
-   - Integration tests with real models
+   - Test Python generation from IR
+   - Test TypeScript generation from IR
+   - Test generated Python code functionality
+   - Test generated TypeScript code functionality
+   - Integration tests with real CDF data models
+   - Compare generated SDKs with hand-written examples
    - Test coverage >90%
 
 ### Deliverables
-- ✅ Working Python generator
-- ✅ Generated code passes linting
-- ✅ Generated code is type-safe
-- ✅ Basic CRUD functionality works
+- ✅ Working Python generator from IR
+- ✅ Working TypeScript generator from IR
+- ✅ Complete generation pipeline
+- ✅ Generated Python SDK matches Phase 2 patterns
+- ✅ Generated TypeScript SDK matches Phase 3 patterns
+- ✅ CLI for generation
+- ✅ Configuration system
 - ✅ Comprehensive test suite
 
 ### Success Criteria
-- Can generate Python SDK from IR
-- Generated code is PEP8 compliant
-- Generated code passes mypy
-- Can instantiate and use generated classes
+- Can generate Python SDK from any CDF data model
+- Can generate TypeScript SDK from any CDF data model
+- Generated code passes linting and type checking
+- Generated code is functionally equivalent to hand-written examples
+- Generated code is clean and maintainable
 - All tests pass with >90% coverage
+- Documentation is complete
 
 ### Dependencies
-- Phase 2 complete (need IR)
+- Phase 4 complete (need IR)
 
 ---
 
-## Phase 4: Runtime Support & Lazy Evaluation
+## Phase 6: Feature Parity & Advanced Features
 
-**Goal**: Implement runtime support for generated SDKs with lazy evaluation (client-based).
-
-**Duration**: 3-4 weeks
-
-### Tasks
-
-1. **Runtime Base Classes (Client-Based)**
-   - Base API class for generated API classes
-   - Base data class (simple Pydantic BaseModel extension)
-   - Lazy iteration helpers
-   - Query helper utilities
-
-2. **Lazy Evaluation Mechanisms**
-   - Iterator protocol implementation in API classes
-   - Chunk-based fetching through PygenClient
-   - Transparent pagination via client
-   - Optional result caching
-
-3. **Query Helpers**
-   - Helper functions for filter composition
-   - Helpers for working with query builder
-   - Type-safe filter methods
-   - Pagination helpers
-
-4. **Integration with Generator**
-   - Update templates to use runtime base classes
-   - Generate API classes with client injection
-   - Generate lazy list/filter methods
-   - Generate relationship traversal methods
-
-5. **Performance Optimization**
-   - Efficient batching through client
-   - Connection reuse (already in HTTPClient)
-   - Memory management in iterators
-   - Benchmark vs v1
-
-6. **Testing**
-   - Unit tests for runtime base classes
-   - Integration tests with generated code
-   - Performance tests vs v1
-   - Memory usage tests
-   - Test coverage >90%
-
-### Deliverables
-- ✅ Complete runtime support library (client-based)
-- ✅ Lazy evaluation working through API classes
-- ✅ Query helpers functional
-- ✅ Generated code uses client-based lazy patterns
-- ✅ Performance benchmarks met
-
-### Success Criteria
-- Can iterate over large datasets without loading all into memory
-- Client-based design is clear and intuitive
-- Performance is better than v1
-- All tests pass with >90% coverage
-- Memory usage is O(chunk_size)
-
-### Dependencies
-- Phase 3 complete (need generator)
-
----
-
-## Phase 5: Feature Parity
-
-**Goal**: Match all features of original Pygen.
+**Goal**: Match all features of original Pygen and add advanced capabilities.
 
 **Duration**: 4-6 weeks
 
 ### Tasks
 
 1. **Advanced Query Features**
-   - Complex filters
+   - Complex filters with nested conditions
    - Aggregations
    - Joins across views
    - Full-text search
-   - Geospatial queries (if supported)
+   - Query builder for type-safe query construction
 
 2. **Advanced Generation Features**
-   - Custom naming conventions
+   - Custom naming conventions configuration
    - Include/exclude specific views
-   - Custom template support
-   - Configuration file support
-   - CLI improvements
+   - Custom template support for both Python and TypeScript
+   - Configuration file support (pygen.yaml)
+   - CLI improvements with better UX
 
 3. **Edge Cases**
    - Self-referential relationships
    - Circular dependencies
    - Deep inheritance hierarchies
-   - Large schemas
-   - Reserved word handling
+   - Large schemas (100+ views)
+   - Reserved word handling for both languages
 
-4. **API Coverage**
-   - All View types supported
-   - All property types supported
-   - All relationship types supported
-   - All query types supported
+4. **Comprehensive Type Coverage**
+   - All CDF property types supported (text, int, float, bool, datetime, date, json, etc.)
+   - All CDF reference types (timeseries, file, sequence)
+   - All connection types (direct relations, edges, reverse relations)
+   - Enum types with proper validation
+   - List/array types with proper cardinality
 
 5. **Developer Experience**
-   - Better error messages
-   - Validation feedback
-   - Progress indicators
-   - Debug mode
-   - Dry-run mode
+   - Better error messages with actionable suggestions
+   - Validation feedback during generation
+   - Progress indicators for long-running operations
+   - Debug mode with verbose output
+   - Dry-run mode to preview generation
 
 6. **Testing**
    - Test all edge cases
-   - Test with real-world schemas
-   - Regression tests vs old Pygen
+   - Test with real-world complex schemas
+   - Regression tests comparing with v1
    - Performance comparison tests
    - Test coverage >90%
 
 ### Deliverables
 - ✅ All original Pygen features implemented
-- ✅ Edge cases handled
-- ✅ Better UX than original
+- ✅ Edge cases handled gracefully
+- ✅ Better UX than original Pygen
+- ✅ Advanced features working
 - ✅ Comprehensive test suite
 
 ### Success Criteria
 - Can generate SDK for any data model that original Pygen supported
-- Performance is equal or better
-- Developer experience is improved
+- Performance is equal or better than v1
+- Developer experience is significantly improved
 - All tests pass with >90% coverage
-- No known bugs
+- No known critical bugs
 
 ### Dependencies
-- Phase 4 complete
+- Phase 5 complete (need working generation pipeline)
 
 ---
 
-## Phase 6: Query Builder & Optimizer
+## Phase 7: Query Builder & Optimizer
 
 **Goal**: Build a comprehensive query builder and optimizer for complex CDF queries.
 
@@ -803,7 +631,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
 4. **Integration**
    - Integrate query builder with PygenClient
    - Update generated API classes to use query builder
-   - Add query builder helpers to runtime base classes
+   - Add query builder helpers to InstanceAPI base classes
 
 5. **Testing**
    - Unit tests for query builder
@@ -828,67 +656,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 ### Dependencies
 - Phase 1 complete (need PygenClient)
-- Phase 4 complete (need runtime base classes)
+- Phase 2 complete (need InstanceAPI patterns)
 
 ---
 
-## Phase 7: Multi-Language Foundation
-
-**Goal**: Enable generation of TypeScript SDKs (proof of concept).
-
-**Duration**: 3-4 weeks
-
-### Tasks
-
-1. **Generator Abstraction**
-   - Refactor generator interface
-   - Extract common functionality
-   - Language-specific configuration
-   - Template organization
-
-2. **TypeScript Generator**
-   - TypeScriptGenerator class
-   - TypeScript templates (basic)
-   - Data class generation
-   - API class generation
-   - Type definitions
-
-3. **TypeScript Runtime**
-   - Base classes in TypeScript
-   - HTTP client wrapper
-   - Query builder
-   - Lazy evaluation support
-
-4. **Testing**
-   - Test TypeScript generation
-   - Test generated TypeScript code
-   - Cross-language consistency tests
-   - Test coverage >90%
-
-5. **Documentation**
-   - Multi-language architecture docs
-   - TypeScript SDK guide
-   - Language comparison guide
-
-### Deliverables
-- ✅ TypeScript generator working
-- ✅ TypeScript SDK generation functional
-- ✅ Framework for adding more languages
-- ✅ Documentation updated
-
-### Success Criteria
-- Can generate TypeScript SDK from IR
-- TypeScript SDK has basic functionality
-- Architecture supports adding C# and PySpark
-- All tests pass with >90% coverage
-
-### Dependencies
-- Phase 5 complete
-- Phase 6 complete (query builder may be used in generated code)
-
----
-
-## Phase 8: API Service (Goal 5)
+## Phase 8: API Service
 
 **Goal**: Build Pygen backend service for generating SDKs on demand via API.
 
@@ -946,7 +718,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - Deployment is straightforward
 
 ### Dependencies
-- Phase 7 complete (multi-language support)
+- Phase 5 complete (need working generators for both Python and TypeScript)
 
 ---
 
@@ -1008,7 +780,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - Ready for beta release
 
 ### Dependencies
-- Phase 7 complete
+- Phase 8 complete
 
 ---
 

@@ -30,37 +30,38 @@ This document outlines the proposed architecture for the Pygen rewrite. The arch
 │  └─────────────────────────────────────────────────────┘   │
 │                           │                                  │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │         2. Validation Layer                          │   │
-│  │  - Schema validation (before IR)                    │   │
-│  │  - Incomplete model handling                        │   │
-│  │  - Warning generation                               │   │
-│  │  - Graceful degradation decisions                   │   │
+│  │    2. Generic Instance API (Python)                  │   │
+│  │  - InstanceModel, Instance, InstanceWrite           │   │
+│  │  - InstanceClient (CRUD operations)                 │   │
+│  │  - InstanceAPI (view-specific operations)           │   │
+│  │  - Example SDK showing extension patterns           │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                           │                                  │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │         3. Intermediate Representation (IR)          │   │
+│  │    3. Generic Instance API (TypeScript)              │   │
+│  │  - Instance interfaces/classes                      │   │
+│  │  - InstanceClient (CRUD operations)                 │   │
+│  │  - InstanceAPI (view-specific operations)           │   │
+│  │  - Example SDK showing extension patterns           │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │    4. Intermediate Representation (IR)               │   │
+│  │  - Validation layer (before IR creation)            │   │
 │  │  - Language-agnostic model representation           │   │
 │  │  - Type system abstraction                          │   │
-│  │  - Relationship mapping                             │   │
+│  │  - Parser (CDF → IR)                                │   │
+│  │  - Transformer (IR → Language-specific IR)          │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                           │                                  │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │         4. Code Generation Engine                    │   │
-│  │  - Template system (Jinja2)                         │   │
+│  │         5. Code Generation Engine                    │   │
+│  │  - Template system (Jinja2 for Python)              │   │
 │  │  - Language-specific generators:                    │   │
-│  │    - Python Generator                               │   │
-│  │    - TypeScript Generator (future)                  │   │
-│  │    - C# Generator (future)                          │   │
-│  │    - PySpark Generator (future)                     │   │
+│  │    - Python Generator (from IR)                     │   │
+│  │    - TypeScript Generator (from IR)                 │   │
+│  │  - Generates code matching Phases 2-3 patterns      │   │
 │  │  - Formatting & linting integration                 │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                           │                                  │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │         5. Generated SDK Runtime                     │   │
-│  │  - Client-based design (not ORM)                    │   │
-│  │  - API classes with PygenClient reference           │   │
-│  │  - Lazy iteration via client methods                │   │
-│  │  - Query builder helpers                            │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                                                               │
 └─────────────────────────────────────────────────────────────┘
@@ -166,68 +167,109 @@ all_models = client.data_models.list(
 
 ```
 
-### 2. Validation Layer
+### 2. Generic Instance API (Python)
 
-**Purpose**: Validate data models upfront, handle incomplete models gracefully, and provide clear warnings.
+**Purpose**: Provide generic base classes for instance CRUD operations that can be extended for specific views.
 
 **Key Features**:
-- Pre-parsing validation of CDF data models
-- Detection of incomplete models (e.g., missing reverse relations)
-- Warning generation with actionable suggestions
-- Graceful degradation decisions (what to include/exclude)
-- Clear error messages for users
+- Generic `InstanceModel`, `Instance`, `InstanceWrite` base classes
+- `InstanceClient` for CRUD operations (upsert, delete)
+- `InstanceAPI` base class for view-specific operations (retrieve, list, iterate, search, aggregate)
+- Support for both node and edge instance types
+- Pagination and lazy iteration
+- Pandas integration for data analysis
 
 **Structure**:
 ```
-pygen/validation/
+pygen/_generation/python/_instance_api/
 ├── __init__.py
-├── validator.py         # Main validation logic
-├── rules.py             # Validation rules
-├── warnings.py          # Warning types and messages
-└── filters.py           # Filtering logic for incomplete models
+├── _instance.py         # Base models (Instance, InstanceWrite, InstanceList)
+├── _client.py           # InstanceClient for CRUD
+├── _api.py              # InstanceAPI base class
+└── _utils.py            # Helper utilities
+
+pygen/_generation/python/example/
+├── __init__.py
+├── _data_class.py       # Example data classes extending Instance
+├── _api.py              # Example API classes extending InstanceAPI
+└── _client.py           # Example client extending InstanceClient
 ```
 
-**Validation Flow**:
-```
-1. Fetch data model from CDF
-   ↓
-2. Run validation rules
-   ↓
-3. Generate warnings for issues
-   ↓
-4. Decide what to include/exclude
-   ↓
-5. Pass cleaned model to IR parser
+**Design Pattern**:
+```python
+# Generic base (in _instance_api/)
+class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
+    def retrieve(self, id: ...) -> T_Instance | T_InstanceList | None: ...
+    def list(self) -> T_InstanceList: ...
+    def iterate(self) -> Page[T_InstanceList]: ...
+
+# View-specific API (generated or hand-written example)
+class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable, PrimitiveNullableList]):
+    # Inherits all methods with proper types
 ```
 
-### 3. Intermediate Representation (IR)
+### 3. Generic Instance API (TypeScript)
 
-**Purpose**: Create a language-agnostic representation of validated data models that can be transformed into any target language.
+**Purpose**: TypeScript equivalent of the Python generic instance API.
 
 **Key Features**:
-- Schema-independent type system
-- Relationship and inheritance mapping
-- Property metadata (required, nullable, default values)
-- Documentation strings
-- Only contains valid, processable models
+- Generic instance interfaces/classes
+- InstanceClient for CRUD operations
+- InstanceAPI base class for view-specific operations
+- TypeScript generics for type safety
+- Async/await patterns for API calls
+
+**Structure**:
+```
+pygen/_generation/typescript/_instance_api/
+├── index.ts
+├── instance.ts          # Base interfaces/classes
+├── client.ts            # InstanceClient
+└── api.ts               # InstanceAPI base class
+
+pygen/_generation/typescript/example/
+├── index.ts
+├── dataClasses.ts       # Example data classes
+├── api.ts               # Example API classes
+└── client.ts            # Example client
+```
+
+### 4. Intermediate Representation (IR)
+
+**Purpose**: Create a language-agnostic representation of CDF data models after validation, which can be transformed into Python or TypeScript code.
+
+**Key Features**:
+- Validation layer upfront (before IR creation)
+- Language-agnostic type system
+- Property and connection mapping
+- Parser: CDF API models → IR
+- Transformer: IR → Language-specific IR (Python or TypeScript)
 
 **Structure**:
 ```
 pygen/ir/
 ├── __init__.py
+├── validation/          # Validation before IR
+│   ├── __init__.py
+│   ├── validator.py     # Main validation logic
+│   ├── rules.py         # Validation rules
+│   └── warnings.py      # Warning types
 ├── models.py            # IR model definitions
 ├── types.py             # Type system abstraction
-├── parser.py            # Parse validated API models to IR
-└── transformer.py       # Transform IR (e.g., flattening)
+├── parser.py            # CDF → IR parser
+└── transformer.py       # IR → Language-specific IR
 ```
 
 **IR Model Structure**:
 ```python
 class IRType:
-    """Abstract type representation"""
+    """Language-agnostic type representation"""
     name: str
     nullable: bool
     default: Any | None
+    
+    def as_python_type() -> str: ...
+    def as_typescript_type() -> str: ...
 
 class IRProperty:
     """Property representation"""
@@ -236,186 +278,179 @@ class IRProperty:
     description: str | None
     required: bool
     
+class IRConnection:
+    """Connection/relationship representation"""
+    name: str
+    target_class: str
+    cardinality: Literal["one", "many"]
+    connection_type: str  # direct_relation, edge, reverse
+    
 class IRClass:
-    """Class/View representation"""
+    """View representation"""
     name: str
     properties: list[IRProperty]
-    relationships: list[IRRelationship]
+    connections: list[IRConnection]
     parent: IRClass | None
     description: str | None
-
+    
 class IRModel:
-    """Complete model representation"""
+    """Complete data model representation"""
     name: str
     classes: list[IRClass]
-    enums: list[IREnum]
     metadata: dict[str, Any]
 ```
 
-### 4. Code Generation Engine
+**IR Flow**:
+```
+CDF Data Model
+   ↓ (validation)
+Validated Model
+   ↓ (parser)
+Language-Agnostic IR
+   ↓ (transformer)
+Python-Specific IR  or  TypeScript-Specific IR
+   ↓ (generator)
+Python Code         or  TypeScript Code
+```
 
-**Purpose**: Transform IR into target language code with proper formatting and conventions.
+### 5. Code Generation Engine
+
+**Purpose**: Generate code from IR that follows the patterns established in Phases 2-3 (generic API + example SDK).
 
 **Key Features**:
-- Plugin architecture for language generators
-- Template-based generation (Jinja2)
-- Post-processing (formatting, linting)
-- Incremental generation support
-- Custom template support
+- Generates code that extends generic InstanceAPI/InstanceClient
+- Template-based generation (Jinja2 for Python, custom for TypeScript)
+- Post-processing (ruff for Python, prettier for TypeScript)
+- Generates data classes extending Instance/InstanceWrite
+- Generates API classes extending InstanceAPI
+- Generates client classes extending InstanceClient
 
 **Structure**:
 ```
 pygen/generation/
 ├── __init__.py
 ├── base.py              # Base generator class
-├── template_env.py      # Jinja2 environment setup
 ├── python/              # Python generator
 │   ├── __init__.py
-│   ├── generator.py
+│   ├── generator.py     # Generates from IR
 │   ├── templates/
-│   │   ├── api_class.py.jinja
-│   │   ├── data_class.py.jinja
-│   │   ├── filter_class.py.jinja
+│   │   ├── data_class.py.jinja    # Extends Instance/InstanceWrite
+│   │   ├── api_class.py.jinja     # Extends InstanceAPI
+│   │   ├── client.py.jinja        # Extends InstanceClient
 │   │   └── __init__.py.jinja
-│   └── formatters.py
-├── typescript/          # Future: TypeScript generator
-│   └── ...
-├── csharp/              # Future: C# generator
-│   └── ...
-└── pyspark/             # Future: PySpark generator
-    └── ...
+│   └── formatter.py     # ruff integration
+├── typescript/          # TypeScript generator
+│   ├── generator.ts
+│   ├── templates/
+│   │   ├── dataClass.ts.jinja
+│   │   ├── apiClass.ts.jinja
+│   │   ├── client.ts.jinja
+│   │   └── index.ts.jinja
+│   └── formatter.ts     # prettier integration
+└── config.py            # Generation configuration
 ```
 
-**Generator Interface**:
+**Generator Pattern**:
 ```python
-class BaseGenerator(ABC):
-    """Abstract base for language generators"""
-    
-    @abstractmethod
-    def generate_class(self, ir_class: IRClass) -> str:
-        """Generate code for a single class"""
-        
-    @abstractmethod
-    def generate_module(self, ir_classes: list[IRClass]) -> str:
-        """Generate code for a module"""
-        
-    @abstractmethod
-    def format_code(self, code: str) -> str:
-        """Format generated code"""
-        
-    @abstractmethod
-    def get_file_extension(self) -> str:
-        """Get file extension for this language"""
+class PythonGenerator(BaseGenerator):
+    def generate(self, ir_model: IRModel) -> GenerationResult:
+        """Generate Python SDK from IR"""
+        # For each IRClass in ir_model:
+        #   - Generate data class extending Instance/InstanceWrite
+        #   - Generate API class extending InstanceAPI[Write, Read, List]
+        #   - Generate client method on main client
+        ...
 ```
 
-### 5. Generated SDK Runtime (Client-Based Design)
-
-**Purpose**: Provide runtime support for generated SDKs using client-based pattern (not ORM-style).
-
-**Key Features**:
-- Client-based design (following Pygen v1 patterns)
-- Generated API classes that wrap PygenClient
-- Lazy iteration through client methods
-- Query builder helpers for filtering and pagination
-- No database-style ORM patterns
-
-**Structure**:
-```
-pygen/runtime/
-├── __init__.py
-├── base_api.py          # Base class for generated API classes
-├── data_classes.py      # Base for generated data classes
-├── iterators.py         # Lazy iteration helpers
-└── query_helpers.py     # Query building helpers
-```
-
-**Client-Based Design Pattern**:
+**Generated Code Pattern** (matches Phase 2):
 ```python
-# Generated API class (client-based, not ORM)
-class MyModelAPI:
-    """Generated API class for MyModel"""
-    
-    def __init__(self, client: PygenClient):
-        self._client = client
-        self._view_id = ViewReference(space="my_space", external_id="MyModel", version="1")
-    
-    def list(self, limit: int | None = None) -> Iterator[MyModel]:
-        """List instances with lazy iteration"""
-        for item in self._client.instances.list(
-            space=self._view_id.space,
-            view=self._view_id,
-            limit=limit
-        ):
-            yield MyModel.model_validate(item)
-    
-    def retrieve(self, external_id: str) -> MyModel | None:
-        """Retrieve single instance"""
-        item = self._client.instances.retrieve(
-            space=self._view_id.space,
-            view=self._view_id,
-            external_id=external_id
-        )
-        return MyModel.model_validate(item) if item else None
-    
-    def filter(self, **filters) -> Iterator[MyModel]:
-        """Filter instances"""
-        query = self._client.query_builder(
-            space=self._view_id.space,
-            view=self._view_id
-        ).filter(**filters)
-        
-        for item in query.execute():
-            yield MyModel.model_validate(item)
+# Generated data class
+class MyView(Instance):
+    _view_id = ViewRef(space="my_space", external_id="MyView", version="1")
+    my_property: str
+    # ... other properties
 
-# Data class (simple pydantic model, no ORM behavior)
-class MyModel(BaseModel):
-    """Generated data class"""
-    external_id: str
-    name: str
-    value: float
+# Generated API class
+class MyViewAPI(InstanceAPI[MyViewWrite, MyView, MyViewList]):
+    # Inherits retrieve, list, iterate, search, aggregate
+    pass
+
+# Generated client
+class MyClient(InstanceClient):
+    def __init__(self, config: PygenClientConfig):
+        super().__init__(config)
+        self.my_view = MyViewAPI(self._http_client, MyView._view_id, "node")
 ```
+
 
 ## Data Flow
 
-### Generation Flow
+### Development Flow (Phases 2-3)
+```
+Phase 2: Build Generic Python API
+   ↓
+1. Create InstanceModel, Instance, InstanceWrite base classes
+2. Create InstanceClient for CRUD
+3. Create InstanceAPI base class
+4. Build example SDK manually extending generic classes
+   ↓
+Phase 3: Build Generic TypeScript API
+   ↓
+5. Create equivalent TypeScript interfaces/classes
+6. Create TypeScript InstanceClient and InstanceAPI
+7. Build example TypeScript SDK
+```
+
+### Generation Flow (Phase 5+)
 ```
 1. User provides data model specification
    ↓
 2. Pygen Client fetches data model from CDF API
    ↓
 3. Validation Layer validates model
-   - Checks for incomplete models
+   - Checks for incomplete models, missing relations
    - Generates warnings
    - Filters out problematic elements
    ↓
-4. Parser converts validated API models to IR
+4. Parser converts validated CDF models to IR
    ↓
-5. Generator transforms IR to target language
+5. Transformer converts IR to language-specific IR
+   - Apply Python or TypeScript naming conventions
+   - Handle language-specific reserved words
    ↓
-6. Formatter/linter processes generated code
+6. Generator creates code from language-specific IR
+   - Generates data classes extending Instance/InstanceWrite
+   - Generates API classes extending InstanceAPI
+   - Generates client extending InstanceClient
    ↓
-7. Output files written to disk (or returned via API)
+7. Formatter/linter processes generated code
+   - ruff for Python
+   - prettier for TypeScript
+   ↓
+8. Output files written to disk (or returned via API)
 ```
 
-### Runtime Flow (Client-Based)
+### Runtime Flow (Using Generated SDK)
 ```
 1. User imports generated SDK
    ↓
-2. User creates PygenClient instance
+2. User creates client instance (extends InstanceClient)
+   client = MyGeneratedClient(config)
    ↓
-3. User creates generated API class (passing client)
+3. User accesses view-specific API (extends InstanceAPI)
+   api = client.my_view  # MyViewAPI instance
    ↓
-4. User calls methods on API class (e.g., list(), filter())
+4. User calls methods on API
+   items = api.list()  # Returns MyViewList
+   item = api.retrieve(id)  # Returns MyView or None
    ↓
-5. API class uses PygenClient to build query
+5. InstanceAPI uses InstanceClient for CRUD
    ↓
-6. User iterates over results (lazy)
+6. InstanceClient uses HTTPClient to call CDF API
    ↓
-7. PygenClient fetches data in chunks via HTTPClient
+7. Data deserialized into view-specific classes (extend Instance)
    ↓
-8. Data deserialized into generated data classes
-   ↓
-9. User processes data
+8. User processes strongly-typed data
 ```
 
 ### API Service Flow (New Goal 5)
@@ -457,34 +492,43 @@ class MyModel(BaseModel):
 - Better user experience (faster initial response)
 - Explicit eager loading when needed
 
-### 4. Why validation before IR?
+### 4. Why build generic API before IR?
+- Establishes concrete patterns for generated code
+- Validates design with real examples
+- Provides immediate value (can use generic API directly)
+- Informs IR design based on actual needs
+- Easier to test patterns before codifying in IR
+
+### 5. Why IR layer after generic API?
+- Can learn from concrete implementations (Phases 2-3)
+- Decouples parsing from generation
+- Enables multi-language support once patterns are proven
+- Easier to test each stage
+- Allows IR transformations
+- Version compatibility layer
+
+### 6. Why extend generic classes (not generate from scratch)?
+- Reduces code duplication
+- Centralizes CRUD logic in InstanceClient
+- Easy to add features to all generated SDKs
+- Clear separation: generic operations vs view-specific logic
+- Type safety through generics
+- Easier to maintain and evolve
+
+### 7. Why validation before IR?
 - Catches issues early in the pipeline
 - Allows graceful degradation decisions before IR creation
 - Prevents invalid models from entering IR
 - Better error messages for users
 - Enables partial generation for incomplete models
 
-### 5. Why IR layer?
-- Decouples parsing from generation
-- Enables multi-language support
-- Easier to test each stage
-- Allows IR transformations
-- Version compatibility layer
-
-### 6. Why client-based design (not ORM)?
-- Maintains compatibility with Pygen v1 patterns
-- Simpler mental model (explicit client usage)
-- No hidden database-style magic
-- Clear separation between data and operations
-- Easier to test and mock
-- More flexible for API-centric operations
-
-### 7. Why template-based generation?
+### 8. Why template-based generation?
 - Easy to customize
 - Language-specific conventions
 - Maintainable
 - Community can contribute templates
 - Clear separation of logic and output
+- Can generate code that extends generic classes
 
 ## Performance Considerations
 
