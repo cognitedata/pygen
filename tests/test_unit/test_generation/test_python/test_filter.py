@@ -9,7 +9,7 @@ from cognite.pygen._utils.collection import humanize_collection
 from tests.utils import get_concrete_subclasses
 
 
-def view_filter_raw_data() -> Iterable[tuple]:
+def filter_raw_data() -> Iterable[tuple]:
     yield pytest.param(
         {"equals": {"property": ["node", "space"], "value": "my_space"}},
         id="equals_filter",
@@ -130,8 +130,8 @@ def view_filter_raw_data() -> Iterable[tuple]:
     )
 
 
-class TestViewFilters:
-    @pytest.mark.parametrize("raw_data", list(view_filter_raw_data()))
+class TestFilters:
+    @pytest.mark.parametrize("raw_data", list(filter_raw_data()))
     def test_roundtrip_serialization(self, raw_data: dict[str, Any]) -> None:
         loaded = FilterAdapter.validate_python(raw_data)
         assert isinstance(loaded, dict)
@@ -178,3 +178,23 @@ class TestViewFilters:
             subclass.model_fields["filter_type"].default for subclass in get_concrete_subclasses(FilterDataDefinition)
         }
         assert filter_data_types == AVAILABLE_FILTERS
+
+    @pytest.mark.parametrize(
+        "raw_data",
+        [
+            pytest.param(
+                {
+                    "equals": {"property": ["node", "space"], "value": "my_space"},
+                    "in": {"property": ["node", "externalId"], "values": ["id1", "id2"]},
+                },
+                id="multiple_filter_types",
+            ),
+            pytest.param(
+                [{"not_a_filter": {}}],
+                id="invalid_top_level_type",
+            ),
+        ],
+    )
+    def test_invalid_filter_raw_data(self, raw_data: Any) -> None:
+        with pytest.raises(ValidationError):
+            FilterAdapter.validate_python(raw_data)
