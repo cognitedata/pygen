@@ -179,7 +179,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 ### Tasks
 
-1. **Generic Instance Models (Foundation)**
+1. **Generic Instance Models (Foundation)** ✅
    - Complete generic `InstanceModel`, `Instance`, `InstanceWrite` base classes
    - Implement `InstanceList` with pagination support
    - Implement `ViewRef` for view references
@@ -192,19 +192,23 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Build `InstanceClient` class for instance CRUD operations
    - Implement `upsert()` method (create and update modes)
    - Implement `delete()` method
-   - Support batch operations for efficiency
+   - Use a three different thread pool executors, one for writing, one for deleting, and one for retrieving. They
+     will have different concurrency limits.
    - Integration with HTTPClient from Phase 1
    - Proper error handling and validation
    - Return `InstanceResult` with created/updated/unchanged/deleted items
 
-3. **Generic InstanceAPI**
+
+3.a **Generic InstanceAPI Part 1**
    - Build `InstanceAPI` base class for view-specific operations
-   - Implement `retrieve()` with single/batch support
    - Implement `list()` with lazy iteration
    - Implement `iterate()` for pagination
-   - Implement `aggregate()` for aggregations
    - Implement `search()` for full-text search
-   - Generic filtering support
+   - Introduce Filtering data structures.
+
+3.b  **Generic InstanceAPI Part 2**
+   - Implement `retrieve()` with single/batch support
+   - Implement `aggregate()` for aggregations
    - Support different connection retrieval modes (skip/identifier/full)
 
 4. **Example Data Classes**
