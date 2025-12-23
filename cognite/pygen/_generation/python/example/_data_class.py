@@ -1,9 +1,8 @@
-from datetime import datetime, date
 from typing import Literal
 
-from pydantic import JsonValue, Field
+from pydantic import Field, JsonValue
 
-from cognite.pygen._generation.python._instance_api._instance import Instance, InstanceWrite, ViewRef
+from cognite.pygen._generation.python._instance_api._instance import Date, DateTime, Instance, InstanceWrite, ViewRef
 
 
 class PrimitiveNullableWrite(InstanceWrite):
@@ -14,9 +13,9 @@ class PrimitiveNullableWrite(InstanceWrite):
     float64: float | None = None
     int32: int | None = None
     int64: int | None = None
-    timestamp: datetime | None = None
-    date_: date | None = None
-    json: JsonValue | None = None
+    timestamp: DateTime | None = None
+    date_: Date | None = None
+    json_: JsonValue | None = Field(None, alias="json")
 
 
 class PrimitiveNullable(Instance):
@@ -28,9 +27,9 @@ class PrimitiveNullable(Instance):
     float64: float | None
     int32: int | None
     int64: int | None
-    timestamp: datetime | None
-    date_: date | None = None
-    json: JsonValue | None = None
+    timestamp: DateTime | None
+    date_: Date | None = Field(None, alias="date")
+    json_: JsonValue | None = Field(None, alias="json")
 
     def as_write(self) -> PrimitiveNullableWrite:
         return PrimitiveNullableWrite.model_validate(self.dump())

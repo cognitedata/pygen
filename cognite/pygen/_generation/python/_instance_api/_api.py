@@ -1,10 +1,9 @@
 from collections.abc import Sequence
-from typing import Generic, Literal
+from typing import Generic
 
 from cognite.pygen._client.http_client import HTTPClient
 from cognite.pygen._generation.python._instance_api._instance import (
     InstanceId,
-    InstanceResult,
     T_Instance,
     T_InstanceWrite,
 )
@@ -26,13 +25,6 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance]):
             http_client: The HTTP client to use for API requests.
         """
         self._http_client = http_client
-
-    def _upsert(
-        self,
-        items: Sequence[T_InstanceWrite],
-        mode: Literal["update", "create"],
-    ) -> InstanceResult:
-        raise NotImplementedError
 
     def _retrieve(self, ids: Sequence[InstanceId]) -> list[T_Instance]:
         raise NotImplementedError
