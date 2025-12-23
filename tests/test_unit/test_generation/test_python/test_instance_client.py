@@ -104,7 +104,9 @@ class TestInstanceClientUpsert:
         """Test upserting a single instance."""
         mock_response = SuccessResponse(
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test", "externalId": "person-1", "version": 1}]}',
+            body='{"items": [{"instanceType": "node", "space": "test", '
+            '"externalId": "person-1", "version": 1, "wasModified": true, '
+            '"createdTime": 1234567890000, "lastUpdatedTime": 1234567890000}]}',
             content=b"",
         )
 
@@ -115,6 +117,7 @@ class TestInstanceClientUpsert:
         assert len(result.created) == 1
         assert result.created[0].external_id == "person-1"
         assert result.created[0].space == "test"
+        assert result.created[0].was_modified is True
         assert len(result.updated) == 0
         assert len(result.unchanged) == 0
         assert len(result.deleted) == 0
@@ -126,9 +129,15 @@ class TestInstanceClientUpsert:
         mock_response = SuccessResponse(
             status_code=200,
             body='{"items": ['
-            '{"instanceType": "node", "space": "test", "externalId": "person-1", "version": 1},'
-            '{"instanceType": "node", "space": "test", "externalId": "person-2", "version": 1},'
-            '{"instanceType": "node", "space": "test", "externalId": "person-3", "version": 1}'
+            '{"instanceType": "node", "space": "test", "externalId": "person-1", '
+            '"version": 1, "wasModified": true, "createdTime": 1234567890000, '
+            '"lastUpdatedTime": 1234567890000},'
+            '{"instanceType": "node", "space": "test", "externalId": "person-2", '
+            '"version": 1, "wasModified": true, "createdTime": 1234567890000, '
+            '"lastUpdatedTime": 1234567890000},'
+            '{"instanceType": "node", "space": "test", "externalId": "person-3", '
+            '"version": 1, "wasModified": true, "createdTime": 1234567890000,'
+            ' "lastUpdatedTime": 1234567890000}'
             "]}",
             content=b"",
         )
@@ -154,7 +163,9 @@ class TestInstanceClientUpsert:
         """Test upserting with replace mode."""
         mock_response = SuccessResponse(
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test", "externalId": "person-1", "version": 1}]}',
+            body='{"items": [{"instanceType": "node", "space": "test",'
+            ' "externalId": "person-1", "version": 1, "wasModified": '
+            'true, "createdTime": 1234567890000, "lastUpdatedTime": 1234567890000}]}',
             content=b"",
         )
 
@@ -173,7 +184,9 @@ class TestInstanceClientUpsert:
         """Test upserting with skip_on_version_conflict."""
         mock_response = SuccessResponse(
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test", "externalId": "person-1", "version": 1}]}',
+            body='{"items": [{"instanceType": "node", "space": "test", "externalId": '
+            '"person-1", "version": 1, "wasModified": true, "createdTime":'
+            ' 1234567890000, "lastUpdatedTime": 1234567890000}]}',
             content=b"",
         )
 
@@ -218,6 +231,7 @@ class TestInstanceClientDelete:
         assert len(result.deleted) == 1
         assert result.deleted[0].external_id == "person-1"
         assert result.deleted[0].space == "test"
+        assert result.deleted[0].instance_type == "node"
 
     def test_delete_single_instance_by_string(self, client: InstanceClient) -> None:
         """Test deleting a single instance by external_id string."""
@@ -233,6 +247,7 @@ class TestInstanceClientDelete:
         assert isinstance(result, InstanceResult)
         assert len(result.deleted) == 1
         assert result.deleted[0].external_id == "person-1"
+        assert result.deleted[0].instance_type == "node"
 
     def test_delete_string_without_space_raises_error(self, client: InstanceClient) -> None:
         """Test that deleting by string without space raises an error."""
@@ -281,6 +296,7 @@ class TestInstanceClientDelete:
         assert isinstance(result, InstanceResult)
         assert len(result.deleted) == 1
         assert result.deleted[0].external_id == "person-1"
+        assert result.deleted[0].instance_type == "node"
 
 
 class TestInstanceClientChunking:

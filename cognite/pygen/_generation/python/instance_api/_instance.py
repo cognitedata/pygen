@@ -111,7 +111,6 @@ class InstanceModel(BaseModel, populate_by_name=True):
     @model_validator(mode="before")
     def reshape_structure(cls, data: dict[str, Any]) -> dict[str, Any]:
         data = data.copy()
-        data.pop("instanceType", None)
         record_data = {
             field_id: data.pop(field_id)
             for field_id in itertools.chain(_DATA_RECORD_FIELDS, _DATA_RECORD_WRITE_FIELDS)
@@ -142,11 +141,42 @@ _INSTANCE_MODEL_ALIASES = frozenset(
 class InstanceId(InstanceModel): ...
 
 
+class InstanceResultItem(InstanceModel, populate_by_name=True):
+    """Result item from instance operations.
+
+    Attributes:
+        instance_type: The type of the instance (node or edge).
+        version: The version of the instance after the operation.
+        was_modified: Whether the instance was modified by the operation.
+        space: The space of the instance.
+        external_id: The external ID of the instance.
+        created_time: The time the instance was created.
+        last_updated_time: The time the instance was last updated.
+    """
+
+    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
+    version: int
+    was_modified: bool = Field(alias="wasModified")
+    created_time: DateTimeMS = Field(alias="createdTime")
+    last_updated_time: DateTimeMS = Field(alias="lastUpdatedTime")
+
+
 class InstanceResult(BaseModel):
-    created: list[InstanceId]
-    updated: list[InstanceId]
-    unchanged: list[InstanceId]
-    deleted: list[InstanceId]
+    created: list[InstanceResultItem] = Field(default_factory=list)
+    updated: list[InstanceResultItem] = Field(default_factory=list)
+    unchanged: list[InstanceResultItem] = Field(default_factory=list)
+    deleted: list[InstanceId] = Field(default_factory=list)
+
+    def extend(self, other: "InstanceResult") -> None:
+        """Extend this result with another result.
+
+        Args:
+            other: The other result to extend with.
+        """
+        self.created.extend(other.created)
+        self.updated.extend(other.updated)
+        self.unchanged.extend(other.unchanged)
+        self.deleted.extend(other.deleted)
 
 
 class Instance(InstanceModel):
