@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from cognite.pygen._client.auth.credentials import Credentials
+from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
 from cognite.pygen._version import __version__
 
 

@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import Field, JsonValue
 
-from cognite.pygen._generation.python._instance_api._instance import (
+from cognite.pygen._generation.python.instance_api._instance import (
     Date,
     DateTime,
     Instance,

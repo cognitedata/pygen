@@ -6,8 +6,8 @@ from threading import Lock
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from cognite.pygen._client.auth.credentials import Credentials
-from cognite.pygen._client.exceptions import OAuth2Error
+from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
+from cognite.pygen._generation.python.instance_api.exceptions import OAuth2Error
 
 
 class _TokenResponse(BaseModel):

@@ -5,8 +5,8 @@ This module provides the DataModelsAPI class for managing CDF data models.
 
 from collections.abc import Sequence
 
-from cognite.pygen._client.http_client import HTTPClient, SuccessResponse
 from cognite.pygen._client.models import DataModelReference, DataModelRequest, DataModelResponse
+from cognite.pygen._generation.python.instance_api.http_client import HTTPClient, SuccessResponse
 
 from ._base import BaseResourceAPI, Page, ReferenceResponseItems, ResourceLimits
 

@@ -6,8 +6,9 @@ from typing import Literal
 
 import httpx
 
-from cognite.pygen._client.config import PygenClientConfig
-from cognite.pygen._client.http_client._data_classes import (
+from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
+
+from ._data_classes import (
     ErrorDetails,
     FailedRequest,
     FailedResponse,
@@ -15,7 +16,7 @@ from cognite.pygen._client.http_client._data_classes import (
     RequestMessage,
     SuccessResponse,
 )
-from cognite.pygen._client.http_client._header import get_current_pygen_version, get_user_agent
+from ._header import get_current_pygen_version, get_user_agent
 
 if sys.version_info >= (3, 11):
     from typing import Self

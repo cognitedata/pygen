@@ -5,7 +5,7 @@ from typing import Any, Literal
 import httpx
 from pydantic import BaseModel, JsonValue, TypeAdapter, model_validator
 
-from cognite.pygen._client.exceptions import PygenAPIError
+from cognite.pygen._generation.python.instance_api.exceptions import PygenAPIError
 
 
 class HTTPResult(BaseModel):
