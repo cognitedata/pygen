@@ -180,21 +180,27 @@ class TestFilters:
         assert filter_data_types == AVAILABLE_FILTERS
 
     @pytest.mark.parametrize(
-        "raw_data",
+        "raw_data, expected_error",
         [
             pytest.param(
                 {
                     "equals": {"property": ["node", "space"], "value": "my_space"},
                     "in": {"property": ["node", "externalId"], "values": ["id1", "id2"]},
                 },
+                "Value error, Filter data must have exactly one key.",
                 id="multiple_filter_types",
             ),
             pytest.param(
                 [{"not_a_filter": {}}],
+                "Input should be a valid dictionary",
                 id="invalid_top_level_type",
             ),
         ],
     )
-    def test_invalid_filter_raw_data(self, raw_data: Any) -> None:
-        with pytest.raises(ValidationError):
+    def test_invalid_filter_raw_data(self, raw_data: Any, expected_error: str) -> None:
+        with pytest.raises(ValidationError) as excinfo:
             FilterAdapter.validate_python(raw_data)
+        errors = excinfo.value.errors()
+        assert len(errors) == 1
+        error_msg = errors[0]["msg"]
+        assert error_msg == expected_error
