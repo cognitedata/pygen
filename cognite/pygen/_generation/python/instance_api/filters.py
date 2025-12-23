@@ -261,7 +261,8 @@ def _move_filter_key(value: Any) -> Any:
         return value
     if key not in AVAILABLE_FILTERS:
         raise ValueError(
-            f"Unknown filter type: {key!r}. Available filter types: {humanize_collection(AVAILABLE_FILTERS)}."
+            f"Unknown filter type: {key!r}. Available "
+            f"filter types: {humanize_collection(AVAILABLE_FILTERS, sort=True)}."
         )
     if isinstance(data, dict) and key == "not":
         # Not is a recursive filter, so we need to move the filter key inside its data as well

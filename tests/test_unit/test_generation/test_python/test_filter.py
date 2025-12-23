@@ -144,19 +144,19 @@ class TestViewFilters:
         [
             pytest.param(
                 {"equals": {"property": ["node", "space"]}},
-                "In equals.equals missing required field: 'value'.",
+                "Field required",
                 id="missing_value_in_equals_filter",
             ),
             pytest.param(
                 {"in": {"property": "node:property", "values": ["val1", "val2"]}},
-                ("In in.in.property input should be a valid list. Got 'node:property' of type str."),
+                ("Input should be a valid list"),
                 id="invalid_values_type_in_in_filter",
             ),
             pytest.param(
                 {"unknownFilterType": {"property": ["node", "space"], "value": "my_space"}},
                 (
-                    f"Unknown filter type: 'unknownFilterType'. "
-                    f"Available filter types: {humanize_collection(AVAILABLE_FILTERS)}."
+                    f"Value error, Unknown filter type: 'unknownFilterType'. "
+                    f"Available filter types: {humanize_collection(AVAILABLE_FILTERS, sort=True)}."
                 ),
                 id="unknown_filter_type",
             ),
