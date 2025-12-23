@@ -75,7 +75,7 @@ _DATA_RECORD_WRITE_FIELDS = frozenset(
 )
 
 
-class InstanceModel(BaseModel):
+class InstanceModel(BaseModel, populate_by_name=True):
     _view_id: ClassVar[ViewRef]
     instance_type: Literal["node", "edge"] = Field(alias="instanceType")
     space: str
