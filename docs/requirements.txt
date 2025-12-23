@@ -6,6 +6,6 @@ mkdocs-git-revision-date-localized-plugin==1.4.*
 mkdocs-git-authors-plugin==0.10.*
 mkdocs-gitbook==0.0.1
 mkdocs-glightbox==0.4.*
-pymdown-extensions==10.16.*
+pymdown-extensions==10.19.*
 mkdocstrings[python]==0.30.*
 mistune==3.1.4
