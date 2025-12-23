@@ -23,7 +23,7 @@ class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable
         """
         raise NotImplementedError()
 
-    def iterate(self) -> Page[PrimitiveNullable]:
+    def iterate(self) -> Page[PrimitiveNullableList]:
         """Fetch a single page of PrimitiveNullable instances.
 
         Returns:

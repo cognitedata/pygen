@@ -4,6 +4,7 @@ import pytest
 
 from cognite.pygen._client import PygenClientConfig
 from cognite.pygen._generation.python.example import ExampleClient, PrimitiveNullable, PrimitiveNullableWrite
+from cognite.pygen._generation.python.example._data_class import PrimitiveNullableList
 
 
 @pytest.fixture(scope="session")
@@ -44,6 +45,15 @@ class TestExampleDTOs:
         dto = PrimitiveNullable.model_validate(example_response)
         assert isinstance(dto.as_write(), PrimitiveNullableWrite)
         assert dto.dump(format="instance") == example_response
+
+    def test_list_to_pandas(self, example_response: dict[str, Any]) -> None:
+        dto = PrimitiveNullable.model_validate(example_response)
+        dto_list = PrimitiveNullableList([dto])
+        df = dto_list.to_pandas()
+        assert not df.empty
+        assert df.loc[0, "external_id"] == dto.external_id
+        assert dto_list._repr_html_() != ""
+        assert dto_list.dump(format="instance") == [example_response]
 
 
 class TestExampleAPI:

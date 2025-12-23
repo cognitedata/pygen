@@ -185,11 +185,17 @@ class InstanceList(UserList[T_Instance]):
             core_schema.list_schema(item_schema),
         )
 
-    def dump(self) -> list[dict[str, Any]]:
-        return [node.model_dump() for node in self.data]
-
-    def as_external_ids(self) -> list[str]:
-        return [node.external_id for node in self.data]
+    def dump(self, camel_case: bool = True, format: Literal["model", "instance"] = "model") -> list[dict[str, Any]]:
+        """
+        Dump the list of nodes to a list of dictionaries.
+        Args:
+            camel_case: Whether to use camel case for the keys. Defaults to True.
+            format: The format of the dump. Can be "model" or "instance". Defaults
+                to "model".
+        Returns:
+            A list of dictionaries representing the nodes.
+        """
+        return [node.dump(camel_case=camel_case, format=format) for node in self.data]
 
     def to_pandas(self, dropna_columns: bool = False) -> pd.DataFrame:
         """
@@ -201,7 +207,7 @@ class InstanceList(UserList[T_Instance]):
         Returns:
             A pandas.DataFrame with the nodes as rows.
         """
-        df = pd.DataFrame(self.dump())
+        df = pd.DataFrame(self.dump(camel_case=False))
         if df.empty:
             df = pd.DataFrame(columns=list(self._INSTANCE.model_fields.keys()))
         # Reorder columns to have the most relevant first
@@ -225,7 +231,7 @@ class InstanceList(UserList[T_Instance]):
 T_InstanceList = TypeVar("T_InstanceList", bound=InstanceList)
 
 
-class Page(BaseModel, Generic[T_Instance], populate_by_name=True):
+class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
     """A page of results from a paginated API response.
 
     Attributes:
@@ -233,5 +239,5 @@ class Page(BaseModel, Generic[T_Instance], populate_by_name=True):
         next_cursor: The cursor for the next page, or None if this is the last page.
     """
 
-    items: InstanceList[T_Instance]
+    items: T_InstanceList
     next_cursor: str | None = Field(default=None, alias="nextCursor")
