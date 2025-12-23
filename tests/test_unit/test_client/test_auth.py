@@ -8,7 +8,7 @@ import httpx
 import pytest
 import respx
 
-from cognite.pygen._client.auth import OAuth2ClientCredentials
+from cognite.pygen._generation.python.instance_api.auth import OAuth2ClientCredentials
 from cognite.pygen._generation.python.instance_api.exceptions import OAuth2Error
 
 
