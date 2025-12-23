@@ -1,7 +1,7 @@
 import pytest
 
 from cognite.pygen._client.auth.credentials import Credentials
-from cognite.pygen._client.config import PygenClientConfig
+from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 
 
 class DummyCredentials(Credentials):

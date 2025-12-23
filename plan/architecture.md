@@ -109,12 +109,13 @@ pygen/client/
 ```
 
 **API Design Example**:
+
 ```python
 from cognite.pygen._client import PygenClient
-from cognite.pygen._client.config import PygenClientConfig
+from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 from cognite.pygen._client.models import DataModelReference, DataModelRequest
 
-client = PygenClient(config = PygenClientConfig(...))
+client = PygenClient(config=PygenClientConfig(...))
 
 # CRUD operations with pydantic models, all CRUD methods support Sequence inputs
 data_model = client.data_models.retrieve(
@@ -141,7 +142,7 @@ create_result = client.data_models.create(
             space="my_space",
             external_id="my_model",
             version="v1",
-            
+
         )
     ]
 )

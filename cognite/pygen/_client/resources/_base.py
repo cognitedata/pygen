@@ -11,12 +11,12 @@ from typing import Any, Generic
 
 from pydantic import BaseModel, Field, JsonValue
 
-from cognite.pygen._client.http_client import HTTPClient, RequestMessage, SuccessResponse
 from cognite.pygen._client.models import (
     T_APIResource,
     T_Reference,
     T_ResponseResource,
 )
+from cognite.pygen._generation.python.instance_api.http_client import HTTPClient, RequestMessage, SuccessResponse
 from cognite.pygen._utils.collection import chunker_sequence
 
 

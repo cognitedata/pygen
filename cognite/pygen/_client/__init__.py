@@ -6,9 +6,9 @@ fetching data models and is not intended for direct use by end users.
 """
 
 from cognite.pygen._client.auth import Credentials, OAuth2ClientCredentials
-from cognite.pygen._client.config import PygenClientConfig
 from cognite.pygen._client.core import PygenClient
 from cognite.pygen._client.resources import ContainersAPI, DataModelsAPI, Page, SpacesAPI, ViewsAPI
+from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 
 __all__ = [
     "ContainersAPI",

@@ -1,6 +1,5 @@
 from typing import Generic, Literal, overload
 
-from cognite.pygen._client.http_client import HTTPClient
 from cognite.pygen._generation.python.instance_api._instance import (
     InstanceId,
     T_Instance,
@@ -8,6 +7,7 @@ from cognite.pygen._generation.python.instance_api._instance import (
     T_InstanceWrite,
     ViewRef,
 )
+from cognite.pygen._generation.python.instance_api.http_client import HTTPClient
 
 
 class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):

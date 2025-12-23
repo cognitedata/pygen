@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Literal
 
 from cognite.pygen._client import PygenClientConfig
-from cognite.pygen._client.http_client import HTTPClient
+from cognite.pygen._generation.python.instance_api.http_client import HTTPClient
 
 from ._instance import InstanceId, InstanceResult, InstanceWrite
 

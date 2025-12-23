@@ -5,8 +5,8 @@ This module provides the SpacesAPI class for managing CDF spaces.
 
 from collections.abc import Sequence
 
-from cognite.pygen._client.http_client import HTTPClient, SuccessResponse
 from cognite.pygen._client.models import SpaceReference, SpaceRequest, SpaceResponse
+from cognite.pygen._generation.python.instance_api.http_client import HTTPClient, SuccessResponse
 
 from ._base import BaseResourceAPI, Page, ReferenceResponseItems, ResourceLimits
 
