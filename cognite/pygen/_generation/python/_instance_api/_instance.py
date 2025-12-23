@@ -1,7 +1,10 @@
 import itertools
+from collections import UserList
+from collections.abc import Collection
 from datetime import date, datetime
 from typing import Annotated, Any, ClassVar, Generic, Literal, TypeVar
 
+import pandas as pd
 from pydantic import BaseModel, BeforeValidator, Field, model_validator
 from pydantic.functional_serializers import PlainSerializer
 
@@ -153,6 +156,49 @@ T_Instance = TypeVar("T_Instance", bound=Instance)
 T_InstanceWrite = TypeVar("T_InstanceWrite", bound=InstanceWrite)
 
 
+class InstanceList(UserList[T_Instance]):
+    _INSTANCE: ClassVar[type[Instance]] = Instance
+
+    def __init__(self, collection: Collection[T_Instance] | None = None) -> None:
+        super().__init__(collection or [])
+
+    def dump(self) -> list[dict[str, Any]]:
+        return [node.model_dump() for node in self.data]
+
+    def as_external_ids(self) -> list[str]:
+        return [node.external_id for node in self.data]
+
+    def to_pandas(self, dropna_columns: bool = False) -> pd.DataFrame:
+        """
+        Convert the list of nodes to a pandas.DataFrame.
+
+        Args:
+            dropna_columns: Whether to drop columns that are all NaN.
+
+        Returns:
+            A pandas.DataFrame with the nodes as rows.
+        """
+        df = pd.DataFrame(self.dump())
+        if df.empty:
+            df = pd.DataFrame(columns=list(self._INSTANCE.model_fields.keys()))
+        # Reorder columns to have the most relevant first
+        id_columns = ["space", "external_id"]
+        end_columns = ["node_type", "data_record"]
+        fixed_columns = set(id_columns + end_columns)
+        columns = (
+            id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
+        )
+        df = df[columns]
+        if df.empty:
+            return df
+        if dropna_columns:
+            df.dropna(how="all", axis=1, inplace=True)
+        return df
+
+    def _repr_html_(self) -> str:
+        return self.to_pandas(dropna_columns=True)._repr_html_()  # type: ignore[operator]
+
+
 class Page(BaseModel, Generic[T_Instance], populate_by_name=True):
     """A page of results from a paginated API response.
 
@@ -161,5 +207,5 @@ class Page(BaseModel, Generic[T_Instance], populate_by_name=True):
         next_cursor: The cursor for the next page, or None if this is the last page.
     """
 
-    items: list[T_Instance]
+    items: InstanceList[T_Instance]
     next_cursor: str | None = Field(default=None, alias="nextCursor")

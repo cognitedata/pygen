@@ -2,7 +2,14 @@ from typing import Literal
 
 from pydantic import Field, JsonValue
 
-from cognite.pygen._generation.python._instance_api._instance import Date, DateTime, Instance, InstanceWrite, ViewRef
+from cognite.pygen._generation.python._instance_api._instance import (
+    Date,
+    DateTime,
+    Instance,
+    InstanceList,
+    InstanceWrite,
+    ViewRef,
+)
 
 
 class PrimitiveNullableWrite(InstanceWrite):
@@ -33,3 +40,7 @@ class PrimitiveNullable(Instance):
 
     def as_write(self) -> PrimitiveNullableWrite:
         return PrimitiveNullableWrite.model_validate(self.dump())
+
+
+class PrimitiveNullableList(InstanceList[PrimitiveNullable]):
+    _INSTANCE = PrimitiveNullable
