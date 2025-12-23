@@ -101,36 +101,39 @@ The original Pygen has been successful but faces several limitations:
 
 ## Project Structure
 
-This rewrite is organized into 9 phases over approximately 6-9 months:
+This rewrite is organized into 10 phases over approximately 7-10 months:
 
 ### Phase 0: Foundation (1 week)
 Reorganize v1 to legacy/, set up v2 structure alongside
 
-### Phase 1: Pygen Client (3-4 weeks)
-Build httpx-based client with HTTPClient wrapper and query builder
+### Phase 1: Pygen Client Core (3-4 weeks)
+Build httpx-based client with HTTPClient wrapper
 
-### Phase 2: Validation & IR (3-4 weeks)
-Upfront validation layer and language-agnostic model representation
+### Phase 2: Generic Instance API & Example SDK - Python (3-4 weeks)
+Build generic InstanceClient and InstanceAPI base classes, create hand-written example SDK
 
-### Phase 3: Python Generator MVP (3-4 weeks)
-Generate basic Python SDKs from IR (client-based design)
+### Phase 3: Generic Instance API & Example SDK - TypeScript (3-4 weeks)
+Build TypeScript equivalent of Python generic API with example SDK
 
-### Phase 4: Runtime & Lazy Evaluation (3-4 weeks)
-Implement lazy loading for scalability with client-based pattern
+### Phase 4: Intermediate Representation (IR) (3-4 weeks)
+Create language-agnostic IR that can generate code for both Python and TypeScript
 
-### Phase 5: Feature Parity (4-6 weeks)
-Match all features of original Pygen
+### Phase 5: Code Generation from IR (4-6 weeks)
+Generate SDKs that match Phases 2-3 patterns from IR for both Python and TypeScript
 
-### Phase 6: Multi-Language (3-4 weeks)
-Add TypeScript generator as proof of concept
+### Phase 6: Feature Parity & Advanced Features (4-6 weeks)
+Match all features of original Pygen, handle edge cases
 
-### Phase 7: API Service (2-3 weeks)
+### Phase 7: Query Builder & Optimizer (2-3 weeks)
+Build comprehensive query builder for complex CDF queries
+
+### Phase 8: API Service (2-3 weeks)
 Build Pygen backend service for on-demand generation
 
-### Phase 8: Production Hardening (2-3 weeks)
+### Phase 9: Production Hardening (2-3 weeks)
 Performance optimization, security, stability
 
-### Phase 9: Migration & Docs (2-3 weeks)
+### Phase 10: Migration & Docs (2-3 weeks)
 Migration guide, complete documentation, release, delete legacy/
 
 ---
@@ -141,25 +144,25 @@ Migration guide, complete documentation, release, delete legacy/
 **Why**: Better performance, HTTP/2, full control
 **Impact**: Internal wrapper provides consistent interface
 
-### 2. Validation before IR
-**Why**: Catches issues early, enables graceful degradation
-**Impact**: Better error messages, partial generation possible
+### 2. Build generic API before IR
+**Why**: Establishes patterns with concrete examples first
+**Impact**: IR design informed by real implementation needs
 
-### 3. Client-based design (not ORM)
-**Why**: Maintains v1 patterns, simpler mental model
-**Impact**: Clear separation of data and operations
+### 3. Generic base classes with extension pattern
+**Why**: Reduce duplication, centralize CRUD logic
+**Impact**: Easy to maintain and evolve generated SDKs
 
 ### 4. Use Pydantic v2 for all models
 **Why**: 5-17x faster, excellent validation, type safety
 **Impact**: Better performance and developer experience
 
-### 5. Implement Intermediate Representation (IR)
-**Why**: Enables multi-language support
-**Impact**: More complex but scalable architecture
+### 5. Implement Intermediate Representation after patterns proven
+**Why**: Enables multi-language support once patterns validated
+**Impact**: More confident IR design, easier to implement
 
-### 6. Lazy evaluation by default (client-based)
-**Why**: Solves scalability problem
-**Impact**: Can handle unlimited dataset sizes
+### 6. Validation before IR
+**Why**: Catches issues early, enables graceful degradation
+**Impact**: Better error messages, partial generation possible
 
 ### 7. Template-based generation
 **Why**: Readable, maintainable, customizable
@@ -299,22 +302,23 @@ This project includes comprehensive planning documentation:
 ```
 Month 1-2: Foundation & Client
 ├─ Week 1:     Phase 0 (Reorganize to legacy/)
-├─ Week 2-5:   Phase 1 (Pygen Client + Query Builder)
-└─ Week 6-9:   Phase 2 (Validation + IR)
+├─ Week 2-5:   Phase 1 (Pygen Client Core)
+└─ Week 6-9:   Phase 2 (Generic Instance API - Python)
 
-Month 3-4: Generation
-├─ Week 10-13: Phase 3 (Python Generator MVP)
-└─ Week 14-17: Phase 4 (Runtime & Lazy Evaluation)
+Month 3-4: TypeScript & IR
+├─ Week 10-13: Phase 3 (Generic Instance API - TypeScript)
+└─ Week 14-17: Phase 4 (Intermediate Representation)
 
-Month 5-6: Feature Complete
-├─ Week 18-23: Phase 5 (Feature Parity)
-└─ Week 24-27: Phase 6 (Multi-Language)
+Month 5-6: Generation & Feature Parity
+├─ Week 18-23: Phase 5 (Code Generation from IR)
+└─ Week 24-29: Phase 6 (Feature Parity & Advanced Features)
 
-Month 7-9: Production & Release
-├─ Week 28-30: Phase 7 (API Service)
-├─ Week 31-33: Phase 8 (Production Hardening)
-├─ Week 34-36: Phase 9 (Migration & Docs)
-└─ Week 37:    Release v2.0.0, delete legacy/
+Month 7-10: Polish & Release
+├─ Week 30-32: Phase 7 (Query Builder & Optimizer)
+├─ Week 33-35: Phase 8 (API Service)
+├─ Week 36-38: Phase 9 (Production Hardening)
+├─ Week 39-41: Phase 10 (Migration & Docs)
+└─ Week 42:    Release v2.0.0, delete legacy/
 ```
 
 ---
@@ -360,11 +364,13 @@ Each phase must meet quality criteria before proceeding:
 - **Email**: Formal updates to stakeholders
 
 ### Milestones
-1. **M1**: Phase 1 complete (Working client)
-2. **M2**: Phase 3 complete (Can generate Python SDK)
-3. **M3**: Phase 5 complete (Feature parity achieved)
-4. **M4**: Phase 7 complete (Beta release)
-5. **M5**: Phase 8 complete (v2.0.0 release)
+1. **M1**: Phase 1 complete (Working client with HTTPClient)
+2. **M2**: Phase 2 complete (Generic Python API working)
+3. **M3**: Phase 3 complete (Generic TypeScript API working)
+4. **M4**: Phase 5 complete (Can generate SDKs from IR)
+5. **M5**: Phase 6 complete (Feature parity achieved)
+6. **M6**: Phase 9 complete (Production ready, beta release)
+7. **M7**: Phase 10 complete (v2.0.0 release)
 
 ---
 
@@ -421,9 +427,17 @@ Each phase must meet quality criteria before proceeding:
 
 ### Internal Dependencies
 ```
-Phase 0 → Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8
-                           ↓                    ↓
-                       (Can start Phase 4 and 5 in parallel once Phase 3 is stable)
+Phase 0 → Phase 1 → Phase 2 (Python Generic API)
+                          ↓
+                    Phase 3 (TypeScript Generic API)
+                          ↓
+                    Phase 4 (IR based on Phases 2-3)
+                          ↓
+                    Phase 5 (Generation from IR)
+                          ↓
+                    Phase 6 (Feature Parity)
+                          ↓
+                    Phase 7 (Query Builder) → Phase 8 (API Service) → Phase 9 (Hardening) → Phase 10 (Docs)
 ```
 
 ---
@@ -431,7 +445,7 @@ Phase 0 → Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 
 ## Budget & Resources
 
 ### Development Time
-- **Core development**: 6-8 months (1-2 FTE)
+- **Core development**: 7-10 months (1-2 FTE)
 - **Testing**: Included in each phase
 - **Documentation**: 2-3 weeks dedicated + ongoing
 - **Buffer**: 20% added to each phase estimate

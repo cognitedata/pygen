@@ -4,6 +4,26 @@
 
 This document provides detailed technical specifications for key components of the Pygen rewrite. It serves as a reference for implementation and ensures consistency across the codebase.
 
+## Architectural Approach
+
+The Pygen rewrite follows a **"concrete-first, abstract-later"** approach:
+
+1. **Phases 2-3**: Build generic InstanceAPI and InstanceClient base classes with hand-written example SDKs
+   - Phase 2: Python implementation with examples
+   - Phase 3: TypeScript implementation with examples
+   - This establishes proven patterns before codifying them
+
+2. **Phase 4**: Create Intermediate Representation (IR) based on proven patterns
+   - IR is designed to generate code that matches Phases 2-3 patterns
+   - Validation layer ensures clean input to IR
+
+3. **Phase 5**: Build generators that produce code extending generic classes
+   - Python generator creates classes extending Python InstanceAPI
+   - TypeScript generator creates classes extending TypeScript InstanceAPI
+   - Generated code follows the same patterns as hand-written examples
+
+This approach ensures the IR and generators produce practical, maintainable code based on real-world patterns.
+
 ---
 
 ## 1. Pygen Client API
@@ -474,11 +494,266 @@ class View(BaseModel):
 
 ---
 
-## 2. Validation Layer
+## 2. Generic Instance API (Python)
 
-### 2.1 Validator
+### 2.1 InstanceModel Base Classes
 
-**Purpose**: Validate data models upfront and handle incomplete models gracefully.
+**Purpose**: Generic base classes for all CDF instances (nodes and edges).
+
+**Interface**:
+
+```python
+from pydantic import BaseModel, Field
+from typing import Literal, ClassVar
+
+class ViewRef(BaseModel):
+    """Reference to a view"""
+    space: str
+    external_id: str = Field(alias="externalId")
+    version: str
+
+class DataRecord(BaseModel):
+    """Metadata for an instance"""
+    version: int
+    last_updated_time: datetime = Field(alias="lastUpdatedTime")
+    created_time: datetime = Field(alias="createdTime")
+    deleted_time: datetime | None = Field(None, alias="deletedTime")
+
+class InstanceModel(BaseModel):
+    """Base for all instance models"""
+    _view_id: ClassVar[ViewRef]
+    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
+    space: str
+    external_id: str = Field(alias="externalId")
+
+class Instance(InstanceModel):
+    """Base for read instances"""
+    data_record: DataRecord
+
+class InstanceWrite(InstanceModel):
+    """Base for write instances"""
+    data_record: DataRecordWrite = Field(default_factory=DataRecordWrite)
+
+class InstanceList(UserList[T_Instance]):
+    """Generic list of instances with pagination support"""
+    def dump(self, camel_case: bool = True) -> list[dict]: ...
+    def to_pandas(self, dropna_columns: bool = False) -> pd.DataFrame: ...
+```
+
+### 2.2 InstanceClient
+
+**Purpose**: Generic client for instance CRUD operations.
+
+**Interface**:
+
+```python
+class InstanceClient:
+    """Generic client for CDF instance operations"""
+    
+    def __init__(self, config: PygenClientConfig) -> None:
+        self._config = config
+        self._http_client = HTTPClient(config)
+    
+    def upsert(
+        self,
+        items: Sequence[InstanceWrite],
+        mode: Literal["update", "create"],
+    ) -> InstanceResult:
+        """
+        Create or update instances.
+        
+        Args:
+            items: Instances to upsert
+            mode: "create" to fail if exists, "update" to merge
+            
+        Returns:
+            Result with created/updated/unchanged items
+        """
+    
+    def delete(
+        self,
+        items: Sequence[InstanceWrite | InstanceId]
+    ) -> InstanceResult:
+        """Delete instances"""
+```
+
+### 2.3 InstanceAPI
+
+**Purpose**: Generic base class for view-specific API operations.
+
+**Interface**:
+
+```python
+class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
+    """Generic API for view-specific operations"""
+    
+    def __init__(
+        self,
+        http_client: HTTPClient,
+        view_ref: ViewRef,
+        instance_type: Literal["node", "edge"]
+    ) -> None:
+        self._http_client = http_client
+        self._view_ref = view_ref
+        self._instance_type = instance_type
+    
+    def retrieve(
+        self,
+        id: str | InstanceId | list[str | InstanceId],
+        space: str | None = None,
+    ) -> T_Instance | T_InstanceList | None:
+        """Retrieve instances by ID"""
+    
+    def list(self) -> T_InstanceList:
+        """List all instances with lazy iteration"""
+    
+    def iterate(self) -> Page[T_InstanceList]:
+        """Fetch a single page of instances"""
+    
+    def search(
+        self,
+        query: str,
+        properties: list[str] | None = None,
+    ) -> T_InstanceList:
+        """Full-text search"""
+    
+    def aggregate(self, ...) -> AggregateResult:
+        """Aggregate instances"""
+```
+
+### 2.4 Example Usage (Hand-Written)
+
+```python
+# Example data class extending Instance
+class PrimitiveNullable(Instance):
+    _view_id = ViewRef(
+        space="example_space",
+        external_id="PrimitiveNullable",
+        version="v1"
+    )
+    
+    text: str | None = None
+    boolean: bool | None = None
+    float32: float | None = None
+    int64: int | None = None
+
+class PrimitiveNullableWrite(InstanceWrite):
+    # Same fields as read class
+    ...
+
+class PrimitiveNullableList(InstanceList[PrimitiveNullable]):
+    _INSTANCE = PrimitiveNullable
+
+# Example API class extending InstanceAPI
+class PrimitiveNullableAPI(
+    InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable, PrimitiveNullableList]
+):
+    """API for PrimitiveNullable instances"""
+    # Inherits all methods with proper types
+
+# Example client extending InstanceClient
+class ExampleClient(InstanceClient):
+    def __init__(self, config: PygenClientConfig):
+        super().__init__(config)
+        self.primitive_nullable = PrimitiveNullableAPI(
+            self._http_client,
+            view_ref=PrimitiveNullable._view_id,
+            instance_type="node"
+        )
+```
+
+---
+
+## 3. Generic Instance API (TypeScript)
+
+### 3.1 Instance Interfaces
+
+```typescript
+interface ViewRef {
+  space: string;
+  externalId: string;
+  version: string;
+}
+
+interface DataRecord {
+  version: number;
+  lastUpdatedTime: number;
+  createdTime: number;
+  deletedTime?: number;
+}
+
+interface Instance {
+  instanceType: "node" | "edge";
+  space: string;
+  externalId: string;
+  dataRecord: DataRecord;
+}
+
+interface InstanceWrite {
+  instanceType: "node" | "edge";
+  space: string;
+  externalId: string;
+  dataRecord?: DataRecordWrite;
+}
+```
+
+### 3.2 InstanceClient (TypeScript)
+
+```typescript
+class InstanceClient {
+  constructor(config: PygenClientConfig) {
+    this._config = config;
+    this._httpClient = new HTTPClient(config);
+  }
+  
+  async upsert(
+    items: InstanceWrite[],
+    mode: "update" | "create"
+  ): Promise<InstanceResult> {
+    // ...
+  }
+  
+  async delete(items: (InstanceWrite | InstanceId)[]): Promise<InstanceResult> {
+    // ...
+  }
+}
+```
+
+### 3.3 InstanceAPI (TypeScript)
+
+```typescript
+class InstanceAPI<TWrite extends InstanceWrite, TRead extends Instance, TList> {
+  constructor(
+    httpClient: HTTPClient,
+    viewRef: ViewRef,
+    instanceType: "node" | "edge"
+  ) {
+    this._httpClient = httpClient;
+    this._viewRef = viewRef;
+    this._instanceType = instanceType;
+  }
+  
+  async retrieve(id: string | string[]): Promise<TRead | TList | null> {
+    // ...
+  }
+  
+  async *list(): AsyncIterableIterator<TRead> {
+    // Lazy iteration with async generator
+  }
+  
+  async iterate(): Promise<Page<TList>> {
+    // ...
+  }
+}
+```
+
+---
+
+## 4. Validation Layer (Phase 4)
+
+### 4.1 Validator
+
+**Purpose**: Validate CDF data models before IR creation, handle incomplete models gracefully.
 
 **Interface**:
 
@@ -545,7 +820,7 @@ class ValidationResult:
         """Print human-readable summary"""
 ```
 
-### 2.2 Validation Rules
+### 4.2 Validation Rules
 
 Common validation rules include:
 
@@ -571,9 +846,11 @@ Common validation rules include:
 
 ---
 
-## 3. Intermediate Representation (IR)
+## 5. Intermediate Representation (IR) (Phase 4)
 
-### 3.1 Type System
+**Note**: IR is designed after Phases 2-3 to generate code matching proven patterns.
+
+### 5.1 Type System
 
 ```python
 class IRPrimitiveType(str, Enum):
@@ -619,7 +896,7 @@ class IREnum(IRType):
     values: list[str]
 ```
 
-### 3.2 IR Models
+### 5.2 IR Models
 
 ```python
 @dataclass
@@ -704,11 +981,11 @@ class IRModel:
     metadata: dict[str, Any] = field(default_factory=dict)
 ```
 
-### 3.3 Parser
+### 5.3 Parser (CDF → IR)
 
 ```python
 class IRParser:
-    """Parse validated CDF models to IR"""
+    """Parse validated CDF models to language-agnostic IR"""
     
     def parse_data_model(self, data_model: DataModel, validation_result: ValidationResult) -> IRModel:
         """
@@ -738,11 +1015,11 @@ class IRParser:
         """Map CDF type to IR type"""
 ```
 
-### 3.4 Transformer
+### 5.4 Transformer (IR → Language-Specific IR)
 
 ```python
 class IRTransformer:
-    """Transform IR for optimization"""
+    """Transform IR to language-specific IR (Python or TypeScript)"""
     
     def flatten_inheritance(self, model: IRModel) -> IRModel:
         """Flatten inheritance hierarchies"""
@@ -756,9 +1033,11 @@ class IRTransformer:
 
 ---
 
-## 4. Code Generation
+## 6. Code Generation (Phase 5)
 
-### 4.1 Generator Interface
+**Purpose**: Generate code from IR that extends the generic InstanceAPI/InstanceClient classes.
+
+### 6.1 Generator Interface
 
 ```python
 class BaseGenerator(ABC):
@@ -837,7 +1116,7 @@ class GenerationResult:
     warnings: list[str] = field(default_factory=list)
 ```
 
-### 4.2 Python Generator
+### 6.2 Python Generator (from IR)
 
 ```python
 class PythonGenerator(BaseGenerator):
@@ -874,7 +1153,9 @@ class PythonGenerator(BaseGenerator):
         """Setup Jinja2 environment"""
 ```
 
-### 4.3 Template Structure
+### 6.3 Template Structure
+
+**Note**: Templates generate code that extends generic InstanceAPI/InstanceClient classes.
 
 ```
 templates/python/
@@ -893,110 +1174,9 @@ templates/python/
 
 ---
 
-## 5. Generated SDK Runtime (Client-Based)
+## 7. API Service (Phase 8)
 
-### 5.1 Base Classes
-
-**Note**: Client-based design, not ORM-style.
-
-```python
-class BaseAPI:
-    """Base class for generated API classes (client-based)"""
-    
-    def __init__(
-        self,
-        client: PygenClient,
-        view_id: ViewReference,
-    ) -> None:
-        self._client = client
-        self._view_id = view_id
-    
-    def _build_query(self, **filters) -> QueryBuilder:
-        """Build query using client's query builder"""
-        return self._client.query_builder(
-            space=self._view_id.space,
-            view=self._view_id
-        ).filter(**filters)
-
-
-# Simple data class (no ORM behavior)
-class BaseDataClass(BaseModel):
-    """Base for generated data classes - just data, no client ref"""
-    
-    model_config = ConfigDict(
-        validate_assignment=True,
-        # NO arbitrary_types_allowed for _client
-        # NO private attributes for client
-    )
-    
-    # Just data fields, no ORM methods
-    # No save(), delete(), refresh() - those are on API classes
-```
-
-### 5.2 Generated Code Pattern
-
-**Example Generated API Class**:
-
-```python
-# Generated file: my_model_api.py
-from pygen.runtime import BaseAPI
-from pygen.client import PygenClient, ViewReference
-from .data_classes import MyModel
-
-class MyModelAPI(BaseAPI):
-    """API for MyModel (client-based design)"""
-    
-    def __init__(self, client: PygenClient):
-        super().__init__(
-            client=client,
-            view_id=ViewReference(
-                space="my_space",
-                external_id="MyModel",
-                version="1"
-            )
-        )
-    
-    def list(self, limit: int | None = None) -> Iterator[MyModel]:
-        """List all MyModel instances (lazy)"""
-        for item in self._client.instances.list(
-            space=self._view_id.space,
-            view=self._view_id,
-            limit=limit
-        ):
-            yield MyModel.model_validate(item)
-    
-    def retrieve(self, external_id: str) -> MyModel | None:
-        """Retrieve a single instance"""
-        item = self._client.instances.retrieve(
-            space=self._view_id.space,
-            view=self._view_id,
-            external_id=external_id
-        )
-        return MyModel.model_validate(item) if item else None
-    
-    def filter(self, **filters) -> Iterator[MyModel]:
-        """Filter instances"""
-        query = self._build_query(**filters)
-        for item in query.execute():
-            yield MyModel.model_validate(item)
-
-
-# Generated file: data_classes.py
-from pygen.runtime import BaseDataClass
-
-class MyModel(BaseDataClass):
-    """Data class for MyModel (just data, no ORM)"""
-    
-    external_id: str
-    name: str
-    value: float | None = None
-```
-
----
-
-## 6. API Service (Goal 5)
-
-### 6.1 Service Architecture
+### 7.1 Service Architecture
 
 **Purpose**: Provide HTTP API for generating SDKs on demand.
 
@@ -1054,7 +1234,7 @@ async def version_info():
     return {"version": "2.0.0", "supported_languages": [...]}
 ```
 
-### 6.2 Job Queue
+### 7.2 Job Queue
 
 For long-running generation jobs:
 
@@ -1074,9 +1254,9 @@ def generate_sdk_task(request_data: dict) -> dict:
 
 ---
 
-## 7. Configuration
+## 8. Configuration
 
-### 7.1 Configuration File
+### 8.1 Configuration File
 
 ```yaml
 # pygen.yaml
@@ -1114,7 +1294,7 @@ model:
   exclude_views: []
 ```
 
-### 7.2 Configuration Loading
+### 8.2 Configuration Loading
 
 ```python
 @dataclass
@@ -1138,7 +1318,7 @@ class PygenConfig:
 
 ---
 
-## 8. CLI Interface
+## 9. CLI Interface
 
 **Note**: Using typer, not click.
 
@@ -1230,9 +1410,9 @@ if __name__ == "__main__":
 
 ---
 
-## 9. Error Handling
+## 10. Error Handling
 
-### 9.1 Exception Hierarchy
+### 10.1 Exception Hierarchy
 
 ```python
 class PygenError(Exception):
@@ -1297,23 +1477,23 @@ class TemplateError(GenerationError):
 
 ---
 
-## 10. Performance Targets
+## 11. Performance Targets
 
-### 10.1 Client Performance
+### 11.1 Client Performance
 
 - **Requests per second**: >100 (with connection pooling)
 - **Latency**: <100ms (p95) for single item retrieval
 - **Memory**: <50MB for client instance
 - **Concurrent requests**: Support 10+ concurrent requests
 
-### 10.2 Generation Performance
+### 11.2 Generation Performance
 
 - **Small model** (<10 views): <5 seconds
 - **Medium model** (10-50 views): <30 seconds
 - **Large model** (50-200 views): <2 minutes
 - **Memory**: <500MB during generation
 
-### 10.3 Runtime Performance
+### 11.3 Runtime Performance
 
 - **Lazy iteration overhead**: <5% vs direct API calls
 - **Query building**: <1ms
@@ -1322,22 +1502,22 @@ class TemplateError(GenerationError):
 
 ---
 
-## 11. Versioning & Compatibility
+## 12. Versioning & Compatibility
 
-### 11.1 Semantic Versioning
+### 12.1 Semantic Versioning
 
 Follow semantic versioning (MAJOR.MINOR.PATCH):
 - **MAJOR**: Breaking changes
 - **MINOR**: New features (backward compatible)
 - **PATCH**: Bug fixes
 
-### 11.2 API Compatibility
+### 12.2 API Compatibility
 
 - Maintain backward compatibility within major version
 - Deprecation warnings for 1 major version
 - Clear migration guides for breaking changes
 
-### 11.3 Generated Code Versioning
+### 12.3 Generated Code Versioning
 
 Include version metadata in generated code:
 
@@ -1350,23 +1530,23 @@ __generated_at__ = "2025-01-15T10:30:00Z"
 
 ---
 
-## 12. Security
+## 13. Security
 
-### 12.1 Credential Handling
+### 13.1 Credential Handling
 
 - Never log credentials
 - Support environment variables
 - Support credential files (with proper permissions)
 - Support secret managers (Azure Key Vault, AWS Secrets Manager)
 
-### 12.2 Input Validation
+### 13.2 Input Validation
 
 - Validate all user inputs
 - Sanitize template inputs
 - Check file paths for traversal attacks
 - Validate API responses
 
-### 12.3 Dependencies
+### 13.3 Dependencies
 
 - Regular security audits
 - Pin dependency versions
