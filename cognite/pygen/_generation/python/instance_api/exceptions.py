@@ -1,5 +1,8 @@
-from .http_client import FailedRequest, FailedResponse
-from .models import InstanceResult
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .http_client import FailedRequest, FailedResponse
+    from .models import InstanceResult
 
 
 class PygenAPIError(Exception):
@@ -24,7 +27,7 @@ class MultiRequestError(PygenAPIError):
     """
 
     def __init__(
-        self, failed_responses: list[FailedResponse], failed_requests: list[FailedRequest], result: InstanceResult
+        self, failed_responses: "list[FailedResponse]", failed_requests: "list[FailedRequest]", result: "InstanceResult"
     ) -> None:
         self.failed_responses = failed_responses
         self.failed_requests = failed_requests
@@ -37,4 +40,4 @@ class MultiRequestError(PygenAPIError):
             parts.append(f"{len(self.failed_responses)} failed responses")
         if self.failed_requests:
             parts.append(f"{len(self.failed_requests)} failed requests")
-        return f"PartialError: {'; '.join(parts)}"
+        return f"{type(self).__name__}: {'; '.join(parts)}"
