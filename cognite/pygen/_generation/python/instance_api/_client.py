@@ -1,6 +1,6 @@
 import concurrent.futures
-from collections.abc import Sequence
-from typing import Literal
+from collections.abc import Callable, Sequence
+from typing import Literal, TypeVar
 
 from pydantic import JsonValue
 
@@ -18,6 +18,8 @@ from cognite.pygen._generation.python.instance_api.http_client import (
 from cognite.pygen._generation.python.instance_api.models.instance import InstanceModel, InstanceWrite
 from cognite.pygen._generation.python.instance_api.models.responses import ApplyResponse, DeleteResponse, InstanceResult
 from cognite.pygen._utils.collection import chunker_sequence
+
+T = TypeVar("T")
 
 
 class InstanceClient:
@@ -66,6 +68,63 @@ class InstanceClient:
         self._delete_executor.shutdown(wait=True)
         self._retrieve_executor.shutdown(wait=True)
 
+    @classmethod
+    def _execute_in_parallel(
+        cls,
+        items: list[T],
+        chunk_size: int,
+        executor: concurrent.futures.ThreadPoolExecutor,
+        task_fn: Callable[[list[T]], HTTPResult],
+    ) -> list[HTTPResult]:
+        """Execute a task function in parallel on chunked items.
+
+        Args:
+            items: List of items to process.
+            chunk_size: Maximum size of each chunk.
+            executor: Thread pool executor to use.
+            task_fn: Function to execute on each chunk.
+
+        Returns:
+            List of HTTPResult objects from all tasks.
+        """
+        futures = [executor.submit(task_fn, chunk) for chunk in chunker_sequence(items, chunk_size)]
+        return [future.result() for future in concurrent.futures.as_completed(futures)]
+
+    @classmethod
+    def _collect_results(
+        cls,
+        results: list[HTTPResult],
+        parse_success: Callable[[str], InstanceResult],
+    ) -> InstanceResult:
+        """Collect results from HTTP responses, raising on failures.
+
+        Args:
+            results: List of HTTPResult objects.
+            parse_success: Function to parse a successful response body into InstanceResult.
+
+        Returns:
+            Combined InstanceResult from all successful operations.
+
+        Raises:
+            MultiRequestError: If any of the HTTPResults indicate a failure.
+        """
+        combined_result = InstanceResult()
+        failed_responses: list[FailedResponse] = []
+        failed_requests: list[FailedRequest] = []
+
+        for result in results:
+            if isinstance(result, SuccessResponse):
+                combined_result.extend(parse_success(result.body))
+            elif isinstance(result, FailedResponse):
+                failed_responses.append(result)
+            elif isinstance(result, FailedRequest):
+                failed_requests.append(result)
+
+        if failed_responses or failed_requests:
+            raise MultiRequestError(failed_responses, failed_requests, combined_result)
+
+        return combined_result
+
     def upsert(
         self,
         items: InstanceWrite | Sequence[InstanceWrite],
@@ -100,21 +159,11 @@ class InstanceClient:
             # This is not implemented yet, but we'll raise a clear error
             raise NotImplementedError("Update mode is not yet implemented")
 
-        futures = []
-        for chunk in chunker_sequence(item_list, self._UPSERT_LIMIT):
-            future = self._write_executor.submit(
-                self._upsert_chunk,
-                chunk,
-                mode,
-                skip_on_version_conflict,
-            )
-            futures.append(future)
+        def upsert_chunk(chunk: list[InstanceWrite]) -> HTTPResult:
+            return self._upsert_chunk(chunk, mode, skip_on_version_conflict)
 
-        http_result: list[HTTPResult] = []
-        for future in concurrent.futures.as_completed(futures):
-            http_result.append(future.result())
-
-        return self._get_success_or_raise_upsert(http_result)
+        http_results = self._execute_in_parallel(item_list, self._UPSERT_LIMIT, self._write_executor, upsert_chunk)
+        return self._collect_results(http_results, self._parse_upsert_response)
 
     def _upsert_chunk(
         self,
@@ -146,32 +195,6 @@ class InstanceClient:
             body_content=body,
         )
         return self._http_client.request_with_retries(request)
-
-    def _get_success_or_raise_upsert(self, results: list[HTTPResult]) -> InstanceResult:
-        """Process a list of HTTPResults, returning a combined InstanceResult or raising an error.
-
-        Args:
-            results: List of HTTPResult objects from upsert operations.
-        Returns:
-            Combined InstanceResult from all successful operations.
-        Raises:
-            MultiRequestError: If any of the HTTPResults indicate a failure.
-        """
-        combined_result = InstanceResult()
-        failed_responses: list[FailedResponse] = []
-        failed_requests: list[FailedRequest] = []
-        for result in results:
-            if isinstance(result, SuccessResponse):
-                combined_result.extend(self._parse_upsert_response(result.body))
-            elif isinstance(result, FailedResponse):
-                failed_responses.append(result)
-            elif isinstance(result, FailedRequest):
-                failed_requests.append(result)
-
-        if failed_responses or failed_requests:
-            raise MultiRequestError(failed_responses, failed_requests, combined_result)
-
-        return combined_result
 
     @staticmethod
     def _parse_upsert_response(body: str) -> InstanceResult:
@@ -220,16 +243,10 @@ class InstanceClient:
 
         instance_ids = [self._to_instance_id(item, space) for item in item_list]
 
-        futures = []
-        for chunk in chunker_sequence(instance_ids, self._DELETE_LIMIT):
-            future = self._delete_executor.submit(self._delete_chunk, chunk)
-            futures.append(future)
-
-        http_result: list[HTTPResult] = []
-        for future in concurrent.futures.as_completed(futures):
-            http_result.append(future.result())
-
-        return self._get_success_or_raise_delete(http_result)
+        http_results = self._execute_in_parallel(
+            instance_ids, self._DELETE_LIMIT, self._delete_executor, self._delete_chunk
+        )
+        return self._collect_results(http_results, self._parse_delete_response)
 
     @staticmethod
     def _to_instance_id(item: str | InstanceId | InstanceWrite | InstanceModel, space: str | None) -> InstanceId:
@@ -245,6 +262,14 @@ class InstanceClient:
         Raises:
             ValueError: If space is None when item is a string.
         """
+        if isinstance(item, InstanceId):
+            return item
+        if isinstance(item, InstanceWrite | InstanceModel):
+            return InstanceId(
+                instance_type=item.instance_type,
+                space=item.space,
+                external_id=item.external_id,
+            )
         if isinstance(item, str):
             if space is None:
                 raise ValueError("space parameter is required when deleting by external_id string")
@@ -253,16 +278,7 @@ class InstanceClient:
                 space=space,
                 external_id=item,
             )
-        elif isinstance(item, InstanceId):
-            return item
-        elif isinstance(item, InstanceWrite | InstanceModel):
-            return InstanceId(
-                instance_type=item.instance_type,
-                space=item.space,
-                external_id=item.external_id,
-            )
-        else:
-            raise TypeError(f"Unsupported type for item: {type(item)}")
+        raise TypeError(f"Unsupported type for item: {type(item)}")
 
     def _delete_chunk(self, items: list[InstanceId]) -> HTTPResult:
         """Delete a chunk of instances via the CDF API.
@@ -286,41 +302,15 @@ class InstanceClient:
 
         return self._http_client.request_with_retries(request)
 
-    def _get_success_or_raise_delete(self, results: list[HTTPResult]) -> InstanceResult:
-        """Process a list of HTTPResults, returning a combined InstanceResult or raising an error.
-
-        Args:
-            results: List of HTTPResult objects from delete operations.
-        Returns:
-            Combined InstanceResult from all successful operations.
-        Raises:
-            MultiRequestError: If any of the HTTPResults indicate a failure.
-        """
-        combined_result = InstanceResult()
-        failed_responses: list[FailedResponse] = []
-        failed_requests: list[FailedRequest] = []
-        for result in results:
-            if isinstance(result, SuccessResponse):
-                deleted_items = self._parse_delete_response(result.body)
-                combined_result.deleted.extend(deleted_items)
-            elif isinstance(result, FailedResponse):
-                failed_responses.append(result)
-            elif isinstance(result, FailedRequest):
-                failed_requests.append(result)
-
-        if failed_responses or failed_requests:
-            raise MultiRequestError(failed_responses, failed_requests, combined_result)
-
-        return combined_result
-
     @staticmethod
-    def _parse_delete_response(body: str) -> list[InstanceId]:
+    def _parse_delete_response(body: str) -> InstanceResult:
         """Parse the response from the delete API.
 
         Args:
             body: The response body from the API.
 
         Returns:
-            List of deleted InstanceId objects.
+            InstanceResult containing the deleted items.
         """
-        return DeleteResponse.model_validate_json(body).deleted
+        deleted = DeleteResponse.model_validate_json(body).deleted
+        return InstanceResult(deleted=deleted)
