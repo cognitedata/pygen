@@ -6,7 +6,7 @@ from cognite.pygen._generation.python.example._data_class import (
     PrimitiveNullableWrite,
 )
 from cognite.pygen._generation.python.instance_api._api import InstanceAPI
-from cognite.pygen._generation.python.instance_api._instance import InstanceId, Page
+from cognite.pygen._generation.python.instance_api.models import InstanceId, Page
 
 
 class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable, PrimitiveNullableList]):

@@ -2,14 +2,13 @@ from typing import Literal
 
 from pydantic import Field, JsonValue
 
-from cognite.pygen._generation.python.instance_api._instance import (
-    Date,
-    DateTime,
+from cognite.pygen._generation.python.instance_api.models._references import ViewReference
+from cognite.pygen._generation.python.instance_api.models._types import Date, DateTime
+from cognite.pygen._generation.python.instance_api.models.instance import (
     Instance,
     InstanceList,
     InstanceWrite,
 )
-from cognite.pygen._generation.python.instance_api._references import ViewReference
 
 
 class PrimitiveNullableWrite(InstanceWrite):

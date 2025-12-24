@@ -1,7 +1,7 @@
 from cognite.pygen._client import PygenClientConfig
 from cognite.pygen._generation.python.example._api import PrimitiveNullableAPI
 from cognite.pygen._generation.python.instance_api._client import InstanceClient
-from cognite.pygen._generation.python.instance_api._references import ViewReference
+from cognite.pygen._generation.python.instance_api.models import ViewReference
 
 
 class ExampleClient(InstanceClient):

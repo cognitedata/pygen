@@ -5,9 +5,12 @@ from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, JsonValue, T
 from pydantic.alias_generators import to_camel
 from pydantic_core.core_schema import FieldSerializationInfo
 
+from cognite.pygen._generation.python.instance_api.models._references import (
+    ContainerReference,
+    NodeReference,
+    ViewReference,
+)
 from cognite.pygen._utils.collection import humanize_collection
-
-from ._references import ContainerReference, NodeReference, ViewReference
 
 # Base classes and helpers
 
