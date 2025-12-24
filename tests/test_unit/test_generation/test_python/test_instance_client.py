@@ -245,11 +245,11 @@ class TestInstanceClientDelete:
 
         result = client.delete(instance_id)
 
-        assert isinstance(result, UpsertResult)
-        assert len(result.deleted) == 1
-        assert result.deleted[0].external_id == "person-1"
-        assert result.deleted[0].space == "test"
-        assert result.deleted[0].instance_type == "node"
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert result[0].external_id == "person-1"
+        assert result[0].space == "test"
+        assert result[0].instance_type == "node"
 
     def test_delete_single_instance_by_string(
         self, respx_mock: respx.MockRouter, client: InstanceClient, delete_url: str
@@ -262,10 +262,10 @@ class TestInstanceClientDelete:
 
         result = client.delete("person-1", space="test")
 
-        assert isinstance(result, UpsertResult)
-        assert len(result.deleted) == 1
-        assert result.deleted[0].external_id == "person-1"
-        assert result.deleted[0].instance_type == "node"
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert result[0].external_id == "person-1"
+        assert result[0].instance_type == "node"
 
     def test_delete_string_without_space_raises_error(self, client: InstanceClient) -> None:
         """Test that deleting by string without space raises an error."""
@@ -291,16 +291,16 @@ class TestInstanceClientDelete:
 
         result = client.delete(instance_ids)
 
-        assert isinstance(result, UpsertResult)
-        assert len(result.deleted) == 3
-        assert {item.external_id for item in result.deleted} == {"person-1", "person-2", "person-3"}
+        assert isinstance(result, list)
+        assert len(result) == 3
+        assert {item.external_id for item in result} == {"person-1", "person-2", "person-3"}
 
     def test_delete_empty_list(self, client: InstanceClient) -> None:
         """Test deleting an empty list."""
         result = client.delete([])
 
-        assert isinstance(result, UpsertResult)
-        assert len(result.deleted) == 0
+        assert isinstance(result, list)
+        assert len(result) == 0
 
     def test_delete_instance_write(
         self,
@@ -317,10 +317,10 @@ class TestInstanceClientDelete:
 
         result = client.delete(sample_instance_write)
 
-        assert isinstance(result, UpsertResult)
-        assert len(result.deleted) == 1
-        assert result.deleted[0].external_id == "person-1"
-        assert result.deleted[0].instance_type == "node"
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert result[0].external_id == "person-1"
+        assert result[0].instance_type == "node"
 
 
 class TestInstanceClientChunking:
@@ -331,10 +331,6 @@ class TestInstanceClientChunking:
     ) -> None:
         """Test that large batches are properly chunked."""
 
-        class PersonWrite(InstanceWrite):
-            _view_id = ViewReference(space="test", external_id="Person", version="1")
-            name: str
-
         # Create more items than the chunk size
         items = [
             PersonWrite(
@@ -342,8 +338,9 @@ class TestInstanceClientChunking:
                 space="test",
                 external_id=f"person-{i}",
                 name=f"Person {i}",
+                age=20 + i,
             )
-            for i in range(1500)  # More than _UPSERT_LIMIT (1000)
+            for i in range(client._UPSERT_LIMIT + 500)
         ]
 
         route = respx_mock.post(upsert_url).respond(
