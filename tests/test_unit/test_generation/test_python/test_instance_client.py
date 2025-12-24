@@ -69,14 +69,30 @@ def sample_instance_writes() -> list[InstanceWrite]:
     ]
 
 
+@pytest.fixture
+def upsert_url(config: PygenClientConfig) -> str:
+    """Return the URL for upserting instances."""
+    return config.create_api_url("/models/instances")
+
+
+@pytest.fixture
+def delete_url(config: PygenClientConfig) -> str:
+    """Return the URL for deleting instances."""
+    return config.create_api_url("/models/instances/delete")
+
+
 class TestInstanceClientUpsert:
     """Tests for InstanceClient.upsert() method."""
 
     def test_upsert_single_instance(
-        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
+        self,
+        respx_mock: respx.MockRouter,
+        client: InstanceClient,
+        sample_instance_write: InstanceWrite,
+        upsert_url: str,
     ) -> None:
         """Test upserting a single instance."""
-        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+        respx_mock.post(upsert_url).respond(
             json={
                 "items": [
                     {
@@ -105,10 +121,14 @@ class TestInstanceClientUpsert:
         assert len(result.deleted) == 0
 
     def test_upsert_multiple_instances(
-        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_writes: list[InstanceWrite]
+        self,
+        respx_mock: respx.MockRouter,
+        client: InstanceClient,
+        sample_instance_writes: list[InstanceWrite],
+        upsert_url: str,
     ) -> None:
         """Test upserting multiple instances."""
-        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+        respx_mock.post(upsert_url).respond(
             json={
                 "items": [
                     {
@@ -164,10 +184,14 @@ class TestInstanceClientUpsert:
         assert len(result.deleted) == 0
 
     def test_upsert_with_arguments(
-        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
+        self,
+        respx_mock: respx.MockRouter,
+        client: InstanceClient,
+        sample_instance_write: InstanceWrite,
+        upsert_url: str,
     ) -> None:
         """Test upserting with replace mode."""
-        route = respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+        route = respx_mock.post(upsert_url).respond(
             json={
                 "items": [
                     {
@@ -204,7 +228,9 @@ class TestInstanceClientUpsert:
 class TestInstanceClientDelete:
     """Tests for InstanceClient.delete() method."""
 
-    def test_delete_single_instance_by_id(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
+    def test_delete_single_instance_by_id(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, delete_url: str
+    ) -> None:
         """Test deleting a single instance by InstanceId."""
         instance_id = InstanceId(
             instance_type="node",
@@ -212,7 +238,7 @@ class TestInstanceClientDelete:
             external_id="person-1",
         )
 
-        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete").respond(
+        respx_mock.post(delete_url).respond(
             json={"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]},
             status_code=200,
         )
@@ -225,9 +251,11 @@ class TestInstanceClientDelete:
         assert result.deleted[0].space == "test"
         assert result.deleted[0].instance_type == "node"
 
-    def test_delete_single_instance_by_string(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
+    def test_delete_single_instance_by_string(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, delete_url: str
+    ) -> None:
         """Test deleting a single instance by external_id string."""
-        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete").respond(
+        respx_mock.post(delete_url).respond(
             json={"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]},
             status_code=200,
         )
@@ -244,11 +272,13 @@ class TestInstanceClientDelete:
         with pytest.raises(ValueError, match="space parameter is required"):
             client.delete("person-1")
 
-    def test_delete_multiple_instances(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
+    def test_delete_multiple_instances(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, delete_url: str
+    ) -> None:
         """Test deleting multiple instances."""
         instance_ids = [InstanceId(instance_type="node", space="test", external_id=f"person-{i}") for i in range(1, 4)]
 
-        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete").respond(
+        respx_mock.post(delete_url).respond(
             json={
                 "items": [
                     {"instanceType": "node", "space": "test", "externalId": "person-1"},
@@ -273,10 +303,14 @@ class TestInstanceClientDelete:
         assert len(result.deleted) == 0
 
     def test_delete_instance_write(
-        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
+        self,
+        respx_mock: respx.MockRouter,
+        client: InstanceClient,
+        sample_instance_write: InstanceWrite,
+        delete_url: str,
     ) -> None:
         """Test deleting using an InstanceWrite object."""
-        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete").respond(
+        respx_mock.post(delete_url).respond(
             json={"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]},
             status_code=200,
         )
@@ -292,7 +326,9 @@ class TestInstanceClientDelete:
 class TestInstanceClientChunking:
     """Tests for chunking behavior in InstanceClient."""
 
-    def test_upsert_large_batch_is_chunked(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
+    def test_upsert_large_batch_is_chunked(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, upsert_url: str
+    ) -> None:
         """Test that large batches are properly chunked."""
 
         class PersonWrite(InstanceWrite):
@@ -310,7 +346,7 @@ class TestInstanceClientChunking:
             for i in range(1500)  # More than _UPSERT_LIMIT (1000)
         ]
 
-        route = respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+        route = respx_mock.post(upsert_url).respond(
             json={"items": []},
             status_code=200,
         )
@@ -320,14 +356,14 @@ class TestInstanceClientChunking:
         # Should have made 2 requests (1000 + 500)
         assert route.call_count == 2
 
-    def test_delete_large_batch_is_chunked(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
+    def test_delete_large_batch_is_chunked(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, delete_url: str
+    ) -> None:
         """Test that large delete batches are properly chunked."""
         # Create more items than the chunk size
         items = [InstanceId(instance_type="node", space="test", external_id=f"person-{i}") for i in range(1500)]
 
-        route = respx_mock.post(
-            "https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete"
-        ).respond(
+        route = respx_mock.post(delete_url).respond(
             json={"items": []},
             status_code=200,
         )
