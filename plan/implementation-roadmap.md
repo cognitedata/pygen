@@ -199,18 +199,18 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - ✅ Return `InstanceResult` with created/updated/unchanged/deleted items
 
 
-3.a **Generic InstanceAPI Part 1**
-   - Build `InstanceAPI` base class for view-specific operations
-   - Implement `iterate()` for pagination built on https://api-docs.cognite.com/20230101/tag/Instances/operation/advancedListInstance
-   - Implement `list()` a simple wrapper around `iterate()`
-   - Implement `search()` for full-text search built on https://api-docs.cognite.com/20230101/tag/Instances/operation/searchInstances
-   - The methods `.iterate()`, `.list()`, and `.search()` should match the API signature, except
+3.a **Generic InstanceAPI Part 1** ✅
+   - ✅ Build `InstanceAPI` base class for view-specific operations
+   - ✅ Implement `iterate()` for pagination built on https://api-docs.cognite.com/20230101/tag/Instances/operation/advancedListInstance
+   - ✅ Implement `list()` a simple wrapper around `iterate()`
+   - ✅ Implement `search()` for full-text search built on https://api-docs.cognite.com/20230101/tag/Instances/operation/searchInstances
+   - ✅ The methods `.iterate()`, `.list()`, and `.search()` should match the API signature, except
      they should not include the `view`/`sources` parameters or the `instanceType` parameter,
      these are passed in via the `InstanceAPI` `__init__`.
-   - ✅Introduce Filtering data structures.
-   - Introduce sort data structure.
-   - Introduce unit data structure.
-   - Introduce debug data structure for the `.list()` and `.iterate()` methods.
+   - ✅ Introduce Filtering data structures.
+   - ✅ Introduce sort data structure (`PropertySort`).
+   - ✅ Introduce unit data structure (`UnitConversion`, `PropertyWithUnits`).
+   - ✅ Introduce debug data structure for the `.list()` and `.iterate()` methods (`DebugInfo`, `ListResponse`).
 
 3.b  **Generic InstanceAPI Part 2**
    - Implement `retrieve()` with single/batch, the thread pool executor built it on https://api-docs.cognite.com/20230101/tag/Instances/operation/byExternalIdsInstances

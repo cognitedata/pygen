@@ -12,8 +12,8 @@ __all__ = [
     "ErrorDetails",
     "FailedRequest",
     "FailedResponse",
+    "HTTPClient",
     "HTTPResult",
     "RequestMessage",
     "SuccessResponse",
-    "HTTPClient",
 ]

@@ -1,12 +1,13 @@
 """Response classes for instance API operations."""
 
 from functools import cached_property
-from typing import Generic, Literal
+from typing import Any, Generic, Literal
 
 from pydantic import BaseModel, Field
 
 from ._types import DateTimeMS
 from .instance import InstanceId, T_InstanceList
+from .query import DebugInfo
 
 
 class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
@@ -19,6 +20,24 @@ class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
 
     items: T_InstanceList
     next_cursor: str | None = Field(default=None, alias="nextCursor")
+
+
+class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
+    """Response from list/iterate/search operations with optional debug information.
+
+    This extends the standard Page response to include debug information when
+    the `include_debug` parameter is set to True.
+
+    Attributes:
+        items: The list of items in this page.
+        next_cursor: The cursor for the next page, or None if this is the last page.
+        debug: Debug information about the query execution (only present when include_debug=True).
+    """
+
+    items: T_InstanceList
+    next_cursor: str | None = Field(default=None, alias="nextCursor")
+    typing: dict[str, dict[str, Any]] | None = None
+    debug: DebugInfo | None = Field(default=None)
 
 
 class InstanceResultItem(BaseModel, populate_by_name=True):
