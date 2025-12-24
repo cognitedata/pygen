@@ -4,6 +4,7 @@ from pydantic import Field, JsonValue
 
 from cognite.pygen._generation.python.instance_api.models._references import ViewReference
 from cognite.pygen._generation.python.instance_api.models._types import Date, DateTime
+from cognite.pygen._generation.python.instance_api.models.dtype_filters import TextFilter
 from cognite.pygen._generation.python.instance_api.models.instance import (
     Instance,
     InstanceList,
@@ -43,3 +44,7 @@ class PrimitiveNullable(Instance):
 
 class PrimitiveNullableList(InstanceList[PrimitiveNullable]):
     _INSTANCE = PrimitiveNullable
+
+
+class PrimitiveNullableFilter:
+    text = TextFilter(PrimitiveNullable._view_id, "text")
