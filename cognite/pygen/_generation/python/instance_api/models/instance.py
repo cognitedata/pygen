@@ -1,25 +1,12 @@
 import itertools
-from collections import UserList
 from collections.abc import Collection
-from datetime import date, datetime
-from typing import Annotated, Any, ClassVar, Generic, Literal, TypeVar, get_args
+from typing import Any, ClassVar, Literal, TypeVar, get_args
 
 import pandas as pd
-from pydantic import BaseModel, BeforeValidator, Field, GetCoreSchemaHandler, model_validator
-from pydantic.functional_serializers import PlainSerializer
+from pydantic import BaseModel, Field, GetCoreSchemaHandler, model_validator
 from pydantic_core import CoreSchema, core_schema
 
-from ._utils import datetime_to_ms, ms_to_datetime
-
-DateTimeMS = Annotated[
-    datetime,
-    BeforeValidator(ms_to_datetime, json_schema_input_type=int),
-    PlainSerializer(datetime_to_ms, return_type=int, when_used="always"),
-]
-DateTime = Annotated[
-    datetime, PlainSerializer(lambda d: d.isoformat(timespec="milliseconds"), return_type=str, when_used="always")
-]
-Date = Annotated[date, PlainSerializer(lambda d: d.isoformat(), return_type=str, when_used="always")]
+from cognite.pygen._generation.python.instance_api.models._types import DateTimeMS
 
 
 class ViewRef(BaseModel, populate_by_name=True):
@@ -138,47 +125,6 @@ _INSTANCE_MODEL_ALIASES = frozenset(
 )
 
 
-class InstanceId(InstanceModel): ...
-
-
-class InstanceResultItem(InstanceModel, populate_by_name=True):
-    """Result item from instance operations.
-
-    Attributes:
-        instance_type: The type of the instance (node or edge).
-        version: The version of the instance after the operation.
-        was_modified: Whether the instance was modified by the operation.
-        space: The space of the instance.
-        external_id: The external ID of the instance.
-        created_time: The time the instance was created.
-        last_updated_time: The time the instance was last updated.
-    """
-
-    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
-    version: int
-    was_modified: bool = Field(alias="wasModified")
-    created_time: DateTimeMS = Field(alias="createdTime")
-    last_updated_time: DateTimeMS = Field(alias="lastUpdatedTime")
-
-
-class InstanceResult(BaseModel):
-    created: list[InstanceResultItem] = Field(default_factory=list)
-    updated: list[InstanceResultItem] = Field(default_factory=list)
-    unchanged: list[InstanceResultItem] = Field(default_factory=list)
-    deleted: list[InstanceId] = Field(default_factory=list)
-
-    def extend(self, other: "InstanceResult") -> None:
-        """Extend this result with another result.
-
-        Args:
-            other: The other result to extend with.
-        """
-        self.created.extend(other.created)
-        self.updated.extend(other.updated)
-        self.unchanged.extend(other.unchanged)
-        self.deleted.extend(other.deleted)
-
-
 class Instance(InstanceModel):
     data_record: DataRecord
 
@@ -191,11 +137,29 @@ T_Instance = TypeVar("T_Instance", bound=Instance)
 T_InstanceWrite = TypeVar("T_InstanceWrite", bound=InstanceWrite)
 
 
-class InstanceList(UserList[T_Instance]):
+class InstanceList(Collection[T_Instance]):
+    """A list of instances with pandas integration.
+
+    This class wraps a list of instances and provides convenient methods
+    for conversion to pandas DataFrames and dumping to dictionaries.
+    """
+
     _INSTANCE: ClassVar[type[Instance]] = Instance
 
     def __init__(self, collection: Collection[T_Instance] | None = None) -> None:
-        super().__init__(collection or [])
+        self.data: list[T_Instance] = list(collection or [])
+
+    def __iter__(self):
+        return iter(self.data)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __contains__(self, item):
+        return item in self.data
+
+    def __getitem__(self, index):
+        return self.data[index]
 
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler: GetCoreSchemaHandler) -> CoreSchema:
@@ -261,13 +225,21 @@ class InstanceList(UserList[T_Instance]):
 T_InstanceList = TypeVar("T_InstanceList", bound=InstanceList)
 
 
-class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
-    """A page of results from a paginated API response.
+class InstanceId(BaseModel, populate_by_name=True):
+    """Identifier for an instance (node or edge)."""
 
-    Attributes:
-        items: The list of items in this page.
-        next_cursor: The cursor for the next page, or None if this is the last page.
-    """
+    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
+    space: str
+    external_id: str = Field(alias="externalId")
 
-    items: T_InstanceList
-    next_cursor: str | None = Field(default=None, alias="nextCursor")
+    def dump(self, camel_case: bool = True, format: Literal["model", "instance"] = "model") -> dict[str, Any]:
+        """Dump the model to a dictionary.
+
+        Args:
+            camel_case: Whether to use camel case for the keys. Defaults to True.
+            format: The format of the dump (unused for InstanceId, kept for compatibility).
+
+        Returns:
+            The dictionary representation of the model.
+        """
+        return self.model_dump(by_alias=camel_case)

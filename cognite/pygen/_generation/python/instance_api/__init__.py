@@ -4,32 +4,37 @@ This module provides a generic client and base classes for working with
 CDF Data Modeling instances.
 """
 
-from ._client import InstanceClient
-from ._instance import (
+from cognite.pygen._generation.python.instance_api.models.instance import (
     DataRecord,
     DataRecordWrite,
     Instance,
     InstanceId,
     InstanceList,
     InstanceModel,
-    InstanceResult,
-    InstanceResultItem,
     InstanceWrite,
-    Page,
     ViewRef,
 )
+from cognite.pygen._generation.python.instance_api.models.responses import (
+    ApplyResponse,
+    InstanceResult,
+    InstanceResultItem,
+    Page,
+)
+
+from ._client import InstanceClient
 
 __all__ = [
-    "InstanceClient",
-    "InstanceModel",
-    "Instance",
-    "InstanceWrite",
-    "InstanceList",
-    "InstanceId",
-    "InstanceResult",
-    "InstanceResultItem",
-    "ViewRef",
+    "ApplyResponse",
     "DataRecord",
     "DataRecordWrite",
+    "Instance",
+    "InstanceClient",
+    "InstanceId",
+    "InstanceList",
+    "InstanceModel",
+    "InstanceResult",
+    "InstanceResultItem",
+    "InstanceWrite",
     "Page",
+    "ViewRef",
 ]

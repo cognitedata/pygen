@@ -1,19 +1,12 @@
 """Tests for the InstanceClient class."""
 
-from unittest.mock import patch
-
 import pytest
+import respx
 
-from cognite.pygen._generation.python.instance_api import InstanceClient
-from cognite.pygen._generation.python.instance_api._instance import (
-    InstanceId,
-    InstanceResult,
-    InstanceWrite,
-    ViewRef,
-)
+from cognite.pygen._generation.python.instance_api import InstanceClient, InstanceId, InstanceResult
 from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
-from cognite.pygen._generation.python.instance_api.http_client import SuccessResponse
+from cognite.pygen._generation.python.instance_api.models.instance import InstanceWrite, ViewRef
 
 
 class MockCredentials(Credentials):
@@ -100,18 +93,28 @@ class TestInstanceClientInit:
 class TestInstanceClientUpsert:
     """Tests for InstanceClient.upsert() method."""
 
-    def test_upsert_single_instance(self, client: InstanceClient, sample_instance_write: InstanceWrite) -> None:
+    def test_upsert_single_instance(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
+    ) -> None:
         """Test upserting a single instance."""
-        mock_response = SuccessResponse(
+        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+            json={
+                "items": [
+                    {
+                        "instanceType": "node",
+                        "space": "test",
+                        "externalId": "person-1",
+                        "version": 1,
+                        "wasModified": True,
+                        "createdTime": 1234567890000,
+                        "lastUpdatedTime": 1234567890000,
+                    }
+                ]
+            },
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test", '
-            '"externalId": "person-1", "version": 1, "wasModified": true, '
-            '"createdTime": 1234567890000, "lastUpdatedTime": 1234567890000}]}',
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response):
-            result = client.upsert(sample_instance_write)
+        result = client.upsert(sample_instance_write)
 
         assert isinstance(result, InstanceResult)
         assert len(result.created) == 1
@@ -123,27 +126,45 @@ class TestInstanceClientUpsert:
         assert len(result.deleted) == 0
 
     def test_upsert_multiple_instances(
-        self, client: InstanceClient, sample_instance_writes: list[InstanceWrite]
+        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_writes: list[InstanceWrite]
     ) -> None:
         """Test upserting multiple instances."""
-        mock_response = SuccessResponse(
+        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+            json={
+                "items": [
+                    {
+                        "instanceType": "node",
+                        "space": "test",
+                        "externalId": "person-1",
+                        "version": 1,
+                        "wasModified": True,
+                        "createdTime": 1234567890000,
+                        "lastUpdatedTime": 1234567890000,
+                    },
+                    {
+                        "instanceType": "node",
+                        "space": "test",
+                        "externalId": "person-2",
+                        "version": 1,
+                        "wasModified": True,
+                        "createdTime": 1234567890000,
+                        "lastUpdatedTime": 1234567890000,
+                    },
+                    {
+                        "instanceType": "node",
+                        "space": "test",
+                        "externalId": "person-3",
+                        "version": 1,
+                        "wasModified": True,
+                        "createdTime": 1234567890000,
+                        "lastUpdatedTime": 1234567890000,
+                    },
+                ]
+            },
             status_code=200,
-            body='{"items": ['
-            '{"instanceType": "node", "space": "test", "externalId": "person-1", '
-            '"version": 1, "wasModified": true, "createdTime": 1234567890000, '
-            '"lastUpdatedTime": 1234567890000},'
-            '{"instanceType": "node", "space": "test", "externalId": "person-2", '
-            '"version": 1, "wasModified": true, "createdTime": 1234567890000, '
-            '"lastUpdatedTime": 1234567890000},'
-            '{"instanceType": "node", "space": "test", "externalId": "person-3", '
-            '"version": 1, "wasModified": true, "createdTime": 1234567890000,'
-            ' "lastUpdatedTime": 1234567890000}'
-            "]}",
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response):
-            result = client.upsert(sample_instance_writes)
+        result = client.upsert(sample_instance_writes)
 
         assert isinstance(result, InstanceResult)
         assert len(result.created) == 3
@@ -159,45 +180,73 @@ class TestInstanceClientUpsert:
         assert len(result.unchanged) == 0
         assert len(result.deleted) == 0
 
-    def test_upsert_with_replace_mode(self, client: InstanceClient, sample_instance_write: InstanceWrite) -> None:
+    def test_upsert_with_replace_mode(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
+    ) -> None:
         """Test upserting with replace mode."""
-        mock_response = SuccessResponse(
+        route = respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+            json={
+                "items": [
+                    {
+                        "instanceType": "node",
+                        "space": "test",
+                        "externalId": "person-1",
+                        "version": 1,
+                        "wasModified": True,
+                        "createdTime": 1234567890000,
+                        "lastUpdatedTime": 1234567890000,
+                    }
+                ]
+            },
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test",'
-            ' "externalId": "person-1", "version": 1, "wasModified": '
-            'true, "createdTime": 1234567890000, "lastUpdatedTime": 1234567890000}]}',
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response) as mock_request:
-            result = client.upsert(sample_instance_write, mode="replace")
+        result = client.upsert(sample_instance_write, mode="replace")
 
         assert isinstance(result, InstanceResult)
         # Verify that replace=True was passed in the request
-        call_args = mock_request.call_args
-        request_message = call_args[0][0]
-        assert request_message.body_content["replace"] is True
+        assert route.called
+        request = respx_mock.calls[-1].request
+        import gzip
+        import json
+
+        # Decompress gzipped content
+        body = json.loads(gzip.decompress(request.content))
+        assert body["replace"] is True
 
     def test_upsert_with_skip_on_version_conflict(
-        self, client: InstanceClient, sample_instance_write: InstanceWrite
+        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
     ) -> None:
         """Test upserting with skip_on_version_conflict."""
-        mock_response = SuccessResponse(
+        route = respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+            json={
+                "items": [
+                    {
+                        "instanceType": "node",
+                        "space": "test",
+                        "externalId": "person-1",
+                        "version": 1,
+                        "wasModified": True,
+                        "createdTime": 1234567890000,
+                        "lastUpdatedTime": 1234567890000,
+                    }
+                ]
+            },
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test", "externalId": '
-            '"person-1", "version": 1, "wasModified": true, "createdTime":'
-            ' 1234567890000, "lastUpdatedTime": 1234567890000}]}',
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response) as mock_request:
-            result = client.upsert(sample_instance_write, skip_on_version_conflict=True)
+        result = client.upsert(sample_instance_write, skip_on_version_conflict=True)
 
         assert isinstance(result, InstanceResult)
         # Verify that skipOnVersionConflict=True was passed in the request
-        call_args = mock_request.call_args
-        request_message = call_args[0][0]
-        assert request_message.body_content["skipOnVersionConflict"] is True
+        assert route.called
+        request = respx_mock.calls[-1].request
+        import gzip
+        import json
+
+        # Decompress gzipped content
+        body = json.loads(gzip.decompress(request.content))
+        assert body["skipOnVersionConflict"] is True
 
     def test_upsert_with_update_mode_not_implemented(
         self, client: InstanceClient, sample_instance_write: InstanceWrite
@@ -210,7 +259,7 @@ class TestInstanceClientUpsert:
 class TestInstanceClientDelete:
     """Tests for InstanceClient.delete() method."""
 
-    def test_delete_single_instance_by_id(self, client: InstanceClient) -> None:
+    def test_delete_single_instance_by_id(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
         """Test deleting a single instance by InstanceId."""
         instance_id = InstanceId(
             instance_type="node",
@@ -218,14 +267,12 @@ class TestInstanceClientDelete:
             external_id="person-1",
         )
 
-        mock_response = SuccessResponse(
+        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete").respond(
+            json={"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]},
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]}',
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response):
-            result = client.delete(instance_id)
+        result = client.delete(instance_id)
 
         assert isinstance(result, InstanceResult)
         assert len(result.deleted) == 1
@@ -233,16 +280,14 @@ class TestInstanceClientDelete:
         assert result.deleted[0].space == "test"
         assert result.deleted[0].instance_type == "node"
 
-    def test_delete_single_instance_by_string(self, client: InstanceClient) -> None:
+    def test_delete_single_instance_by_string(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
         """Test deleting a single instance by external_id string."""
-        mock_response = SuccessResponse(
+        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete").respond(
+            json={"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]},
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]}',
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response):
-            result = client.delete("person-1", space="test")
+        result = client.delete("person-1", space="test")
 
         assert isinstance(result, InstanceResult)
         assert len(result.deleted) == 1
@@ -254,22 +299,22 @@ class TestInstanceClientDelete:
         with pytest.raises(ValueError, match="space parameter is required"):
             client.delete("person-1")
 
-    def test_delete_multiple_instances(self, client: InstanceClient) -> None:
+    def test_delete_multiple_instances(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
         """Test deleting multiple instances."""
         instance_ids = [InstanceId(instance_type="node", space="test", external_id=f"person-{i}") for i in range(1, 4)]
 
-        mock_response = SuccessResponse(
+        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete").respond(
+            json={
+                "items": [
+                    {"instanceType": "node", "space": "test", "externalId": "person-1"},
+                    {"instanceType": "node", "space": "test", "externalId": "person-2"},
+                    {"instanceType": "node", "space": "test", "externalId": "person-3"},
+                ]
+            },
             status_code=200,
-            body='{"items": ['
-            '{"instanceType": "node", "space": "test", "externalId": "person-1"},'
-            '{"instanceType": "node", "space": "test", "externalId": "person-2"},'
-            '{"instanceType": "node", "space": "test", "externalId": "person-3"}'
-            "]}",
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response):
-            result = client.delete(instance_ids)
+        result = client.delete(instance_ids)
 
         assert isinstance(result, InstanceResult)
         assert len(result.deleted) == 3
@@ -282,16 +327,16 @@ class TestInstanceClientDelete:
         assert isinstance(result, InstanceResult)
         assert len(result.deleted) == 0
 
-    def test_delete_instance_write(self, client: InstanceClient, sample_instance_write: InstanceWrite) -> None:
+    def test_delete_instance_write(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
+    ) -> None:
         """Test deleting using an InstanceWrite object."""
-        mock_response = SuccessResponse(
+        respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete").respond(
+            json={"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]},
             status_code=200,
-            body='{"items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}]}',
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response):
-            result = client.delete(sample_instance_write)
+        result = client.delete(sample_instance_write)
 
         assert isinstance(result, InstanceResult)
         assert len(result.deleted) == 1
@@ -302,7 +347,7 @@ class TestInstanceClientDelete:
 class TestInstanceClientChunking:
     """Tests for chunking behavior in InstanceClient."""
 
-    def test_upsert_large_batch_is_chunked(self, client: InstanceClient) -> None:
+    def test_upsert_large_batch_is_chunked(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
         """Test that large batches are properly chunked."""
 
         class PersonWrite(InstanceWrite):
@@ -320,31 +365,29 @@ class TestInstanceClientChunking:
             for i in range(1500)  # More than _UPSERT_LIMIT (1000)
         ]
 
-        mock_response = SuccessResponse(
+        route = respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
+            json={"items": []},
             status_code=200,
-            body='{"items": []}',
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response) as mock_request:
-            _ = client.upsert(items)
+        _ = client.upsert(items)
 
         # Should have made 2 requests (1000 + 500)
-        assert mock_request.call_count == 2
+        assert route.call_count == 2
 
-    def test_delete_large_batch_is_chunked(self, client: InstanceClient) -> None:
+    def test_delete_large_batch_is_chunked(self, respx_mock: respx.MockRouter, client: InstanceClient) -> None:
         """Test that large delete batches are properly chunked."""
         # Create more items than the chunk size
         items = [InstanceId(instance_type="node", space="test", external_id=f"person-{i}") for i in range(1500)]
 
-        mock_response = SuccessResponse(
+        route = respx_mock.post(
+            "https://test.cognitedata.com/api/v1/projects/test-project/models/instances/delete"
+        ).respond(
+            json={"items": []},
             status_code=200,
-            body='{"items": []}',
-            content=b"",
         )
 
-        with patch.object(client._http_client, "request_with_retries", return_value=mock_response) as mock_request:
-            _ = client.delete(items)
+        _ = client.delete(items)
 
         # Should have made 2 requests (1000 + 500)
-        assert mock_request.call_count == 2
+        assert route.call_count == 2

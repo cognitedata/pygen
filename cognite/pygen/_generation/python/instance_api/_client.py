@@ -2,19 +2,14 @@ import concurrent.futures
 from collections.abc import Sequence
 from typing import Literal
 
-from pydantic import BaseModel, JsonValue, TypeAdapter
+from pydantic import JsonValue, TypeAdapter
 
 from cognite.pygen._client import PygenClientConfig
+from cognite.pygen._generation.python.instance_api import InstanceId
 from cognite.pygen._generation.python.instance_api.http_client import HTTPClient, RequestMessage
+from cognite.pygen._generation.python.instance_api.models.instance import InstanceModel, InstanceWrite
+from cognite.pygen._generation.python.instance_api.models.responses import ApplyResponse, InstanceResult
 from cognite.pygen._utils.collection import chunker_sequence
-
-from ._instance import InstanceId, InstanceModel, InstanceResult, InstanceResultItem, InstanceWrite
-
-
-class DeleteResult(BaseModel, populate_by_name=True):
-    """Result from delete operation."""
-
-    items: list[InstanceId]
 
 
 class InstanceClient:
@@ -169,19 +164,19 @@ class InstanceClient:
         Returns:
             InstanceResult containing the results.
         """
-        # The CDF API returns: {"items": [...]}
-        # Each item has instanceType, space, externalId, version, wasModified, etc.
-        data = TypeAdapter(dict[str, list[InstanceResultItem]]).validate_json(body)
-        items = data.get("items", [])
+        # The CDF API returns: {"items": [...], "deleted": [...]}
+        # Parse using ApplyResponse model
+        apply_response = TypeAdapter(ApplyResponse).validate_json(body)
 
         # Separate items based on wasModified flag
-        created_or_updated = [item for item in items if item.was_modified]
-        unchanged = [item for item in items if not item.was_modified]
+        created_or_updated = [item for item in apply_response.items if item.was_modified]
+        unchanged = [item for item in apply_response.items if not item.was_modified]
 
         return InstanceResult(
             created=created_or_updated,
             updated=[],
             unchanged=unchanged,
+            deleted=apply_response.deleted,
         )
 
     def delete(
@@ -299,5 +294,6 @@ class InstanceClient:
             List of deleted InstanceId objects.
         """
         # The CDF API returns: {"items": [...]} with the deleted instances
-        delete_result = TypeAdapter(DeleteResult).validate_json(body)
-        return delete_result.items
+        # Using a simple dict parser since the delete response only contains items
+        data = TypeAdapter(dict[str, list[InstanceId]]).validate_json(body)
+        return data.get("items", [])
