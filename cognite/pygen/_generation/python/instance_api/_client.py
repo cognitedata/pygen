@@ -4,8 +4,8 @@ from typing import Literal, TypeVar
 
 from pydantic import JsonValue
 
-from cognite.pygen._client import PygenClientConfig
 from cognite.pygen._generation.python.instance_api import InstanceId
+from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 from cognite.pygen._generation.python.instance_api.exceptions import MultiRequestError
 from cognite.pygen._generation.python.instance_api.http_client import (
     FailedRequest,
@@ -221,7 +221,7 @@ class InstanceClient:
             space: Optional space identifier if items are provided as strings.
 
         Returns:
-            InstanceResult containing details of the delete operation.
+            list[InstanceId] containing details of the delete operation.
         """
         # Normalize input to list
         if isinstance(items, str | InstanceId | InstanceWrite | InstanceModel):
@@ -301,7 +301,7 @@ class InstanceClient:
             body: The response body from the API.
 
         Returns:
-            InstanceResult containing the deleted items.
+            UpsertResult containing the deleted items.
         """
         deleted = DeleteResponse.model_validate_json(body).items
         return UpsertResult(deleted=deleted)
