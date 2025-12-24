@@ -76,40 +76,7 @@ class DataTypeFilter(ABC):
         return FilterAdapter.validate_python(filter_dict)
 
 
-class ComparableFilter(DataTypeFilter, ABC):
-    """Base class for filters that support comparison operators."""
-
-    @abstractmethod
-    def _validate_value(self, value: Any) -> Any:
-        """Validate and potentially convert the input value."""
-        ...
-
-    def equals(self, value: Any) -> Self:
-        """Filter for values equal to the given value."""
-        return self._add_condition("eq", self._validate_value(value))
-
-    def not_equals(self, value: Any) -> Self:
-        """Filter for values not equal to the given value."""
-        return self._add_condition("ne", self._validate_value(value))
-
-    def less_than(self, value: Any) -> Self:
-        """Filter for values less than the given value."""
-        return self._add_condition("lt", self._validate_value(value))
-
-    def less_than_or_equals(self, value: Any) -> Self:
-        """Filter for values less than or equal to the given value."""
-        return self._add_condition("le", self._validate_value(value))
-
-    def greater_than(self, value: Any) -> Self:
-        """Filter for values greater than the given value."""
-        return self._add_condition("gt", self._validate_value(value))
-
-    def greater_than_or_equals(self, value: Any) -> Self:
-        """Filter for values greater than or equal to the given value."""
-        return self._add_condition("ge", self._validate_value(value))
-
-
-class FloatFilter(ComparableFilter):
+class FloatFilter(DataTypeFilter):
     """Filter for float/numeric properties."""
 
     def _validate_value(self, value: float | int) -> float:
@@ -144,7 +111,7 @@ class FloatFilter(ComparableFilter):
         return self._build_filter()
 
 
-class IntegerFilter(ComparableFilter):
+class IntegerFilter(DataTypeFilter):
     """Filter for integer properties."""
 
     def _validate_value(self, value: int) -> int:
@@ -179,7 +146,7 @@ class IntegerFilter(ComparableFilter):
         return self._build_filter()
 
 
-class DateTimeFilter(ComparableFilter):
+class DateTimeFilter(DataTypeFilter):
     """Filter for datetime properties."""
 
     def _validate_value(self, value: datetime | str) -> str:
@@ -220,7 +187,7 @@ class DateTimeFilter(ComparableFilter):
         return self._build_filter()
 
 
-class DateFilter(ComparableFilter):
+class DateFilter(DataTypeFilter):
     """Filter for date properties."""
 
     def _validate_value(self, value: date | str) -> str:
