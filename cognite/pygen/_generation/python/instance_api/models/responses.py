@@ -1,5 +1,6 @@
 """Response classes for instance API operations."""
 
+from functools import cached_property
 from typing import Generic, Literal
 
 from pydantic import BaseModel, Field
@@ -42,46 +43,37 @@ class InstanceResultItem(BaseModel, populate_by_name=True):
     last_updated_time: DateTimeMS = Field(alias="lastUpdatedTime")
 
 
-class InstanceResult(BaseModel):
+class UpsertResult(BaseModel):
     """Result from instance CRUD operations.
 
     Attributes:
-        created: List of instances that were created.
-        updated: List of instances that were updated.
-        unchanged: List of instances that were unchanged.
+        items: List of instance result items.
         deleted: List of instance IDs that were deleted.
     """
 
-    created: list[InstanceResultItem] = Field(default_factory=list)
-    updated: list[InstanceResultItem] = Field(default_factory=list)
-    unchanged: list[InstanceResultItem] = Field(default_factory=list)
+    items: list[InstanceResultItem] = Field(default_factory=list)
     deleted: list[InstanceId] = Field(default_factory=list)
 
-    def extend(self, other: "InstanceResult") -> None:
+    @cached_property
+    def created(self) -> list[InstanceResultItem]:
+        return [item for item in self.items if item.was_modified and item.created_time == item.last_updated_time]
+
+    @cached_property
+    def updated(self) -> list[InstanceResultItem]:
+        return [item for item in self.items if item.was_modified and item.created_time != item.last_updated_time]
+
+    @cached_property
+    def unchanged(self) -> list[InstanceResultItem]:
+        return [item for item in self.items if not item.was_modified]
+
+    def extend(self, other: "UpsertResult") -> None:
         """Extend this result with another result.
 
         Args:
             other: The other result to extend with.
         """
-        self.created.extend(other.created)
-        self.updated.extend(other.updated)
-        self.unchanged.extend(other.unchanged)
+        self.items.extend(other.items)
         self.deleted.extend(other.deleted)
-
-
-class ApplyResponse(BaseModel):
-    """Response from the apply (upsert) operation.
-
-    This matches the CDF API response format from the
-    /models/instances endpoint (POST).
-
-    Attributes:
-        items: List of instances that were created or updated.
-        deleted: List of instance IDs that were deleted (if delete was included in the request).
-    """
-
-    items: list[InstanceResultItem] = Field(default_factory=list)
-    deleted: list[InstanceId] = Field(default_factory=list)
 
 
 class DeleteResponse(BaseModel):

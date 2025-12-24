@@ -16,7 +16,7 @@ from cognite.pygen._generation.python.instance_api.http_client import (
     SuccessResponse,
 )
 from cognite.pygen._generation.python.instance_api.models.instance import InstanceModel, InstanceWrite
-from cognite.pygen._generation.python.instance_api.models.responses import ApplyResponse, DeleteResponse, InstanceResult
+from cognite.pygen._generation.python.instance_api.models.responses import DeleteResponse, UpsertResult
 from cognite.pygen._utils.collection import chunker_sequence
 
 T = TypeVar("T")
@@ -94,8 +94,8 @@ class InstanceClient:
     def _collect_results(
         cls,
         results: list[HTTPResult],
-        parse_success: Callable[[str], InstanceResult],
-    ) -> InstanceResult:
+        parse_success: Callable[[str], UpsertResult],
+    ) -> UpsertResult:
         """Collect results from HTTP responses, raising on failures.
 
         Args:
@@ -108,7 +108,7 @@ class InstanceClient:
         Raises:
             MultiRequestError: If any of the HTTPResults indicate a failure.
         """
-        combined_result = InstanceResult()
+        combined_result = UpsertResult()
         failed_responses: list[FailedResponse] = []
         failed_requests: list[FailedRequest] = []
 
@@ -130,7 +130,7 @@ class InstanceClient:
         items: InstanceWrite | Sequence[InstanceWrite],
         mode: Literal["replace", "update", "apply"] = "apply",
         skip_on_version_conflict: bool = False,
-    ) -> InstanceResult:
+    ) -> UpsertResult:
         """Create or update instances.
 
         Args:
@@ -152,7 +152,7 @@ class InstanceClient:
         item_list = [items] if isinstance(items, InstanceWrite) else list(items)
 
         if not item_list:
-            return InstanceResult()
+            return UpsertResult()
 
         if mode == "update":
             # For update mode, we need to first retrieve existing instances
@@ -197,7 +197,7 @@ class InstanceClient:
         return self._http_client.request_with_retries(request)
 
     @staticmethod
-    def _parse_upsert_response(body: str) -> InstanceResult:
+    def _parse_upsert_response(body: str) -> UpsertResult:
         """Parse the response from the upsert API.
 
         Args:
@@ -206,23 +206,13 @@ class InstanceClient:
         Returns:
             InstanceResult containing the results.
         """
-        response = ApplyResponse.model_validate_json(body)
-        result = InstanceResult(deleted=response.deleted)
-        for item in response.items:
-            if not item.was_modified:
-                result.unchanged.append(item)
-                continue
-            if item.created_time == item.last_updated_time:
-                result.created.append(item)
-            else:
-                result.updated.append(item)
-        return result
+        return UpsertResult.model_validate_json(body)
 
     def delete(
         self,
         items: str | InstanceId | InstanceWrite | Sequence[str | InstanceWrite | InstanceId],
         space: str | None = None,
-    ) -> InstanceResult:
+    ) -> list[InstanceId]:
         """Delete instances.
 
         Args:
@@ -240,14 +230,14 @@ class InstanceClient:
             item_list = list(items)
 
         if not item_list:
-            return InstanceResult()
+            return []
 
         instance_ids = [self._to_instance_id(item, space) for item in item_list]
 
         http_results = self._execute_in_parallel(
             instance_ids, self._DELETE_LIMIT, self._delete_executor, self._delete_chunk
         )
-        return self._collect_results(http_results, self._parse_delete_response)
+        return self._collect_results(http_results, self._parse_delete_response).deleted
 
     @staticmethod
     def _to_instance_id(item: str | InstanceId | InstanceWrite | InstanceModel, space: str | None) -> InstanceId:
@@ -304,7 +294,7 @@ class InstanceClient:
         return self._http_client.request_with_retries(request)
 
     @staticmethod
-    def _parse_delete_response(body: str) -> InstanceResult:
+    def _parse_delete_response(body: str) -> UpsertResult:
         """Parse the response from the delete API.
 
         Args:
@@ -314,4 +304,4 @@ class InstanceClient:
             InstanceResult containing the deleted items.
         """
         deleted = DeleteResponse.model_validate_json(body).items
-        return InstanceResult(deleted=deleted)
+        return UpsertResult(deleted=deleted)

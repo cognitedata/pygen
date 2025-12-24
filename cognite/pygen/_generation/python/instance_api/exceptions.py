@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .http_client import FailedRequest, FailedResponse
-    from .models import InstanceResult
+    from .models import UpsertResult
 
 
 class PygenAPIError(Exception):
@@ -27,7 +27,7 @@ class MultiRequestError(PygenAPIError):
     """
 
     def __init__(
-        self, failed_responses: "list[FailedResponse]", failed_requests: "list[FailedRequest]", result: "InstanceResult"
+        self, failed_responses: "list[FailedResponse]", failed_requests: "list[FailedRequest]", result: "UpsertResult"
     ) -> None:
         self.failed_responses = failed_responses
         self.failed_requests = failed_requests

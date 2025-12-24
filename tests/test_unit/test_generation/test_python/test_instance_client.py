@@ -6,7 +6,7 @@ import json
 import pytest
 import respx
 
-from cognite.pygen._generation.python.instance_api import InstanceClient, InstanceId, InstanceResult
+from cognite.pygen._generation.python.instance_api import InstanceClient, InstanceId, UpsertResult
 from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 from cognite.pygen._generation.python.instance_api.models.instance import InstanceWrite, ViewReference
@@ -95,7 +95,7 @@ class TestInstanceClientUpsert:
 
         result = client.upsert(sample_instance_write)
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert len(result.created) == 1
         assert result.created[0].external_id == "person-1"
         assert result.created[0].space == "test"
@@ -145,7 +145,7 @@ class TestInstanceClientUpsert:
 
         result = client.upsert(sample_instance_writes)
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert len(result.created) == 1
         assert len(result.updated) == 1
         assert len(result.unchanged) == 1
@@ -157,7 +157,7 @@ class TestInstanceClientUpsert:
         """Test upserting an empty list."""
         result = client.upsert([])
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert len(result.created) == 0
         assert len(result.updated) == 0
         assert len(result.unchanged) == 0
@@ -186,7 +186,7 @@ class TestInstanceClientUpsert:
 
         result = client.upsert(sample_instance_write, mode="replace", skip_on_version_conflict=True)
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert route.called
         request = respx_mock.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -219,7 +219,7 @@ class TestInstanceClientDelete:
 
         result = client.delete(instance_id)
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert len(result.deleted) == 1
         assert result.deleted[0].external_id == "person-1"
         assert result.deleted[0].space == "test"
@@ -234,7 +234,7 @@ class TestInstanceClientDelete:
 
         result = client.delete("person-1", space="test")
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert len(result.deleted) == 1
         assert result.deleted[0].external_id == "person-1"
         assert result.deleted[0].instance_type == "node"
@@ -261,7 +261,7 @@ class TestInstanceClientDelete:
 
         result = client.delete(instance_ids)
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert len(result.deleted) == 3
         assert {item.external_id for item in result.deleted} == {"person-1", "person-2", "person-3"}
 
@@ -269,7 +269,7 @@ class TestInstanceClientDelete:
         """Test deleting an empty list."""
         result = client.delete([])
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert len(result.deleted) == 0
 
     def test_delete_instance_write(
@@ -283,7 +283,7 @@ class TestInstanceClientDelete:
 
         result = client.delete(sample_instance_write)
 
-        assert isinstance(result, InstanceResult)
+        assert isinstance(result, UpsertResult)
         assert len(result.deleted) == 1
         assert result.deleted[0].external_id == "person-1"
         assert result.deleted[0].instance_type == "node"

@@ -1,7 +1,7 @@
 from ._references import ContainerReference, NodeReference, ViewReference
 from ._types import Date, DateTime, DateTimeMS
 from .instance import Instance, InstanceId, InstanceList, InstanceWrite, T_Instance, T_InstanceList, T_InstanceWrite
-from .responses import ApplyResponse, InstanceResult, InstanceResultItem, Page
+from .responses import InstanceResultItem, Page, UpsertResult
 
 __all__ = [
     "DateTimeMS",
@@ -19,6 +19,5 @@ __all__ = [
     "T_InstanceList",
     "Page",
     "InstanceResultItem",
-    "InstanceResult",
-    "ApplyResponse",
+    "UpsertResult",
 ]

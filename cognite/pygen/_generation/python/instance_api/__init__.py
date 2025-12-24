@@ -15,16 +15,14 @@ from cognite.pygen._generation.python.instance_api.models.instance import (
     ViewReference,
 )
 from cognite.pygen._generation.python.instance_api.models.responses import (
-    ApplyResponse,
-    InstanceResult,
     InstanceResultItem,
     Page,
+    UpsertResult,
 )
 
 from ._client import InstanceClient
 
 __all__ = [
-    "ApplyResponse",
     "DataRecord",
     "DataRecordWrite",
     "Instance",
@@ -32,7 +30,7 @@ __all__ = [
     "InstanceId",
     "InstanceList",
     "InstanceModel",
-    "InstanceResult",
+    "UpsertResult",
     "InstanceResultItem",
     "InstanceWrite",
     "Page",
