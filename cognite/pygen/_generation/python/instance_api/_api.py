@@ -36,7 +36,6 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         self,
         id: str | InstanceId | tuple[str, str],
         space: str | None = None,
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> T_Instance | None: ...
 
     @overload
@@ -44,14 +43,12 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         self,
         id: list[str | InstanceId | tuple[str, str]],
         space: str | None = None,
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> T_InstanceList: ...
 
     def _retrieve(
         self,
         id: str | InstanceId | tuple[str, str] | list[str | InstanceId | tuple[str, str]],
         space: str | None = None,
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> T_Instance | T_InstanceList | None:
         raise NotImplementedError
 
@@ -62,7 +59,6 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         self,
         query: str | None = None,
         properties: list[str] | None = None,
-        target_units: list[dict] | None = None,
     ) -> None:
         raise NotImplementedError
 
