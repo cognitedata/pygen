@@ -69,7 +69,7 @@ class InstanceResult(BaseModel):
         self.deleted.extend(other.deleted)
 
 
-class ApplyResponse(BaseModel, populate_by_name=True):
+class ApplyResponse(BaseModel):
     """Response from the apply (upsert) operation.
 
     This matches the CDF API response format from the
@@ -81,4 +81,17 @@ class ApplyResponse(BaseModel, populate_by_name=True):
     """
 
     items: list[InstanceResultItem] = Field(default_factory=list)
+    deleted: list[InstanceId] = Field(default_factory=list)
+
+
+class DeleteResponse(BaseModel):
+    """Response from the delete operation.
+
+    This matches the CDF API response format from the
+    /models/instances endpoint (DELETE).
+
+    Attributes:
+        deleted: List of instance IDs that were deleted.
+    """
+
     deleted: list[InstanceId] = Field(default_factory=list)

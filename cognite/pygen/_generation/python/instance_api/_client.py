@@ -2,13 +2,21 @@ import concurrent.futures
 from collections.abc import Sequence
 from typing import Literal
 
-from pydantic import JsonValue, TypeAdapter
+from pydantic import JsonValue
 
 from cognite.pygen._client import PygenClientConfig
 from cognite.pygen._generation.python.instance_api import InstanceId
-from cognite.pygen._generation.python.instance_api.http_client import HTTPClient, RequestMessage
+from cognite.pygen._generation.python.instance_api.exceptions import MultiRequestError
+from cognite.pygen._generation.python.instance_api.http_client import (
+    FailedRequest,
+    FailedResponse,
+    HTTPClient,
+    HTTPResult,
+    RequestMessage,
+    SuccessResponse,
+)
 from cognite.pygen._generation.python.instance_api.models.instance import InstanceModel, InstanceWrite
-from cognite.pygen._generation.python.instance_api.models.responses import ApplyResponse, InstanceResult
+from cognite.pygen._generation.python.instance_api.models.responses import ApplyResponse, DeleteResponse, InstanceResult
 from cognite.pygen._utils.collection import chunker_sequence
 
 
@@ -82,22 +90,16 @@ class InstanceClient:
         Returns:
             InstanceResult containing details of the upsert operation.
         """
-        # Normalize input to list
         item_list = [items] if isinstance(items, InstanceWrite) else list(items)
 
         if not item_list:
             return InstanceResult()
 
-        # Handle different modes
         if mode == "update":
             # For update mode, we need to first retrieve existing instances
             # This is not implemented yet, but we'll raise a clear error
             raise NotImplementedError("Update mode is not yet implemented")
 
-        # For replace and apply modes, we can directly call the API
-        result = InstanceResult()
-
-        # Chunk items and submit to thread pool
         futures = []
         for chunk in chunker_sequence(item_list, self._UPSERT_LIMIT):
             future = self._write_executor.submit(
@@ -108,19 +110,18 @@ class InstanceClient:
             )
             futures.append(future)
 
-        # Collect results
+        http_result: list[HTTPResult] = []
         for future in concurrent.futures.as_completed(futures):
-            chunk_result = future.result()
-            result.extend(chunk_result)
+            http_result.append(future.result())
 
-        return result
+        return self._get_success_or_raise_upsert(http_result)
 
     def _upsert_chunk(
         self,
         items: list[InstanceWrite],
         mode: Literal["replace", "apply"],
         skip_on_version_conflict: bool,
-    ) -> InstanceResult:
+    ) -> HTTPResult:
         """Upsert a chunk of instances via the CDF API.
 
         Args:
@@ -131,31 +132,49 @@ class InstanceClient:
         Returns:
             InstanceResult containing the results of the upsert operation.
         """
-        # Serialize items to CDF API format
         serialized_items = [item.dump(camel_case=True, format="instance") for item in items]
 
-        # Build request body
         body: dict[str, JsonValue] = {
             "items": serialized_items,  # type: ignore[dict-item]
             "replace": mode == "replace",
             "skipOnVersionConflict": skip_on_version_conflict,
         }
 
-        # Create request
         request = RequestMessage(
             endpoint_url=self._config.create_api_url(self._ENDPOINT),
             method="POST",
             body_content=body,
         )
+        return self._http_client.request_with_retries(request)
 
-        # Execute request with retries
-        result = self._http_client.request_with_retries(request)
-        response = result.get_success_or_raise()
+    def _get_success_or_raise_upsert(self, results: list[HTTPResult]) -> InstanceResult:
+        """Process a list of HTTPResults, returning a combined InstanceResult or raising an error.
 
-        # Parse response
-        return self._parse_upsert_response(response.body)
+        Args:
+            results: List of HTTPResult objects from upsert operations.
+        Returns:
+            Combined InstanceResult from all successful operations.
+        Raises:
+            MultiRequestError: If any of the HTTPResults indicate a failure.
+        """
+        combined_result = InstanceResult()
+        failed_responses: list[FailedResponse] = []
+        failed_requests: list[FailedRequest] = []
+        for result in results:
+            if isinstance(result, SuccessResponse):
+                combined_result.extend(self._parse_upsert_response(result.body))
+            elif isinstance(result, FailedResponse):
+                failed_responses.append(result)
+            elif isinstance(result, FailedRequest):
+                failed_requests.append(result)
 
-    def _parse_upsert_response(self, body: str) -> InstanceResult:
+        if failed_responses or failed_requests:
+            raise MultiRequestError(failed_responses, failed_requests, combined_result)
+
+        return combined_result
+
+    @staticmethod
+    def _parse_upsert_response(body: str) -> InstanceResult:
         """Parse the response from the upsert API.
 
         Args:
@@ -164,20 +183,16 @@ class InstanceClient:
         Returns:
             InstanceResult containing the results.
         """
-        # The CDF API returns: {"items": [...], "deleted": [...]}
-        # Parse using ApplyResponse model
-        apply_response = TypeAdapter(ApplyResponse).validate_json(body)
-
-        # Separate items based on wasModified flag
-        created_or_updated = [item for item in apply_response.items if item.was_modified]
-        unchanged = [item for item in apply_response.items if not item.was_modified]
-
-        return InstanceResult(
-            created=created_or_updated,
-            updated=[],
-            unchanged=unchanged,
-            deleted=apply_response.deleted,
-        )
+        response = ApplyResponse.model_validate_json(body)
+        result = InstanceResult(deleted=response.deleted)
+        for item in response.items:
+            if not item.was_modified:
+                result.unchanged.append(item)
+            if item.created_time == item.last_updated_time:
+                result.created.append(item)
+            else:
+                result.updated.append(item)
+        return result
 
     def delete(
         self,
@@ -203,24 +218,21 @@ class InstanceClient:
         if not item_list:
             return InstanceResult()
 
-        # Convert to InstanceId objects
         instance_ids = [self._to_instance_id(item, space) for item in item_list]
 
-        # Chunk items and submit to thread pool
-        result = InstanceResult()
         futures = []
         for chunk in chunker_sequence(instance_ids, self._DELETE_LIMIT):
             future = self._delete_executor.submit(self._delete_chunk, chunk)
             futures.append(future)
 
-        # Collect results
+        http_result: list[HTTPResult] = []
         for future in concurrent.futures.as_completed(futures):
-            deleted_ids = future.result()
-            result.deleted.extend(deleted_ids)
+            http_result.append(future.result())
 
-        return result
+        return self._get_success_or_raise_delete(http_result)
 
-    def _to_instance_id(self, item: str | InstanceId | InstanceWrite | InstanceModel, space: str | None) -> InstanceId:
+    @staticmethod
+    def _to_instance_id(item: str | InstanceId | InstanceWrite | InstanceModel, space: str | None) -> InstanceId:
         """Convert various input types to InstanceId.
 
         Args:
@@ -252,7 +264,7 @@ class InstanceClient:
         else:
             raise TypeError(f"Unsupported type for item: {type(item)}")
 
-    def _delete_chunk(self, items: list[InstanceId]) -> list[InstanceId]:
+    def _delete_chunk(self, items: list[InstanceId]) -> HTTPResult:
         """Delete a chunk of instances via the CDF API.
 
         Args:
@@ -261,39 +273,54 @@ class InstanceClient:
         Returns:
             List of deleted InstanceId objects.
         """
-        # Serialize items to CDF API format
         serialized_items = [item.dump(camel_case=True, format="model") for item in items]
 
-        # Build request body
         body: dict[str, JsonValue] = {
             "items": serialized_items,  # type: ignore[dict-item]
         }
-
-        # Create request
         request = RequestMessage(
             endpoint_url=self._config.create_api_url("/models/instances/delete"),
             method="POST",
             body_content=body,
         )
 
-        # Execute request with retries
-        result = self._http_client.request_with_retries(request)
-        response = result.get_success_or_raise()
+        return self._http_client.request_with_retries(request)
 
-        # Parse response
-        return self._parse_delete_response(response.body, items)
+    def _get_success_or_raise_delete(self, results: list[HTTPResult]) -> InstanceResult:
+        """Process a list of HTTPResults, returning a combined InstanceResult or raising an error.
 
-    def _parse_delete_response(self, body: str, requested_items: list[InstanceId]) -> list[InstanceId]:
+        Args:
+            results: List of HTTPResult objects from delete operations.
+        Returns:
+            Combined InstanceResult from all successful operations.
+        Raises:
+            MultiRequestError: If any of the HTTPResults indicate a failure.
+        """
+        combined_result = InstanceResult()
+        failed_responses: list[FailedResponse] = []
+        failed_requests: list[FailedRequest] = []
+        for result in results:
+            if isinstance(result, SuccessResponse):
+                deleted_items = self._parse_delete_response(result.body)
+                combined_result.deleted.extend(deleted_items)
+            elif isinstance(result, FailedResponse):
+                failed_responses.append(result)
+            elif isinstance(result, FailedRequest):
+                failed_requests.append(result)
+
+        if failed_responses or failed_requests:
+            raise MultiRequestError(failed_responses, failed_requests, combined_result)
+
+        return combined_result
+
+    @staticmethod
+    def _parse_delete_response(body: str) -> list[InstanceId]:
         """Parse the response from the delete API.
 
         Args:
             body: The response body from the API.
-            requested_items: The items that were requested to be deleted.
 
         Returns:
             List of deleted InstanceId objects.
         """
-        # The CDF API returns: {"items": [...]} with the deleted instances
-        # Using a simple dict parser since the delete response only contains items
-        data = TypeAdapter(dict[str, list[InstanceId]]).validate_json(body)
-        return data.get("items", [])
+        return DeleteResponse.model_validate_json(body).deleted
