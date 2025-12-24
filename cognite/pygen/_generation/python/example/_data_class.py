@@ -47,4 +47,4 @@ class PrimitiveNullableList(InstanceList[PrimitiveNullable]):
 
 
 class PrimitiveNullableFilter:
-    text = TextFilter(PrimitiveNullable._view_id, "text")
+    text = TextFilter(PrimitiveNullable._view_id, "text", "and")
