@@ -2,12 +2,12 @@ from typing import Literal
 
 from pydantic import Field, JsonValue
 
+from cognite.pygen._generation.python.instance_api.models._references import ViewReference
 from cognite.pygen._generation.python.instance_api.models._types import Date, DateTime
 from cognite.pygen._generation.python.instance_api.models.instance import (
     Instance,
     InstanceList,
     InstanceWrite,
-    ViewRef,
 )
 
 
@@ -25,7 +25,7 @@ class PrimitiveNullableWrite(InstanceWrite):
 
 
 class PrimitiveNullable(Instance):
-    _view_id = ViewRef(space="sp_pygen_models", external_id="PrimitiveNullable", version="v1")
+    _view_id = ViewReference(space="sp_pygen_models", external_id="PrimitiveNullable", version="v1")
     instance_type: Literal["node"] = Field("node", alias="instanceType")
     text: str | None
     boolean: bool | None

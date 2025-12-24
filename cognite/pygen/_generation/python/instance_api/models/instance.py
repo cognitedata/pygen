@@ -8,18 +8,7 @@ from pydantic_core import CoreSchema, core_schema
 
 from cognite.pygen._generation.python.instance_api.models._types import DateTimeMS
 
-
-class ViewRef(BaseModel, populate_by_name=True):
-    """Reference to a view.
-
-    Args:
-        space: The space of the view.
-        external_id: The external ID of the view.
-    """
-
-    space: str
-    external_id: str = Field(alias="externalId")
-    version: str
+from ._references import ViewReference
 
 
 class DataRecord(BaseModel, populate_by_name=True):
@@ -63,7 +52,7 @@ _DATA_RECORD_WRITE_FIELDS = frozenset(
 
 
 class InstanceModel(BaseModel, populate_by_name=True):
-    _view_id: ClassVar[ViewRef]
+    _view_id: ClassVar[ViewReference]
     instance_type: Literal["node", "edge"] = Field(alias="instanceType")
     space: str
     external_id: str = Field(alias="externalId")

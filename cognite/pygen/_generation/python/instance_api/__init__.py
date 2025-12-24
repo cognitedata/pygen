@@ -12,7 +12,7 @@ from cognite.pygen._generation.python.instance_api.models.instance import (
     InstanceList,
     InstanceModel,
     InstanceWrite,
-    ViewRef,
+    ViewReference,
 )
 from cognite.pygen._generation.python.instance_api.models.responses import (
     ApplyResponse,
@@ -36,5 +36,5 @@ __all__ = [
     "InstanceResultItem",
     "InstanceWrite",
     "Page",
-    "ViewRef",
+    "ViewReference",
 ]

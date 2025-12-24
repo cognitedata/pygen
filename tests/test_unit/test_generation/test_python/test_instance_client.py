@@ -6,7 +6,7 @@ import respx
 from cognite.pygen._generation.python.instance_api import InstanceClient, InstanceId, InstanceResult
 from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
-from cognite.pygen._generation.python.instance_api.models.instance import InstanceWrite, ViewRef
+from cognite.pygen._generation.python.instance_api.models.instance import InstanceWrite, ViewReference
 
 
 class MockCredentials(Credentials):
@@ -38,7 +38,7 @@ def sample_instance_write() -> InstanceWrite:
     """Create a sample InstanceWrite object."""
 
     class PersonWrite(InstanceWrite):
-        _view_id = ViewRef(space="test", external_id="Person", version="1")
+        _view_id = ViewReference(space="test", external_id="Person", version="1")
         name: str
         age: int
 
@@ -56,7 +56,7 @@ def sample_instance_writes() -> list[InstanceWrite]:
     """Create multiple sample InstanceWrite objects."""
 
     class PersonWrite(InstanceWrite):
-        _view_id = ViewRef(space="test", external_id="Person", version="1")
+        _view_id = ViewReference(space="test", external_id="Person", version="1")
         name: str
         age: int
 
@@ -351,7 +351,7 @@ class TestInstanceClientChunking:
         """Test that large batches are properly chunked."""
 
         class PersonWrite(InstanceWrite):
-            _view_id = ViewRef(space="test", external_id="Person", version="1")
+            _view_id = ViewReference(space="test", external_id="Person", version="1")
             name: str
 
         # Create more items than the chunk size
