@@ -312,5 +312,5 @@ class InstanceClient:
         Returns:
             InstanceResult containing the deleted items.
         """
-        deleted = DeleteResponse.model_validate_json(body).deleted
+        deleted = DeleteResponse.model_validate_json(body).items
         return InstanceResult(deleted=deleted)

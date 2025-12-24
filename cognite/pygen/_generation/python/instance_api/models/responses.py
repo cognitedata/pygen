@@ -91,7 +91,7 @@ class DeleteResponse(BaseModel):
     /models/instances endpoint (DELETE).
 
     Attributes:
-        deleted: List of instance IDs that were deleted.
+        items: List of instance IDs that were deleted.
     """
 
-    deleted: list[InstanceId] = Field(default_factory=list)
+    items: list[InstanceId] = Field(default_factory=list)
