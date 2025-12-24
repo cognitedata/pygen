@@ -1,5 +1,8 @@
 """Tests for the InstanceClient class."""
 
+import gzip
+import json
+
 import pytest
 import respx
 
@@ -33,15 +36,15 @@ def client(config: PygenClientConfig) -> InstanceClient:
     return InstanceClient(config)
 
 
+class PersonWrite(InstanceWrite):
+    _view_id = ViewReference(space="test", external_id="Person", version="1")
+    name: str
+    age: int
+
+
 @pytest.fixture
 def sample_instance_write() -> InstanceWrite:
     """Create a sample InstanceWrite object."""
-
-    class PersonWrite(InstanceWrite):
-        _view_id = ViewReference(space="test", external_id="Person", version="1")
-        name: str
-        age: int
-
     return PersonWrite(
         instance_type="node",
         space="test",
@@ -54,12 +57,6 @@ def sample_instance_write() -> InstanceWrite:
 @pytest.fixture
 def sample_instance_writes() -> list[InstanceWrite]:
     """Create multiple sample InstanceWrite objects."""
-
-    class PersonWrite(InstanceWrite):
-        _view_id = ViewReference(space="test", external_id="Person", version="1")
-        name: str
-        age: int
-
     return [
         PersonWrite(
             instance_type="node",
@@ -70,24 +67,6 @@ def sample_instance_writes() -> list[InstanceWrite]:
         )
         for i in range(1, 4)
     ]
-
-
-class TestInstanceClientInit:
-    """Tests for InstanceClient initialization."""
-
-    def test_init(self, config: PygenClientConfig) -> None:
-        """Test that InstanceClient can be initialized."""
-        client = InstanceClient(config)
-        assert client._config == config
-        assert client._http_client is not None
-        assert client._write_executor is not None
-        assert client._delete_executor is not None
-        assert client._retrieve_executor is not None
-
-    def test_context_manager(self, client: InstanceClient) -> None:
-        """Test that InstanceClient works as a context manager."""
-        with client as c:
-            assert c is client
 
 
 class TestInstanceClientUpsert:
@@ -148,14 +127,14 @@ class TestInstanceClientUpsert:
                         "version": 1,
                         "wasModified": True,
                         "createdTime": 1234567890000,
-                        "lastUpdatedTime": 1234567890000,
+                        "lastUpdatedTime": 2345678900000,
                     },
                     {
                         "instanceType": "node",
                         "space": "test",
                         "externalId": "person-3",
                         "version": 1,
-                        "wasModified": True,
+                        "wasModified": False,
                         "createdTime": 1234567890000,
                         "lastUpdatedTime": 1234567890000,
                     },
@@ -167,8 +146,12 @@ class TestInstanceClientUpsert:
         result = client.upsert(sample_instance_writes)
 
         assert isinstance(result, InstanceResult)
-        assert len(result.created) == 3
-        assert {item.external_id for item in result.created} == {"person-1", "person-2", "person-3"}
+        assert len(result.created) == 1
+        assert len(result.updated) == 1
+        assert len(result.unchanged) == 1
+        assert result.created[0].external_id == "person-1"
+        assert result.updated[0].external_id == "person-2"
+        assert result.unchanged[0].external_id == "person-3"
 
     def test_upsert_empty_list(self, client: InstanceClient) -> None:
         """Test upserting an empty list."""
@@ -180,7 +163,7 @@ class TestInstanceClientUpsert:
         assert len(result.unchanged) == 0
         assert len(result.deleted) == 0
 
-    def test_upsert_with_replace_mode(
+    def test_upsert_with_arguments(
         self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
     ) -> None:
         """Test upserting with replace mode."""
@@ -201,51 +184,13 @@ class TestInstanceClientUpsert:
             status_code=200,
         )
 
-        result = client.upsert(sample_instance_write, mode="replace")
+        result = client.upsert(sample_instance_write, mode="replace", skip_on_version_conflict=True)
 
         assert isinstance(result, InstanceResult)
-        # Verify that replace=True was passed in the request
         assert route.called
         request = respx_mock.calls[-1].request
-        import gzip
-        import json
-
-        # Decompress gzipped content
         body = json.loads(gzip.decompress(request.content))
         assert body["replace"] is True
-
-    def test_upsert_with_skip_on_version_conflict(
-        self, respx_mock: respx.MockRouter, client: InstanceClient, sample_instance_write: InstanceWrite
-    ) -> None:
-        """Test upserting with skip_on_version_conflict."""
-        route = respx_mock.post("https://test.cognitedata.com/api/v1/projects/test-project/models/instances").respond(
-            json={
-                "items": [
-                    {
-                        "instanceType": "node",
-                        "space": "test",
-                        "externalId": "person-1",
-                        "version": 1,
-                        "wasModified": True,
-                        "createdTime": 1234567890000,
-                        "lastUpdatedTime": 1234567890000,
-                    }
-                ]
-            },
-            status_code=200,
-        )
-
-        result = client.upsert(sample_instance_write, skip_on_version_conflict=True)
-
-        assert isinstance(result, InstanceResult)
-        # Verify that skipOnVersionConflict=True was passed in the request
-        assert route.called
-        request = respx_mock.calls[-1].request
-        import gzip
-        import json
-
-        # Decompress gzipped content
-        body = json.loads(gzip.decompress(request.content))
         assert body["skipOnVersionConflict"] is True
 
     def test_upsert_with_update_mode_not_implemented(

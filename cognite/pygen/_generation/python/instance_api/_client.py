@@ -211,6 +211,7 @@ class InstanceClient:
         for item in response.items:
             if not item.was_modified:
                 result.unchanged.append(item)
+                continue
             if item.created_time == item.last_updated_time:
                 result.created.append(item)
             else:
