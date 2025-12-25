@@ -51,12 +51,13 @@ class DataTypeFilter:
         leaf_filters = [{filter_type: value} for filter_type, value in self._filters.items()]
         return {self._operator: leaf_filters}  # type: ignore[dict-item]
 
-    def dump(self) -> dict[str, Any]:
+    def dump(self, exclude_none: bool = False) -> dict[str, Any]:
         """Dump the filter to a dictionary."""
         filter_obj = self.as_filter()
         if filter_obj is None:
             return {}
-        return FilterAdapter.dump_python(filter_obj)
+        return FilterAdapter.dump_python(filter_obj, exclude_none=exclude_none)
+
 
 class FilterContainer:
     def __init__(self, data_type_filters: list[DataTypeFilter], operator: Literal["and", "or"]) -> None:
