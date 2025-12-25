@@ -211,7 +211,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         if view_key == "view":
             body["view"] = self._view_ref.dump(camel_case=True, include_type=True)
         else:
-            source = {
+            source: dict[str, Any] = {
                 "source": self._view_ref.dump(camel_case=True, include_type=True),
             }
             if target_units is not None:
@@ -290,7 +290,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         self,
         include_typing: bool = False,
         target_units: UnitConversion | Sequence[UnitConversion] | None = None,
-        include_debug: bool = False,
+        debug: DebugParameters | None = None,
         limit: int | None = _DEFAULT_LIST_LIMIT,
         sort: PropertySort | Sequence[PropertySort] | None = None,
         filter: Filter | None = None,
@@ -309,8 +309,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
             limit: Maximum number of instances to return. Defaults to 25.
                 Set to -1 or None to return all matching instances.
             include_typing: If True, includes type information for direct relations.
-            include_debug: If True, includes debug information. Note: only the
-                debug info from the last page is preserved when collecting results.
+            debug: Return query debug notices.
             target_units: Unit conversion configuration for numeric properties with units.
 
         Returns:
@@ -325,7 +324,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
             page = self._iterate(
                 include_typing=include_typing,
                 target_units=target_units,
-                include_debug=include_debug,
+                debug=debug,
                 cursor=next_cursor,
                 limit=page_limit,
                 sort=sort,
