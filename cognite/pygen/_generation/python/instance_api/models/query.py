@@ -51,7 +51,7 @@ class PropertySort(BaseModel):
 
     property: list[str] = Field(..., min_length=2, max_length=3)
     direction: Literal["ascending", "descending"] = "ascending"
-    nulls_first: bool | None = Field(default=None, alias="nullsFirst")
+    nulls_first: bool | None = Field(default=None)
 
 
 class UnitConversion(BaseModel):
@@ -101,8 +101,8 @@ class PropertyWithUnits(BaseModel):
         populate_by_name=True,
     )
 
-    value: float | int | list[float] | list[int] | None = None
-    unit: dict[str, str] | None = None  # Contains {"externalId": "unit:identifier"}
+    value: float | list[float] | None = None
+    unit: dict[Literal["externalId"], str] | None = None  # Contains {"externalId": "unit:identifier"}
 
 
 class DebugInfo(BaseModel):
@@ -123,7 +123,9 @@ class DebugInfo(BaseModel):
         populate_by_name=True,
     )
 
-    request_items_limit: int | None = Field(default=None, alias="requestItemsLimit")
-    query_time_ms: float | None = Field(default=None, alias="queryTimeMs")
-    parse_time_ms: float | None = Field(default=None, alias="parseTimeMs")
-    serialize_time_ms: float | None = Field(default=None, alias="serializeTimeMs")
+    request_items_limit: int | None = Field(default=None)
+    query_time_ms: float | None = Field(
+        default=None,
+    )
+    parse_time_ms: float | None = Field(default=None)
+    serialize_time_ms: float | None = Field(default=None)

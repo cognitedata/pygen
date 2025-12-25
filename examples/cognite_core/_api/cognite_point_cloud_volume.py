@@ -706,7 +706,7 @@ class CognitePointCloudVolumeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_point_cloud_volumes in client.cognite_point_cloud_volume.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_point_cloud_volumes in client.cognite_point_cloud_volume.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_point_cloud_volume in cognite_point_cloud_volumes:
                 ...         print(cognite_point_cloud_volume.external_id)
 
@@ -714,11 +714,7 @@ class CognitePointCloudVolumeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_point_cloud_volumes in client.cognite_point_cloud_volume.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_point_cloud_volumes in client.cognite_point_cloud_volume.iterate(chunk_size=100):
                 ...     for cognite_point_cloud_volume in cognite_point_cloud_volumes:
                 ...         print(cognite_point_cloud_volume.external_id)
 
@@ -726,14 +722,10 @@ class CognitePointCloudVolumeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_point_cloud_volume.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_point_cloud_volume.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_point_cloud_volumes in client.cognite_point_cloud_volume.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_point_cloud_volumes in client.cognite_point_cloud_volume.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_point_cloud_volume in cognite_point_cloud_volumes:
                 ...         print(cognite_point_cloud_volume.external_id)
 

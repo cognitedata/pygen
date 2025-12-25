@@ -480,7 +480,7 @@ class CogniteAssetClassAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_asset_class in client.cognite_asset_class.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_asset_class in client.cognite_asset_class.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_asset_clas in cognite_asset_class:
                 ...         print(cognite_asset_clas.external_id)
 
@@ -488,11 +488,7 @@ class CogniteAssetClassAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_asset_class in client.cognite_asset_class.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_asset_class in client.cognite_asset_class.iterate(chunk_size=100):
                 ...     for cognite_asset_clas in cognite_asset_class:
                 ...         print(cognite_asset_clas.external_id)
 
@@ -500,14 +496,10 @@ class CogniteAssetClassAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_asset_class.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_asset_class.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_asset_class in client.cognite_asset_class.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_asset_class in client.cognite_asset_class.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_asset_clas in cognite_asset_class:
                 ...         print(cognite_asset_clas.external_id)
 

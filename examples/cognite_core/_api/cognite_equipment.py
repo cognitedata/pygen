@@ -967,7 +967,7 @@ class CogniteEquipmentAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_equipments in client.cognite_equipment.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_equipments in client.cognite_equipment.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_equipment in cognite_equipments:
                 ...         print(cognite_equipment.external_id)
 
@@ -975,11 +975,7 @@ class CogniteEquipmentAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_equipments in client.cognite_equipment.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_equipments in client.cognite_equipment.iterate(chunk_size=100):
                 ...     for cognite_equipment in cognite_equipments:
                 ...         print(cognite_equipment.external_id)
 
@@ -987,14 +983,10 @@ class CogniteEquipmentAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_equipment.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_equipment.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_equipments in client.cognite_equipment.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_equipments in client.cognite_equipment.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_equipment in cognite_equipments:
                 ...         print(cognite_equipment.external_id)
 

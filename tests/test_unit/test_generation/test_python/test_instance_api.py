@@ -235,7 +235,7 @@ class TestInstanceAPIList:
         route = respx_mock.post(list_url).respond(json=make_list_response(items))
 
         units = UnitConversion(property=["test", "Person/1", "temperature"], target_unit="temperature:fah")
-        api.list(units=units)
+        api.list(target_units=units)
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))

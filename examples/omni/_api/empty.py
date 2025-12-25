@@ -577,7 +577,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for empties in client.empty.iterate(chunk_size=100, limit=2000):
+                >>> for empties in client.empty.iterate(limit=2000,chunk_size=100):
                 ...     for empty in empties:
                 ...         print(empty.external_id)
 
@@ -585,11 +585,7 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for empties in client.empty.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for empties in client.empty.iterate(chunk_size=100):
                 ...     for empty in empties:
                 ...         print(empty.external_id)
 
@@ -597,14 +593,10 @@ class EmptyAPI(NodeAPI[Empty, EmptyWrite, EmptyList, EmptyWriteList]):
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.empty.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.empty.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for empties in client.empty.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for empties in client.empty.iterate(limit=2000,chunk_size=100):
                 ...     for empty in empties:
                 ...         print(empty.external_id)
 

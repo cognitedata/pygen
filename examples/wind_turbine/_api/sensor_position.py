@@ -1030,7 +1030,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for sensor_positions in client.sensor_position.iterate(chunk_size=100, limit=2000):
+                >>> for sensor_positions in client.sensor_position.iterate(limit=2000,chunk_size=100):
                 ...     for sensor_position in sensor_positions:
                 ...         print(sensor_position.external_id)
 
@@ -1038,11 +1038,7 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for sensor_positions in client.sensor_position.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for sensor_positions in client.sensor_position.iterate(chunk_size=100):
                 ...     for sensor_position in sensor_positions:
                 ...         print(sensor_position.external_id)
 
@@ -1050,14 +1046,10 @@ class SensorPositionAPI(NodeAPI[SensorPosition, SensorPositionWrite, SensorPosit
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.sensor_position.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.sensor_position.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for sensor_positions in client.sensor_position.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for sensor_positions in client.sensor_position.iterate(limit=2000,chunk_size=100):
                 ...     for sensor_position in sensor_positions:
                 ...         print(sensor_position.external_id)
 

@@ -585,7 +585,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for power_inverters in client.power_inverter.iterate(chunk_size=100, limit=2000):
+                >>> for power_inverters in client.power_inverter.iterate(limit=2000,chunk_size=100):
                 ...     for power_inverter in power_inverters:
                 ...         print(power_inverter.external_id)
 
@@ -593,11 +593,7 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for power_inverters in client.power_inverter.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for power_inverters in client.power_inverter.iterate(chunk_size=100):
                 ...     for power_inverter in power_inverters:
                 ...         print(power_inverter.external_id)
 
@@ -605,14 +601,10 @@ class PowerInverterAPI(NodeAPI[PowerInverter, PowerInverterWrite, PowerInverterL
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.power_inverter.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.power_inverter.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for power_inverters in client.power_inverter.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for power_inverters in client.power_inverter.iterate(limit=2000,chunk_size=100):
                 ...     for power_inverter in power_inverters:
                 ...         print(power_inverter.external_id)
 

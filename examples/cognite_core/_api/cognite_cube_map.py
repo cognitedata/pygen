@@ -791,7 +791,7 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_cube_maps in client.cognite_cube_map.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_cube_maps in client.cognite_cube_map.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_cube_map in cognite_cube_maps:
                 ...         print(cognite_cube_map.external_id)
 
@@ -799,11 +799,7 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_cube_maps in client.cognite_cube_map.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_cube_maps in client.cognite_cube_map.iterate(chunk_size=100):
                 ...     for cognite_cube_map in cognite_cube_maps:
                 ...         print(cognite_cube_map.external_id)
 
@@ -811,14 +807,10 @@ class CogniteCubeMapAPI(NodeAPI[CogniteCubeMap, CogniteCubeMapWrite, CogniteCube
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_cube_map.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_cube_map.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_cube_maps in client.cognite_cube_map.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_cube_maps in client.cognite_cube_map.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_cube_map in cognite_cube_maps:
                 ...         print(cognite_cube_map.external_id)
 

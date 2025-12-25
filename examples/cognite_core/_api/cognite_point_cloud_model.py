@@ -543,7 +543,7 @@ class CognitePointCloudModelAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_point_cloud_models in client.cognite_point_cloud_model.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_point_cloud_models in client.cognite_point_cloud_model.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_point_cloud_model in cognite_point_cloud_models:
                 ...         print(cognite_point_cloud_model.external_id)
 
@@ -551,11 +551,7 @@ class CognitePointCloudModelAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_point_cloud_models in client.cognite_point_cloud_model.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_point_cloud_models in client.cognite_point_cloud_model.iterate(chunk_size=100):
                 ...     for cognite_point_cloud_model in cognite_point_cloud_models:
                 ...         print(cognite_point_cloud_model.external_id)
 
@@ -563,14 +559,10 @@ class CognitePointCloudModelAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_point_cloud_model.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_point_cloud_model.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_point_cloud_models in client.cognite_point_cloud_model.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_point_cloud_models in client.cognite_point_cloud_model.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_point_cloud_model in cognite_point_cloud_models:
                 ...         print(cognite_point_cloud_model.external_id)
 

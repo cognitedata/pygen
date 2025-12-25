@@ -725,7 +725,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for main_shafts in client.main_shaft.iterate(chunk_size=100, limit=2000):
+                >>> for main_shafts in client.main_shaft.iterate(limit=2000,chunk_size=100):
                 ...     for main_shaft in main_shafts:
                 ...         print(main_shaft.external_id)
 
@@ -733,11 +733,7 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for main_shafts in client.main_shaft.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for main_shafts in client.main_shaft.iterate(chunk_size=100):
                 ...     for main_shaft in main_shafts:
                 ...         print(main_shaft.external_id)
 
@@ -745,14 +741,10 @@ class MainShaftAPI(NodeAPI[MainShaft, MainShaftWrite, MainShaftList, MainShaftWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.main_shaft.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.main_shaft.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for main_shafts in client.main_shaft.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for main_shafts in client.main_shaft.iterate(limit=2000,chunk_size=100):
                 ...     for main_shaft in main_shafts:
                 ...         print(main_shaft.external_id)
 

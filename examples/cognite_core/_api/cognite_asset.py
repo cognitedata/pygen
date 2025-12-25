@@ -1176,7 +1176,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_assets in client.cognite_asset.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_assets in client.cognite_asset.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_asset in cognite_assets:
                 ...         print(cognite_asset.external_id)
 
@@ -1184,11 +1184,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_assets in client.cognite_asset.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_assets in client.cognite_asset.iterate(chunk_size=100):
                 ...     for cognite_asset in cognite_assets:
                 ...         print(cognite_asset.external_id)
 
@@ -1196,14 +1192,10 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_asset.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_asset.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_assets in client.cognite_asset.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_assets in client.cognite_asset.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_asset in cognite_assets:
                 ...         print(cognite_asset.external_id)
 

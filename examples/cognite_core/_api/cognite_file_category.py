@@ -508,7 +508,7 @@ class CogniteFileCategoryAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_file_categories in client.cognite_file_category.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_file_categories in client.cognite_file_category.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_file_category in cognite_file_categories:
                 ...         print(cognite_file_category.external_id)
 
@@ -516,11 +516,7 @@ class CogniteFileCategoryAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_file_categories in client.cognite_file_category.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_file_categories in client.cognite_file_category.iterate(chunk_size=100):
                 ...     for cognite_file_category in cognite_file_categories:
                 ...         print(cognite_file_category.external_id)
 
@@ -528,14 +524,10 @@ class CogniteFileCategoryAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_file_category.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_file_category.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_file_categories in client.cognite_file_category.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_file_categories in client.cognite_file_category.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_file_category in cognite_file_categories:
                 ...         print(cognite_file_category.external_id)
 

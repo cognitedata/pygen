@@ -10,28 +10,24 @@ from .instance import InstanceId, T_InstanceList
 from .query import DebugInfo
 
 
+class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
+    """Response from a list operation.
+
+    Attributes:
+        items: The list of items returned by the operation.
+        typing: Optional typing information about the items.
+    """
+
+    items: T_InstanceList
+    typing: dict[str, dict[str, Any]] | None = None
+
+
 class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
     """A page of results from a paginated API response.
 
     Attributes:
         items: The list of items in this page.
         next_cursor: The cursor for the next page, or None if this is the last page.
-    """
-
-    items: T_InstanceList
-    next_cursor: str | None = Field(default=None, alias="nextCursor")
-
-
-class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
-    """Response from list/iterate/search operations with optional debug information.
-
-    This extends the standard Page response to include debug information when
-    the `include_debug` parameter is set to True.
-
-    Attributes:
-        items: The list of items in this page.
-        next_cursor: The cursor for the next page, or None if this is the last page.
-        debug: Debug information about the query execution (only present when include_debug=True).
     """
 
     items: T_InstanceList

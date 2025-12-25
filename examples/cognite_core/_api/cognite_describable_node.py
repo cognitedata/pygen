@@ -559,7 +559,7 @@ class CogniteDescribableNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_describable_nodes in client.cognite_describable_node.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_describable_nodes in client.cognite_describable_node.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_describable_node in cognite_describable_nodes:
                 ...         print(cognite_describable_node.external_id)
 
@@ -567,11 +567,7 @@ class CogniteDescribableNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_describable_nodes in client.cognite_describable_node.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_describable_nodes in client.cognite_describable_node.iterate(chunk_size=100):
                 ...     for cognite_describable_node in cognite_describable_nodes:
                 ...         print(cognite_describable_node.external_id)
 
@@ -579,14 +575,10 @@ class CogniteDescribableNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_describable_node.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_describable_node.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_describable_nodes in client.cognite_describable_node.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_describable_nodes in client.cognite_describable_node.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_describable_node in cognite_describable_nodes:
                 ...         print(cognite_describable_node.external_id)
 

@@ -384,7 +384,7 @@ class PrimitiveNullableListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_nullable_listeds in client.primitive_nullable_listed.iterate(chunk_size=100, limit=2000):
+                >>> for primitive_nullable_listeds in client.primitive_nullable_listed.iterate(limit=2000,chunk_size=100):
                 ...     for primitive_nullable_listed in primitive_nullable_listeds:
                 ...         print(primitive_nullable_listed.external_id)
 
@@ -392,11 +392,7 @@ class PrimitiveNullableListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_nullable_listeds in client.primitive_nullable_listed.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for primitive_nullable_listeds in client.primitive_nullable_listed.iterate(chunk_size=100):
                 ...     for primitive_nullable_listed in primitive_nullable_listeds:
                 ...         print(primitive_nullable_listed.external_id)
 
@@ -404,14 +400,10 @@ class PrimitiveNullableListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.primitive_nullable_listed.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.primitive_nullable_listed.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for primitive_nullable_listeds in client.primitive_nullable_listed.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for primitive_nullable_listeds in client.primitive_nullable_listed.iterate(limit=2000,chunk_size=100):
                 ...     for primitive_nullable_listed in primitive_nullable_listeds:
                 ...         print(primitive_nullable_listed.external_id)
 

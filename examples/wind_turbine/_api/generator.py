@@ -515,7 +515,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for generators in client.generator.iterate(chunk_size=100, limit=2000):
+                >>> for generators in client.generator.iterate(limit=2000,chunk_size=100):
                 ...     for generator in generators:
                 ...         print(generator.external_id)
 
@@ -523,11 +523,7 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for generators in client.generator.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for generators in client.generator.iterate(chunk_size=100):
                 ...     for generator in generators:
                 ...         print(generator.external_id)
 
@@ -535,14 +531,10 @@ class GeneratorAPI(NodeAPI[Generator, GeneratorWrite, GeneratorList, GeneratorWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.generator.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.generator.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for generators in client.generator.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for generators in client.generator.iterate(limit=2000,chunk_size=100):
                 ...     for generator in generators:
                 ...         print(generator.external_id)
 

@@ -384,7 +384,7 @@ class PrimitiveRequiredListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_required_listeds in client.primitive_required_listed.iterate(chunk_size=100, limit=2000):
+                >>> for primitive_required_listeds in client.primitive_required_listed.iterate(limit=2000,chunk_size=100):
                 ...     for primitive_required_listed in primitive_required_listeds:
                 ...         print(primitive_required_listed.external_id)
 
@@ -392,11 +392,7 @@ class PrimitiveRequiredListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_required_listeds in client.primitive_required_listed.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for primitive_required_listeds in client.primitive_required_listed.iterate(chunk_size=100):
                 ...     for primitive_required_listed in primitive_required_listeds:
                 ...         print(primitive_required_listed.external_id)
 
@@ -404,14 +400,10 @@ class PrimitiveRequiredListedAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.primitive_required_listed.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.primitive_required_listed.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for primitive_required_listeds in client.primitive_required_listed.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for primitive_required_listeds in client.primitive_required_listed.iterate(limit=2000,chunk_size=100):
                 ...     for primitive_required_listed in primitive_required_listeds:
                 ...         print(primitive_required_listed.external_id)
 

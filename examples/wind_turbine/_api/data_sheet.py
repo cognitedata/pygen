@@ -521,7 +521,7 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for data_sheets in client.data_sheet.iterate(chunk_size=100, limit=2000):
+                >>> for data_sheets in client.data_sheet.iterate(limit=2000,chunk_size=100):
                 ...     for data_sheet in data_sheets:
                 ...         print(data_sheet.external_id)
 
@@ -529,11 +529,7 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for data_sheets in client.data_sheet.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for data_sheets in client.data_sheet.iterate(chunk_size=100):
                 ...     for data_sheet in data_sheets:
                 ...         print(data_sheet.external_id)
 
@@ -541,14 +537,10 @@ class DataSheetAPI(NodeAPI[DataSheet, DataSheetWrite, DataSheetList, DataSheetWr
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.data_sheet.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.data_sheet.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for data_sheets in client.data_sheet.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for data_sheets in client.data_sheet.iterate(limit=2000,chunk_size=100):
                 ...     for data_sheet in data_sheets:
                 ...         print(data_sheet.external_id)
 

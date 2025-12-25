@@ -474,7 +474,7 @@ class CogniteSchedulableAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_schedulables in client.cognite_schedulable.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_schedulables in client.cognite_schedulable.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_schedulable in cognite_schedulables:
                 ...         print(cognite_schedulable.external_id)
 
@@ -482,11 +482,7 @@ class CogniteSchedulableAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_schedulables in client.cognite_schedulable.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_schedulables in client.cognite_schedulable.iterate(chunk_size=100):
                 ...     for cognite_schedulable in cognite_schedulables:
                 ...         print(cognite_schedulable.external_id)
 
@@ -494,14 +490,10 @@ class CogniteSchedulableAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_schedulable.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_schedulable.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_schedulables in client.cognite_schedulable.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_schedulables in client.cognite_schedulable.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_schedulable in cognite_schedulables:
                 ...         print(cognite_schedulable.external_id)
 

@@ -428,7 +428,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> for sub_interfaces in client.sub_interface.iterate(chunk_size=100, limit=2000):
+                >>> for sub_interfaces in client.sub_interface.iterate(limit=2000,chunk_size=100):
                 ...     for sub_interface in sub_interfaces:
                 ...         print(sub_interface.external_id)
 
@@ -436,11 +436,7 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> for sub_interfaces in client.sub_interface.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for sub_interfaces in client.sub_interface.iterate(chunk_size=100):
                 ...     for sub_interface in sub_interfaces:
                 ...         print(sub_interface.external_id)
 
@@ -448,14 +444,10 @@ class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList,
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> for first_iteration in client.sub_interface.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.sub_interface.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for sub_interfaces in client.sub_interface.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for sub_interfaces in client.sub_interface.iterate(limit=2000,chunk_size=100):
                 ...     for sub_interface in sub_interfaces:
                 ...         print(sub_interface.external_id)
 

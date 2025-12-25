@@ -1210,7 +1210,7 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_360_images in client.cognite_360_image.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_360_images in client.cognite_360_image.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_360_image in cognite_360_images:
                 ...         print(cognite_360_image.external_id)
 
@@ -1218,11 +1218,7 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_360_images in client.cognite_360_image.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_360_images in client.cognite_360_image.iterate(chunk_size=100):
                 ...     for cognite_360_image in cognite_360_images:
                 ...         print(cognite_360_image.external_id)
 
@@ -1230,14 +1226,10 @@ class Cognite360ImageAPI(NodeAPI[Cognite360Image, Cognite360ImageWrite, Cognite3
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_360_image.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_360_image.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_360_images in client.cognite_360_image.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_360_images in client.cognite_360_image.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_360_image in cognite_360_images:
                 ...         print(cognite_360_image.external_id)
 

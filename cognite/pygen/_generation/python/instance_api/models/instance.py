@@ -156,8 +156,7 @@ class InstanceList(Collection[T_Instance]):
         args = get_args(source_type)
         if args:
             item_type = args[0]
-        elif hasattr(cls, "_INSTANCE") and cls._INSTANCE is not Instance:
-            # Use the _INSTANCE class variable if it's been set to a subclass
+        elif cls._INSTANCE is not Instance:
             item_type = cls._INSTANCE
         else:
             item_type = Instance

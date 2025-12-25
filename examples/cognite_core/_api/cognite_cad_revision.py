@@ -535,7 +535,7 @@ class CogniteCADRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_cad_revisions in client.cognite_cad_revision.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_cad_revisions in client.cognite_cad_revision.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_cad_revision in cognite_cad_revisions:
                 ...         print(cognite_cad_revision.external_id)
 
@@ -543,11 +543,7 @@ class CogniteCADRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_cad_revisions in client.cognite_cad_revision.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_cad_revisions in client.cognite_cad_revision.iterate(chunk_size=100):
                 ...     for cognite_cad_revision in cognite_cad_revisions:
                 ...         print(cognite_cad_revision.external_id)
 
@@ -555,14 +551,10 @@ class CogniteCADRevisionAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_cad_revision.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_cad_revision.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_cad_revisions in client.cognite_cad_revision.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_cad_revisions in client.cognite_cad_revision.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_cad_revision in cognite_cad_revisions:
                 ...         print(cognite_cad_revision.external_id)
 

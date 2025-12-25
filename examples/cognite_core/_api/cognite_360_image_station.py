@@ -450,7 +450,7 @@ class Cognite360ImageStationAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_360_image_stations in client.cognite_360_image_station.iterate(chunk_size=100, limit=2000):
+                >>> for cognite_360_image_stations in client.cognite_360_image_station.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_360_image_station in cognite_360_image_stations:
                 ...         print(cognite_360_image_station.external_id)
 
@@ -458,11 +458,7 @@ class Cognite360ImageStationAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_360_image_stations in client.cognite_360_image_station.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for cognite_360_image_stations in client.cognite_360_image_station.iterate(chunk_size=100):
                 ...     for cognite_360_image_station in cognite_360_image_stations:
                 ...         print(cognite_360_image_station.external_id)
 
@@ -470,14 +466,10 @@ class Cognite360ImageStationAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_360_image_station.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_360_image_station.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_360_image_stations in client.cognite_360_image_station.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for cognite_360_image_stations in client.cognite_360_image_station.iterate(limit=2000,chunk_size=100):
                 ...     for cognite_360_image_station in cognite_360_image_stations:
                 ...         print(cognite_360_image_station.external_id)
 

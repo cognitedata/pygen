@@ -579,7 +579,7 @@ class PrimitiveRequiredAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_requireds in client.primitive_required.iterate(chunk_size=100, limit=2000):
+                >>> for primitive_requireds in client.primitive_required.iterate(limit=2000,chunk_size=100):
                 ...     for primitive_required in primitive_requireds:
                 ...         print(primitive_required.external_id)
 
@@ -587,11 +587,7 @@ class PrimitiveRequiredAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_requireds in client.primitive_required.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for primitive_requireds in client.primitive_required.iterate(chunk_size=100):
                 ...     for primitive_required in primitive_requireds:
                 ...         print(primitive_required.external_id)
 
@@ -599,14 +595,10 @@ class PrimitiveRequiredAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.primitive_required.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.primitive_required.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for primitive_requireds in client.primitive_required.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for primitive_requireds in client.primitive_required.iterate(limit=2000,chunk_size=100):
                 ...     for primitive_required in primitive_requireds:
                 ...         print(primitive_required.external_id)
 

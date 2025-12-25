@@ -542,7 +542,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for implementation_1_non_writeables in client.implementation_1_non_writeable.iterate(chunk_size=100, limit=2000):
+                >>> for implementation_1_non_writeables in client.implementation_1_non_writeable.iterate(limit=2000,chunk_size=100):
                 ...     for implementation_1_non_writeable in implementation_1_non_writeables:
                 ...         print(implementation_1_non_writeable.external_id)
 
@@ -550,11 +550,7 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for implementation_1_non_writeables in client.implementation_1_non_writeable.iterate(
-                ...     chunk_size=100,
-                ...     sort_by="external_id",
-                ...     direction="descending",
-                ... ):
+                >>> for implementation_1_non_writeables in client.implementation_1_non_writeable.iterate(chunk_size=100):
                 ...     for implementation_1_non_writeable in implementation_1_non_writeables:
                 ...         print(implementation_1_non_writeable.external_id)
 
@@ -562,14 +558,10 @@ class Implementation1NonWriteableAPI(NodeReadAPI[Implementation1NonWriteable, Im
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.implementation_1_non_writeable.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.implementation_1_non_writeable.iterate(limit=2000,chunk_size=100):
                 ...     print(first_iteration)
                 ...     break
-                >>> for implementation_1_non_writeables in client.implementation_1_non_writeable.iterate(
-                ...     chunk_size=100,
-                ...     limit=2000,
-                ...     cursors=first_iteration.cursors,
-                ... ):
+                >>> for implementation_1_non_writeables in client.implementation_1_non_writeable.iterate(limit=2000,chunk_size=100):
                 ...     for implementation_1_non_writeable in implementation_1_non_writeables:
                 ...         print(implementation_1_non_writeable.external_id)
 
