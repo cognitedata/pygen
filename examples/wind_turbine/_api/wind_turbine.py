@@ -793,7 +793,7 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for wind_turbines in client.wind_turbine.iterate(limit=2000,chunk_size=100):
+                >>> for wind_turbines in client.wind_turbine.iterate(chunk_size=100, limit=2000):
                 ...     for wind_turbine in wind_turbines:
                 ...         print(wind_turbine.external_id)
 
@@ -801,7 +801,11 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for wind_turbines in client.wind_turbine.iterate(chunk_size=100):
+                >>> for wind_turbines in client.wind_turbine.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for wind_turbine in wind_turbines:
                 ...         print(wind_turbine.external_id)
 
@@ -809,10 +813,14 @@ class WindTurbineAPI(NodeAPI[WindTurbine, WindTurbineWrite, WindTurbineList, Win
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.wind_turbine.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.wind_turbine.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for wind_turbines in client.wind_turbine.iterate(limit=2000,chunk_size=100):
+                >>> for wind_turbines in client.wind_turbine.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for wind_turbine in wind_turbines:
                 ...         print(wind_turbine.external_id)
 

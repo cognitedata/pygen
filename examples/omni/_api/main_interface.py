@@ -403,7 +403,7 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for main_interfaces in client.main_interface.iterate(limit=2000,chunk_size=100):
+                >>> for main_interfaces in client.main_interface.iterate(chunk_size=100, limit=2000):
                 ...     for main_interface in main_interfaces:
                 ...         print(main_interface.external_id)
 
@@ -411,7 +411,11 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for main_interfaces in client.main_interface.iterate(chunk_size=100):
+                >>> for main_interfaces in client.main_interface.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for main_interface in main_interfaces:
                 ...         print(main_interface.external_id)
 
@@ -419,10 +423,14 @@ class MainInterfaceAPI(NodeAPI[MainInterface, MainInterfaceWrite, MainInterfaceL
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.main_interface.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.main_interface.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for main_interfaces in client.main_interface.iterate(limit=2000,chunk_size=100):
+                >>> for main_interfaces in client.main_interface.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for main_interface in main_interfaces:
                 ...         print(main_interface.external_id)
 

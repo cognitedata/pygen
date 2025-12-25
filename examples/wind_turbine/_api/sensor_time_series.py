@@ -536,7 +536,7 @@ class SensorTimeSeriesAPI(
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for sensor_time_series_list in client.sensor_time_series.iterate(limit=2000,chunk_size=100):
+                >>> for sensor_time_series_list in client.sensor_time_series.iterate(chunk_size=100, limit=2000):
                 ...     for sensor_time_series in sensor_time_series_list:
                 ...         print(sensor_time_series.external_id)
 
@@ -544,7 +544,11 @@ class SensorTimeSeriesAPI(
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for sensor_time_series_list in client.sensor_time_series.iterate(chunk_size=100):
+                >>> for sensor_time_series_list in client.sensor_time_series.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for sensor_time_series in sensor_time_series_list:
                 ...         print(sensor_time_series.external_id)
 
@@ -552,10 +556,14 @@ class SensorTimeSeriesAPI(
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.sensor_time_series.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.sensor_time_series.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for sensor_time_series_list in client.sensor_time_series.iterate(limit=2000,chunk_size=100):
+                >>> for sensor_time_series_list in client.sensor_time_series.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for sensor_time_series in sensor_time_series_list:
                 ...         print(sensor_time_series.external_id)
 

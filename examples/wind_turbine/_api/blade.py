@@ -430,7 +430,7 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for blades in client.blade.iterate(limit=2000,chunk_size=100):
+                >>> for blades in client.blade.iterate(chunk_size=100, limit=2000):
                 ...     for blade in blades:
                 ...         print(blade.external_id)
 
@@ -438,7 +438,11 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for blades in client.blade.iterate(chunk_size=100):
+                >>> for blades in client.blade.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for blade in blades:
                 ...         print(blade.external_id)
 
@@ -446,10 +450,14 @@ class BladeAPI(NodeAPI[Blade, BladeWrite, BladeList, BladeWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.blade.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.blade.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for blades in client.blade.iterate(limit=2000,chunk_size=100):
+                >>> for blades in client.blade.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for blade in blades:
                 ...         print(blade.external_id)
 

@@ -563,7 +563,7 @@ class CogniteAssetTypeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_asset_types in client.cognite_asset_type.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_asset_types in client.cognite_asset_type.iterate(chunk_size=100, limit=2000):
                 ...     for cognite_asset_type in cognite_asset_types:
                 ...         print(cognite_asset_type.external_id)
 
@@ -571,7 +571,11 @@ class CogniteAssetTypeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_asset_types in client.cognite_asset_type.iterate(chunk_size=100):
+                >>> for cognite_asset_types in client.cognite_asset_type.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for cognite_asset_type in cognite_asset_types:
                 ...         print(cognite_asset_type.external_id)
 
@@ -579,10 +583,14 @@ class CogniteAssetTypeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_asset_type.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.cognite_asset_type.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_asset_types in client.cognite_asset_type.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_asset_types in client.cognite_asset_type.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for cognite_asset_type in cognite_asset_types:
                 ...         print(cognite_asset_type.external_id)
 

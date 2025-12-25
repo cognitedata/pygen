@@ -583,7 +583,7 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for high_speed_shafts in client.high_speed_shaft.iterate(limit=2000,chunk_size=100):
+                >>> for high_speed_shafts in client.high_speed_shaft.iterate(chunk_size=100, limit=2000):
                 ...     for high_speed_shaft in high_speed_shafts:
                 ...         print(high_speed_shaft.external_id)
 
@@ -591,7 +591,11 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for high_speed_shafts in client.high_speed_shaft.iterate(chunk_size=100):
+                >>> for high_speed_shafts in client.high_speed_shaft.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for high_speed_shaft in high_speed_shafts:
                 ...         print(high_speed_shaft.external_id)
 
@@ -599,10 +603,14 @@ class HighSpeedShaftAPI(NodeAPI[HighSpeedShaft, HighSpeedShaftWrite, HighSpeedSh
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.high_speed_shaft.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.high_speed_shaft.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for high_speed_shafts in client.high_speed_shaft.iterate(limit=2000,chunk_size=100):
+                >>> for high_speed_shafts in client.high_speed_shaft.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for high_speed_shaft in high_speed_shafts:
                 ...         print(high_speed_shaft.external_id)
 

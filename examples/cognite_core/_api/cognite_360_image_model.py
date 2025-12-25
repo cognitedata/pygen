@@ -531,7 +531,7 @@ class Cognite360ImageModelAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_360_image_models in client.cognite_360_image_model.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_360_image_models in client.cognite_360_image_model.iterate(chunk_size=100, limit=2000):
                 ...     for cognite_360_image_model in cognite_360_image_models:
                 ...         print(cognite_360_image_model.external_id)
 
@@ -539,7 +539,11 @@ class Cognite360ImageModelAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_360_image_models in client.cognite_360_image_model.iterate(chunk_size=100):
+                >>> for cognite_360_image_models in client.cognite_360_image_model.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for cognite_360_image_model in cognite_360_image_models:
                 ...         print(cognite_360_image_model.external_id)
 
@@ -547,10 +551,14 @@ class Cognite360ImageModelAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_360_image_model.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.cognite_360_image_model.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_360_image_models in client.cognite_360_image_model.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_360_image_models in client.cognite_360_image_model.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for cognite_360_image_model in cognite_360_image_models:
                 ...         print(cognite_360_image_model.external_id)
 

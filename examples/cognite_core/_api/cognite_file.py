@@ -924,7 +924,7 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_files in client.cognite_file.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_files in client.cognite_file.iterate(chunk_size=100, limit=2000):
                 ...     for cognite_file in cognite_files:
                 ...         print(cognite_file.external_id)
 
@@ -932,7 +932,11 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_files in client.cognite_file.iterate(chunk_size=100):
+                >>> for cognite_files in client.cognite_file.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for cognite_file in cognite_files:
                 ...         print(cognite_file.external_id)
 
@@ -940,10 +944,14 @@ class CogniteFileAPI(NodeAPI[CogniteFile, CogniteFileWrite, CogniteFileList, Cog
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_file.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.cognite_file.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_files in client.cognite_file.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_files in client.cognite_file.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for cognite_file in cognite_files:
                 ...         print(cognite_file.external_id)
 

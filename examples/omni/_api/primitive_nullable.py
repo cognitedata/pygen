@@ -579,7 +579,7 @@ class PrimitiveNullableAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_nullables in client.primitive_nullable.iterate(limit=2000,chunk_size=100):
+                >>> for primitive_nullables in client.primitive_nullable.iterate(chunk_size=100, limit=2000):
                 ...     for primitive_nullable in primitive_nullables:
                 ...         print(primitive_nullable.external_id)
 
@@ -587,7 +587,11 @@ class PrimitiveNullableAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_nullables in client.primitive_nullable.iterate(chunk_size=100):
+                >>> for primitive_nullables in client.primitive_nullable.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for primitive_nullable in primitive_nullables:
                 ...         print(primitive_nullable.external_id)
 
@@ -595,10 +599,14 @@ class PrimitiveNullableAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.primitive_nullable.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.primitive_nullable.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for primitive_nullables in client.primitive_nullable.iterate(limit=2000,chunk_size=100):
+                >>> for primitive_nullables in client.primitive_nullable.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for primitive_nullable in primitive_nullables:
                 ...         print(primitive_nullable.external_id)
 

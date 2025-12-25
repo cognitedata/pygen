@@ -1073,7 +1073,7 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for nacelles in client.nacelle.iterate(limit=2000,chunk_size=100):
+                >>> for nacelles in client.nacelle.iterate(chunk_size=100, limit=2000):
                 ...     for nacelle in nacelles:
                 ...         print(nacelle.external_id)
 
@@ -1081,7 +1081,11 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for nacelles in client.nacelle.iterate(chunk_size=100):
+                >>> for nacelles in client.nacelle.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for nacelle in nacelles:
                 ...         print(nacelle.external_id)
 
@@ -1089,10 +1093,14 @@ class NacelleAPI(NodeAPI[Nacelle, NacelleWrite, NacelleList, NacelleWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.nacelle.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.nacelle.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for nacelles in client.nacelle.iterate(limit=2000,chunk_size=100):
+                >>> for nacelles in client.nacelle.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for nacelle in nacelles:
                 ...         print(nacelle.external_id)
 

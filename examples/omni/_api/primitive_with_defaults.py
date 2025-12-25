@@ -478,7 +478,7 @@ class PrimitiveWithDefaultsAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_with_defaults in client.primitive_with_defaults.iterate(limit=2000,chunk_size=100):
+                >>> for primitive_with_defaults in client.primitive_with_defaults.iterate(chunk_size=100, limit=2000):
                 ...     for primitive_with_default in primitive_with_defaults:
                 ...         print(primitive_with_default.external_id)
 
@@ -486,7 +486,11 @@ class PrimitiveWithDefaultsAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for primitive_with_defaults in client.primitive_with_defaults.iterate(chunk_size=100):
+                >>> for primitive_with_defaults in client.primitive_with_defaults.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for primitive_with_default in primitive_with_defaults:
                 ...         print(primitive_with_default.external_id)
 
@@ -494,10 +498,14 @@ class PrimitiveWithDefaultsAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.primitive_with_defaults.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.primitive_with_defaults.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for primitive_with_defaults in client.primitive_with_defaults.iterate(limit=2000,chunk_size=100):
+                >>> for primitive_with_defaults in client.primitive_with_defaults.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for primitive_with_default in primitive_with_defaults:
                 ...         print(primitive_with_default.external_id)
 

@@ -620,7 +620,7 @@ class Cognite3DTransformationNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_3_d_transformation_nodes in client.cognite_3_d_transformation_node.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_3_d_transformation_nodes in client.cognite_3_d_transformation_node.iterate(chunk_size=100, limit=2000):
                 ...     for cognite_3_d_transformation_node in cognite_3_d_transformation_nodes:
                 ...         print(cognite_3_d_transformation_node.external_id)
 
@@ -628,7 +628,11 @@ class Cognite3DTransformationNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_3_d_transformation_nodes in client.cognite_3_d_transformation_node.iterate(chunk_size=100):
+                >>> for cognite_3_d_transformation_nodes in client.cognite_3_d_transformation_node.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for cognite_3_d_transformation_node in cognite_3_d_transformation_nodes:
                 ...         print(cognite_3_d_transformation_node.external_id)
 
@@ -636,10 +640,14 @@ class Cognite3DTransformationNodeAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_3_d_transformation_node.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.cognite_3_d_transformation_node.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_3_d_transformation_nodes in client.cognite_3_d_transformation_node.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_3_d_transformation_nodes in client.cognite_3_d_transformation_node.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for cognite_3_d_transformation_node in cognite_3_d_transformation_nodes:
                 ...         print(cognite_3_d_transformation_node.external_id)
 

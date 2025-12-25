@@ -537,7 +537,7 @@ class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DMo
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_3_d_models in client.cognite_3_d_model.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_3_d_models in client.cognite_3_d_model.iterate(chunk_size=100, limit=2000):
                 ...     for cognite_3_d_model in cognite_3_d_models:
                 ...         print(cognite_3_d_model.external_id)
 
@@ -545,7 +545,11 @@ class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DMo
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_3_d_models in client.cognite_3_d_model.iterate(chunk_size=100):
+                >>> for cognite_3_d_models in client.cognite_3_d_model.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for cognite_3_d_model in cognite_3_d_models:
                 ...         print(cognite_3_d_model.external_id)
 
@@ -553,10 +557,14 @@ class Cognite3DModelAPI(NodeAPI[Cognite3DModel, Cognite3DModelWrite, Cognite3DMo
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_3_d_model.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.cognite_3_d_model.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_3_d_models in client.cognite_3_d_model.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_3_d_models in client.cognite_3_d_model.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for cognite_3_d_model in cognite_3_d_models:
                 ...         print(cognite_3_d_model.external_id)
 

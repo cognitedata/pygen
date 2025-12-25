@@ -459,7 +459,7 @@ class GeneratingUnitAPI(NodeAPI[GeneratingUnit, GeneratingUnitWrite, GeneratingU
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for generating_units in client.generating_unit.iterate(limit=2000,chunk_size=100):
+                >>> for generating_units in client.generating_unit.iterate(chunk_size=100, limit=2000):
                 ...     for generating_unit in generating_units:
                 ...         print(generating_unit.external_id)
 
@@ -467,7 +467,11 @@ class GeneratingUnitAPI(NodeAPI[GeneratingUnit, GeneratingUnitWrite, GeneratingU
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for generating_units in client.generating_unit.iterate(chunk_size=100):
+                >>> for generating_units in client.generating_unit.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for generating_unit in generating_units:
                 ...         print(generating_unit.external_id)
 
@@ -475,10 +479,14 @@ class GeneratingUnitAPI(NodeAPI[GeneratingUnit, GeneratingUnitWrite, GeneratingU
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.generating_unit.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.generating_unit.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for generating_units in client.generating_unit.iterate(limit=2000,chunk_size=100):
+                >>> for generating_units in client.generating_unit.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for generating_unit in generating_units:
                 ...         print(generating_unit.external_id)
 

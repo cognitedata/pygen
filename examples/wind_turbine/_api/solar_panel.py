@@ -603,7 +603,7 @@ class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPa
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for solar_panels in client.solar_panel.iterate(limit=2000,chunk_size=100):
+                >>> for solar_panels in client.solar_panel.iterate(chunk_size=100, limit=2000):
                 ...     for solar_panel in solar_panels:
                 ...         print(solar_panel.external_id)
 
@@ -611,7 +611,11 @@ class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPa
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for solar_panels in client.solar_panel.iterate(chunk_size=100):
+                >>> for solar_panels in client.solar_panel.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for solar_panel in solar_panels:
                 ...         print(solar_panel.external_id)
 
@@ -619,10 +623,14 @@ class SolarPanelAPI(NodeAPI[SolarPanel, SolarPanelWrite, SolarPanelList, SolarPa
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.solar_panel.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.solar_panel.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for solar_panels in client.solar_panel.iterate(limit=2000,chunk_size=100):
+                >>> for solar_panels in client.solar_panel.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for solar_panel in solar_panels:
                 ...         print(solar_panel.external_id)
 

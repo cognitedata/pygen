@@ -430,7 +430,7 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for connection_item_bs in client.connection_item_b.iterate(limit=2000,chunk_size=100):
+                >>> for connection_item_bs in client.connection_item_b.iterate(chunk_size=100, limit=2000):
                 ...     for connection_item_b in connection_item_bs:
                 ...         print(connection_item_b.external_id)
 
@@ -438,7 +438,11 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for connection_item_bs in client.connection_item_b.iterate(chunk_size=100):
+                >>> for connection_item_bs in client.connection_item_b.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for connection_item_b in connection_item_bs:
                 ...         print(connection_item_b.external_id)
 
@@ -446,10 +450,14 @@ class ConnectionItemBAPI(NodeAPI[ConnectionItemB, ConnectionItemBWrite, Connecti
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.connection_item_b.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.connection_item_b.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for connection_item_bs in client.connection_item_b.iterate(limit=2000,chunk_size=100):
+                >>> for connection_item_bs in client.connection_item_b.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for connection_item_b in connection_item_bs:
                 ...         print(connection_item_b.external_id)
 

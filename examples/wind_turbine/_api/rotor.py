@@ -513,7 +513,7 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for rotors in client.rotor.iterate(limit=2000,chunk_size=100):
+                >>> for rotors in client.rotor.iterate(chunk_size=100, limit=2000):
                 ...     for rotor in rotors:
                 ...         print(rotor.external_id)
 
@@ -521,7 +521,11 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for rotors in client.rotor.iterate(chunk_size=100):
+                >>> for rotors in client.rotor.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for rotor in rotors:
                 ...         print(rotor.external_id)
 
@@ -529,10 +533,14 @@ class RotorAPI(NodeAPI[Rotor, RotorWrite, RotorList, RotorWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.rotor.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.rotor.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for rotors in client.rotor.iterate(limit=2000,chunk_size=100):
+                >>> for rotors in client.rotor.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for rotor in rotors:
                 ...         print(rotor.external_id)
 

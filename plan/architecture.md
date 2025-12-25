@@ -147,7 +147,12 @@ create_result = client.data_models.create(
         )
     ]
 )
-page = client.data_models.iterate(cursor=None, limit=100)
+page = client.data_models.iterate(
+    space="my_space",
+    include_global=True,
+    cursor=None,
+    limit=100,
+)
 print(page.cursor)
 print(page.items)
 

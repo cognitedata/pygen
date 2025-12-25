@@ -955,7 +955,7 @@ class CogniteTimeSeriesAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_time_series_list in client.cognite_time_series.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_time_series_list in client.cognite_time_series.iterate(chunk_size=100, limit=2000):
                 ...     for cognite_time_series in cognite_time_series_list:
                 ...         print(cognite_time_series.external_id)
 
@@ -963,7 +963,11 @@ class CogniteTimeSeriesAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_time_series_list in client.cognite_time_series.iterate(chunk_size=100):
+                >>> for cognite_time_series_list in client.cognite_time_series.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for cognite_time_series in cognite_time_series_list:
                 ...         print(cognite_time_series.external_id)
 
@@ -971,10 +975,14 @@ class CogniteTimeSeriesAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_time_series.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.cognite_time_series.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_time_series_list in client.cognite_time_series.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_time_series_list in client.cognite_time_series.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for cognite_time_series in cognite_time_series_list:
                 ...         print(cognite_time_series.external_id)
 

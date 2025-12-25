@@ -433,7 +433,7 @@ class DependentOnNonWritableAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for dependent_on_non_writables in client.dependent_on_non_writable.iterate(limit=2000,chunk_size=100):
+                >>> for dependent_on_non_writables in client.dependent_on_non_writable.iterate(chunk_size=100, limit=2000):
                 ...     for dependent_on_non_writable in dependent_on_non_writables:
                 ...         print(dependent_on_non_writable.external_id)
 
@@ -441,7 +441,11 @@ class DependentOnNonWritableAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for dependent_on_non_writables in client.dependent_on_non_writable.iterate(chunk_size=100):
+                >>> for dependent_on_non_writables in client.dependent_on_non_writable.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for dependent_on_non_writable in dependent_on_non_writables:
                 ...         print(dependent_on_non_writable.external_id)
 
@@ -449,10 +453,14 @@ class DependentOnNonWritableAPI(
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.dependent_on_non_writable.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.dependent_on_non_writable.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for dependent_on_non_writables in client.dependent_on_non_writable.iterate(limit=2000,chunk_size=100):
+                >>> for dependent_on_non_writables in client.dependent_on_non_writable.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for dependent_on_non_writable in dependent_on_non_writables:
                 ...         print(dependent_on_non_writable.external_id)
 

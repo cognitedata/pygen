@@ -410,7 +410,7 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for metmasts in client.metmast.iterate(limit=2000,chunk_size=100):
+                >>> for metmasts in client.metmast.iterate(chunk_size=100, limit=2000):
                 ...     for metmast in metmasts:
                 ...         print(metmast.external_id)
 
@@ -418,7 +418,11 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for metmasts in client.metmast.iterate(chunk_size=100):
+                >>> for metmasts in client.metmast.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for metmast in metmasts:
                 ...         print(metmast.external_id)
 
@@ -426,10 +430,14 @@ class MetmastAPI(NodeAPI[Metmast, MetmastWrite, MetmastList, MetmastWriteList]):
 
                 >>> from wind_turbine import WindTurbineClient
                 >>> client = WindTurbineClient()
-                >>> for first_iteration in client.metmast.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.metmast.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for metmasts in client.metmast.iterate(limit=2000,chunk_size=100):
+                >>> for metmasts in client.metmast.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for metmast in metmasts:
                 ...         print(metmast.external_id)
 

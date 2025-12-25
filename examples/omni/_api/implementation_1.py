@@ -478,7 +478,7 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for implementation_1_list in client.implementation_1.iterate(limit=2000,chunk_size=100):
+                >>> for implementation_1_list in client.implementation_1.iterate(chunk_size=100, limit=2000):
                 ...     for implementation_1 in implementation_1_list:
                 ...         print(implementation_1.external_id)
 
@@ -486,7 +486,11 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for implementation_1_list in client.implementation_1.iterate(chunk_size=100):
+                >>> for implementation_1_list in client.implementation_1.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for implementation_1 in implementation_1_list:
                 ...         print(implementation_1.external_id)
 
@@ -494,10 +498,14 @@ class Implementation1API(NodeAPI[Implementation1, Implementation1Write, Implemen
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.implementation_1.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.implementation_1.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for implementation_1_list in client.implementation_1.iterate(limit=2000,chunk_size=100):
+                >>> for implementation_1_list in client.implementation_1.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for implementation_1 in implementation_1_list:
                 ...         print(implementation_1.external_id)
 

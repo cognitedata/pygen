@@ -999,7 +999,7 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_activities in client.cognite_activity.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_activities in client.cognite_activity.iterate(chunk_size=100, limit=2000):
                 ...     for cognite_activity in cognite_activities:
                 ...         print(cognite_activity.external_id)
 
@@ -1007,7 +1007,11 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_activities in client.cognite_activity.iterate(chunk_size=100):
+                >>> for cognite_activities in client.cognite_activity.iterate(
+                ...     chunk_size=100,
+                ...     sort_by="external_id",
+                ...     direction="descending",
+                ... ):
                 ...     for cognite_activity in cognite_activities:
                 ...         print(cognite_activity.external_id)
 
@@ -1015,10 +1019,14 @@ class CogniteActivityAPI(NodeAPI[CogniteActivity, CogniteActivityWrite, CogniteA
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_activity.iterate(limit=2000,chunk_size=100):
+                >>> for first_iteration in client.cognite_activity.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_activities in client.cognite_activity.iterate(limit=2000,chunk_size=100):
+                >>> for cognite_activities in client.cognite_activity.iterate(
+                ...     chunk_size=100,
+                ...     limit=2000,
+                ...     cursors=first_iteration.cursors,
+                ... ):
                 ...     for cognite_activity in cognite_activities:
                 ...         print(cognite_activity.external_id)
 
