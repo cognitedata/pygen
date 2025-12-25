@@ -4,6 +4,7 @@ from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, Literal
 
 from ._references import ViewReference
+from .filters import FilterAdapter
 
 if TYPE_CHECKING:
     from .filters import Filter
@@ -73,6 +74,25 @@ class DataTypeFilter(ABC):
             leaf_filters = [self._build_leaf_filter(op, val) for op, val in self._conditions]
             filter_dict = {self._operator: leaf_filters}
 
+        return FilterAdapter.validate_python(filter_dict)
+
+
+class FilterContainer:
+    def __init__(self, data_type_filters: list[DataTypeFilter], operator: Literal["and", "or"]) -> None:
+        self._data_type_filters = data_type_filters
+        self._operator = operator
+
+    def as_filter(self) -> Filter:
+        """Convert the accumulated conditions to a Filter."""
+        if not self._data_type_filters:
+            raise ValueError("No data type filters have been added.")
+
+        leaf_filters = [dtf.as_filter() for dtf in self._data_type_filters]
+        filter_dict: dict[str, Any]
+        if len(leaf_filters) == 1:
+            filter_dict = FilterAdapter.dump_python(leaf_filters[0])
+        else:
+            filter_dict = {self._operator: leaf_filters}
         return FilterAdapter.validate_python(filter_dict)
 
 
