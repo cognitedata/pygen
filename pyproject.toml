@@ -165,6 +165,7 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
     "@abstractmethod",
+    "from typing_extensions import Self",
 ]
 
 [build-system]
