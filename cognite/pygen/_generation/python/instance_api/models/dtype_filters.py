@@ -1,13 +1,10 @@
 import sys
 from abc import ABC, abstractmethod
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Any, Literal
+from typing import Any, Literal
 
 from ._references import ViewReference
-from .filters import FilterAdapter
-
-if TYPE_CHECKING:
-    from .filters import Filter
+from .filters import Filter, FilterAdapter
 
 if sys.version_info >= (3, 11):
     from typing import Self
