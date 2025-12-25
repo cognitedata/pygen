@@ -5,7 +5,7 @@ querying instances (nodes/edges) through a specific view.
 """
 
 from collections.abc import Sequence
-from typing import Any, Generic, Literal, TypeVar, overload
+from typing import Any, Generic, Literal, overload
 
 from pydantic import BaseModel, JsonValue, TypeAdapter
 
@@ -15,7 +15,6 @@ from cognite.pygen._generation.python.instance_api.http_client import (
 )
 from cognite.pygen._generation.python.instance_api.models import (
     InstanceId,
-    InstanceList,
     T_Instance,
     T_InstanceList,
     T_InstanceWrite,
@@ -23,20 +22,11 @@ from cognite.pygen._generation.python.instance_api.models import (
 )
 from cognite.pygen._generation.python.instance_api.models.filters import Filter, FilterAdapter
 from cognite.pygen._generation.python.instance_api.models.query import (
+    DebugParameters,
     PropertySort,
     UnitConversion,
 )
 from cognite.pygen._generation.python.instance_api.models.responses import ListResponse, Page
-
-# Default limits
-DEFAULT_LIMIT = 25
-DEFAULT_CHUNK_SIZE = 1000
-MAX_LIMIT = 1000
-SEARCH_LIMIT = 1000
-
-
-# Type variable for the list type constructor
-T_List = TypeVar("T_List", bound=InstanceList[Any])
 
 
 class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
@@ -53,13 +43,6 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         view_ref: Reference to the view for querying instances.
         instance_type: The type of instances to query ("node" or "edge").
         list_cls: The class to use for creating instance lists (defaults to InstanceList).
-
-    Example:
-        >>> from cognite.pygen._generation.python.instance_api import InstanceAPI
-        >>> api = InstanceAPI(http_client, view_ref, "node")
-        >>> for page in api.iterate(limit=100):
-        ...     for instance in page.items:
-        ...         print(instance.external_id)
     """
 
     _ENDPOINT = "/models/instances"
@@ -67,6 +50,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
     _SEARCH_ENDPOINT = f"{_ENDPOINT}/search"
     _LIST_LIMIT = 1000
     _SEARCH_LIMIT = 1000
+    _DEFAULT_LIST_LIMIT = 25
 
     def __init__(
         self,
@@ -88,13 +72,13 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         self._instance_type = instance_type
         self._list_cls = list_cls
 
-    def iterate(
+    def _iterate(
         self,
         include_typing: bool = False,
         target_units: UnitConversion | Sequence[UnitConversion] | None = None,
-        include_debug: bool = False,
+        debug: DebugParameters | None = None,
         cursor: str | None = None,
-        limit: int = DEFAULT_LIMIT,
+        limit: int = _DEFAULT_LIST_LIMIT,
         sort: PropertySort | Sequence[PropertySort] | None = None,
         filter: Filter | None = None,
     ) -> Page[T_InstanceList]:
@@ -108,8 +92,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
                 in the response.
             target_units: Unit conversion configuration for numeric properties with units.
                 Can be a single UnitConversion or a sequence for multiple properties.
-            include_debug: If True, includes debug information (query timing, etc.)
-                in each response page.
+            debug: Return query debug notices.
             cursor: Initial cursor for resuming pagination from a previous point.
             limit: Maximum total number of instances to return across all pages.
             sort: Sort order for the results. Can be a single PropertySort or
@@ -131,7 +114,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
             limit=limit,
             cursor=cursor,
             include_typing=include_typing,
-            include_debug=include_debug,
+            debug=debug,
             target_units=target_units,
         )
 
@@ -144,7 +127,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         success = result.get_success_or_raise()
         return TypeAdapter(Page[self._list_cls]).validate_json(success.body)
 
-    def search(
+    def _search(
         self,
         query: str | None = None,
         properties: str | Sequence[str] | None = None,
@@ -153,7 +136,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         include_typing: bool = False,
         sort: PropertySort | Sequence[PropertySort] | None = None,
         operator: Literal["and", "or"] = "or",
-        limit: int = DEFAULT_LIMIT,
+        limit: int = _DEFAULT_LIST_LIMIT,
     ) -> ListResponse[T_InstanceList]:
         """Search for instances using full-text search.
 
@@ -179,8 +162,8 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         Returns:
             A list of instances matching the search query.
         """
-        if not (0 < limit <= SEARCH_LIMIT):
-            raise ValueError(f"Limit must be between 1 and {SEARCH_LIMIT}, got {limit}.")
+        if not (0 < limit <= self._SEARCH_LIMIT):
+            raise ValueError(f"Limit must be between 1 and {self._SEARCH_LIMIT}, got {limit}.")
 
         # Build request body
         body = self._build_read_body(
@@ -215,7 +198,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         sort: PropertySort | Sequence[PropertySort] | None = None,
         cursor: str | None = None,
         include_typing: bool | None = None,
-        include_debug: bool | None = None,
+        debug: DebugParameters | None = None,
         target_units: UnitConversion | Sequence[UnitConversion] | None = None,
         operator: Literal["and", "or"] | None = None,
     ) -> dict[str, JsonValue]:
@@ -250,8 +233,8 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         if cursor is not None:
             body["cursor"] = cursor
 
-        if include_debug is not None:
-            body["includeDebug"] = include_debug
+        if debug is not None:
+            body["debug"] = debug.model_dump(by_alias=True, exclude_none=True)
 
         if target_units is not None and view_key == "view":
             body["targetUnits"] = self._serialize_model(target_units)
@@ -303,12 +286,12 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         """Query instances (placeholder for future implementation)."""
         raise NotImplementedError("query() is not yet implemented")
 
-    def list(
+    def _list(
         self,
         include_typing: bool = False,
         target_units: UnitConversion | Sequence[UnitConversion] | None = None,
         include_debug: bool = False,
-        limit: int | None = DEFAULT_LIMIT,
+        limit: int | None = _DEFAULT_LIST_LIMIT,
         sort: PropertySort | Sequence[PropertySort] | None = None,
         filter: Filter | None = None,
     ) -> T_InstanceList:
@@ -339,7 +322,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         total = 0
         while True:
             page_limit = self._LIST_LIMIT if limit is None else min(limit - total, self._LIST_LIMIT)
-            page = self.iterate(
+            page = self._iterate(
                 include_typing=include_typing,
                 target_units=target_units,
                 include_debug=include_debug,

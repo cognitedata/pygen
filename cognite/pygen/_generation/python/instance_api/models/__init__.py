@@ -1,7 +1,7 @@
 from ._references import ContainerReference, NodeReference, ViewReference
 from ._types import Date, DateTime, DateTimeMS
 from .instance import Instance, InstanceId, InstanceList, InstanceWrite, T_Instance, T_InstanceList, T_InstanceWrite
-from .query import DebugInfo, PropertySort, PropertyWithUnits, UnitConversion
+from .query import DebugParameters, PropertySort, PropertyWithUnits, UnitConversion
 from .responses import InstanceResultItem, Page, UpsertResult
 
 __all__ = [
@@ -9,7 +9,7 @@ __all__ = [
     "Date",
     "DateTime",
     "DateTimeMS",
-    "DebugInfo",
+    "DebugParameters",
     "Instance",
     "InstanceId",
     "InstanceList",

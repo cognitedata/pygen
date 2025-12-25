@@ -8,7 +8,7 @@ import respx
 from httpx import Response
 
 from cognite.pygen._generation.python.instance_api import (
-    DebugInfo,
+    DebugParameters,
     Instance,
     InstanceAPI,
     InstanceList,
@@ -261,7 +261,7 @@ class TestInstanceAPIIterate:
         items = [make_person_item("person-1", "Alice", 30)]
         respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        page = api.iterate()
+        page = api._iterate()
 
         assert isinstance(page, Page)
         assert len(page.items) == 1
@@ -291,12 +291,12 @@ class TestInstanceAPIIterate:
         route.side_effect = respond
 
         # First call returns first page with cursor
-        page1 = api.iterate(limit=3)
+        page1 = api._iterate(limit=3)
         assert len(page1.items) == 3
         assert page1.next_cursor == "cursor123"
 
         # Second call with cursor returns second page
-        page2 = api.iterate(cursor=page1.next_cursor, limit=3)
+        page2 = api._iterate(cursor=page1.next_cursor, limit=3)
         assert len(page2.items) == 2
         assert page2.next_cursor is None
 
@@ -310,7 +310,7 @@ class TestInstanceAPIIterate:
         items = [make_person_item(f"person-{i}", f"Person {i}", 20 + i) for i in range(2)]
         route = respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        page = api.iterate(limit=2)
+        page = api._iterate(limit=2)
 
         assert len(page.items) == 2
         # Verify the request had the correct limit
@@ -328,7 +328,7 @@ class TestInstanceAPIIterate:
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        page = api.iterate(cursor="start_cursor")
+        page = api._iterate(cursor="start_cursor")
 
         assert len(page.items) == 1
         request = route.calls[-1].request
@@ -345,7 +345,7 @@ class TestInstanceAPIIterate:
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(list_url).respond(json=make_list_response(items, include_debug=True))
 
-        page = api.iterate(include_debug=True)
+        page = api._iterate(include_debug=True)
 
         assert page.debug is not None
         assert page.debug.query_time_ms == 10.5
@@ -361,7 +361,7 @@ class TestInstanceAPIIterate:
     ) -> None:
         """Test that iterate raises ValueError for invalid limit."""
         with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
-            api.iterate(limit=0)
+            api._iterate(limit=0)
 
     def test_iterate_limit_max_1000(
         self,
@@ -369,7 +369,7 @@ class TestInstanceAPIIterate:
     ) -> None:
         """Test that iterate raises ValueError for limit > 1000."""
         with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
-            api.iterate(limit=1001)
+            api._iterate(limit=1001)
 
 
 class TestInstanceAPISearch:
@@ -385,7 +385,7 @@ class TestInstanceAPISearch:
         items = [make_person_item("person-1", "Alice Smith", 30)]
         route = respx_mock.post(search_url).respond(json=make_list_response(items))
 
-        result = api.search(query="Alice")
+        result = api._search(query="Alice")
 
         assert isinstance(result, ListResponse)
         assert len(result.items) == 1
@@ -405,7 +405,7 @@ class TestInstanceAPISearch:
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(search_url).respond(json=make_list_response(items))
 
-        result = api.search(query="Alice", properties=["name"])
+        result = api._search(query="Alice", properties=["name"])
 
         assert len(result.items) == 1
         request = route.calls[-1].request
@@ -422,7 +422,7 @@ class TestInstanceAPISearch:
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(search_url).respond(json=make_list_response(items))
 
-        api.search(query="test", properties=["name", "description"])
+        api._search(query="test", properties=["name", "description"])
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -439,7 +439,7 @@ class TestInstanceAPISearch:
         route = respx_mock.post(search_url).respond(json=make_list_response(items))
 
         filter_data = {"equals": EqualsFilterData(property=["test", "Person/1", "age"], value=30)}
-        result = api.search(query="Alice", filter=filter_data)
+        result = api._search(query="Alice", filter=filter_data)
 
         assert len(result.items) == 1
         request = route.calls[-1].request
@@ -461,7 +461,7 @@ class TestInstanceAPISearch:
         route = respx_mock.post(search_url).respond(json=make_list_response(items))
 
         sort = PropertySort(property=["test", "Person/1", "age"], direction="ascending")
-        api.search(query="test", sort=sort)
+        api._search(query="test", sort=sort)
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -473,7 +473,7 @@ class TestInstanceAPISearch:
     ) -> None:
         """Test that search raises ValueError for invalid limit."""
         with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
-            api.search(query="test", limit=0)
+            api._search(query="test", limit=0)
 
     def test_search_limit_max_1000(
         self,
@@ -481,7 +481,7 @@ class TestInstanceAPISearch:
     ) -> None:
         """Test that search raises ValueError for limit > 1000."""
         with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
-            api.search(query="test", limit=1001)
+            api._search(query="test", limit=1001)
 
 
 class TestPropertySort:
@@ -557,7 +557,7 @@ class TestDebugInfo:
             "serializeTimeMs": 1.8,
         }
 
-        info = DebugInfo.model_validate(data)
+        info = DebugParameters.model_validate(data)
 
         assert info.request_items_limit == 1000
         assert info.query_time_ms == 15.5
@@ -568,7 +568,7 @@ class TestDebugInfo:
         """Test DebugInfo with partial data."""
         data = {"queryTimeMs": 10.0}
 
-        info = DebugInfo.model_validate(data)
+        info = DebugParameters.model_validate(data)
 
         assert info.query_time_ms == 10.0
         assert info.request_items_limit is None

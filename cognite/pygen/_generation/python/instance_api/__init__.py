@@ -15,7 +15,7 @@ from cognite.pygen._generation.python.instance_api.models.instance import (
     ViewReference,
 )
 from cognite.pygen._generation.python.instance_api.models.query import (
-    DebugInfo,
+    DebugParameters,
     PropertySort,
     PropertyWithUnits,
     UnitConversion,
@@ -33,7 +33,7 @@ from ._client import InstanceClient
 __all__ = [
     "DataRecord",
     "DataRecordWrite",
-    "DebugInfo",
+    "DebugParameters",
     "Instance",
     "InstanceAPI",
     "InstanceClient",

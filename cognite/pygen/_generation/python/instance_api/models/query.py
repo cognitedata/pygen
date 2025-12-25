@@ -12,7 +12,21 @@ from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 
-class PropertySort(BaseModel):
+class QueryParameters(BaseModel):
+    """Base class for query parameters.
+
+    This class can be extended to include common query parameters
+    used across different instance queries.
+    """
+
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
+        extra="forbid",
+    )
+
+
+class PropertySort(QueryParameters):
     """Sort configuration for a property.
 
     This corresponds to the CDF API InstanceSort structure for sorting query results
@@ -43,18 +57,32 @@ class PropertySort(BaseModel):
         ... )
     """
 
-    model_config = ConfigDict(
-        alias_generator=to_camel,
-        populate_by_name=True,
-        extra="forbid",
-    )
-
     property: list[str] = Field(..., min_length=2, max_length=3)
     direction: Literal["ascending", "descending"] = "ascending"
     nulls_first: bool | None = Field(default=None)
 
 
-class UnitConversion(BaseModel):
+class UnitReference(QueryParameters):
+    """Reference to a specific unit by its external ID.
+
+    Args:
+        external_id: The external ID of the unit.
+    """
+
+    external_id: str
+
+
+class UnitSystemReference(QueryParameters):
+    """Reference to a unit system by its external ID.
+
+    Args:
+        unit_system_name: The name of the unit system.
+    """
+
+    unit_system_name: str
+
+
+class UnitConversion(QueryParameters):
     """Unit conversion configuration for a property.
 
     Use this to specify a target unit for numeric properties that have units defined
@@ -63,69 +91,32 @@ class UnitConversion(BaseModel):
     Args:
         property: The property path to convert. Must be a 3-element list:
             [<space>, <view_external_id/version>, <property>]
-        target_unit: The target unit to convert to. Must be a valid unit from the
+        unit: The target unit to convert to. Must be a valid unit from the
             same unit catalog as the source property's unit.
 
-    Examples:
-        Convert temperature from Celsius to Fahrenheit:
-
-        >>> unit = UnitConversion(
-        ...     property=["my_space", "Sensor/v1", "temperature"],
-        ...     target_unit="temperature:fah"
-        ... )
     """
 
-    model_config = ConfigDict(
-        alias_generator=to_camel,
-        populate_by_name=True,
-        extra="forbid",
-    )
-
-    property: list[str] = Field(..., min_length=3, max_length=3)
-    target_unit: str = Field(..., alias="targetUnit")
+    property: str
+    unit: UnitReference | UnitSystemReference
 
 
-class PropertyWithUnits(BaseModel):
-    """A property value along with its unit information.
-
-    This is returned when debug mode is enabled and includes the unit information
-    for properties that have units defined.
-
-    Args:
-        value: The property value (converted if unit conversion was requested).
-        unit: The unit information containing the external_id of the unit.
-    """
-
-    model_config = ConfigDict(
-        alias_generator=to_camel,
-        populate_by_name=True,
-    )
-
-    value: float | list[float] | None = None
-    unit: dict[Literal["externalId"], str] | None = None  # Contains {"externalId": "unit:identifier"}
-
-
-class DebugInfo(BaseModel):
+class DebugParameters(QueryParameters):
     """Debug information for a query response.
 
     When debug mode is enabled in list/iterate/search operations, the response includes
     additional metadata about the query execution.
 
     Args:
-        request_items_limit: The maximum number of items that could be returned.
-        query_time_ms: Time spent processing the query in milliseconds.
-        parse_time_ms: Time spent parsing the request in milliseconds.
-        serialize_time_ms: Time spent serializing the response in milliseconds.
     """
 
-    model_config = ConfigDict(
-        alias_generator=to_camel,
-        populate_by_name=True,
+    emit_results: bool = Field(
+        True,
+        description="nclude the query result in the response. emitResults=false is required for advanced query analysis features.",
     )
-
-    request_items_limit: int | None = Field(default=None)
-    query_time_ms: float | None = Field(
+    timeout: int | None = Field(
         default=None,
+        description="Query timeout in milliseconds. Can be used to override the default timeout when analysing queries. Requires emitResults=false.",
     )
-    parse_time_ms: float | None = Field(default=None)
-    serialize_time_ms: float | None = Field(default=None)
+    profile: bool = Field(
+        default=False, description="Most thorough level of query analysis. Requires emitResults=false."
+    )
