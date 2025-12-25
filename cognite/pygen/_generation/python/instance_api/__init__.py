@@ -17,7 +17,6 @@ from cognite.pygen._generation.python.instance_api.models.instance import (
 from cognite.pygen._generation.python.instance_api.models.query import (
     DebugParameters,
     PropertySort,
-    PropertyWithUnits,
     UnitConversion,
 )
 from cognite.pygen._generation.python.instance_api.models.responses import (
@@ -45,7 +44,6 @@ __all__ = [
     "ListResponse",
     "Page",
     "PropertySort",
-    "PropertyWithUnits",
     "UnitConversion",
     "UpsertResult",
     "ViewReference",

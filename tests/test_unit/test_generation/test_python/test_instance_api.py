@@ -2,6 +2,7 @@
 
 import gzip
 import json
+from typing import Any
 
 import pytest
 import respx
@@ -21,7 +22,8 @@ from cognite.pygen._generation.python.instance_api import (
 from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 from cognite.pygen._generation.python.instance_api.http_client import HTTPClient
-from cognite.pygen._generation.python.instance_api.models.filters import EqualsFilterData
+from cognite.pygen._generation.python.instance_api.models.filters import EqualsFilterData, Filter
+from cognite.pygen._generation.python.instance_api.models.query import UnitReference
 
 
 class MockCredentials(Credentials):
@@ -29,10 +31,9 @@ class MockCredentials(Credentials):
 
     def authorization_header(self) -> tuple[str, str]:
         """Return a mock authorization header."""
-        return ("Authorization", "Bearer mock-token")
+        return "Authorization", "Bearer mock-token"
 
 
-# Sample view-specific classes for testing
 class Person(Instance):
     _view_id = ViewReference(space="test", external_id="Person", version="1")
     name: str
@@ -66,7 +67,7 @@ def view_ref() -> ViewReference:
 
 
 @pytest.fixture
-def api(http_client: HTTPClient, view_ref: ViewReference) -> InstanceAPI[None, Person, PersonList]:
+def api(http_client: HTTPClient, view_ref: ViewReference) -> InstanceAPI[Person, PersonList]:
     """Create an InstanceAPI for testing."""
     return InstanceAPI(http_client, view_ref, "node", PersonList)
 
@@ -84,13 +85,13 @@ def search_url(config: PygenClientConfig) -> str:
 
 
 def make_list_response(
-    items: list[dict],
+    items: list[dict[str, Any]],
     next_cursor: str | None = None,
     include_typing: bool = False,
     include_debug: bool = False,
-) -> dict:
+) -> dict[str, Any]:
     """Helper to create a list response JSON."""
-    response = {"items": items}
+    response: dict[str, Any] = {"items": items}
     if next_cursor:
         response["nextCursor"] = next_cursor
     if include_typing:
@@ -105,7 +106,7 @@ def make_list_response(
     return response
 
 
-def make_person_item(external_id: str, name: str, age: int) -> dict:
+def make_person_item(external_id: str, name: str, age: int) -> dict[str, Any]:
     """Helper to create a person instance JSON."""
     return {
         "instanceType": "node",
@@ -124,13 +125,13 @@ class TestInstanceAPIList:
     def test_list_empty_result(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test listing with no results."""
         respx_mock.post(list_url).respond(json=make_list_response([]))
 
-        result = api.list()
+        result = api._list()
 
         assert isinstance(result, PersonList)
         assert len(result) == 0
@@ -138,7 +139,7 @@ class TestInstanceAPIList:
     def test_list_single_page(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test listing instances that fit in a single page."""
@@ -148,7 +149,7 @@ class TestInstanceAPIList:
         ]
         respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        result = api.list(limit=10)
+        result = api._list(limit=10)
 
         assert isinstance(result, PersonList)
         assert len(result) == 2
@@ -160,15 +161,15 @@ class TestInstanceAPIList:
     def test_list_with_filter(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test listing with a filter applied."""
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        filter_data = {"equals": EqualsFilterData(property=["test", "Person/1", "name"], value="Alice")}
-        result = api.list(filter=filter_data)
+        filter_data: Filter = {"equals": EqualsFilterData(property=["test", "Person/1", "name"], value="Alice")}
+        result = api._list(filter=filter_data)
 
         assert len(result) == 1
         assert result[0].name == "Alice"
@@ -182,7 +183,7 @@ class TestInstanceAPIList:
     def test_list_with_sort(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test listing with sorting."""
@@ -193,7 +194,7 @@ class TestInstanceAPIList:
         route = respx_mock.post(list_url).respond(json=make_list_response(items))
 
         sort = PropertySort(property=["test", "Person/1", "age"], direction="ascending")
-        result = api.list(sort=sort)
+        result = api._list(sort=sort)
 
         assert len(result) == 2
         assert result[0].age == 25
@@ -209,7 +210,7 @@ class TestInstanceAPIList:
     def test_list_with_multiple_sorts(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test listing with multiple sort criteria."""
@@ -220,7 +221,7 @@ class TestInstanceAPIList:
             PropertySort(property=["test", "Person/1", "age"], direction="ascending"),
             PropertySort(property=["test", "Person/1", "name"], direction="descending"),
         ]
-        api.list(sort=sorts)
+        api._list(sort=sorts)
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -229,23 +230,23 @@ class TestInstanceAPIList:
     def test_list_with_unit_conversion(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test listing with unit conversion."""
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        units = UnitConversion(property=["test", "Person/1", "temperature"], target_unit="temperature:fah")
-        api.list(target_units=units)
+        units = UnitConversion(property="temperature", unit=UnitReference(external_id="temperature:fah"))
+        api._list(target_units=units)
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
         # For list(), target units are in the sources array
         assert "sources" in body
         assert "targetUnits" in body["sources"][0]
-        assert body["sources"][0]["targetUnits"][0]["property"] == ["test", "Person/1", "temperature"]
-        assert body["sources"][0]["targetUnits"][0]["targetUnit"] == "temperature:fah"
+        assert body["sources"][0]["targetUnits"][0]["property"] == "temperature"
+        assert body["sources"][0]["targetUnits"][0]["unit"]["externalId"] == "temperature:fah"
 
 
 class TestInstanceAPIIterate:
@@ -254,7 +255,7 @@ class TestInstanceAPIIterate:
     def test_iterate_single_page(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test iterating returns a single page of results."""
@@ -270,7 +271,7 @@ class TestInstanceAPIIterate:
     def test_iterate_with_pagination(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test iterating with pagination using cursor."""
@@ -303,7 +304,7 @@ class TestInstanceAPIIterate:
     def test_iterate_with_limit(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test iterating with a limit."""
@@ -321,7 +322,7 @@ class TestInstanceAPIIterate:
     def test_iterate_with_initial_cursor(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test iterating starting from a cursor."""
@@ -338,26 +339,28 @@ class TestInstanceAPIIterate:
     def test_iterate_with_debug(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         list_url: str,
     ) -> None:
         """Test iterating with debug information."""
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(list_url).respond(json=make_list_response(items, include_debug=True))
 
-        page = api._iterate(include_debug=True)
+        debug_params = DebugParameters(emit_results=True)
+        page = api._iterate(debug=debug_params)
 
         assert page.debug is not None
-        assert page.debug.query_time_ms == 10.5
-        assert page.debug.parse_time_ms == 2.3
+        assert page.debug["queryTimeMs"] == 10.5
+        assert page.debug["parseTimeMs"] == 2.3
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
-        assert body["includeDebug"] is True
+        assert "debug" in body
+        assert body["debug"]["emitResults"] is True
 
     def test_iterate_limit_must_be_positive(
         self,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
     ) -> None:
         """Test that iterate raises ValueError for invalid limit."""
         with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
@@ -365,7 +368,7 @@ class TestInstanceAPIIterate:
 
     def test_iterate_limit_max_1000(
         self,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
     ) -> None:
         """Test that iterate raises ValueError for limit > 1000."""
         with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
@@ -378,7 +381,7 @@ class TestInstanceAPISearch:
     def test_search_simple_query(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         search_url: str,
     ) -> None:
         """Test simple text search."""
@@ -398,7 +401,7 @@ class TestInstanceAPISearch:
     def test_search_with_properties(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         search_url: str,
     ) -> None:
         """Test search with specific properties."""
@@ -415,7 +418,7 @@ class TestInstanceAPISearch:
     def test_search_with_multiple_properties(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         search_url: str,
     ) -> None:
         """Test search with multiple properties."""
@@ -431,14 +434,14 @@ class TestInstanceAPISearch:
     def test_search_with_filter(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         search_url: str,
     ) -> None:
         """Test search combined with filter."""
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(search_url).respond(json=make_list_response(items))
 
-        filter_data = {"equals": EqualsFilterData(property=["test", "Person/1", "age"], value=30)}
+        filter_data: Filter = {"equals": EqualsFilterData(property=["test", "Person/1", "age"], value=30)}
         result = api._search(query="Alice", filter=filter_data)
 
         assert len(result.items) == 1
@@ -450,7 +453,7 @@ class TestInstanceAPISearch:
     def test_search_with_sort(
         self,
         respx_mock: respx.MockRouter,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
         search_url: str,
     ) -> None:
         """Test search with sorting."""
@@ -469,7 +472,7 @@ class TestInstanceAPISearch:
 
     def test_search_limit_must_be_positive(
         self,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
     ) -> None:
         """Test that search raises ValueError for invalid limit."""
         with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
@@ -477,7 +480,7 @@ class TestInstanceAPISearch:
 
     def test_search_limit_max_1000(
         self,
-        api: InstanceAPI[None, Person, PersonList],
+        api: InstanceAPI[Person, PersonList],
     ) -> None:
         """Test that search raises ValueError for limit > 1000."""
         with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
@@ -486,26 +489,6 @@ class TestInstanceAPISearch:
 
 class TestPropertySort:
     """Tests for PropertySort data class."""
-
-    def test_property_sort_basic(self) -> None:
-        """Test basic PropertySort creation."""
-        sort = PropertySort(property=["space", "view/v1", "name"])
-
-        assert sort.property == ["space", "view/v1", "name"]
-        assert sort.direction == "ascending"
-        assert sort.nulls_first is None
-
-    def test_property_sort_descending(self) -> None:
-        """Test PropertySort with descending direction."""
-        sort = PropertySort(property=["space", "view/v1", "name"], direction="descending")
-
-        assert sort.direction == "descending"
-
-    def test_property_sort_nulls_first(self) -> None:
-        """Test PropertySort with nulls_first."""
-        sort = PropertySort(property=["space", "view/v1", "name"], nulls_first=True)
-
-        assert sort.nulls_first is True
 
     def test_property_sort_serialization(self) -> None:
         """Test PropertySort serialization to camelCase."""
@@ -527,49 +510,27 @@ class TestPropertySort:
 class TestUnitConversion:
     """Tests for UnitConversion data class."""
 
-    def test_unit_conversion_basic(self) -> None:
-        """Test basic UnitConversion creation."""
-        unit = UnitConversion(property=["space", "view/v1", "temp"], target_unit="temperature:cel")
-
-        assert unit.property == ["space", "view/v1", "temp"]
-        assert unit.target_unit == "temperature:cel"
-
     def test_unit_conversion_serialization(self) -> None:
         """Test UnitConversion serialization to camelCase."""
-        unit = UnitConversion(property=["space", "view/v1", "temp"], target_unit="temperature:cel")
+        unit = UnitConversion(property="temperature", unit=UnitReference(external_id="temperature:cel"))
 
         result = unit.model_dump(by_alias=True)
         assert result == {
-            "property": ["space", "view/v1", "temp"],
-            "targetUnit": "temperature:cel",
+            "property": "temperature",
+            "unit": {"externalId": "temperature:cel"},
         }
 
 
-class TestDebugInfo:
-    """Tests for DebugInfo data class."""
+class TestDebugParameters:
+    """Tests for DebugParameters data class."""
 
-    def test_debug_info_from_response(self) -> None:
-        """Test DebugInfo parsing from API response."""
-        data = {
-            "requestItemsLimit": 1000,
-            "queryTimeMs": 15.5,
-            "parseTimeMs": 3.2,
-            "serializeTimeMs": 1.8,
+    def test_debug_parameters_serialization(self) -> None:
+        """Test DebugParameters serialization to camelCase."""
+        params = DebugParameters(emit_results=False, timeout=5000, profile=True)
+
+        result = params.model_dump(by_alias=True, exclude_none=True)
+        assert result == {
+            "emitResults": False,
+            "timeout": 5000,
+            "profile": True,
         }
-
-        info = DebugParameters.model_validate(data)
-
-        assert info.request_items_limit == 1000
-        assert info.query_time_ms == 15.5
-        assert info.parse_time_ms == 3.2
-        assert info.serialize_time_ms == 1.8
-
-    def test_debug_info_partial(self) -> None:
-        """Test DebugInfo with partial data."""
-        data = {"queryTimeMs": 10.0}
-
-        info = DebugParameters.model_validate(data)
-
-        assert info.query_time_ms == 10.0
-        assert info.request_items_limit is None
-        assert info.parse_time_ms is None
