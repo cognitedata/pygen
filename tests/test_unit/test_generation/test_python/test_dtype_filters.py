@@ -20,7 +20,7 @@ class TestDataTypeFilters:
     def test_boolean_filter(self, primitive_filter: PrimitiveNullableFilter) -> None:
         boolean_filter = primitive_filter.boolean
         boolean_filter.equals(True)
-        assert FilterAdapter.dump_python(boolean_filter.as_filter()) == {
+        assert boolean_filter.dump() == {
             "equals": {"property": _get_property_path("boolean"), "value": True}
         }
 
@@ -38,6 +38,13 @@ class TestDataTypeFilters:
             "range": {"property": _get_property_path("float64"), "gt": 1.0, "lt": 10.0}
         }
 
+    def test_float_filter_range_ge_le(self, primitive_filter: PrimitiveNullableFilter) -> None:
+        float_filter = primitive_filter.float64
+        float_filter.greater_than_or_equals(2.5).less_than_or_equals(7.5)
+        assert FilterAdapter.dump_python(float_filter.as_filter(), exclude_none=True) == {
+            "range": {"property": _get_property_path("float64"), "gte": 2.5, "lte": 7.5}
+        }
+
     def test_integer_filter_equals(self, primitive_filter: PrimitiveNullableFilter) -> None:
         int_filter = primitive_filter.int32
         int_filter.equals(42)
@@ -50,6 +57,13 @@ class TestDataTypeFilters:
         int_filter.greater_than_or_equals(0).less_than_or_equals(100)
         assert FilterAdapter.dump_python(int_filter.as_filter(), exclude_none=True) == {
             "range": {"property": _get_property_path("int64"), "gte": 0, "lte": 100}
+        }
+
+    def test_integer_filter_range_ge_lt(self, primitive_filter: PrimitiveNullableFilter) -> None:
+        int_filter = primitive_filter.int64
+        int_filter.greater_than(10).less_than(50)
+        assert FilterAdapter.dump_python(int_filter.as_filter(), exclude_none=True) == {
+            "range": {"property": _get_property_path("int64"), "gt": 10, "lt": 50}
         }
 
     def test_datetime_filter_equals(self, primitive_filter: PrimitiveNullableFilter) -> None:
@@ -73,6 +87,19 @@ class TestDataTypeFilters:
             }
         }
 
+    def test_datetime_filter_range_with_str(self, primitive_filter: PrimitiveNullableFilter) -> None:
+        start = "2024-01-01T00:00:00.000Z"
+        end = "2024-12-31T23:59:59.999Z"
+        datetime_filter = primitive_filter.timestamp
+        datetime_filter.greater_than(start).less_than_or_equals(end)
+        assert FilterAdapter.dump_python(datetime_filter.as_filter(), exclude_none=True) == {
+            "range": {
+                "property": _get_property_path("timestamp"),
+                "gt": start,
+                "lte": end,
+            }
+        }
+
     def test_date_filter_equals(self, primitive_filter: PrimitiveNullableFilter) -> None:
         d = date(2024, 1, 15)
         date_filter = primitive_filter.date_
@@ -88,6 +115,15 @@ class TestDataTypeFilters:
         date_filter.greater_than_or_equals(start).less_than_or_equals(end)
         assert FilterAdapter.dump_python(date_filter.as_filter(), exclude_none=True) == {
             "range": {"property": _get_property_path("date"), "lte": end.isoformat(), "gte": start.isoformat()}
+        }
+
+    def test_date_filter_range_with_str(self, primitive_filter: PrimitiveNullableFilter) -> None:
+        start = "2024-01-01"
+        end = "2024-12-31"
+        date_filter = primitive_filter.date_
+        date_filter.greater_than(start).less_than(end)
+        assert FilterAdapter.dump_python(date_filter.as_filter(), exclude_none=True) == {
+            "range": {"property": _get_property_path("date"), "gt": start, "lt": end}
         }
 
     def test_text_filter_equals(self, primitive_filter: PrimitiveNullableFilter) -> None:
@@ -118,5 +154,28 @@ class TestDataTypeFilters:
             "and": [
                 {"prefix": {"property": _get_property_path("text"), "value": "start"}},
                 {"equals": {"property": _get_property_path("text"), "value": "exact"}},
+            ]
+        }
+
+
+class TestFilterContainer:
+    def test_empty_filter_container(self) -> None:
+        assert PrimitiveNullableFilter(operator="and").as_filter() is None
+
+    def test_single_filter(self, primitive_filter: PrimitiveNullableFilter) -> None:
+        primitive_filter.int32.equals(5)
+        single_filter = primitive_filter.as_filter()
+        assert FilterAdapter.dump_python(single_filter) == {
+            "equals": {"property": _get_property_path("int32"), "value": 5}
+        }
+
+    def test_combined_filters(self, primitive_filter: PrimitiveNullableFilter) -> None:
+        primitive_filter.text.equals("example")
+        primitive_filter.int32.greater_than(10)
+        combined_filter = primitive_filter.as_filter()
+        assert FilterAdapter.dump_python(combined_filter, exclude_none=True) == {
+            "and": [
+                {"equals": {"property": _get_property_path("text"), "value": "example"}},
+                {"range": {"property": _get_property_path("int32"), "gt": 10}},
             ]
         }

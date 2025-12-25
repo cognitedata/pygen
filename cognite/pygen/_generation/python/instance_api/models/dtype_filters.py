@@ -40,10 +40,10 @@ class DataTypeFilter:
         """Get the property path for the filter."""
         return [self._view_ref.space, f"{self._view_ref.external_id}/{self._view_ref.version}", self._property_id]
 
-    def as_filter(self) -> Filter:
+    def as_filter(self) -> Filter | None:
         """Convert the accumulated conditions to a Filter."""
         if not self._filters:
-            raise ValueError("No filter conditions have been added.")
+            return None
 
         if len(self._filters) == 1:
             return self._filters
@@ -51,24 +51,30 @@ class DataTypeFilter:
         leaf_filters = [{filter_type: value} for filter_type, value in self._filters.items()]
         return {self._operator: leaf_filters}  # type: ignore[dict-item]
 
+    def dump(self) -> dict[str, Any]:
+        """Dump the filter to a dictionary."""
+        filter_obj = self.as_filter()
+        if filter_obj is None:
+            return {}
+        return FilterAdapter.dump_python(filter_obj)
 
 class FilterContainer:
     def __init__(self, data_type_filters: list[DataTypeFilter], operator: Literal["and", "or"]) -> None:
         self._data_type_filters = data_type_filters
         self._operator = operator
 
-    def as_filter(self) -> Filter:
+    def as_filter(self) -> Filter | None:
         """Convert the accumulated conditions to a Filter."""
         if not self._data_type_filters:
             raise ValueError("No data type filters have been added.")
 
-        leaf_filters = [dtf.as_filter() for dtf in self._data_type_filters]
-        filter_dict: dict[str, Any]
-        if len(leaf_filters) == 1:
-            filter_dict = FilterAdapter.dump_python(leaf_filters[0])
+        leaf_filters = [leaf_filter for dtf in self._data_type_filters if (leaf_filter := dtf.as_filter())]
+        if len(leaf_filters) == 0:
+            return None
+        elif len(leaf_filters) == 1:
+            return leaf_filters[0]
         else:
-            filter_dict = {self._operator: leaf_filters}
-        return FilterAdapter.validate_python(filter_dict)
+            return {self._operator: leaf_filters}  # type: ignore[dict-item]
 
 
 class FloatFilter(DataTypeFilter):
