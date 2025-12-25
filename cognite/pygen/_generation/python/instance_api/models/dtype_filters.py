@@ -28,8 +28,8 @@ class DataTypeFilter:
     def _add_filter(self, filter_type: FilterTypes, key: str, value: Any) -> Self:
         """Add a filter condition and return self for chaining."""
         if filter_type in self._filters:
-            current_filter = self._filters[filter_type]
-            self._filters[filter_type] = current_filter.model_copy(update={key: value})
+            filter_data = self._filters[filter_type]
+            self._filters[filter_type] = filter_data.model_copy(update={key: value})
         else:
             filter_ = FilterAdapter.validate_python({filter_type: {"property": self._property_path, key: value}})
             self._filters.update(filter_)
@@ -87,7 +87,7 @@ class FloatFilter(DataTypeFilter):
 
     def less_than_or_equals(self, value: float | int) -> Self:
         """Filter for values less than or equal to the given value."""
-        return self._add_filter("range", "le", self._validate_value(value))
+        return self._add_filter("range", "lte", self._validate_value(value))
 
     def greater_than(self, value: float | int) -> Self:
         """Filter for values greater than the given value."""
@@ -95,7 +95,7 @@ class FloatFilter(DataTypeFilter):
 
     def greater_than_or_equals(self, value: float | int) -> Self:
         """Filter for values greater than or equal to the given value."""
-        return self._add_filter("range", "ge", self._validate_value(value))
+        return self._add_filter("range", "gte", self._validate_value(value))
 
 
 class IntegerFilter(DataTypeFilter):
@@ -114,7 +114,7 @@ class IntegerFilter(DataTypeFilter):
 
     def less_than_or_equals(self, value: int) -> Self:
         """Filter for values less than or equal to the given value."""
-        return self._add_filter("range", "le", self._validate_value(value))
+        return self._add_filter("range", "lte", self._validate_value(value))
 
     def greater_than(self, value: int) -> Self:
         """Filter for values greater than the given value."""
@@ -122,7 +122,7 @@ class IntegerFilter(DataTypeFilter):
 
     def greater_than_or_equals(self, value: int) -> Self:
         """Filter for values greater than or equal to the given value."""
-        return self._add_filter("range", "ge", self._validate_value(value))
+        return self._add_filter("range", "gte", self._validate_value(value))
 
 
 class DateTimeFilter(DataTypeFilter):
@@ -130,7 +130,7 @@ class DateTimeFilter(DataTypeFilter):
 
     def _validate_value(self, value: datetime | str) -> str:
         if isinstance(value, datetime):
-            return value.isoformat()
+            return value.isoformat(timespec="milliseconds")
         if isinstance(value, str):
             # Validate it's a valid ISO format by parsing it
             datetime.fromisoformat(value)
@@ -147,7 +147,7 @@ class DateTimeFilter(DataTypeFilter):
 
     def less_than_or_equals(self, value: datetime | str) -> Self:
         """Filter for values less than or equal to the given value."""
-        return self._add_filter("range", "le", self._validate_value(value))
+        return self._add_filter("range", "lte", self._validate_value(value))
 
     def greater_than(self, value: datetime | str) -> Self:
         """Filter for values greater than the given value."""
@@ -155,7 +155,7 @@ class DateTimeFilter(DataTypeFilter):
 
     def greater_than_or_equals(self, value: datetime | str) -> Self:
         """Filter for values greater than or equal to the given value."""
-        return self._add_filter("range", "ge", self._validate_value(value))
+        return self._add_filter("range", "gte", self._validate_value(value))
 
 
 class DateFilter(DataTypeFilter):
@@ -180,7 +180,7 @@ class DateFilter(DataTypeFilter):
 
     def less_than_or_equals(self, value: date | str) -> Self:
         """Filter for values less than or equal to the given value."""
-        return self._add_filter("range", "le", self._validate_value(value))
+        return self._add_filter("range", "lte", self._validate_value(value))
 
     def greater_than(self, value: date | str) -> Self:
         """Filter for values greater than the given value."""
@@ -188,7 +188,7 @@ class DateFilter(DataTypeFilter):
 
     def greater_than_or_equals(self, value: date | str) -> Self:
         """Filter for values greater than or equal to the given value."""
-        return self._add_filter("range", "ge", self._validate_value(value))
+        return self._add_filter("range", "gte", self._validate_value(value))
 
 
 class TextFilter(DataTypeFilter):

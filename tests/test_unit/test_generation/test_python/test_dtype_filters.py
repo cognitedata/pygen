@@ -34,8 +34,8 @@ class TestDataTypeFilters:
     def test_float_filter_range(self, primitive_filter: PrimitiveNullableFilter) -> None:
         float_filter = primitive_filter.float64
         float_filter.greater_than(1.0).less_than(10.0)
-        assert FilterAdapter.dump_python(float_filter.as_filter()) == {
-            {"range": {"property": _get_property_path("float64"), "gt": 1.0, "lt": 10.0}},
+        assert FilterAdapter.dump_python(float_filter.as_filter(), exclude_none=True) == {
+            "range": {"property": _get_property_path("float64"), "gt": 1.0, "lt": 10.0}
         }
 
     def test_integer_filter_equals(self, primitive_filter: PrimitiveNullableFilter) -> None:
@@ -48,8 +48,8 @@ class TestDataTypeFilters:
     def test_integer_filter_range(self, primitive_filter: PrimitiveNullableFilter) -> None:
         int_filter = primitive_filter.int64
         int_filter.greater_than_or_equals(0).less_than_or_equals(100)
-        assert FilterAdapter.dump_python(int_filter.as_filter()) == {
-            {"range": {"property": _get_property_path("int64"), "gte": 0, "lte": 100}},
+        assert FilterAdapter.dump_python(int_filter.as_filter(), exclude_none=True) == {
+            "range": {"property": _get_property_path("int64"), "gte": 0, "lte": 100}
         }
 
     def test_datetime_filter_equals(self, primitive_filter: PrimitiveNullableFilter) -> None:
@@ -57,7 +57,7 @@ class TestDataTypeFilters:
         datetime_filter = primitive_filter.timestamp
         datetime_filter.equals(dt)
         assert FilterAdapter.dump_python(datetime_filter.as_filter()) == {
-            "equals": {"property": _get_property_path("timestamp"), "value": dt.isoformat()}
+            "equals": {"property": _get_property_path("timestamp"), "value": dt.isoformat(timespec="milliseconds")}
         }
 
     def test_datetime_filter_range(self, primitive_filter: PrimitiveNullableFilter) -> None:
@@ -65,14 +65,12 @@ class TestDataTypeFilters:
         end = datetime(2024, 12, 31)
         datetime_filter = primitive_filter.timestamp
         datetime_filter.greater_than_or_equals(start).less_than(end)
-        assert FilterAdapter.dump_python(datetime_filter.as_filter()) == {
-            {
-                "range": {
-                    "property": _get_property_path("timestamp"),
-                    "gte": start.isoformat(timespec="milliseconds"),
-                    "lt": end.isoformat(timespec="milliseconds"),
-                }
-            },
+        assert FilterAdapter.dump_python(datetime_filter.as_filter(), exclude_none=True) == {
+            "range": {
+                "property": _get_property_path("timestamp"),
+                "gte": start.isoformat(timespec="milliseconds"),
+                "lt": end.isoformat(timespec="milliseconds"),
+            }
         }
 
     def test_date_filter_equals(self, primitive_filter: PrimitiveNullableFilter) -> None:
@@ -88,7 +86,7 @@ class TestDataTypeFilters:
         end = date(2024, 12, 31)
         date_filter = primitive_filter.date_
         date_filter.greater_than_or_equals(start).less_than_or_equals(end)
-        assert FilterAdapter.dump_python(date_filter.as_filter()) == {
+        assert FilterAdapter.dump_python(date_filter.as_filter(), exclude_none=True) == {
             "range": {"property": _get_property_path("date"), "lte": end.isoformat(), "gte": start.isoformat()}
         }
 
