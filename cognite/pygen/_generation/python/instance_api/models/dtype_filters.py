@@ -67,7 +67,7 @@ class FilterContainer:
     def as_filter(self) -> Filter | None:
         """Convert the accumulated conditions to a Filter."""
         if not self._data_type_filters:
-            raise ValueError("No data type filters have been added.")
+            return None
 
         leaf_filters = [leaf_filter for dtf in self._data_type_filters if (leaf_filter := dtf.as_filter())]
         if len(leaf_filters) == 0:

@@ -3,6 +3,7 @@ from datetime import date, datetime
 import pytest
 
 from cognite.pygen._generation.python.example._data_class import PrimitiveNullable, PrimitiveNullableFilter
+from cognite.pygen._generation.python.instance_api.models.dtype_filters import FilterContainer
 from cognite.pygen._generation.python.instance_api.models.filters import FilterAdapter
 
 
@@ -147,6 +148,9 @@ class TestDataTypeFilters:
 
 
 class TestFilterContainer:
+    def test_null_filter_container(self) -> None:
+        assert FilterContainer([], "or").as_filter() is None
+
     def test_empty_filter_container(self) -> None:
         assert PrimitiveNullableFilter(operator="and").as_filter() is None
 
