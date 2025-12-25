@@ -1,12 +1,24 @@
 """Response classes for instance API operations."""
 
 from functools import cached_property
-from typing import Generic, Literal
+from typing import Any, Generic, Literal
 
 from pydantic import BaseModel, Field
 
 from ._types import DateTimeMS
 from .instance import InstanceId, T_InstanceList
+
+
+class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
+    """Response from a list operation.
+
+    Attributes:
+        items: The list of items returned by the operation.
+        typing: Optional typing information about the items.
+    """
+
+    items: T_InstanceList
+    typing: dict[str, Any] | None = None
 
 
 class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
@@ -19,6 +31,8 @@ class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
 
     items: T_InstanceList
     next_cursor: str | None = Field(default=None, alias="nextCursor")
+    typing: dict[str, Any] | None = None
+    debug: dict[str, Any] | None = Field(default=None)
 
 
 class InstanceResultItem(BaseModel, populate_by_name=True):

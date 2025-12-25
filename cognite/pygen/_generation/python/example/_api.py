@@ -3,13 +3,12 @@ from collections.abc import Sequence
 from cognite.pygen._generation.python.example._data_class import (
     PrimitiveNullable,
     PrimitiveNullableList,
-    PrimitiveNullableWrite,
 )
 from cognite.pygen._generation.python.instance_api._api import InstanceAPI
 from cognite.pygen._generation.python.instance_api.models import InstanceId, Page
 
 
-class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable, PrimitiveNullableList]):
+class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullable, PrimitiveNullableList]):
     """API client for PrimitiveNullable instances in the example space."""
 
     def retrieve(self, ids: Sequence[InstanceId]) -> PrimitiveNullable | PrimitiveNullableList | None:

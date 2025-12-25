@@ -28,6 +28,21 @@ class ViewReference(ReferenceObject):
     def __str__(self) -> str:
         return f"{self.space}:{self.external_id}(version={self.version})"
 
+    def dump(self, camel_case: bool = True, include_type: bool = False) -> dict[str, str]:
+        """Dump the view reference to a dictionary.
+
+        Args:
+            camel_case: Whether to use camel case for the keys. Defaults to True.
+            include_type: Whether to include the 'type' field in the output. Defaults to False.
+
+        Returns:
+            The dictionary representation of the view reference.
+        """
+        data = self.model_dump(by_alias=camel_case)
+        if include_type:
+            data["type"] = "view"
+        return data
+
 
 class NodeReference(ReferenceObject):
     space: str
