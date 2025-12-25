@@ -311,7 +311,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             sort: Sort order for the results. Can be a single PropertySort or
                 a sequence of PropertySort for multi-level sorting.
             limit: Maximum number of instances to return. Defaults to 25.
-                Set to -1 or None to return all matching instances.
+                Set to None to return all matching instances.
             include_typing: If True, includes type information for direct relations.
             debug: Return query debug notices.
             target_units: Unit conversion configuration for numeric properties with units.
@@ -320,6 +320,8 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             A list of instances matching the query.
 
         """
+        if limit is not None and limit <= 0:
+            raise ValueError("Limit must be a positive integer or None for no limit.")
         all_items = self._list_cls()
         next_cursor: str | None = None
         total = 0

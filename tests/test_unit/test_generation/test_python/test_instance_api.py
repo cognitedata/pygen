@@ -248,6 +248,14 @@ class TestInstanceAPIList:
         assert body["sources"][0]["targetUnits"][0]["property"] == "temperature"
         assert body["sources"][0]["targetUnits"][0]["unit"]["externalId"] == "temperature:fah"
 
+    def test_list_limit_must_be_positive(
+        self,
+        api: InstanceAPI[Person, PersonList],
+    ) -> None:
+        """Test that list raises ValueError for invalid limit."""
+        with pytest.raises(ValueError, match="Limit must be a positive integer or None for no limit."):
+            api._list(limit=0)
+
 
 class TestInstanceAPIIterate:
     """Tests for InstanceAPI.iterate() method."""
