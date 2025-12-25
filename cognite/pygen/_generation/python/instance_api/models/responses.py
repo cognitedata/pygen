@@ -7,7 +7,6 @@ from pydantic import BaseModel, Field
 
 from ._types import DateTimeMS
 from .instance import InstanceId, T_InstanceList
-from .query import DebugParameters
 
 
 class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
@@ -19,7 +18,7 @@ class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
     """
 
     items: T_InstanceList
-    typing: dict[str, dict[str, Any]] | None = None
+    typing: dict[str, Any] | None = None
 
 
 class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
@@ -32,8 +31,8 @@ class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
 
     items: T_InstanceList
     next_cursor: str | None = Field(default=None, alias="nextCursor")
-    typing: dict[str, dict[str, Any]] | None = None
-    debug: DebugParameters | None = Field(default=None)
+    typing: dict[str, Any] | None = None
+    debug: dict[str, Any] | None = Field(default=None)
 
 
 class InstanceResultItem(BaseModel, populate_by_name=True):

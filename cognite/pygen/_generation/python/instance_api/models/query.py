@@ -111,12 +111,14 @@ class DebugParameters(QueryParameters):
 
     emit_results: bool = Field(
         True,
-        description="nclude the query result in the response. emitResults=false is required for advanced query analysis features.",
+        description="Include the query result in the response. emitResults=false is required for "
+        "advanced query analysis features.",
     )
     timeout: int | None = Field(
         default=None,
-        description="Query timeout in milliseconds. Can be used to override the default timeout when analysing queries. Requires emitResults=false.",
+        description="Query timeout in milliseconds. Can be used to override the default timeout"
+        " when analysing queries. Requires emitResults=false.",
     )
     profile: bool = Field(
-        default=False, description="Most thorough level of query analysis. Requires emitResults=false."
+        default=False, description="Most thorough level of query analysis. " "Requires emitResults=false."
     )
