@@ -12,6 +12,8 @@ from cognite.pygen._generation.python.instance_api import (
     Instance,
     InstanceAPI,
     InstanceList,
+    ListResponse,
+    Page,
     PropertySort,
     UnitConversion,
     ViewReference,
@@ -239,9 +241,11 @@ class TestInstanceAPIList:
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
-        assert "targetUnits" in body
-        assert body["targetUnits"][0]["property"] == ["test", "Person/1", "temperature"]
-        assert body["targetUnits"][0]["targetUnit"] == "temperature:fah"
+        # For list(), target units are in the sources array
+        assert "sources" in body
+        assert "targetUnits" in body["sources"][0]
+        assert body["sources"][0]["targetUnits"][0]["property"] == ["test", "Person/1", "temperature"]
+        assert body["sources"][0]["targetUnits"][0]["targetUnit"] == "temperature:fah"
 
 
 class TestInstanceAPIIterate:
@@ -253,23 +257,23 @@ class TestInstanceAPIIterate:
         api: InstanceAPI[None, Person, PersonList],
         list_url: str,
     ) -> None:
-        """Test iterating with a single page of results."""
+        """Test iterating returns a single page of results."""
         items = [make_person_item("person-1", "Alice", 30)]
         respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        pages = list(api.iterate())
+        page = api.iterate()
 
-        assert len(pages) == 1
-        assert len(pages[0].items) == 1
-        assert pages[0].next_cursor is None
+        assert isinstance(page, Page)
+        assert len(page.items) == 1
+        assert page.next_cursor is None
 
-    def test_iterate_multiple_pages(
+    def test_iterate_with_pagination(
         self,
         respx_mock: respx.MockRouter,
         api: InstanceAPI[None, Person, PersonList],
         list_url: str,
     ) -> None:
-        """Test iterating with multiple pages."""
+        """Test iterating with pagination using cursor."""
         # First page
         page1_items = [make_person_item(f"person-{i}", f"Person {i}", 20 + i) for i in range(3)]
         # Second page
@@ -286,13 +290,15 @@ class TestInstanceAPIIterate:
 
         route.side_effect = respond
 
-        pages = list(api.iterate(chunk_size=3))
+        # First call returns first page with cursor
+        page1 = api.iterate(limit=3)
+        assert len(page1.items) == 3
+        assert page1.next_cursor == "cursor123"
 
-        assert len(pages) == 2
-        assert len(pages[0].items) == 3
-        assert pages[0].next_cursor == "cursor123"
-        assert len(pages[1].items) == 2
-        assert pages[1].next_cursor is None
+        # Second call with cursor returns second page
+        page2 = api.iterate(cursor=page1.next_cursor, limit=3)
+        assert len(page2.items) == 2
+        assert page2.next_cursor is None
 
     def test_iterate_with_limit(
         self,
@@ -300,13 +306,13 @@ class TestInstanceAPIIterate:
         api: InstanceAPI[None, Person, PersonList],
         list_url: str,
     ) -> None:
-        """Test iterating with a total limit."""
-        items = [make_person_item(f"person-{i}", f"Person {i}", 20 + i) for i in range(5)]
-        route = respx_mock.post(list_url).respond(json=make_list_response(items[:2]))
+        """Test iterating with a limit."""
+        items = [make_person_item(f"person-{i}", f"Person {i}", 20 + i) for i in range(2)]
+        route = respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        pages = list(api.iterate(limit=2))
+        page = api.iterate(limit=2)
 
-        assert len(pages) == 1
+        assert len(page.items) == 2
         # Verify the request had the correct limit
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -322,9 +328,9 @@ class TestInstanceAPIIterate:
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(list_url).respond(json=make_list_response(items))
 
-        pages = list(api.iterate(cursor="start_cursor"))
+        page = api.iterate(cursor="start_cursor")
 
-        assert len(pages) == 1
+        assert len(page.items) == 1
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
         assert body["cursor"] == "start_cursor"
@@ -339,16 +345,31 @@ class TestInstanceAPIIterate:
         items = [make_person_item("person-1", "Alice", 30)]
         route = respx_mock.post(list_url).respond(json=make_list_response(items, include_debug=True))
 
-        pages = list(api.iterate(include_debug=True))
+        page = api.iterate(include_debug=True)
 
-        assert len(pages) == 1
-        assert pages[0].debug is not None
-        assert pages[0].debug.query_time_ms == 10.5
-        assert pages[0].debug.parse_time_ms == 2.3
+        assert page.debug is not None
+        assert page.debug.query_time_ms == 10.5
+        assert page.debug.parse_time_ms == 2.3
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
         assert body["includeDebug"] is True
+
+    def test_iterate_limit_must_be_positive(
+        self,
+        api: InstanceAPI[None, Person, PersonList],
+    ) -> None:
+        """Test that iterate raises ValueError for invalid limit."""
+        with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
+            api.iterate(limit=0)
+
+    def test_iterate_limit_max_1000(
+        self,
+        api: InstanceAPI[None, Person, PersonList],
+    ) -> None:
+        """Test that iterate raises ValueError for limit > 1000."""
+        with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
+            api.iterate(limit=1001)
 
 
 class TestInstanceAPISearch:
@@ -366,8 +387,9 @@ class TestInstanceAPISearch:
 
         result = api.search(query="Alice")
 
-        assert len(result) == 1
-        assert result[0].name == "Alice Smith"
+        assert isinstance(result, ListResponse)
+        assert len(result.items) == 1
+        assert result.items[0].name == "Alice Smith"
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -385,7 +407,7 @@ class TestInstanceAPISearch:
 
         result = api.search(query="Alice", properties=["name"])
 
-        assert len(result) == 1
+        assert len(result.items) == 1
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
         assert body["properties"] == ["name"]
@@ -419,7 +441,7 @@ class TestInstanceAPISearch:
         filter_data = {"equals": EqualsFilterData(property=["test", "Person/1", "age"], value=30)}
         result = api.search(query="Alice", filter=filter_data)
 
-        assert len(result) == 1
+        assert len(result.items) == 1
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
         assert "filter" in body
@@ -445,21 +467,21 @@ class TestInstanceAPISearch:
         body = json.loads(gzip.decompress(request.content))
         assert "sort" in body
 
-    def test_search_limit_capped_at_1000(
+    def test_search_limit_must_be_positive(
         self,
-        respx_mock: respx.MockRouter,
         api: InstanceAPI[None, Person, PersonList],
-        search_url: str,
     ) -> None:
-        """Test that search limit is capped at 1000."""
-        items = [make_person_item("person-1", "Alice", 30)]
-        route = respx_mock.post(search_url).respond(json=make_list_response(items))
+        """Test that search raises ValueError for invalid limit."""
+        with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
+            api.search(query="test", limit=0)
 
-        api.search(query="test", limit=5000)
-
-        request = route.calls[-1].request
-        body = json.loads(gzip.decompress(request.content))
-        assert body["limit"] == 1000
+    def test_search_limit_max_1000(
+        self,
+        api: InstanceAPI[None, Person, PersonList],
+    ) -> None:
+        """Test that search raises ValueError for limit > 1000."""
+        with pytest.raises(ValueError, match="Limit must be between 1 and 1000"):
+            api.search(query="test", limit=1001)
 
 
 class TestPropertySort:

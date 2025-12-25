@@ -1,4 +1,5 @@
 import itertools
+from collections import UserList
 from collections.abc import Collection
 from typing import Any, ClassVar, Literal, TypeVar, get_args
 
@@ -126,7 +127,7 @@ T_Instance = TypeVar("T_Instance", bound=Instance)
 T_InstanceWrite = TypeVar("T_InstanceWrite", bound=InstanceWrite)
 
 
-class InstanceList(Collection[T_Instance]):
+class InstanceList(UserList[T_Instance]):
     """A list of instances with pandas integration.
 
     This class wraps a list of instances and provides convenient methods
@@ -136,19 +137,7 @@ class InstanceList(Collection[T_Instance]):
     _INSTANCE: ClassVar[type[Instance]] = Instance
 
     def __init__(self, collection: Collection[T_Instance] | None = None) -> None:
-        self.data: list[T_Instance] = list(collection or [])
-
-    def __iter__(self):
-        return iter(self.data)
-
-    def __len__(self):
-        return len(self.data)
-
-    def __contains__(self, item):
-        return item in self.data
-
-    def __getitem__(self, index):
-        return self.data[index]
+        super().__init__(collection or [])
 
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler: GetCoreSchemaHandler) -> CoreSchema:
