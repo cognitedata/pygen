@@ -101,12 +101,17 @@ class UnitConversion(QueryParameters):
 
 
 class DebugParameters(QueryParameters):
-    """Debug information for a query response.
+    """Debug parameters for a query request.
 
     When debug mode is enabled in list/iterate/search operations, the response includes
     additional metadata about the query execution.
 
     Args:
+        emit_results: Include the query result in the response. Set to False for
+            advanced query analysis features.
+        timeout: Query timeout in milliseconds. Can be used to override the default
+            timeout when analysing queries. Requires emit_results=False.
+        profile: Most thorough level of query analysis. Requires emit_results=False.
     """
 
     emit_results: bool = Field(

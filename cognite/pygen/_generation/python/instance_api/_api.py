@@ -17,7 +17,6 @@ from cognite.pygen._generation.python.instance_api.models import (
     InstanceId,
     T_Instance,
     T_InstanceList,
-    T_InstanceWrite,
     ViewReference,
 )
 from cognite.pygen._generation.python.instance_api.models.filters import Filter, FilterAdapter
@@ -29,13 +28,13 @@ from cognite.pygen._generation.python.instance_api.models.query import (
 from cognite.pygen._generation.python.instance_api.models.responses import ListResponse, Page
 
 
-class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
+class InstanceAPI(Generic[T_Instance, T_InstanceList]):
     """Generic resource API for CDF Data Modeling view-specific operations.
 
     This class provides methods for querying instances (nodes or edges) through
     a specific view. It supports filtering, sorting, pagination, and full-text search.
 
-    The InstanceAPI is designed to be subclassed or used via composition to create
+    The InstanceAPI is designed to be subclassed to create
     view-specific APIs with proper type hints.
 
     Args:
@@ -71,6 +70,11 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         self._view_ref = view_ref
         self._instance_type = instance_type
         self._list_cls = list_cls
+        # Create TypeAdapters at init time to avoid mypy errors with dynamic types
+        self._page_adapter: TypeAdapter[Page[T_InstanceList]] = TypeAdapter(Page[list_cls])  # type: ignore[valid-type]
+        self._list_response_adapter: TypeAdapter[ListResponse[T_InstanceList]] = TypeAdapter(
+            ListResponse[list_cls]  # type: ignore[valid-type]
+        )
 
     def _iterate(
         self,
@@ -125,7 +129,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
         )
         result = self._http_client.request_with_retries(request)
         success = result.get_success_or_raise()
-        return TypeAdapter(Page[self._list_cls]).validate_json(success.body)
+        return self._page_adapter.validate_json(success.body)
 
     def _search(
         self,
@@ -186,7 +190,7 @@ class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
 
         result = self._http_client.request_with_retries(request)
         success = result.get_success_or_raise()
-        return TypeAdapter(ListResponse[self._list_cls]).validate_json(success.body)
+        return self._list_response_adapter.validate_json(success.body)
 
     def _build_read_body(
         self,
