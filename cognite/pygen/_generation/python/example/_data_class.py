@@ -13,6 +13,14 @@ from pydantic import Field
 
 from cognite.pygen._generation.python.instance_api.models._references import NodeReference, ViewReference
 from cognite.pygen._generation.python.instance_api.models._types import Date, DateTime
+from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
+    BooleanFilter,
+    DateFilter,
+    FilterContainer,
+    FloatFilter,
+    IntegerFilter,
+    TextFilter,
+)
 from cognite.pygen._generation.python.instance_api.models.instance import (
     Instance,
     InstanceId,
@@ -60,27 +68,35 @@ class ProductNode(Instance):
 
     def as_write(self) -> ProductNodeWrite:
         """Convert to write representation."""
-        return ProductNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            name=self.name,
-            description=self.description,
-            tags=self.tags,
-            price=self.price,
-            prices=self.prices,
-            quantity=self.quantity,
-            quantities=self.quantities,
-            active=self.active,
-            created_date=self.created_date,
-            updated_timestamp=self.updated_timestamp,
-            category=self.category,
-        )
+        return ProductNodeWrite.model_validate(self.model_dump(by_alias=True))
 
 
 class ProductNodeList(InstanceList[ProductNode]):
     """List of ProductNode instances."""
 
     _INSTANCE: ClassVar[type[ProductNode]] = ProductNode
+
+
+class ProductNodeFilter(FilterContainer):
+    def __init__(self, operator: Literal["and", "or"] = "and") -> None:
+        view_id = ProductNode._view_id
+        self.name = TextFilter(view_id, "name", operator)
+        self.description = TextFilter(view_id, "description", operator)
+        self.price = FloatFilter(view_id, "price", operator)
+        self.quantity = IntegerFilter(view_id, "quantity", operator)
+        self.active = BooleanFilter(view_id, "active", operator)
+        self.created_date = DateFilter(view_id, "createdDate", operator)
+        super().__init__(
+            data_type_filters=[
+                self.name,
+                self.description,
+                self.price,
+                self.quantity,
+                self.active,
+                self.created_date,
+            ],
+            operator=operator,
+        )
 
 
 class CategoryNodeWrite(InstanceWrite):
