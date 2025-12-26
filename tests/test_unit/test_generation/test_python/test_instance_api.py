@@ -10,6 +10,7 @@ import respx
 from httpx import Response
 
 from cognite.pygen._generation.python.instance_api import (
+    AggregatedNumberValue,
     AggregateResponse,
     Avg,
     Count,
@@ -31,8 +32,7 @@ from cognite.pygen._generation.python.instance_api.auth.credentials import Crede
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 from cognite.pygen._generation.python.instance_api.http_client import HTTPClient
 from cognite.pygen._generation.python.instance_api.models.filters import EqualsFilterData, Filter
-from cognite.pygen._generation.python.instance_api.models.query import UnitReference
-from cognite.pygen._generation.python.instance_api.models.responses import AggregatedNumberValue
+from cognite.pygen._generation.python.instance_api.models.query import AggregationAdapter, UnitReference
 
 
 class MockCredentials(Credentials):
@@ -753,15 +753,13 @@ def aggregate_url(config: PygenClientConfig) -> str:
 
 def make_aggregate_response(
     aggregates: list[dict[str, Any]] | None = None,
-    instance_groups: list[dict[str, Any]] | None = None,
+    group: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Helper to create an aggregate response JSON."""
-    response: dict[str, Any] = {"instanceType": "node"}
-    if aggregates is not None:
-        response["items"] = aggregates
-    if instance_groups is not None:
-        response["instanceGroups"] = instance_groups
-    return response
+    item: dict[str, Any] = {"instanceType": "node", "aggregates": aggregates or []}
+    if group is not None:
+        item["group"] = group
+    return {"items": [item]}
 
 
 class TestInstanceAPIAggregate:
@@ -774,16 +772,18 @@ class TestInstanceAPIAggregate:
         aggregate_url: str,
     ) -> None:
         """Test count aggregation."""
-        response = make_aggregate_response([{"aggregate": "count", "property": "externalId", "value": 42}])
+        response = make_aggregate_response([{"aggregate": "count", "value": 42}])
         respx_mock.post(aggregate_url).respond(json=response)
 
-        result = api._aggregate(Count(property="externalId"))
+        result = api._aggregate(Count())  # type: ignore[arg-type]
 
         assert isinstance(result, AggregateResponse)
-        assert len(result.aggregates) == 1
-        assert result.aggregates[0].aggregate == "count"
-        assert result.aggregates[0].property == "externalId"
-        assert result.aggregates[0].value == 42
+        assert len(result.items) == 1
+        assert len(result.items[0].aggregates) == 1
+        agg = result.items[0].aggregates[0]
+        assert agg.aggregate == "count"
+        assert isinstance(agg, AggregatedNumberValue)
+        assert agg.value == 42
 
     def test_aggregate_with_aggregation_object(
         self,
@@ -792,15 +792,18 @@ class TestInstanceAPIAggregate:
         aggregate_url: str,
     ) -> None:
         """Test aggregation with Aggregation object."""
-        response = make_aggregate_response(items=[{"aggregate": "avg", "property": "age", "value": 27.5}])
+        response = make_aggregate_response(aggregates=[{"aggregate": "avg", "property": "age", "value": 27.5}])
         respx_mock.post(aggregate_url).respond(json=response)
 
-        result = api._aggregate(Avg(property="age"))
+        result = api._aggregate(Avg(property="age"))  # type: ignore[arg-type]
 
         assert len(result.items) == 1
-        assert result.items[0].aggregate == "avg"
-        assert result.items[0].property == "age"
-        assert result.items[0].value == 27.5
+        assert len(result.items[0].aggregates) == 1
+        agg = result.items[0].aggregates[0]
+        assert agg.aggregate == "avg"
+        assert agg.property == "age"
+        assert isinstance(agg, AggregatedNumberValue)
+        assert agg.value == 27.5
 
     def test_aggregate_multiple(
         self,
@@ -810,7 +813,7 @@ class TestInstanceAPIAggregate:
     ) -> None:
         """Test multiple aggregations."""
         response = make_aggregate_response(
-            items=[
+            aggregates=[
                 {"aggregate": "min", "property": "age", "value": 20},
                 {"aggregate": "max", "property": "age", "value": 50},
                 {"aggregate": "avg", "property": "age", "value": 35},
@@ -818,10 +821,13 @@ class TestInstanceAPIAggregate:
         )
         respx_mock.post(aggregate_url).respond(json=response)
 
-        result = api._aggregate([Min(property="age"), Max(property="age"), Avg(property="age")])
+        result = api._aggregate([Min(property="age"), Max(property="age"), Avg(property="age")])  # type: ignore[list-item]
 
-        assert len(result.items) == 3
-        values = {item.aggregate: item.value for item in result.items}
+        assert len(result.items) == 1
+        assert len(result.items[0].aggregates) == 3
+        values = {
+            agg.aggregate: agg.value for agg in result.items[0].aggregates if isinstance(agg, AggregatedNumberValue)
+        }
         assert values == {"min": 20, "max": 50, "avg": 35}
 
     def test_aggregate_with_group_by(
@@ -832,28 +838,19 @@ class TestInstanceAPIAggregate:
     ) -> None:
         """Test aggregation with group_by."""
         response = make_aggregate_response(
-            instance_groups=[
-                {
-                    "instanceType": "node",
-                    "group": {"category": "A"},
-                    "aggregates": [{"aggregate": "count", "property": "externalId", "value": 10}],
-                },
-                {
-                    "instanceType": "node",
-                    "group": {"category": "B"},
-                    "aggregates": [{"aggregate": "count", "property": "externalId", "value": 20}],
-                },
-            ]
+            aggregates=[{"aggregate": "count", "property": "externalId", "value": 10}],
+            group={"category": "A"},
         )
         respx_mock.post(aggregate_url).respond(json=response)
 
-        result = api._aggregate(Count(property="externalId"), group_by="category")
+        result = api._aggregate(Count(property="externalId"), group_by="category")  # type: ignore[arg-type]
 
-        assert len(result.grouped) == 2
-        assert result.grouped[0].group == {"category": "A"}
-        assert result.grouped[0].aggregates[0].value == 10
-        assert result.grouped[1].group == {"category": "B"}
-        assert result.grouped[1].aggregates[0].value == 20
+        assert len(result.items) == 1
+        assert result.items[0].group == {"category": "A"}
+        assert len(result.items[0].aggregates) == 1
+        agg = result.items[0].aggregates[0]
+        assert isinstance(agg, AggregatedNumberValue)
+        assert agg.value == 10
 
     def test_aggregate_with_filter(
         self,
@@ -862,11 +859,11 @@ class TestInstanceAPIAggregate:
         aggregate_url: str,
     ) -> None:
         """Test aggregation with filter."""
-        response = make_aggregate_response(items=[{"aggregate": "count", "property": "externalId", "value": 5}])
+        response = make_aggregate_response(aggregates=[{"aggregate": "count", "property": "externalId", "value": 5}])
         route = respx_mock.post(aggregate_url).respond(json=response)
 
         filter_data: Filter = {"equals": EqualsFilterData(property=["test", "Person/1", "name"], value="Alice")}
-        api._aggregate(Count(property="externalId"), filter=filter_data)
+        api._aggregate(Count(property="externalId"), filter=filter_data)  # type: ignore[arg-type]
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -880,17 +877,17 @@ class TestInstanceAPIAggregate:
         aggregate_url: str,
     ) -> None:
         """Test the request body format for aggregate."""
-        response = make_aggregate_response(items=[{"aggregate": "avg", "property": "age", "value": 27.5}])
+        response = make_aggregate_response(aggregates=[{"aggregate": "avg", "property": "age", "value": 27.5}])
         route = respx_mock.post(aggregate_url).respond(json=response)
 
-        api._aggregate(Avg(property="age"), group_by=["category", "status"], query="test", properties=["name"])
+        api._aggregate(Avg(property="age"), group_by=["category", "status"], query="test", properties=["name"])  # type: ignore[arg-type]
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
 
         assert body["instanceType"] == "node"
         assert body["view"] == {"type": "view", "space": "test", "externalId": "Person", "version": "1"}
-        assert body["aggregates"] == [{"aggregate": "avg", "property": "age"}]
+        assert body["aggregates"] == [{"avg": {"property": "age"}}]
         assert body["groupBy"] == ["category", "status"]
         assert body["query"] == "test"
         assert body["properties"] == ["name"]
@@ -903,27 +900,38 @@ class TestInstanceAPIAggregate:
     ) -> None:
         """Test aggregation with multiple aggregation objects."""
         response = make_aggregate_response(
-            items=[
+            aggregates=[
                 {"aggregate": "sum", "property": "age", "value": 100},
                 {"aggregate": "sum", "property": "score", "value": 500},
             ]
         )
         route = respx_mock.post(aggregate_url).respond(json=response)
 
-        api._aggregate([Sum(property="age"), Sum(property="score")])
+        api._aggregate([Sum(property="age"), Sum(property="score")])  # type: ignore[list-item]
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
         assert len(body["aggregates"]) == 2
-        assert body["aggregates"][0] == {"aggregate": "sum", "property": "age"}
-        assert body["aggregates"][1] == {"aggregate": "sum", "property": "score"}
-
-
-# =============================================================================
-# Aggregation Data Class Tests
-# =============================================================================
+        assert body["aggregates"][0] == {"sum": {"property": "age"}}
+        assert body["aggregates"][1] == {"sum": {"property": "score"}}
 
 
 class TestAggregationClasses:
     """Tests for aggregation data classes."""
-    ...
+
+    @pytest.mark.parametrize(
+        "raw_data",
+        [
+            pytest.param({"count": {}}, id="Count Aggregation"),
+            pytest.param({"avg": {"property": "age"}}, id="Avg Aggregation"),
+            pytest.param({"min": {"property": "age"}}, id="Min Aggregation"),
+            pytest.param({"max": {"property": "age"}}, id="Max Aggregation"),
+            pytest.param({"sum": {"property": "age"}}, id="Sum Aggregation"),
+            pytest.param({"histogram": {"property": "age", "interval": 5}}, id="Histogram Aggregation"),
+        ],
+    )
+    def test_roundtrip_serialization(self, raw_data: dict[str, Any]) -> None:
+        """Test serialization and deserialization of aggregation classes."""
+        class_ = AggregationAdapter.validate_python(raw_data)
+
+        assert AggregationAdapter.dump_python(class_, exclude_unset=True) == raw_data

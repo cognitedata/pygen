@@ -121,7 +121,7 @@ class AggregatedNumberValue(ResponseBase):
     """
 
     aggregate: Literal["avg", "min", "max", "count", "sum"]
-    property: str
+    property: str | None = None
     value: float
 
 

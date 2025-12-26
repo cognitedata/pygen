@@ -9,7 +9,7 @@ This module contains data classes used for configuring instance queries includin
 
 from typing import Annotated, Any, Literal, TypeAlias, get_args
 
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, TypeAdapter
 from pydantic.alias_generators import to_camel
 
 from cognite.pygen._utils.collection import humanize_collection
@@ -79,7 +79,7 @@ class Histogram(AggregationDataDefinition):
 AggregationTypes: TypeAlias = Literal["count", "sum", "avg", "min", "max", "histogram"]
 
 
-AggregationData = Annotated[
+Aggregation = Annotated[
     Count | Sum | Avg | Min | Max | Histogram,
     Field(discriminator="aggregate"),
 ]
@@ -108,9 +108,9 @@ def _move_aggregate_key(value: Any) -> Any:
         return value
 
 
-Aggregation = dict[AggregationTypes, AggregationData]
+AggregationRequest = Annotated[dict[AggregationTypes, Aggregation], BeforeValidator(_move_aggregate_key)]
 
-AggregationAdapter: TypeAdapter[Aggregation] = TypeAdapter(Aggregation)
+AggregationAdapter: TypeAdapter[AggregationRequest] = TypeAdapter(AggregationRequest)
 
 AVAILABLE_AGGREGATES: frozenset[str] = frozenset(get_args(AggregationTypes))
 

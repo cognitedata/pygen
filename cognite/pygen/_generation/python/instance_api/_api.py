@@ -270,7 +270,10 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         if operator is not None:
             body["operator"] = operator.upper()
         if aggregates is not None:
-            body["aggregates"] = self._serialize_model(aggregates)
+            body["aggregates"] = [
+                {agg.aggregate: agg.model_dump(by_alias=True, exclude_none=True)}
+                for agg in (aggregates if isinstance(aggregates, Sequence) else [aggregates])
+            ]
         if group_by is not None:
             if isinstance(group_by, str):
                 body["groupBy"] = [group_by]
@@ -403,7 +406,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             include_typing=include_typing,
             target_units=target_units,
         )
-        body["items"] = items  # type: ignore[dict-item]
+        body["items"] = items  # type: ignore[assignment]
 
         request = RequestMessage(
             endpoint_url=self._http_client.config.create_api_url(self._RETRIEVE_ENDPOINT),
