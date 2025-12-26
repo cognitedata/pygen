@@ -1,15 +1,25 @@
 """Response classes for instance API operations."""
 
 from functools import cached_property
-from typing import Any, Generic, Literal
+from typing import Annotated, Any, Generic, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
 
+from . import NodeReference
 from ._types import DateTimeMS
 from .instance import InstanceId, T_InstanceList
 
 
-class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
+class ResponseBase(BaseModel):
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
+        extra="forbid",
+    )
+
+
+class ListResponse(ResponseBase, Generic[T_InstanceList]):
     """Response from a list operation.
 
     Attributes:
@@ -21,7 +31,7 @@ class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
     typing: dict[str, Any] | None = None
 
 
-class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
+class Page(ResponseBase, Generic[T_InstanceList]):
     """A page of results from a paginated API response.
 
     Attributes:
@@ -30,12 +40,12 @@ class Page(BaseModel, Generic[T_InstanceList], populate_by_name=True):
     """
 
     items: T_InstanceList
-    next_cursor: str | None = Field(default=None, alias="nextCursor")
+    next_cursor: str | None = Field(default=None)
     typing: dict[str, Any] | None = None
     debug: dict[str, Any] | None = Field(default=None)
 
 
-class InstanceResultItem(BaseModel, populate_by_name=True):
+class InstanceResultItem(ResponseBase):
     """Result item from instance operations.
 
     Attributes:
@@ -48,16 +58,16 @@ class InstanceResultItem(BaseModel, populate_by_name=True):
         last_updated_time: The time the instance was last updated.
     """
 
-    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
+    instance_type: Literal["node", "edge"]
     space: str
-    external_id: str = Field(alias="externalId")
+    external_id: str
     version: int
-    was_modified: bool = Field(alias="wasModified")
-    created_time: DateTimeMS = Field(alias="createdTime")
-    last_updated_time: DateTimeMS = Field(alias="lastUpdatedTime")
+    was_modified: bool
+    created_time: DateTimeMS
+    last_updated_time: DateTimeMS
 
 
-class UpsertResult(BaseModel):
+class UpsertResult(ResponseBase):
     """Result from instance CRUD operations.
 
     Attributes:
@@ -90,7 +100,7 @@ class UpsertResult(BaseModel):
         self.deleted.extend(other.deleted)
 
 
-class DeleteResponse(BaseModel):
+class DeleteResponse(ResponseBase):
     """Response from the delete operation.
 
     This matches the CDF API response format from the
@@ -101,3 +111,45 @@ class DeleteResponse(BaseModel):
     """
 
     items: list[InstanceId] = Field(default_factory=list)
+
+
+class AggregatedNumberValue(ResponseBase):
+    """An aggregated numeric value.
+
+    Attributes:
+        value: The aggregated numeric value.
+    """
+
+    aggregate: Literal["avg", "min", "max", "count", "sum"]
+    property: str | None = None
+    value: float
+
+
+class Bucket(ResponseBase):
+    start: float
+    count: int
+
+
+class AggregatedHistogramValue(ResponseBase):
+    """An aggregated histogram value."""
+
+    aggregate: Literal["histogram"]
+    property: str
+    interval: float
+    buckets: list[Bucket]
+
+
+AggregatedValue = Annotated[AggregatedNumberValue | AggregatedHistogramValue, Field(discriminator="aggregate")]
+
+
+class AggregateItem(ResponseBase):
+    instance_type: Literal["node", "edge"]
+    group: dict[str, str | int | float | bool | NodeReference] | None = None
+    aggregates: list[AggregatedValue]
+
+
+class AggregateResponse(ResponseBase):
+    """Response from an aggregate operation."""
+
+    items: list[AggregateItem]
+    typing: dict[str, Any] | None = None

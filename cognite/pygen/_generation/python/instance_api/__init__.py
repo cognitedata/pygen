@@ -15,11 +15,20 @@ from cognite.pygen._generation.python.instance_api.models.instance import (
     ViewReference,
 )
 from cognite.pygen._generation.python.instance_api.models.query import (
+    Aggregation,
+    Avg,
+    Count,
     DebugParameters,
+    Max,
+    Min,
     PropertySort,
+    Sum,
     UnitConversion,
 )
 from cognite.pygen._generation.python.instance_api.models.responses import (
+    AggregatedNumberValue,
+    AggregatedValue,
+    AggregateResponse,
     InstanceResultItem,
     ListResponse,
     Page,
@@ -30,6 +39,12 @@ from ._api import InstanceAPI
 from ._client import InstanceClient
 
 __all__ = [
+    "AggregatedNumberValue",
+    "AggregatedValue",
+    "AggregateResponse",
+    "Aggregation",
+    "Avg",
+    "Count",
     "DataRecord",
     "DataRecordWrite",
     "DebugParameters",
@@ -42,8 +57,12 @@ __all__ = [
     "InstanceResultItem",
     "InstanceWrite",
     "ListResponse",
+    "Max",
+    "Aggregation",
+    "Min",
     "Page",
     "PropertySort",
+    "Sum",
     "UnitConversion",
     "UpsertResult",
     "ViewReference",

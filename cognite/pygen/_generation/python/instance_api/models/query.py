@@ -4,12 +4,15 @@ This module contains data classes used for configuring instance queries includin
 - Sorting: Order query results by property values
 - Units: Convert property values to target units
 - Debug: Include additional debug information in responses
+- Aggregation: Aggregate data across instances
 """
 
-from typing import Literal
+from typing import Annotated, Any, Literal, TypeAlias, get_args
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, TypeAdapter
 from pydantic.alias_generators import to_camel
+
+from cognite.pygen._utils.collection import humanize_collection
 
 
 class QueryParameters(BaseModel):
@@ -24,6 +27,92 @@ class QueryParameters(BaseModel):
         populate_by_name=True,
         extra="forbid",
     )
+
+
+class AggregationDataDefinition(QueryParameters):
+    aggregate: str = Field(..., exclude=True)
+
+
+class Count(AggregationDataDefinition):
+    """Count aggregation configuration."""
+
+    aggregate: Literal["count"] = Field("count", exclude=True)
+    property: str | None = None
+
+
+class Sum(AggregationDataDefinition):
+    """Sum aggregation configuration."""
+
+    aggregate: Literal["sum"] = Field("sum", exclude=True)
+    property: str
+
+
+class Avg(AggregationDataDefinition):
+    """Average aggregation configuration."""
+
+    aggregate: Literal["avg"] = Field("avg", exclude=True)
+    property: str
+
+
+class Min(AggregationDataDefinition):
+    """Minimum aggregation configuration."""
+
+    aggregate: Literal["min"] = Field("min", exclude=True)
+    property: str
+
+
+class Max(AggregationDataDefinition):
+    """Maximum aggregation configuration."""
+
+    aggregate: Literal["max"] = Field("max", exclude=True)
+    property: str
+
+
+class Histogram(AggregationDataDefinition):
+    """Histogram aggregation configuration."""
+
+    aggregate: Literal["histogram"] = Field("histogram", exclude=True)
+    property: str
+    interval: float
+
+
+AggregationTypes: TypeAlias = Literal["count", "sum", "avg", "min", "max", "histogram"]
+
+
+Aggregation = Annotated[
+    Count | Sum | Avg | Min | Max | Histogram,
+    Field(discriminator="aggregate"),
+]
+
+
+def _move_aggregate_key(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    if len(value) != 1:
+        raise ValueError("Aggregate data must have exactly one key.")
+    if "aggregate" in value:
+        # Already in the correct format
+        return value
+    key, data = next(iter(value.items()))
+    # Check if inner data already has aggregate (already processed by a previous recursive call)
+    if isinstance(data, dict) and "" in data:
+        return value
+    if key not in AVAILABLE_AGGREGATES:
+        raise ValueError(
+            f"Unknown aggregate: {key!r}. Available "
+            f"aggregates: {humanize_collection(AVAILABLE_AGGREGATES, sort=True)}."
+        )
+    if isinstance(data, dict):
+        return {key: {"aggregate": key, **data}}
+    else:
+        return value
+
+
+AggregationRequest = Annotated[dict[AggregationTypes, Aggregation], BeforeValidator(_move_aggregate_key)]
+
+AggregationAdapter: TypeAdapter[AggregationRequest] = TypeAdapter(AggregationRequest)
+
+AVAILABLE_AGGREGATES: frozenset[str] = frozenset(get_args(AggregationTypes))
 
 
 class PropertySort(QueryParameters):
