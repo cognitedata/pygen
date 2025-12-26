@@ -305,7 +305,6 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         space: str | None = None,
         include_typing: bool = False,
         target_units: UnitConversion | Sequence[UnitConversion] | None = None,
-
     ) -> T_InstanceList: ...
 
     def _retrieve(

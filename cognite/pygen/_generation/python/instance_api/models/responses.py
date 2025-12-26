@@ -139,5 +139,5 @@ class AggregateResponse(BaseModel, populate_by_name=True, alias_generator=to_cam
 
     instance_type: Literal["node", "edge"] = Field(alias="instanceType")
     group: dict[str, str | int | float | bool | NodeReference] | None = None
-    aggregates: AggregatedValue
+    aggregates: list[AggregatedValue]
     typing: dict[str, Any] | None = None

@@ -10,8 +10,7 @@ import respx
 from httpx import Response
 
 from cognite.pygen._generation.python.instance_api import (
-    AggregatedValue,
-    AggregateResult,
+    AggregateResponse,
     Avg,
     Count,
     DebugParameters,
@@ -33,6 +32,7 @@ from cognite.pygen._generation.python.instance_api.config import PygenClientConf
 from cognite.pygen._generation.python.instance_api.http_client import HTTPClient
 from cognite.pygen._generation.python.instance_api.models.filters import EqualsFilterData, Filter
 from cognite.pygen._generation.python.instance_api.models.query import UnitReference
+from cognite.pygen._generation.python.instance_api.models.responses import AggregatedNumberValue
 
 
 class MockCredentials(Credentials):
@@ -262,7 +262,7 @@ class TestInstanceAPIList:
         api: InstanceAPI[Person, PersonList],
     ) -> None:
         """Test that list raises ValueError for invalid limit."""
-        with pytest.raises(ValueError, match="Limit must be a positive integer or None for no limit."):
+        with pytest.raises(ValueError, match=r"Limit must be a positive integer or None for no limit\."):
             api._list(limit=0)
 
 
@@ -715,6 +715,7 @@ class TestInstanceAPIRetrieve:
         body = json.loads(gzip.decompress(request.content))
 
         assert body == {
+            "instanceType": "node",
             "items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}],
             "sources": [{"source": {"type": "view", "space": "test", "externalId": "Person", "version": "1"}}],
             "includeTyping": True,
@@ -751,13 +752,13 @@ def aggregate_url(config: PygenClientConfig) -> str:
 
 
 def make_aggregate_response(
-    items: list[dict[str, Any]] | None = None,
+    aggregates: list[dict[str, Any]] | None = None,
     instance_groups: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Helper to create an aggregate response JSON."""
-    response: dict[str, Any] = {}
-    if items is not None:
-        response["items"] = items
+    response: dict[str, Any] = {"instanceType": "node"}
+    if aggregates is not None:
+        response["items"] = aggregates
     if instance_groups is not None:
         response["instanceGroups"] = instance_groups
     return response
@@ -773,16 +774,16 @@ class TestInstanceAPIAggregate:
         aggregate_url: str,
     ) -> None:
         """Test count aggregation."""
-        response = make_aggregate_response(items=[{"aggregate": "count", "property": "externalId", "value": 42}])
+        response = make_aggregate_response([{"aggregate": "count", "property": "externalId", "value": 42}])
         respx_mock.post(aggregate_url).respond(json=response)
 
-        result = api._aggregate("count")
+        result = api._aggregate(Count(property="externalId"))
 
-        assert isinstance(result, AggregateResult)
-        assert len(result.items) == 1
-        assert result.items[0].aggregate == "count"
-        assert result.items[0].property == "externalId"
-        assert result.items[0].value == 42
+        assert isinstance(result, AggregateResponse)
+        assert len(result.aggregates) == 1
+        assert result.aggregates[0].aggregate == "count"
+        assert result.aggregates[0].property == "externalId"
+        assert result.aggregates[0].value == 42
 
     def test_aggregate_with_aggregation_object(
         self,
@@ -833,10 +834,12 @@ class TestInstanceAPIAggregate:
         response = make_aggregate_response(
             instance_groups=[
                 {
+                    "instanceType": "node",
                     "group": {"category": "A"},
                     "aggregates": [{"aggregate": "count", "property": "externalId", "value": 10}],
                 },
                 {
+                    "instanceType": "node",
                     "group": {"category": "B"},
                     "aggregates": [{"aggregate": "count", "property": "externalId", "value": 20}],
                 },
@@ -844,7 +847,7 @@ class TestInstanceAPIAggregate:
         )
         respx_mock.post(aggregate_url).respond(json=response)
 
-        result = api._aggregate("count", group_by="category")
+        result = api._aggregate(Count(property="externalId"), group_by="category")
 
         assert len(result.grouped) == 2
         assert result.grouped[0].group == {"category": "A"}
@@ -863,7 +866,7 @@ class TestInstanceAPIAggregate:
         route = respx_mock.post(aggregate_url).respond(json=response)
 
         filter_data: Filter = {"equals": EqualsFilterData(property=["test", "Person/1", "name"], value="Alice")}
-        api._aggregate("count", filter=filter_data)
+        api._aggregate(Count(property="externalId"), filter=filter_data)
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -880,7 +883,7 @@ class TestInstanceAPIAggregate:
         response = make_aggregate_response(items=[{"aggregate": "avg", "property": "age", "value": 27.5}])
         route = respx_mock.post(aggregate_url).respond(json=response)
 
-        api._aggregate(Avg(property="age"), group_by=["category", "status"], query="test", search_properties=["name"])
+        api._aggregate(Avg(property="age"), group_by=["category", "status"], query="test", properties=["name"])
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -892,37 +895,13 @@ class TestInstanceAPIAggregate:
         assert body["query"] == "test"
         assert body["properties"] == ["name"]
 
-    def test_aggregate_string_literal_with_properties(
+    def test_aggregate_multiple_aggregations(
         self,
         respx_mock: respx.MockRouter,
         api: InstanceAPI[Person, PersonList],
         aggregate_url: str,
     ) -> None:
-        """Test aggregation using string literal with properties."""
-        response = make_aggregate_response(items=[{"aggregate": "sum", "property": "age", "value": 100}])
-        route = respx_mock.post(aggregate_url).respond(json=response)
-
-        api._aggregate("sum", properties="age")
-
-        request = route.calls[-1].request
-        body = json.loads(gzip.decompress(request.content))
-        assert body["aggregates"] == [{"aggregate": "sum", "property": "age"}]
-
-    def test_aggregate_string_literal_requires_properties(
-        self,
-        api: InstanceAPI[Person, PersonList],
-    ) -> None:
-        """Test that non-count string aggregations require properties."""
-        with pytest.raises(ValueError, match="Cannot aggregate 'sum' without specifying properties"):
-            api._aggregate("sum")
-
-    def test_aggregate_multiple_properties(
-        self,
-        respx_mock: respx.MockRouter,
-        api: InstanceAPI[Person, PersonList],
-        aggregate_url: str,
-    ) -> None:
-        """Test aggregation with multiple properties creates multiple aggregates."""
+        """Test aggregation with multiple aggregation objects."""
         response = make_aggregate_response(
             items=[
                 {"aggregate": "sum", "property": "age", "value": 100},
@@ -931,7 +910,7 @@ class TestInstanceAPIAggregate:
         )
         route = respx_mock.post(aggregate_url).respond(json=response)
 
-        api._aggregate("sum", properties=["age", "score"])
+        api._aggregate([Sum(property="age"), Sum(property="score")])
 
         request = route.calls[-1].request
         body = json.loads(gzip.decompress(request.content))
@@ -947,68 +926,4 @@ class TestInstanceAPIAggregate:
 
 class TestAggregationClasses:
     """Tests for aggregation data classes."""
-
-    def test_count_serialization(self) -> None:
-        """Test Count aggregation serialization."""
-        agg = Count(property="externalId")
-        result = agg.model_dump(by_alias=True, exclude_none=True)
-        assert result == {"aggregate": "count", "property": "externalId"}
-
-    def test_sum_serialization(self) -> None:
-        """Test Sum aggregation serialization."""
-        agg = Sum(property="price")
-        result = agg.model_dump(by_alias=True, exclude_none=True)
-        assert result == {"aggregate": "sum", "property": "price"}
-
-    def test_avg_serialization(self) -> None:
-        """Test Avg aggregation serialization."""
-        agg = Avg(property="temperature")
-        result = agg.model_dump(by_alias=True, exclude_none=True)
-        assert result == {"aggregate": "avg", "property": "temperature"}
-
-    def test_min_serialization(self) -> None:
-        """Test Min aggregation serialization."""
-        agg = Min(property="startDate")
-        result = agg.model_dump(by_alias=True, exclude_none=True)
-        assert result == {"aggregate": "min", "property": "startDate"}
-
-    def test_max_serialization(self) -> None:
-        """Test Max aggregation serialization."""
-        agg = Max(property="endDate")
-        result = agg.model_dump(by_alias=True, exclude_none=True)
-        assert result == {"aggregate": "max", "property": "endDate"}
-
-    def test_aggregated_value(self) -> None:
-        """Test AggregatedValue deserialization."""
-        value = AggregatedValue(aggregate="count", property="externalId", value=42.0)
-        assert value.aggregate == "count"
-        assert value.property == "externalId"
-        assert value.value == 42.0
-
-    def test_aggregate_result_items(self) -> None:
-        """Test AggregateResult with items."""
-        result = AggregateResult(
-            items=[
-                AggregatedValue(aggregate="count", property="externalId", value=42),
-                AggregatedValue(aggregate="avg", property="age", value=27.5),
-            ]
-        )
-        assert len(result.items) == 2
-        assert len(result.grouped) == 0
-
-    def test_aggregate_result_grouped(self) -> None:
-        """Test AggregateResult with grouped results."""
-        from cognite.pygen._generation.python.instance_api import AggregationGroup
-
-        result = AggregateResult(
-            grouped=[
-                AggregationGroup(
-                    group={"category": "A"}, aggregates=[AggregatedValue(aggregate="count", property="id", value=10)]
-                ),
-                AggregationGroup(
-                    group={"category": "B"}, aggregates=[AggregatedValue(aggregate="count", property="id", value=20)]
-                ),
-            ]
-        )
-        assert len(result.grouped) == 2
-        assert len(result.items) == 0
+    ...

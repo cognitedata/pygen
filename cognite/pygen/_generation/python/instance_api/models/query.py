@@ -7,10 +7,12 @@ This module contains data classes used for configuring instance queries includin
 - Aggregation: Aggregate data across instances
 """
 
-from typing import Literal, TypeAlias
+from typing import Annotated, Any, Literal, TypeAlias, get_args
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 from pydantic.alias_generators import to_camel
+
+from cognite.pygen._utils.collection import humanize_collection
 
 
 class QueryParameters(BaseModel):
@@ -27,103 +29,90 @@ class QueryParameters(BaseModel):
     )
 
 
-# =============================================================================
-# Aggregation Types
-# =============================================================================
+class AggregationDataDefinition(QueryParameters):
+    aggregate: str = Field(..., exclude=True)
 
 
-class MetricAggregation(QueryParameters):
-    """Base class for metric aggregations.
+class Count(AggregationDataDefinition):
+    """Count aggregation configuration."""
 
-    Metric aggregations compute numeric metrics over property values.
-    """
+    aggregate: Literal["count"] = Field("count", exclude=True)
+    property: str | None = None
 
+
+class Sum(AggregationDataDefinition):
+    """Sum aggregation configuration."""
+
+    aggregate: Literal["sum"] = Field("sum", exclude=True)
     property: str
 
 
-class Count(MetricAggregation):
-    """Count aggregation.
+class Avg(AggregationDataDefinition):
+    """Average aggregation configuration."""
 
-    Counts the number of instances (or non-null values for a property).
-
-    Args:
-        property: The property to count. Use "externalId" for counting all instances.
-
-    Examples:
-        Count all instances:
-
-        >>> agg = Count(property="externalId")
-
-        Count non-null values of a specific property:
-
-        >>> agg = Count(property="name")
-    """
-
-    aggregate: Literal["count"] = "count"
+    aggregate: Literal["avg"] = Field("avg", exclude=True)
+    property: str
 
 
-class Sum(MetricAggregation):
-    """Sum aggregation.
+class Min(AggregationDataDefinition):
+    """Minimum aggregation configuration."""
 
-    Computes the sum of numeric property values.
-
-    Args:
-        property: The numeric property to sum.
-
-    Examples:
-        >>> agg = Sum(property="price")
-    """
-
-    aggregate: Literal["sum"] = "sum"
+    aggregate: Literal["min"] = Field("min", exclude=True)
+    property: str
 
 
-class Avg(MetricAggregation):
-    """Average aggregation.
+class Max(AggregationDataDefinition):
+    """Maximum aggregation configuration."""
 
-    Computes the average of numeric property values.
-
-    Args:
-        property: The numeric property to average.
-
-    Examples:
-        >>> agg = Avg(property="temperature")
-    """
-
-    aggregate: Literal["avg"] = "avg"
+    aggregate: Literal["max"] = Field("max", exclude=True)
+    property: str
 
 
-class Min(MetricAggregation):
-    """Minimum aggregation.
+class Histogram(AggregationDataDefinition):
+    """Histogram aggregation configuration."""
 
-    Finds the minimum value of a property.
-
-    Args:
-        property: The property to find the minimum of.
-
-    Examples:
-        >>> agg = Min(property="startDate")
-    """
-
-    aggregate: Literal["min"] = "min"
+    aggregate: Literal["histogram"] = Field("histogram", exclude=True)
+    property: str
+    interval: float
 
 
-class Max(MetricAggregation):
-    """Maximum aggregation.
-
-    Finds the maximum value of a property.
-
-    Args:
-        property: The property to find the maximum of.
-
-    Examples:
-        >>> agg = Max(property="endDate")
-    """
-
-    aggregate: Literal["max"] = "max"
+AggregationTypes: TypeAlias = Literal["count", "sum", "avg", "min", "max", "histogram"]
 
 
-# Type alias for all aggregation types
-Aggregation: TypeAlias = Count | Sum | Avg | Min | Max
+AggregationData = Annotated[
+    Count | Sum | Avg | Min | Max | Histogram,
+    Field(discriminator="aggregate"),
+]
+
+
+def _move_aggregate_key(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    if len(value) != 1:
+        raise ValueError("Aggregate data must have exactly one key.")
+    if "aggregate" in value:
+        # Already in the correct format
+        return value
+    key, data = next(iter(value.items()))
+    # Check if inner data already has aggregate (already processed by a previous recursive call)
+    if isinstance(data, dict) and "" in data:
+        return value
+    if key not in AVAILABLE_AGGREGATES:
+        raise ValueError(
+            f"Unknown aggregate: {key!r}. Available "
+            f"aggregates: {humanize_collection(AVAILABLE_AGGREGATES, sort=True)}."
+        )
+    if isinstance(data, dict):
+        return {key: {"aggregate": key, **data}}
+    else:
+        return value
+
+
+Aggregation = dict[AggregationTypes, AggregationData]
+
+AggregationAdapter: TypeAdapter[Aggregation] = TypeAdapter(Aggregation)
+
+AVAILABLE_AGGREGATES: frozenset[str] = frozenset(get_args(AggregationTypes))
 
 
 class PropertySort(QueryParameters):

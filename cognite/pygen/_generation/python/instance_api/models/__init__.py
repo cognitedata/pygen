@@ -2,29 +2,30 @@ from ._references import ContainerReference, NodeReference, ViewReference
 from ._types import Date, DateTime, DateTimeMS
 from .instance import Instance, InstanceId, InstanceList, InstanceWrite, T_Instance, T_InstanceList, T_InstanceWrite
 from .query import (
-    AggregatedValue,
-    AggregateResult,
     Aggregation,
-    AggregationGroup,
-    AggregationLiteral,
     Avg,
     Count,
     DebugParameters,
     Max,
-    MetricAggregation,
     Min,
     PropertySort,
     Sum,
     UnitConversion,
 )
-from .responses import InstanceResultItem, Page, RetrieveResponse, UpsertResult
+from .responses import (
+    AggregatedNumberValue,
+    AggregatedValue,
+    AggregateResponse,
+    InstanceResultItem,
+    Page,
+    UpsertResult,
+)
 
 __all__ = [
+    "AggregatedNumberValue",
     "AggregatedValue",
-    "AggregateResult",
+    "AggregateResponse",
     "Aggregation",
-    "AggregationGroup",
-    "AggregationLiteral",
     "Avg",
     "ContainerReference",
     "Count",
@@ -38,12 +39,11 @@ __all__ = [
     "InstanceResultItem",
     "InstanceWrite",
     "Max",
-    "MetricAggregation",
+    "Aggregation",
     "Min",
     "NodeReference",
     "Page",
     "PropertySort",
-    "RetrieveResponse",
     "Sum",
     "T_Instance",
     "T_InstanceList",
