@@ -17,18 +17,8 @@ from cognite.pygen._generation.python.instance_api.http_client import (
     SuccessResponse,
 )
 from cognite.pygen._generation.python.instance_api.models import (
-    AggregatedValue,
-    AggregateResult,
     Aggregation,
-    AggregationGroup,
-    AggregationLiteral,
-    Avg,
-    Count,
     InstanceId,
-    Max,
-    MetricAggregation,
-    Min,
-    Sum,
     T_Instance,
     T_InstanceList,
     ViewReference,
@@ -40,9 +30,9 @@ from cognite.pygen._generation.python.instance_api.models.query import (
     UnitConversion,
 )
 from cognite.pygen._generation.python.instance_api.models.responses import (
+    AggregateResponse,
     ListResponse,
     Page,
-    RetrieveResponse,
 )
 from cognite.pygen._utils.collection import chunker_sequence
 
@@ -76,7 +66,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
     _LIST_LIMIT = 1000
     _SEARCH_LIMIT = 1000
     _RETRIEVE_LIMIT = 1000
-    _AGGREGATE_LIMIT = 10000
+    _AGGREGATE_LIMIT = 1000
     _DEFAULT_LIST_LIMIT = 25
 
     def __init__(
@@ -105,9 +95,6 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         self._page_adapter: TypeAdapter[Page[T_InstanceList]] = TypeAdapter(Page[list_cls])  # type: ignore[valid-type]
         self._list_response_adapter: TypeAdapter[ListResponse[T_InstanceList]] = TypeAdapter(
             ListResponse[list_cls]  # type: ignore[valid-type]
-        )
-        self._retrieve_response_adapter: TypeAdapter[RetrieveResponse[T_InstanceList]] = TypeAdapter(
-            RetrieveResponse[list_cls]  # type: ignore[valid-type]
         )
 
     def _iterate(
@@ -239,6 +226,8 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         debug: DebugParameters | None = None,
         target_units: UnitConversion | Sequence[UnitConversion] | None = None,
         operator: Literal["and", "or"] | None = None,
+        aggregates: Aggregation | Sequence[Aggregation] | None = None,
+        group_by: str | Sequence[str] | None = None,
     ) -> dict[str, JsonValue]:
         """Build the request body for list operations."""
         body: dict[str, Any] = {
@@ -278,6 +267,14 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             body["targetUnits"] = self._serialize_model(target_units)
         if operator is not None:
             body["operator"] = operator.upper()
+        if aggregates is not None:
+            body["aggregates"] = self._serialize_model(aggregates)
+        if group_by is not None:
+            if isinstance(group_by, str):
+                body["groupBy"] = [group_by]
+            else:
+                body["groupBy"] = list(group_by)
+
         return body  # type: ignore[return-value]
 
     @staticmethod
@@ -367,7 +364,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             )
             for result in results:
                 if isinstance(result, SuccessResponse):
-                    response = self._retrieve_response_adapter.validate_json(result.body)
+                    response = self._list_response_adapter.validate_json(result.body)
                     all_items.extend(response.items)
                 else:
                     result.get_success_or_raise()  # Raises appropriate error
@@ -376,7 +373,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             for chunk in chunker_sequence(instance_ids, self._RETRIEVE_LIMIT):
                 result = self._retrieve_chunk(chunk, include_typing)
                 success = result.get_success_or_raise()
-                response = self._retrieve_response_adapter.validate_json(success.body)
+                response = self._list_response_adapter.validate_json(success.body)
                 all_items.extend(response.items)
 
         if is_single:
@@ -482,14 +479,16 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
 
     def _aggregate(
         self,
-        aggregate: Aggregation | AggregationLiteral | Sequence[Aggregation | AggregationLiteral],
+        aggregate: Aggregation | Sequence[Aggregation],
+        query: str | None = None,
         group_by: str | Sequence[str] | None = None,
         properties: str | Sequence[str] | None = None,
-        query: str | None = None,
-        search_properties: str | Sequence[str] | None = None,
+        operator: Literal["and", "or"] = "or",
+        target_units: UnitConversion | Sequence[UnitConversion] | None = None,
+        include_typing: bool = False,
         filter: Filter | None = None,
         limit: int = _AGGREGATE_LIMIT,
-    ) -> AggregateResult:
+    ) -> AggregateResponse:
         """Aggregate instances in the view.
 
         This method performs aggregations on instances using the CDF aggregate
@@ -503,45 +502,29 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
                 - A sequence of aggregations
             group_by: Property or properties to group results by. Results will be
                 organized into groups based on unique combinations of these values.
-            properties: Property or properties to aggregate on. Required for sum, avg,
-                min, max aggregations when using string literals.
             query: Search query for full-text search filtering before aggregation.
-            search_properties: Properties to search in when using query.
             filter: Filter to apply before aggregation.
             limit: Maximum number of groups to return when using group_by.
                 Defaults to 10000.
 
         Returns:
-            AggregateResult containing the aggregated values. When using group_by,
+            AggregateResponse containing the aggregated values. When using group_by,
             results are in the `grouped` field; otherwise they're in the `items` field.
 
         Raises:
             ValueError: If properties are required but not provided.
-
-        Examples:
-            Count all instances:
-
-            >>> result = api._aggregate("count")
-
-            Get average of a property:
-
-            >>> result = api._aggregate(Avg(property="temperature"))
-
-            Group by a property and count:
-
-            >>> result = api._aggregate("count", group_by="category")
         """
-        # Normalize aggregations
-        aggregations = self._normalize_aggregations(aggregate, properties)
-
-        # Build request body
-        body = self._build_aggregate_body(
-            aggregations=aggregations,
-            group_by=group_by,
+        body = self._build_read_body(
+            view_key="view",
             query=query,
-            search_properties=search_properties,
+            target_units=target_units,
+            include_typing=include_typing,
+            properties=properties,
             filter=filter,
             limit=limit,
+            operator=operator,
+            aggregates=aggregate,
+            group_by=group_by,
         )
 
         request = RequestMessage(
@@ -551,148 +534,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         )
         result = self._http_client.request_with_retries(request)
         success = result.get_success_or_raise()
-        return self._parse_aggregate_response(success.body, group_by is not None)
-
-    def _normalize_aggregations(
-        self,
-        aggregate: Aggregation | AggregationLiteral | Sequence[Aggregation | AggregationLiteral],
-        properties: str | Sequence[str] | None,
-    ) -> list[Aggregation]:
-        """Normalize aggregation inputs to a list of Aggregation objects.
-
-        Args:
-            aggregate: The aggregation(s) to normalize.
-            properties: Properties to use for string literal aggregations.
-
-        Returns:
-            List of Aggregation objects.
-
-        Raises:
-            ValueError: If properties are required but not provided.
-        """
-        AGGREGATION_CLASSES: dict[str, type[MetricAggregation]] = {
-            "count": Count,
-            "sum": Sum,
-            "avg": Avg,
-            "min": Min,
-            "max": Max,
-        }
-
-        # Normalize to list
-        if isinstance(aggregate, str | MetricAggregation):
-            agg_list: list[Aggregation | AggregationLiteral] = [aggregate]
-        else:
-            agg_list = list(aggregate)
-
-        # Normalize properties
-        if isinstance(properties, str):
-            prop_list: list[str] = [properties]
-        elif properties is not None:
-            prop_list = list(properties)
-        else:
-            prop_list = []
-
-        # Convert string literals to Aggregation objects
-        result: list[Aggregation] = []
-        for agg in agg_list:
-            if isinstance(agg, Count | Sum | Avg | Min | Max):
-                result.append(agg)
-            elif isinstance(agg, str):
-                if agg == "count" and not prop_list:
-                    # Count without properties counts externalId
-                    result.append(Count(property="externalId"))
-                elif not prop_list:
-                    raise ValueError(f"Cannot aggregate '{agg}' without specifying properties")
-                else:
-                    agg_class = AGGREGATION_CLASSES.get(agg)
-                    if agg_class is None:
-                        raise ValueError(f"Unknown aggregation type: {agg}")
-                    for prop in prop_list:
-                        result.append(agg_class(property=prop))  # type: ignore[arg-type]
-
-        return result
-
-    def _build_aggregate_body(
-        self,
-        aggregations: list[Aggregation],
-        group_by: str | Sequence[str] | None,
-        query: str | None,
-        search_properties: str | Sequence[str] | None,
-        filter: Filter | None,
-        limit: int,
-    ) -> dict[str, JsonValue]:
-        """Build the request body for aggregate operations."""
-        body: dict[str, Any] = {
-            "instanceType": self._instance_type,
-            "view": self._view_ref.dump(camel_case=True, include_type=True),
-            "aggregates": [agg.model_dump(by_alias=True, exclude_none=True) for agg in aggregations],
-            "limit": limit,
-        }
-
-        if group_by is not None:
-            if isinstance(group_by, str):
-                body["groupBy"] = [group_by]
-            else:
-                body["groupBy"] = list(group_by)
-
-        if query is not None:
-            body["query"] = query
-
-        if search_properties is not None:
-            if isinstance(search_properties, str):
-                body["properties"] = [search_properties]
-            else:
-                body["properties"] = list(search_properties)
-
-        if filter is not None:
-            body["filter"] = FilterAdapter.dump_python(filter, by_alias=True, exclude_none=True)
-
-        return body  # type: ignore[return-value]
-
-    def _parse_aggregate_response(self, body: str, has_groups: bool) -> AggregateResult:
-        """Parse the aggregate response from the API.
-
-        Args:
-            body: The response body JSON string.
-            has_groups: Whether the response contains grouped results.
-
-        Returns:
-            AggregateResult with the parsed data.
-        """
-        import json
-
-        data = json.loads(body)
-
-        if has_groups:
-            # Response format with groupBy contains instanceGroups with group and aggregates
-            groups = []
-            for group_data in data.get("instanceGroups", []):
-                aggregates = [
-                    AggregatedValue(
-                        aggregate=agg.get("aggregate"),
-                        property=agg.get("property"),
-                        value=agg.get("value"),
-                    )
-                    for agg in group_data.get("aggregates", [])
-                ]
-                groups.append(
-                    AggregationGroup(
-                        group=group_data.get("group", {}),
-                        aggregates=aggregates,
-                    )
-                )
-            return AggregateResult(grouped=groups)
-        else:
-            # Response format without groupBy contains items with aggregate, property, and value
-            items = [
-                AggregatedValue(
-                    aggregate=item.get("aggregate"),
-                    property=item.get("property"),
-                    value=item.get("value"),
-                )
-                for item in data.get("items", [])
-            ]
-            return AggregateResult(items=items)
+        return AggregateResponse.model_validate_json(success.body)
 
     def _sync(self) -> None:
         """Sync instances (placeholder for future implementation)."""

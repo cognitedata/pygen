@@ -7,7 +7,7 @@ This module contains data classes used for configuring instance queries includin
 - Aggregation: Aggregate data across instances
 """
 
-from typing import Any, Literal, TypeAlias
+from typing import Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
@@ -124,50 +124,6 @@ class Max(MetricAggregation):
 
 # Type alias for all aggregation types
 Aggregation: TypeAlias = Count | Sum | Avg | Min | Max
-
-# Literal type for string-based aggregation names
-AggregationLiteral: TypeAlias = Literal["count", "sum", "avg", "min", "max"]
-
-
-class AggregatedValue(BaseModel, populate_by_name=True):
-    """A single aggregated value from an aggregation operation.
-
-    Attributes:
-        aggregate: The type of aggregation performed.
-        property: The property that was aggregated.
-        value: The aggregated value.
-    """
-
-    aggregate: str = Field(alias="aggregate")
-    property: str = Field(alias="property")
-    value: float = Field(alias="value")
-
-
-class AggregationGroup(BaseModel, populate_by_name=True):
-    """A group in a grouped aggregation result.
-
-    When using group_by, results are organized into groups based on
-    the group_by property values.
-
-    Attributes:
-        group: The group key values (property name -> value).
-        aggregates: The aggregated values for this group.
-    """
-
-    group: dict[str, Any] = Field(alias="group")
-    aggregates: list[AggregatedValue] = Field(alias="aggregates")
-
-
-class AggregateResult(BaseModel, populate_by_name=True):
-    """Result from an aggregation operation.
-
-    Attributes:
-        items: List of aggregated values (when not using group_by).
-        grouped: List of grouped aggregation results (when using group_by).
-    """
-
-    items: list[AggregatedValue] = Field(default_factory=list)
-    grouped: list[AggregationGroup] = Field(default_factory=list, alias="instanceGroups")
 
 
 class PropertySort(QueryParameters):

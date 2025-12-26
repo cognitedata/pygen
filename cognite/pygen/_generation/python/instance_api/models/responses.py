@@ -1,24 +1,14 @@
 """Response classes for instance API operations."""
 
 from functools import cached_property
-from typing import Any, Generic, Literal
+from typing import Annotated, Any, Generic, Literal
 
 from pydantic import BaseModel, Field
+from pydantic.alias_generators import to_camel
 
+from . import NodeReference
 from ._types import DateTimeMS
 from .instance import InstanceId, T_InstanceList
-
-
-class RetrieveResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
-    """Response from a retrieve operation.
-
-    Attributes:
-        items: The list of items returned by the operation.
-        typing: Optional typing information about the items.
-    """
-
-    items: T_InstanceList
-    typing: dict[str, Any] | None = None
 
 
 class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
@@ -113,3 +103,41 @@ class DeleteResponse(BaseModel):
     """
 
     items: list[InstanceId] = Field(default_factory=list)
+
+
+class AggregatedNumberValue(BaseModel, populate_by_name=True, alias_generator=to_camel):
+    """An aggregated numeric value.
+
+    Attributes:
+        value: The aggregated numeric value.
+    """
+
+    aggregate: Literal["avg", "min", "max", "count", "sum"]
+    property: str
+    value: float
+
+
+class Bucket(BaseModel):
+    start: float
+    count: int
+
+
+class AggregatedHistogramValue(BaseModel, populate_by_name=True, alias_generator=to_camel):
+    """An aggregated histogram value."""
+
+    aggregate: Literal["histogram"]
+    property: str
+    interval: float
+    buckets: list[Bucket]
+
+
+AggregatedValue = Annotated[AggregatedNumberValue | AggregatedHistogramValue, Field(discriminator="aggregate")]
+
+
+class AggregateResponse(BaseModel, populate_by_name=True, alias_generator=to_camel):
+    """Response from an aggregate operation."""
+
+    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
+    group: dict[str, str | int | float | bool | NodeReference] | None = None
+    aggregates: AggregatedValue
+    typing: dict[str, Any] | None = None
