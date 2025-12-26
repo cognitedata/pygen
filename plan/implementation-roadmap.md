@@ -227,20 +227,15 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Include comprehensive docstrings
 
 5. **Example API Classes**
-   - Create `ExampleClient` extending `InstanceClient`
-   - Create view-specific API classes extending `InstanceAPI`
-   - Demonstrate how to initialize API classes with HTTPClient and ViewRef
-   - Implement type-safe retrieve/list/iterate methods
-   - Show proper type hints with generics (T_Instance, T_InstanceWrite, T_InstanceList)
-   - Include examples of different view types (nodes with various property types)
-
-6. **Testing**
-   - Unit tests for generic InstanceModel/Instance/InstanceWrite
-   - Unit tests for InstanceClient CRUD operations
-   - Unit tests for InstanceAPI methods
-   - Integration tests with mock CDF API
-   - Test example SDK end-to-end
-   - Test coverage >90%
+   - Build an example client and API classes based on the example data model
+     located in `cognite/pygen/_generation/example_model/`
+   - Remove the existing `PrimitiveNullable` example.
+   - This should have a `ExampleClient` extending `InstanceClient` with three view-specific API classes
+     extending `InstanceAPI`, one for each view in the example model.
+   - Demonstrate how to initialize API classes with HTTPClient and ViewReference
+   - Implement type-safe retrieve/list/iterate methods with unpacked parameters. The goal is to use
+     as much primary Python typing features as possible, such as:
+     int, str, bool, datetime in the method signatures.
 
 ### Deliverables
 - ✅ Complete generic InstanceModel/Instance/InstanceWrite base classes
