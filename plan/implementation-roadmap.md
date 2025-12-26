@@ -229,7 +229,8 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Demonstrate how to initialize API classes with HTTPClient and ViewReference
    - Implement type-safe retrieve/list/iterate methods with unpacked parameters. The goal is to use
      as much primary Python typing features as possible, such as:
-     int, str, bool, datetime in the method signatures.
+     int, float, str, bool, datetime, None or list version of these in the method signatures. If absolute necessary, use
+     a more complex data structures that you create from pydantic or data classes. 
 
 ### Deliverables
 - ✅ Complete generic InstanceModel/Instance/InstanceWrite base classes
