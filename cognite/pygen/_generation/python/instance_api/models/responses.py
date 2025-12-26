@@ -3,12 +3,13 @@
 from functools import cached_property
 from typing import Annotated, Any, Generic, Literal
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 from . import NodeReference
 from ._types import DateTimeMS
 from .instance import InstanceId, T_InstanceList
+
 
 class ResponseBase(BaseModel):
     model_config = ConfigDict(
@@ -141,10 +142,14 @@ class AggregatedHistogramValue(ResponseBase):
 AggregatedValue = Annotated[AggregatedNumberValue | AggregatedHistogramValue, Field(discriminator="aggregate")]
 
 
-class AggregateResponse(ResponseBase):
-    """Response from an aggregate operation."""
-
+class AggregateItem(ResponseBase):
     instance_type: Literal["node", "edge"] = Field(alias="instanceType")
     group: dict[str, str | int | float | bool | NodeReference] | None = None
     aggregates: list[AggregatedValue]
+
+
+class AggregateResponse(ResponseBase):
+    """Response from an aggregate operation."""
+
+    items: list[AggregateItem]
     typing: dict[str, Any] | None = None
