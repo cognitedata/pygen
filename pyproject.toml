@@ -140,10 +140,10 @@ filterwarnings = [
 ]
 addopts = [
     "--doctest-modules",
-    "--cov=cognite.pygen",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
+#    "--cov=cognite.pygen",
+#    "--cov-report=term-missing",
+#    "--cov-report=html",
+#    "--cov-report=xml",
     "-v",
 ]
 markers = [
@@ -165,7 +165,7 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
     "@abstractmethod",
-    "    from typing_extensions import Self",
+    "from typing_extensions import Self",
 ]
 
 [build-system]
