@@ -218,15 +218,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Implement `aggregate()` for aggregations support built on https://api-docs.cognite.com/20230101/tag/Instances/operation/aggregateInstances
    - The `.aggregate` method should reuse the sort, filtering, unit data structures from part 1.
 
-4. **Example Data Classes**
-   - Create example view-specific data classes extending `Instance`
-   - Create example write classes extending `InstanceWrite`
-   - Create example list classes extending `InstanceList`
-   - Demonstrate property type mappings (text, int, float, bool, datetime, etc.)
-   - Demonstrate nullable and required fields
-   - Include comprehensive docstrings
-
-5. **Example API Classes**
+4. **Example API Classes**
    - Build an example client and API classes based on the example data model
      located in `cognite/pygen/_generation/example_model/`
    - Remove the existing `PrimitiveNullable` example.
@@ -314,13 +306,6 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Show proper type hints with TypeScript generics
    - Include examples of different view types
 
-6. **Testing**
-   - Unit tests for generic InstanceModel/Instance/InstanceWrite
-   - Unit tests for InstanceClient CRUD operations
-   - Unit tests for InstanceAPI methods
-   - Integration tests with mock CDF API
-   - Test example SDK end-to-end
-   - Test coverage >90%
 
 ### Deliverables
 - ✅ Complete generic TypeScript instance models
@@ -411,14 +396,6 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Resolve all dependencies
    - Organize into language-appropriate module structure
 
-6. **Testing**
-   - Unit tests for validation rules
-   - Unit tests for each IR component
-   - Parser tests with various CDF data models
-   - Transformer tests for both Python and TypeScript
-   - Integration tests with real data models
-   - Test coverage >90%
-
 ### Deliverables
 - ✅ Complete validation layer
 - ✅ Language-agnostic IR type system
@@ -502,15 +479,6 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Clean, readable code structure
    - Follow language best practices (PEP8, TypeScript style guide)
 
-6. **Testing**
-   - Test Python generation from IR
-   - Test TypeScript generation from IR
-   - Test generated Python code functionality
-   - Test generated TypeScript code functionality
-   - Integration tests with real CDF data models
-   - Compare generated SDKs with hand-written examples
-   - Test coverage >90%
-
 ### Deliverables
 - ✅ Working Python generator from IR
 - ✅ Working TypeScript generator from IR
@@ -577,13 +545,6 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Progress indicators for long-running operations
    - Debug mode with verbose output
    - Dry-run mode to preview generation
-
-6. **Testing**
-   - Test all edge cases
-   - Test with real-world complex schemas
-   - Regression tests comparing with v1
-   - Performance comparison tests
-   - Test coverage >90%
 
 ### Deliverables
 - ✅ All original Pygen features implemented
@@ -756,13 +717,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Dependency audit
    - Security best practices
 
-5. **Stability Testing**
-   - Load testing
-   - Stress testing
-   - Long-running tests
-   - Edge case fuzzing
-
-6. **Production Readiness**
+5. **Production Readiness**
    - Deployment guide
    - Configuration guide
    - Troubleshooting guide
