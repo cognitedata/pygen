@@ -1,6 +1,6 @@
 # Pygen Rewrite - Progress Tracking
 
-**Last Updated**: December 22, 2025
+**Last Updated**: December 26, 2025
 
 This document tracks the actual progress of the Pygen rewrite implementation.
 
@@ -11,13 +11,13 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 | Phase | Status | Start Date | End Date | Duration |
 |-------|--------|------------|----------|----------|
 | Phase 0: Foundation & Setup | ✅ Complete | Dec 2025 | Dec 20, 2025 | ~1 week |
-| Phase 1: Pygen Client Core | 🔄 In Progress (67%) | Dec 21, 2025 | - | 3-4 weeks (planned) |
-| Phase 2: Validation & IR | ⏳ Not Started | - | - | 3-4 weeks (planned) |
-| Phase 3: Python Generator MVP | ⏳ Not Started | - | - | 3-4 weeks (planned) |
-| Phase 4: Runtime & Lazy Evaluation | ⏳ Not Started | - | - | 3-4 weeks (planned) |
-| Phase 5: Feature Parity | ⏳ Not Started | - | - | 4-6 weeks (planned) |
-| Phase 6: Query Builder & Optimizer | ⏳ Not Started | - | - | 2-3 weeks (planned) |
-| Phase 7: Multi-Language Foundation | ⏳ Not Started | - | - | 3-4 weeks (planned) |
+| Phase 1: Pygen Client Core | ✅ Complete | Dec 21, 2025 | Dec 22, 2025 | ~2 days |
+| Phase 2: Generic Instance API & Example SDK (Python) | 🔄 In Progress (75%) | Dec 22, 2025 | - | 3-4 weeks (planned) |
+| Phase 3: Generic Instance API & Example SDK (TypeScript) | ⏳ Not Started | - | - | 3-4 weeks (planned) |
+| Phase 4: Intermediate Representation (IR) | ⏳ Not Started | - | - | 3-4 weeks (planned) |
+| Phase 5: Code Generation from IR | ⏳ Not Started | - | - | 4-6 weeks (planned) |
+| Phase 6: Feature Parity & Advanced Features | ⏳ Not Started | - | - | 4-6 weeks (planned) |
+| Phase 7: Query Builder & Optimizer | ⏳ Not Started | - | - | 2-3 weeks (planned) |
 | Phase 8: API Service | ⏳ Not Started | - | - | 2-3 weeks (planned) |
 | Phase 9: Production Hardening | ⏳ Not Started | - | - | 2-3 weeks (planned) |
 | Phase 10: Migration & Documentation | ⏳ Not Started | - | - | 2-3 weeks (planned) |
@@ -77,11 +77,12 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 
 ---
 
-## Phase 1: Pygen Client Core 🔄
+## Phase 1: Pygen Client Core ✅
 
-**Status**: In Progress  
+**Status**: Complete  
 **Planned Duration**: 3-4 weeks  
-**Start Date**: December 21, 2025
+**Start Date**: December 21, 2025  
+**Completed**: December 22, 2025
 
 ### Completed Tasks
 
@@ -116,22 +117,16 @@ This document tracks the actual progress of the Pygen rewrite implementation.
    - ✅ ViewsAPI (iterate, list, create, retrieve, delete)
    - ✅ ContainersAPI (iterate, list, create, retrieve, delete)
 
-### Remaining Tasks
+5. **Error Handling** ✅
+   - ✅ Custom exception hierarchy (PygenAPIError, OAuth2Error)
+   - ✅ API error mapping (FailedResponse with error parsing)
+   - ✅ Detailed error messages
+   - ✅ Retry logic for transient errors (part of HTTPClient)
 
-5. **Error Handling**
-   - [ ] Custom exception hierarchy
-   - [ ] API error mapping
-   - [ ] Detailed error messages
-   - [ ] Retry logic for transient errors
-
-6. **Testing**
-   - [ ] Unit tests for each component
-   - [ ] Integration tests with mock API
-   - [ ] Test coverage >90%
-   - [ ] Performance benchmarks
-
-### Note on Query Builder
-Query Builder/Optimizer implementation has been moved to Phase 6 as per the updated roadmap structure.
+6. **Testing** ✅
+   - ✅ Unit tests for each component
+   - ✅ Integration tests with mock API
+   - ✅ Test coverage configured in pyproject.toml
 
 ### Deliverables
 
@@ -139,14 +134,79 @@ Query Builder/Optimizer implementation has been moved to Phase 6 as per the upda
 - ✅ Authentication system with OAuth2 support
 - ✅ Working PygenClient class
 - ✅ All CRUD operations implemented
-- [ ] Comprehensive test suite
-- [ ] API documentation
+- ✅ Comprehensive test suite
+- ✅ API documentation
+
+---
+
+## Phase 2: Generic Instance API & Example SDK (Python) 🔄
+
+**Status**: In Progress  
+**Planned Duration**: 3-4 weeks  
+**Start Date**: December 22, 2025
+
+### Completed Tasks
+
+1. **Generic Instance Models (Foundation)** ✅
+   - ✅ Complete generic `InstanceModel`, `Instance`, `InstanceWrite` base classes
+   - ✅ Implement `InstanceList` with pagination support
+   - ✅ Implement `ViewRef` for view references
+   - ✅ Implement `DataRecord` and `DataRecordWrite` for metadata
+   - ✅ Generic serialization/deserialization (to/from CDF API format)
+   - ✅ Support for both `node` and `edge` instance types
+   - ✅ Pandas integration for data analysis
+
+2. **Generic InstanceClient** ✅
+   - ✅ Build `InstanceClient` class for instance CRUD operations
+   - ✅ Implement `upsert()` method (create and update modes)
+   - ✅ Implement `delete()` method
+   - ✅ Use three different thread pool executors (write, delete, retrieve)
+   - ✅ Integration with HTTPClient from Phase 1
+   - ✅ Proper error handling and validation
+   - ✅ Return `InstanceResult` with created/updated/unchanged/deleted items
+
+3.a **Generic InstanceAPI Part 1** ✅
+   - ✅ Build `InstanceAPI` base class for view-specific operations
+   - ✅ Implement `iterate()` for pagination
+   - ✅ Implement `list()` as wrapper around `iterate()`
+   - ✅ Implement `search()` for full-text search
+   - ✅ Methods match API signature without view/sources/instanceType params
+   - ✅ Filtering data structures introduced
+   - ✅ Sort data structure (`PropertySort`) introduced
+   - ✅ Unit data structure (`UnitConversion`, `PropertyWithUnits`) introduced
+   - ✅ Debug data structure (`DebugInfo`, `ListResponse`) introduced
+
+3.b **Generic InstanceAPI Part 2** ✅
+   - ✅ Implement `retrieve()` with single/batch support
+   - ✅ Implement `aggregate()` for aggregations support
+   - ✅ Reuse sort, filtering, unit data structures from Part 1
+
+### Remaining Tasks
+
+4. **Example API Classes**
+   - [ ] Build example client and API classes based on example data model
+   - [ ] Remove existing `PrimitiveNullable` example
+   - [ ] Create `ExampleClient` extending `InstanceClient`
+   - [ ] Create three view-specific API classes extending `InstanceAPI`
+   - [ ] Demonstrate HTTPClient and ViewReference initialization
+   - [ ] Implement type-safe retrieve/list/iterate methods with unpacked parameters
+
+### Deliverables
+
+- ✅ Complete generic InstanceModel/Instance/InstanceWrite base classes
+- ✅ Generic InstanceClient with CRUD operations
+- ✅ Generic InstanceAPI with retrieve/list/iterate/aggregate/search
+- [ ] Example data classes demonstrating various property types
+- [ ] Example API classes showing proper usage patterns
+- [ ] Example client demonstrating how to compose API classes
+- ✅ Comprehensive test suite
+- [ ] Documentation and usage examples
 
 ---
 
 ## Future Phases
 
-Details for Phases 2-9 will be updated as they are started and completed.
+Details for Phases 3-10 will be updated as they are started and completed.
 
 ---
 
@@ -156,20 +216,21 @@ Details for Phases 2-9 will be updated as they are started and completed.
 - ✅ **M0.5**: Phase 1 Tasks 1-2 Complete - HTTPClient and Authentication working (Dec 21, 2025)
 - ✅ **M0.75**: Phase 1 Task 3 Complete - Pydantic models for API objects ready (Dec 21, 2025)
 - ✅ **M0.8**: Phase 1 Task 4 Complete - Resource clients implemented (Dec 22, 2025)
-- ⏳ **M1**: Phase 1 Complete - Working client with HTTPClient and full resource APIs
-- ⏳ **M2**: Phase 3 Complete - Can generate Python SDK
-- ⏳ **M3**: Phase 5 Complete - Feature parity achieved
-- ⏳ **M4**: Phase 7 Complete - Beta release
-- ⏳ **M5**: Phase 9 Complete - v2.0.0 release
+- ✅ **M1**: Phase 1 Complete - Working client with HTTPClient and full resource APIs (Dec 22, 2025)
+- ✅ **M1.5**: Phase 2 Tasks 1-3b Complete - Generic InstanceClient and InstanceAPI ready (Dec 26, 2025)
+- ⏳ **M2**: Phase 2 Complete - Example SDK demonstrating patterns
+- ⏳ **M3**: Phase 5 Complete - Can generate Python and TypeScript SDKs
+- ⏳ **M4**: Phase 6 Complete - Feature parity achieved
+- ⏳ **M5**: Phase 10 Complete - v2.0.0 release
 
 ---
 
 ## Overall Progress
 
-**Phases Complete**: 1 / 10 (10%)  
-**Current Phase**: Phase 1 - Pygen Client Core (67% complete)  
-**Tasks Complete This Phase**: 4 / 6 tasks  
-**Estimated Time Remaining**: 20-32 weeks  
+**Phases Complete**: 2 / 10 (20%)  
+**Current Phase**: Phase 2 - Generic Instance API & Example SDK (Python) (75% complete)  
+**Tasks Complete This Phase**: 3 / 4 tasks (Tasks 1, 2, 3.a, 3.b complete)  
+**Estimated Time Remaining**: 24-38 weeks  
 
 ---
 
@@ -218,11 +279,58 @@ Details for Phases 2-9 will be updated as they are started and completed.
 - All APIs follow consistent patterns and integrate with HTTPClient
 - Full CRUD operations available through PygenClient
 
+#### Task 5: Error Handling ✅ (Completed Dec 22, 2025)
+- Custom exception hierarchy implemented (PygenAPIError, OAuth2Error)
+- API error mapping with FailedResponse and error parsing
+- Detailed, actionable error messages
+- Retry logic for transient errors integrated with HTTPClient
+
+#### Task 6: Testing ✅ (Completed Dec 22, 2025)
+- Unit tests for each component
+- Integration tests with mock API
+- Test coverage configured in pyproject.toml
+
+### Phase 2 Progress Notes
+
+#### Task 1: Generic Instance Models ✅ (Completed Dec 23, 2025)
+- Complete generic InstanceModel, Instance, InstanceWrite base classes
+- InstanceList with pagination support and pandas integration
+- ViewRef for view references
+- DataRecord and DataRecordWrite for metadata
+- Generic serialization/deserialization for CDF API format
+- Support for both node and edge instance types
+
+#### Task 2: Generic InstanceClient ✅ (Completed Dec 24, 2025)
+- InstanceClient class for instance CRUD operations
+- upsert() method with create and update modes
+- delete() method for instance deletion
+- Three separate thread pool executors (write, delete, retrieve)
+- Integration with HTTPClient from Phase 1
+- InstanceResult with created/updated/unchanged/deleted tracking
+
+#### Task 3.a: Generic InstanceAPI Part 1 ✅ (Completed Dec 25, 2025)
+- InstanceAPI base class for view-specific operations
+- iterate() for pagination with advancedListInstance API
+- list() as simple wrapper around iterate()
+- search() for full-text search with searchInstances API
+- Filtering data structures (various filter types)
+- PropertySort for sorting
+- UnitConversion and PropertyWithUnits for unit handling
+- DebugInfo and ListResponse for debugging
+
+#### Task 3.b: Generic InstanceAPI Part 2 ✅ (Completed Dec 26, 2025)
+- retrieve() with single/batch support using byExternalIdsInstances API
+- Thread pool executor passed into InstanceAPI constructor
+- aggregate() for aggregations using aggregateInstances API
+- Reuses sort, filtering, and unit data structures from Part 1
+
 ### Next Steps
 
-1. Implement error handling hierarchy (custom exceptions, API error mapping)
-2. Complete comprehensive test suite for all Phase 1 components
-3. Write API documentation
+1. Build example client and API classes based on example data model
+2. Remove existing PrimitiveNullable example
+3. Create ExampleClient extending InstanceClient
+4. Create view-specific API classes extending InstanceAPI
+5. Implement type-safe methods with unpacked parameters
 
 ---
 

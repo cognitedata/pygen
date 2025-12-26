@@ -212,11 +212,11 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - ✅ Introduce unit data structure (`UnitConversion`, `PropertyWithUnits`).
    - ✅ Introduce debug data structure for the `.list()` and `.iterate()` methods (`DebugInfo`, `ListResponse`).
 
-3.b  **Generic InstanceAPI Part 2**
-   - Implement `retrieve()` with single/batch, the thread pool executor built it on https://api-docs.cognite.com/20230101/tag/Instances/operation/byExternalIdsInstances
+3.b  **Generic InstanceAPI Part 2** ✅
+   - ✅ Implement `retrieve()` with single/batch, the thread pool executor built it on https://api-docs.cognite.com/20230101/tag/Instances/operation/byExternalIdsInstances
      should be passed into the `InstanceAPI` constructor.
-   - Implement `aggregate()` for aggregations support built on https://api-docs.cognite.com/20230101/tag/Instances/operation/aggregateInstances
-   - The `.aggregate` method should reuse the sort, filtering, unit data structures from part 1.
+   - ✅ Implement `aggregate()` for aggregations support built on https://api-docs.cognite.com/20230101/tag/Instances/operation/aggregateInstances
+   - ✅ The `.aggregate` method should reuse the sort, filtering, unit data structures from part 1.
 
 4. **Example API Classes**
    - Build an example client and API classes based on the example data model
