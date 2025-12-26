@@ -2,13 +2,16 @@
 
 import gzip
 import json
+from unittest.mock import patch
 
+import httpx
 import pytest
 import respx
 
 from cognite.pygen._generation.python.instance_api import InstanceClient, InstanceId, UpsertResult
 from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
+from cognite.pygen._generation.python.instance_api.exceptions import MultiRequestError
 from cognite.pygen._generation.python.instance_api.models.instance import InstanceWrite, ViewReference
 
 
@@ -369,3 +372,48 @@ class TestInstanceClientChunking:
 
         # Should have made 2 requests (1000 + 500)
         assert route.call_count == 2
+
+    def test_delete_batch_some_failing(
+        self, respx_mock: respx.MockRouter, client: InstanceClient, delete_url: str
+    ) -> None:
+        """Test that partial failures are properly reported via MultiRequestError."""
+
+        # Create 2500 items to trigger 3 batches (1000 + 1000 + 500)
+        items = [InstanceId(instance_type="node", space="test", external_id=f"person-{i}") for i in range(2500)]
+
+        def side_effect(request: httpx.Request) -> httpx.Response:
+            content = gzip.decompress(request.content).decode("utf-8")
+            if "person-500" in content:
+                # First batch: connection timeout
+                raise httpx.ConnectTimeout("Connection timed out")
+            elif "person-1500" in content:
+                return httpx.Response(
+                    status_code=500,
+                    json={"error": {"code": 500, "message": "Internal server error"}},
+                )
+            else:
+                # Third batch: success
+                return httpx.Response(
+                    status_code=200,
+                    json={
+                        "items": [
+                            {"instanceType": "node", "space": "test", "externalId": f"person-{i}"}
+                            for i in range(2000, 2500)
+                        ]
+                    },
+                )
+
+        respx_mock.post(delete_url).mock(side_effect=side_effect)
+
+        with patch("time.sleep"):
+            with pytest.raises(MultiRequestError) as exc_info:
+                client.delete(items)
+
+        error = exc_info.value
+        # One batch had connection timeout (FailedRequest)
+        assert len(error.failed_requests) == 1
+        # One batch had failed response (FailedResponse)
+        assert len(error.failed_responses) == 1
+        assert error.failed_responses[0].status_code == 500
+        # One batch succeeded (500 items deleted)
+        assert len(error.result.deleted) == 500

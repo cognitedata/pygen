@@ -935,3 +935,22 @@ class TestAggregationClasses:
         class_ = AggregationAdapter.validate_python(raw_data)
 
         assert AggregationAdapter.dump_python(class_, exclude_unset=True) == raw_data
+
+    @pytest.mark.parametrize(
+        "raw_data,error_msg",
+        [
+            pytest.param({"unknown_agg": {}}, "Unknown aggregate: 'unknown_agg'.", id="Unknown Aggregation"),
+            pytest.param(["not", "a", "dict"], "Input should be a valid dictionary", id="Invalid Type"),
+            pytest.param({}, "Aggregate data must have exactly one key", id="Empty Dict"),
+            pytest.param(
+                {"count": {}, "avg": {"property": "age"}},
+                "Aggregate data must have exactly one key.",
+                id="Multiple Aggregations in One Dictionary",
+            ),
+        ],
+    )
+    def test_invalid_aggregation_data(self, raw_data: Any, error_msg: str) -> None:
+        """Test that invalid aggregation data raises ValueError."""
+        with pytest.raises(ValueError) as exc_info:
+            AggregationAdapter.validate_python(raw_data)
+        assert error_msg in str(exc_info.value)
