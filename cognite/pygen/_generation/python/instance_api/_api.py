@@ -216,7 +216,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
     def _build_read_body(
         self,
         view_key: Literal["sources", "view"],
-        limit: int,
+        limit: int | None = None,
         query: str | None = None,
         properties: str | Sequence[str] | None = None,
         filter: Filter | None = None,
@@ -232,9 +232,11 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         """Build the request body for list operations."""
         body: dict[str, Any] = {
             "instanceType": self._instance_type,
-            "limit": limit,
-            "includeTyping": include_typing,
         }
+        if include_typing is not None:
+            body["includeTyping"] = include_typing
+        if limit is not None:
+            body["limit"] = limit
         if view_key == "view":
             body["view"] = self._view_ref.dump(camel_case=True, include_type=True)
         else:
@@ -293,6 +295,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         id: str | InstanceId | tuple[str, str],
         space: str | None = None,
         include_typing: bool = False,
+        target_units: UnitConversion | Sequence[UnitConversion] | None = None,
     ) -> T_Instance | None: ...
 
     @overload
@@ -301,6 +304,8 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         id: list[str | InstanceId | tuple[str, str]],
         space: str | None = None,
         include_typing: bool = False,
+        target_units: UnitConversion | Sequence[UnitConversion] | None = None,
+
     ) -> T_InstanceList: ...
 
     def _retrieve(
@@ -308,6 +313,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         id: str | InstanceId | tuple[str, str] | list[str | InstanceId | tuple[str, str]],
         space: str | None = None,
         include_typing: bool = False,
+        target_units: UnitConversion | Sequence[UnitConversion] | None = None,
     ) -> T_Instance | T_InstanceList | None:
         """Retrieve instances by ID.
 
@@ -331,16 +337,6 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         Raises:
             ValueError: If space is not provided when using string external_ids.
 
-        Examples:
-            Retrieve a single instance:
-
-            >>> instance = api._retrieve("my-instance", space="my-space")
-
-            Retrieve multiple instances:
-
-            >>> instances = api._retrieve(
-            ...     [("space1", "id1"), ("space2", "id2")]
-            ... )
         """
         # Normalize input to list
         is_single = not isinstance(id, list)
@@ -384,6 +380,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         self,
         instance_ids: list[InstanceId],
         include_typing: bool,
+        target_units: UnitConversion | Sequence[UnitConversion] | None = None,
     ) -> HTTPResult:
         """Retrieve a chunk of instances by their IDs.
 
@@ -402,16 +399,12 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             }
             for item in instance_ids
         ]
-
-        source: dict[str, Any] = {
-            "source": self._view_ref.dump(camel_case=True, include_type=True),
-        }
-
-        body: dict[str, JsonValue] = {
-            "items": items,  # type: ignore[dict-item]
-            "sources": [source],
-            "includeTyping": include_typing,
-        }
+        body = self._build_read_body(
+            view_key="sources",
+            include_typing=include_typing,
+            target_units=target_units,
+        )
+        body["items"] = items  # type: ignore[dict-item]
 
         request = RequestMessage(
             endpoint_url=self._http_client.config.create_api_url(self._RETRIEVE_ENDPOINT),
