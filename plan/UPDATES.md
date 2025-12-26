@@ -1,33 +1,72 @@
 # Plan Updates Summary
 
-**Date**: December 22, 2025  
-**Status**: Phase 1 In Progress - Tasks 1-4 Complete (67%)
+**Date**: December 26, 2025  
+**Status**: Phase 2 In Progress - Tasks 1-3.b Complete (75%)
 
 ---
 
-## Latest Update: Phase 1 Task 4 Complete (December 22, 2025)
+## Latest Update: Phase 2 Task 3.b Complete (December 26, 2025)
 
 ### Completed Work
 
-**Phase 1, Task 4: Resource Clients** ✅
-- Implemented all resource client APIs for CDF Data Modeling
-- APIs implemented:
-  - SpacesAPI (iterate, list, create, retrieve, delete)
-  - DataModelsAPI (iterate, list, create, retrieve, delete)
-  - ViewsAPI (iterate, list, create, retrieve, delete)
-  - ContainersAPI (iterate, list, create, retrieve, delete)
-- All APIs follow consistent patterns with HTTPClient integration
-- Full CRUD operations available through PygenClient class
-- Location: `cognite/pygen/_client/resources/`
+**Phase 2, Task 3.b: Generic InstanceAPI Part 2** ✅
+- Implemented `retrieve()` with single/batch support
+  - Uses byExternalIdsInstances API endpoint
+  - Thread pool executor passed into InstanceAPI constructor for concurrent retrieval
+- Implemented `aggregate()` for aggregations support
+  - Uses aggregateInstances API endpoint
+  - Reuses sort, filtering, and unit data structures from Part 1
+- Location: `cognite/pygen/_generation/`
 
-### Next Steps for Phase 1
+### Next Steps for Phase 2
 
-- Task 5: Implement error handling hierarchy (custom exceptions, API error mapping)
-- Task 6: Complete comprehensive test suite with >90% coverage
+- Task 4: Build example client and API classes based on example data model
+  - Create `ExampleClient` extending `InstanceClient`
+  - Create view-specific API classes extending `InstanceAPI`
+  - Implement type-safe methods with unpacked parameters
 
 ---
 
-## Previous Update: Phase 1 Task 3 Complete (December 21, 2025)
+## Previous Update: Phase 2 Tasks 1-3.a Complete (December 25, 2025)
+
+### Completed Work
+
+**Phase 2, Task 1: Generic Instance Models** ✅
+- Complete generic InstanceModel, Instance, InstanceWrite base classes
+- InstanceList with pagination support and pandas integration
+- ViewRef, DataRecord, DataRecordWrite for metadata
+- Support for both node and edge instance types
+
+**Phase 2, Task 2: Generic InstanceClient** ✅
+- InstanceClient class for instance CRUD operations
+- upsert() and delete() methods
+- Three separate thread pool executors (write, delete, retrieve)
+- InstanceResult tracking for created/updated/unchanged/deleted items
+
+**Phase 2, Task 3.a: Generic InstanceAPI Part 1** ✅
+- InstanceAPI base class for view-specific operations
+- iterate(), list(), search() methods implemented
+- Filtering, sorting, and unit data structures introduced
+- DebugInfo and ListResponse for debugging
+
+---
+
+## Previous Update: Phase 1 Complete (December 22, 2025)
+
+### Completed Work
+
+**Phase 1: Pygen Client Core** ✅
+- All 6 tasks completed
+- HTTP Client Foundation with retry, rate limiting, connection pooling
+- Authentication with OAuth2 support
+- Pydantic models for all API objects
+- Resource clients (Spaces, DataModels, Views, Containers)
+- Error handling with custom exception hierarchy
+- Comprehensive test suite
+
+---
+
+## Previous Update: Phase 1 Task 4 Complete (December 22, 2025)
 
 ### Completed Work
 
@@ -308,8 +347,9 @@ V1 and V2 development in parallel:
 1. ✅ Plan updated and approved
 2. ✅ Phase 0 Complete: Moved v1 to legacy/
 3. ✅ V2 project structure set up
-4. ✅ Phase 1 Tasks 1-4 Complete: HTTPClient, Auth, Models, Resource Clients
-5. ⏳ Phase 1 Tasks 5-6: Error handling and comprehensive testing
+4. ✅ Phase 1 Complete: HTTPClient, Auth, Models, Resource Clients, Error Handling, Testing
+5. ✅ Phase 2 Tasks 1-3.b Complete: Generic Instance Models, InstanceClient, InstanceAPI
+6. ⏳ Phase 2 Task 4: Example API classes with type-safe methods
 
 ---
 
@@ -384,5 +424,5 @@ A: Allows v1 bug fixes during v2 development, maintains functional v1 for users,
 
 ---
 
-**Plan Status**: ✅ Complete and Ready for Implementation
+**Plan Status**: ✅ Implementation In Progress - Phase 2 (75% complete)
 
