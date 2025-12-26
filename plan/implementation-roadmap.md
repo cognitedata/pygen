@@ -223,7 +223,9 @@ All tasks, deliverables, and success criteria have been met. The project is read
      located in `cognite/pygen/_generation/example_model/`
    - Remove the existing `PrimitiveNullable` example.
    - This should have a `ExampleClient` extending `InstanceClient` with three view-specific API classes
-     extending `InstanceAPI`, one for each view in the example model.
+     extending `InstanceAPI`, one for each view in the example model. Note this subclassing
+     should be trivial to implement, a simple subclassing of `InstanceClient` and add three
+     attributes for the view-specific API classes.
    - Demonstrate how to initialize API classes with HTTPClient and ViewReference
    - Implement type-safe retrieve/list/iterate methods with unpacked parameters. The goal is to use
      as much primary Python typing features as possible, such as:
