@@ -9,6 +9,18 @@ from ._types import DateTimeMS
 from .instance import InstanceId, T_InstanceList
 
 
+class RetrieveResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
+    """Response from a retrieve operation.
+
+    Attributes:
+        items: The list of items returned by the operation.
+        typing: Optional typing information about the items.
+    """
+
+    items: T_InstanceList
+    typing: dict[str, Any] | None = None
+
+
 class ListResponse(BaseModel, Generic[T_InstanceList], populate_by_name=True):
     """Response from a list operation.
 

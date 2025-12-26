@@ -4,9 +4,10 @@ This module contains data classes used for configuring instance queries includin
 - Sorting: Order query results by property values
 - Units: Convert property values to target units
 - Debug: Include additional debug information in responses
+- Aggregation: Aggregate data across instances
 """
 
-from typing import Literal
+from typing import Any, Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
@@ -24,6 +25,149 @@ class QueryParameters(BaseModel):
         populate_by_name=True,
         extra="forbid",
     )
+
+
+# =============================================================================
+# Aggregation Types
+# =============================================================================
+
+
+class MetricAggregation(QueryParameters):
+    """Base class for metric aggregations.
+
+    Metric aggregations compute numeric metrics over property values.
+    """
+
+    property: str
+
+
+class Count(MetricAggregation):
+    """Count aggregation.
+
+    Counts the number of instances (or non-null values for a property).
+
+    Args:
+        property: The property to count. Use "externalId" for counting all instances.
+
+    Examples:
+        Count all instances:
+
+        >>> agg = Count(property="externalId")
+
+        Count non-null values of a specific property:
+
+        >>> agg = Count(property="name")
+    """
+
+    aggregate: Literal["count"] = "count"
+
+
+class Sum(MetricAggregation):
+    """Sum aggregation.
+
+    Computes the sum of numeric property values.
+
+    Args:
+        property: The numeric property to sum.
+
+    Examples:
+        >>> agg = Sum(property="price")
+    """
+
+    aggregate: Literal["sum"] = "sum"
+
+
+class Avg(MetricAggregation):
+    """Average aggregation.
+
+    Computes the average of numeric property values.
+
+    Args:
+        property: The numeric property to average.
+
+    Examples:
+        >>> agg = Avg(property="temperature")
+    """
+
+    aggregate: Literal["avg"] = "avg"
+
+
+class Min(MetricAggregation):
+    """Minimum aggregation.
+
+    Finds the minimum value of a property.
+
+    Args:
+        property: The property to find the minimum of.
+
+    Examples:
+        >>> agg = Min(property="startDate")
+    """
+
+    aggregate: Literal["min"] = "min"
+
+
+class Max(MetricAggregation):
+    """Maximum aggregation.
+
+    Finds the maximum value of a property.
+
+    Args:
+        property: The property to find the maximum of.
+
+    Examples:
+        >>> agg = Max(property="endDate")
+    """
+
+    aggregate: Literal["max"] = "max"
+
+
+# Type alias for all aggregation types
+Aggregation: TypeAlias = Count | Sum | Avg | Min | Max
+
+# Literal type for string-based aggregation names
+AggregationLiteral: TypeAlias = Literal["count", "sum", "avg", "min", "max"]
+
+
+class AggregatedValue(BaseModel, populate_by_name=True):
+    """A single aggregated value from an aggregation operation.
+
+    Attributes:
+        aggregate: The type of aggregation performed.
+        property: The property that was aggregated.
+        value: The aggregated value.
+    """
+
+    aggregate: str = Field(alias="aggregate")
+    property: str = Field(alias="property")
+    value: float = Field(alias="value")
+
+
+class AggregationGroup(BaseModel, populate_by_name=True):
+    """A group in a grouped aggregation result.
+
+    When using group_by, results are organized into groups based on
+    the group_by property values.
+
+    Attributes:
+        group: The group key values (property name -> value).
+        aggregates: The aggregated values for this group.
+    """
+
+    group: dict[str, Any] = Field(alias="group")
+    aggregates: list[AggregatedValue] = Field(alias="aggregates")
+
+
+class AggregateResult(BaseModel, populate_by_name=True):
+    """Result from an aggregation operation.
+
+    Attributes:
+        items: List of aggregated values (when not using group_by).
+        grouped: List of grouped aggregation results (when using group_by).
+    """
+
+    items: list[AggregatedValue] = Field(default_factory=list)
+    grouped: list[AggregationGroup] = Field(default_factory=list, alias="instanceGroups")
 
 
 class PropertySort(QueryParameters):

@@ -1,5 +1,6 @@
-"""Tests for the InstanceAPI class (iterate, list, search methods)."""
+"""Tests for the InstanceAPI class (iterate, list, search, retrieve, aggregate methods)."""
 
+import concurrent.futures
 import gzip
 import json
 from typing import Any
@@ -9,13 +10,21 @@ import respx
 from httpx import Response
 
 from cognite.pygen._generation.python.instance_api import (
+    AggregatedValue,
+    AggregateResult,
+    Avg,
+    Count,
     DebugParameters,
     Instance,
     InstanceAPI,
+    InstanceId,
     InstanceList,
     ListResponse,
+    Max,
+    Min,
     Page,
     PropertySort,
+    Sum,
     UnitConversion,
     ViewReference,
 )
@@ -542,3 +551,464 @@ class TestDebugParameters:
             "timeout": 5000,
             "profile": True,
         }
+
+
+# =============================================================================
+# Retrieve Tests
+# =============================================================================
+
+
+@pytest.fixture
+def retrieve_url(config: PygenClientConfig) -> str:
+    """Return the URL for retrieving instances."""
+    return config.create_api_url("/models/instances/byids")
+
+
+def make_retrieve_response(items: list[dict[str, Any]]) -> dict[str, Any]:
+    """Helper to create a retrieve response JSON."""
+    return {"items": items}
+
+
+class TestInstanceAPIRetrieve:
+    """Tests for InstanceAPI.retrieve() method."""
+
+    def test_retrieve_single_by_instance_id(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        retrieve_url: str,
+    ) -> None:
+        """Test retrieving a single instance by InstanceId."""
+        items = [make_person_item("person-1", "Alice", 30)]
+        respx_mock.post(retrieve_url).respond(json=make_retrieve_response(items))
+
+        instance_id = InstanceId(instance_type="node", space="test", external_id="person-1")
+        result = api._retrieve(instance_id)
+
+        assert result is not None
+        assert isinstance(result, Person)
+        assert result.external_id == "person-1"
+        assert result.name == "Alice"
+
+    def test_retrieve_single_by_string(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        retrieve_url: str,
+    ) -> None:
+        """Test retrieving a single instance by string external_id with space."""
+        items = [make_person_item("person-1", "Alice", 30)]
+        respx_mock.post(retrieve_url).respond(json=make_retrieve_response(items))
+
+        result = api._retrieve("person-1", space="test")
+
+        assert result is not None
+        assert result.external_id == "person-1"
+
+    def test_retrieve_single_by_tuple(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        retrieve_url: str,
+    ) -> None:
+        """Test retrieving a single instance by (space, external_id) tuple."""
+        items = [make_person_item("person-1", "Alice", 30)]
+        respx_mock.post(retrieve_url).respond(json=make_retrieve_response(items))
+
+        result = api._retrieve(("test", "person-1"))
+
+        assert result is not None
+        assert result.external_id == "person-1"
+
+    def test_retrieve_single_not_found(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        retrieve_url: str,
+    ) -> None:
+        """Test retrieving a single instance that doesn't exist returns None."""
+        respx_mock.post(retrieve_url).respond(json=make_retrieve_response([]))
+
+        result = api._retrieve("non-existent", space="test")
+
+        assert result is None
+
+    def test_retrieve_batch(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        retrieve_url: str,
+    ) -> None:
+        """Test retrieving multiple instances."""
+        items = [
+            make_person_item("person-1", "Alice", 30),
+            make_person_item("person-2", "Bob", 25),
+        ]
+        respx_mock.post(retrieve_url).respond(json=make_retrieve_response(items))
+
+        result = api._retrieve(
+            [
+                InstanceId(instance_type="node", space="test", external_id="person-1"),
+                InstanceId(instance_type="node", space="test", external_id="person-2"),
+            ]
+        )
+
+        assert isinstance(result, PersonList)
+        assert len(result) == 2
+        assert result[0].name == "Alice"
+        assert result[1].name == "Bob"
+
+    def test_retrieve_batch_mixed_types(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        retrieve_url: str,
+    ) -> None:
+        """Test retrieving with mixed identifier types."""
+        items = [
+            make_person_item("person-1", "Alice", 30),
+            make_person_item("person-2", "Bob", 25),
+        ]
+        respx_mock.post(retrieve_url).respond(json=make_retrieve_response(items))
+
+        result = api._retrieve(
+            [
+                "person-1",
+                ("test", "person-2"),
+            ],
+            space="test",
+        )
+
+        assert len(result) == 2
+
+    def test_retrieve_empty_list(
+        self,
+        api: InstanceAPI[Person, PersonList],
+    ) -> None:
+        """Test retrieving with an empty list returns empty PersonList."""
+        result = api._retrieve([])
+
+        assert isinstance(result, PersonList)
+        assert len(result) == 0
+
+    def test_retrieve_requires_space_for_string(
+        self,
+        api: InstanceAPI[Person, PersonList],
+    ) -> None:
+        """Test that retrieve raises ValueError when space is missing for string id."""
+        with pytest.raises(ValueError, match="space parameter is required"):
+            api._retrieve("person-1")
+
+    def test_retrieve_request_body_format(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        retrieve_url: str,
+    ) -> None:
+        """Test the request body format for retrieve."""
+        items = [make_person_item("person-1", "Alice", 30)]
+        route = respx_mock.post(retrieve_url).respond(json=make_retrieve_response(items))
+
+        api._retrieve("person-1", space="test", include_typing=True)
+
+        request = route.calls[-1].request
+        body = json.loads(gzip.decompress(request.content))
+
+        assert body == {
+            "items": [{"instanceType": "node", "space": "test", "externalId": "person-1"}],
+            "sources": [{"source": {"type": "view", "space": "test", "externalId": "Person", "version": "1"}}],
+            "includeTyping": True,
+        }
+
+    def test_retrieve_with_executor(
+        self,
+        respx_mock: respx.MockRouter,
+        http_client: HTTPClient,
+        view_ref: ViewReference,
+        retrieve_url: str,
+    ) -> None:
+        """Test retrieving with a thread pool executor."""
+        items = [make_person_item("person-1", "Alice", 30)]
+        respx_mock.post(retrieve_url).respond(json=make_retrieve_response(items))
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            api = InstanceAPI[Person, PersonList](http_client, view_ref, "node", PersonList, retrieve_executor=executor)
+            result = api._retrieve("person-1", space="test")
+
+        assert result is not None
+        assert result.name == "Alice"
+
+
+# =============================================================================
+# Aggregate Tests
+# =============================================================================
+
+
+@pytest.fixture
+def aggregate_url(config: PygenClientConfig) -> str:
+    """Return the URL for aggregating instances."""
+    return config.create_api_url("/models/instances/aggregate")
+
+
+def make_aggregate_response(
+    items: list[dict[str, Any]] | None = None,
+    instance_groups: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Helper to create an aggregate response JSON."""
+    response: dict[str, Any] = {}
+    if items is not None:
+        response["items"] = items
+    if instance_groups is not None:
+        response["instanceGroups"] = instance_groups
+    return response
+
+
+class TestInstanceAPIAggregate:
+    """Tests for InstanceAPI.aggregate() method."""
+
+    def test_aggregate_count(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        aggregate_url: str,
+    ) -> None:
+        """Test count aggregation."""
+        response = make_aggregate_response(items=[{"aggregate": "count", "property": "externalId", "value": 42}])
+        respx_mock.post(aggregate_url).respond(json=response)
+
+        result = api._aggregate("count")
+
+        assert isinstance(result, AggregateResult)
+        assert len(result.items) == 1
+        assert result.items[0].aggregate == "count"
+        assert result.items[0].property == "externalId"
+        assert result.items[0].value == 42
+
+    def test_aggregate_with_aggregation_object(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        aggregate_url: str,
+    ) -> None:
+        """Test aggregation with Aggregation object."""
+        response = make_aggregate_response(items=[{"aggregate": "avg", "property": "age", "value": 27.5}])
+        respx_mock.post(aggregate_url).respond(json=response)
+
+        result = api._aggregate(Avg(property="age"))
+
+        assert len(result.items) == 1
+        assert result.items[0].aggregate == "avg"
+        assert result.items[0].property == "age"
+        assert result.items[0].value == 27.5
+
+    def test_aggregate_multiple(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        aggregate_url: str,
+    ) -> None:
+        """Test multiple aggregations."""
+        response = make_aggregate_response(
+            items=[
+                {"aggregate": "min", "property": "age", "value": 20},
+                {"aggregate": "max", "property": "age", "value": 50},
+                {"aggregate": "avg", "property": "age", "value": 35},
+            ]
+        )
+        respx_mock.post(aggregate_url).respond(json=response)
+
+        result = api._aggregate([Min(property="age"), Max(property="age"), Avg(property="age")])
+
+        assert len(result.items) == 3
+        values = {item.aggregate: item.value for item in result.items}
+        assert values == {"min": 20, "max": 50, "avg": 35}
+
+    def test_aggregate_with_group_by(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        aggregate_url: str,
+    ) -> None:
+        """Test aggregation with group_by."""
+        response = make_aggregate_response(
+            instance_groups=[
+                {
+                    "group": {"category": "A"},
+                    "aggregates": [{"aggregate": "count", "property": "externalId", "value": 10}],
+                },
+                {
+                    "group": {"category": "B"},
+                    "aggregates": [{"aggregate": "count", "property": "externalId", "value": 20}],
+                },
+            ]
+        )
+        respx_mock.post(aggregate_url).respond(json=response)
+
+        result = api._aggregate("count", group_by="category")
+
+        assert len(result.grouped) == 2
+        assert result.grouped[0].group == {"category": "A"}
+        assert result.grouped[0].aggregates[0].value == 10
+        assert result.grouped[1].group == {"category": "B"}
+        assert result.grouped[1].aggregates[0].value == 20
+
+    def test_aggregate_with_filter(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        aggregate_url: str,
+    ) -> None:
+        """Test aggregation with filter."""
+        response = make_aggregate_response(items=[{"aggregate": "count", "property": "externalId", "value": 5}])
+        route = respx_mock.post(aggregate_url).respond(json=response)
+
+        filter_data: Filter = {"equals": EqualsFilterData(property=["test", "Person/1", "name"], value="Alice")}
+        api._aggregate("count", filter=filter_data)
+
+        request = route.calls[-1].request
+        body = json.loads(gzip.decompress(request.content))
+        assert "filter" in body
+        assert "equals" in body["filter"]
+
+    def test_aggregate_request_body_format(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        aggregate_url: str,
+    ) -> None:
+        """Test the request body format for aggregate."""
+        response = make_aggregate_response(items=[{"aggregate": "avg", "property": "age", "value": 27.5}])
+        route = respx_mock.post(aggregate_url).respond(json=response)
+
+        api._aggregate(Avg(property="age"), group_by=["category", "status"], query="test", search_properties=["name"])
+
+        request = route.calls[-1].request
+        body = json.loads(gzip.decompress(request.content))
+
+        assert body["instanceType"] == "node"
+        assert body["view"] == {"type": "view", "space": "test", "externalId": "Person", "version": "1"}
+        assert body["aggregates"] == [{"aggregate": "avg", "property": "age"}]
+        assert body["groupBy"] == ["category", "status"]
+        assert body["query"] == "test"
+        assert body["properties"] == ["name"]
+
+    def test_aggregate_string_literal_with_properties(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        aggregate_url: str,
+    ) -> None:
+        """Test aggregation using string literal with properties."""
+        response = make_aggregate_response(items=[{"aggregate": "sum", "property": "age", "value": 100}])
+        route = respx_mock.post(aggregate_url).respond(json=response)
+
+        api._aggregate("sum", properties="age")
+
+        request = route.calls[-1].request
+        body = json.loads(gzip.decompress(request.content))
+        assert body["aggregates"] == [{"aggregate": "sum", "property": "age"}]
+
+    def test_aggregate_string_literal_requires_properties(
+        self,
+        api: InstanceAPI[Person, PersonList],
+    ) -> None:
+        """Test that non-count string aggregations require properties."""
+        with pytest.raises(ValueError, match="Cannot aggregate 'sum' without specifying properties"):
+            api._aggregate("sum")
+
+    def test_aggregate_multiple_properties(
+        self,
+        respx_mock: respx.MockRouter,
+        api: InstanceAPI[Person, PersonList],
+        aggregate_url: str,
+    ) -> None:
+        """Test aggregation with multiple properties creates multiple aggregates."""
+        response = make_aggregate_response(
+            items=[
+                {"aggregate": "sum", "property": "age", "value": 100},
+                {"aggregate": "sum", "property": "score", "value": 500},
+            ]
+        )
+        route = respx_mock.post(aggregate_url).respond(json=response)
+
+        api._aggregate("sum", properties=["age", "score"])
+
+        request = route.calls[-1].request
+        body = json.loads(gzip.decompress(request.content))
+        assert len(body["aggregates"]) == 2
+        assert body["aggregates"][0] == {"aggregate": "sum", "property": "age"}
+        assert body["aggregates"][1] == {"aggregate": "sum", "property": "score"}
+
+
+# =============================================================================
+# Aggregation Data Class Tests
+# =============================================================================
+
+
+class TestAggregationClasses:
+    """Tests for aggregation data classes."""
+
+    def test_count_serialization(self) -> None:
+        """Test Count aggregation serialization."""
+        agg = Count(property="externalId")
+        result = agg.model_dump(by_alias=True, exclude_none=True)
+        assert result == {"aggregate": "count", "property": "externalId"}
+
+    def test_sum_serialization(self) -> None:
+        """Test Sum aggregation serialization."""
+        agg = Sum(property="price")
+        result = agg.model_dump(by_alias=True, exclude_none=True)
+        assert result == {"aggregate": "sum", "property": "price"}
+
+    def test_avg_serialization(self) -> None:
+        """Test Avg aggregation serialization."""
+        agg = Avg(property="temperature")
+        result = agg.model_dump(by_alias=True, exclude_none=True)
+        assert result == {"aggregate": "avg", "property": "temperature"}
+
+    def test_min_serialization(self) -> None:
+        """Test Min aggregation serialization."""
+        agg = Min(property="startDate")
+        result = agg.model_dump(by_alias=True, exclude_none=True)
+        assert result == {"aggregate": "min", "property": "startDate"}
+
+    def test_max_serialization(self) -> None:
+        """Test Max aggregation serialization."""
+        agg = Max(property="endDate")
+        result = agg.model_dump(by_alias=True, exclude_none=True)
+        assert result == {"aggregate": "max", "property": "endDate"}
+
+    def test_aggregated_value(self) -> None:
+        """Test AggregatedValue deserialization."""
+        value = AggregatedValue(aggregate="count", property="externalId", value=42.0)
+        assert value.aggregate == "count"
+        assert value.property == "externalId"
+        assert value.value == 42.0
+
+    def test_aggregate_result_items(self) -> None:
+        """Test AggregateResult with items."""
+        result = AggregateResult(
+            items=[
+                AggregatedValue(aggregate="count", property="externalId", value=42),
+                AggregatedValue(aggregate="avg", property="age", value=27.5),
+            ]
+        )
+        assert len(result.items) == 2
+        assert len(result.grouped) == 0
+
+    def test_aggregate_result_grouped(self) -> None:
+        """Test AggregateResult with grouped results."""
+        from cognite.pygen._generation.python.instance_api import AggregationGroup
+
+        result = AggregateResult(
+            grouped=[
+                AggregationGroup(
+                    group={"category": "A"}, aggregates=[AggregatedValue(aggregate="count", property="id", value=10)]
+                ),
+                AggregationGroup(
+                    group={"category": "B"}, aggregates=[AggregatedValue(aggregate="count", property="id", value=20)]
+                ),
+            ]
+        )
+        assert len(result.grouped) == 2
+        assert len(result.items) == 0
