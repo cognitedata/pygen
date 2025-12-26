@@ -358,7 +358,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
                 instance_ids,
                 self._RETRIEVE_LIMIT,
                 self._retrieve_executor,
-                lambda chunk: self._retrieve_chunk(chunk, include_typing),
+                lambda chunk: self._retrieve_chunk(chunk, include_typing, target_units),
             )
             for result in results:
                 if isinstance(result, SuccessResponse):
@@ -369,7 +369,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         else:
             # Sequential execution
             for chunk in chunker_sequence(instance_ids, self._RETRIEVE_LIMIT):
-                result = self._retrieve_chunk(chunk, include_typing)
+                result = self._retrieve_chunk(chunk, include_typing, target_units)
                 success = result.get_success_or_raise()
                 response = self._list_response_adapter.validate_json(success.body)
                 all_items.extend(response.items)
@@ -470,7 +470,7 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             List of HTTPResult objects from all tasks.
         """
         futures = [executor.submit(task_fn, chunk) for chunk in chunker_sequence(items, chunk_size)]
-        return [future.result() for future in concurrent.futures.as_completed(futures)]
+        return [future.result() for future in futures]
 
     def _aggregate(
         self,

@@ -143,7 +143,7 @@ AggregatedValue = Annotated[AggregatedNumberValue | AggregatedHistogramValue, Fi
 
 
 class AggregateItem(ResponseBase):
-    instance_type: Literal["node", "edge"] = Field(alias="instanceType")
+    instance_type: Literal["node", "edge"]
     group: dict[str, str | int | float | bool | NodeReference] | None = None
     aggregates: list[AggregatedValue]
 
