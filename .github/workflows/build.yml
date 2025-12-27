@@ -60,7 +60,7 @@ jobs:
       - run: uv sync --all-extras
 
       - name: Test Legacy
-        run: uv run pytest cognite tests/legacy/test_unit -v
+        run: uv run pytest cognite tests/test_python/test_unit -v
 
       - name: Test CLI
         run: uv run pygen --help
