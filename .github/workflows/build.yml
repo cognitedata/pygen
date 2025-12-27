@@ -112,6 +112,17 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "22"
+      # The package.json is for generating TypeScript SDK and has nothing to do with pyodide testing
+      - name: Remove package-lock.json if exists
+        run: |
+          if [ -f package-lock.json ]; then
+            rm package-lock.json
+          fi
+      - name: Remove package.json if exists
+        run: |
+          if [ -f package.json ]; then
+            rm package.json
+          fi
       - name: Install dependencies
         run: npm install pyodide@0.26.2 # stlite currently using pyodide 0.26.2
       - name: Install pygen in pyodide environment
@@ -138,6 +149,17 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "22"
+      # The package.json is for generating TypeScript SDK and has nothing to do with pyodide testing
+      - name: Remove package-lock.json if exists
+        run: |
+          if [ -f package-lock.json ]; then
+            rm package-lock.json
+          fi
+      - name: Remove package.json if exists
+        run: |
+          if [ -f package.json ]; then
+            rm package.json
+          fi
       - name: Install dependencies
         run: npm install pyodide@0.26.2 # JupyterLite currently using pyodide 0.26.2
       - name: Install pygen in pyodide environment
@@ -147,6 +169,31 @@ jobs:
           PYGEN_FILE_PATH=$whl_file \
           PACKAGES="[\"pyodide-http\", \"pandas\", \"typing-extensions>=4.14.0\", \"http://localhost:3000/dist/$whl_file\"]" \
           node test-pyodide.js
+
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: TypeScript compilation check
+        run: npm run typecheck
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Lint check
+        run: npm run lint
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
 
   validate-description:
     name: Validate PR description
