@@ -6,6 +6,8 @@ on:
 
 env:
   PYTHON_VERSION: '3.13'
+  NODE_VERSION: '22'
+  TYPESCRIPT_DIR: 'cognite/pygen/_generation/typescript'
 
 jobs:
   lint:
@@ -95,6 +97,38 @@ jobs:
             coverageFile: coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
             thresholdAll: 0.95
+
+  typescript:
+    name: TypeScript SDK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.TYPESCRIPT_DIR }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Test with coverage
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build
 
   build_and_test_streamlit_pyodide:
     runs-on: ubuntu-latest
