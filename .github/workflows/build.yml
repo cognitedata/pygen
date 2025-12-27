@@ -148,6 +148,37 @@ jobs:
           PACKAGES="[\"pyodide-http\", \"pandas\", \"typing-extensions>=4.14.0\", \"http://localhost:3000/dist/$whl_file\"]" \
           node test-pyodide.js
 
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: TypeScript compilation check
+        run: npm run typecheck
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Install test dependencies
+        working-directory: tests/typescript
+        run: npm install
+
+      - name: Lint check
+        working-directory: tests/typescript
+        run: npm run lint
+
+      - name: Run tests with coverage
+        working-directory: tests/typescript
+        run: npm run test:coverage
+
   validate-description:
     name: Validate PR description
     runs-on: ubuntu-latest
