@@ -261,5 +261,8 @@ class TestExampleAPI:
 
         assert isinstance(result, AggregateResponse)
         assert len(result.items) == 1
-        assert isinstance(result.items[0], AggregatedNumberValue)
-        assert result.items[0].aggregates[0].value == 37
+        aggregates = result.items[0].aggregates
+        assert len(aggregates) == 1
+        aggregate = aggregates[0]
+        assert isinstance(aggregate, AggregatedNumberValue)
+        assert aggregate.value == 37

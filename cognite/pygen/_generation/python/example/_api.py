@@ -7,7 +7,7 @@ type-safe methods using unpacked parameters for common filter operations.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from datetime import date
+from datetime import date, datetime
 from typing import Literal, overload
 
 from cognite.pygen._generation.python.instance_api._api import InstanceAPI
@@ -496,8 +496,8 @@ class RelatesToAPI(InstanceAPI[RelatesTo, RelatesToList]):
         relation_type: str | list[str] | None = None,
         min_strength: float | None = None,
         max_strength: float | None = None,
-        min_created_at: date | None = None,
-        max_created_at: date | None = None,
+        min_created_at: datetime | None = None,
+        max_created_at: datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         cursor: str | None = None,
@@ -534,8 +534,8 @@ class RelatesToAPI(InstanceAPI[RelatesTo, RelatesToList]):
         relation_type: str | list[str] | None = None,
         min_strength: float | None = None,
         max_strength: float | None = None,
-        min_created_at: date | None = None,
-        max_created_at: date | None = None,
+        min_created_at: datetime | None = None,
+        max_created_at: datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = 25,
@@ -572,8 +572,8 @@ class RelatesToAPI(InstanceAPI[RelatesTo, RelatesToList]):
         relation_type: str | list[str] | None = None,
         min_strength: float | None = None,
         max_strength: float | None = None,
-        min_created_at: date | None = None,
-        max_created_at: date | None = None,
+        min_created_at: datetime | None = None,
+        max_created_at: datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
     ) -> AggregateResponse:
@@ -606,8 +606,8 @@ class RelatesToAPI(InstanceAPI[RelatesTo, RelatesToList]):
         relation_type: str | list[str] | None = None,
         min_strength: float | None = None,
         max_strength: float | None = None,
-        min_created_at: date | None = None,
-        max_created_at: date | None = None,
+        min_created_at: datetime | None = None,
+        max_created_at: datetime | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         sort_by: str | None = None,

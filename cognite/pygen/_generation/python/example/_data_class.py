@@ -15,6 +15,7 @@ from cognite.pygen._generation.python.instance_api.models._types import Date, Da
 from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
     BooleanFilter,
     DateFilter,
+    DateTimeFilter,
     DirectRelationFilter,
     FilterContainer,
     FloatFilter,
@@ -182,7 +183,7 @@ class RelatesToFilter(FilterContainer):
         view_id = RelatesTo._view_id
         self.relation_type = TextFilter(view_id, "relationType", operator)
         self.strength = FloatFilter(view_id, "strength", operator)
-        self.created_at = DateFilter(view_id, "createdAt", operator)
+        self.created_at = DateTimeFilter(view_id, "createdAt", operator)
         super().__init__(
             data_type_filters=[
                 self.relation_type,
