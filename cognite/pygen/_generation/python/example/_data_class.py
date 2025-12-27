@@ -96,6 +96,7 @@ class ProductNodeFilter(FilterContainer):
                 self.created_date,
             ],
             operator=operator,
+            instance_type="node",
         )
 
 
@@ -119,17 +120,26 @@ class CategoryNode(Instance):
 
     def as_write(self) -> CategoryNodeWrite:
         """Convert to write representation."""
-        return CategoryNodeWrite(
-            space=self.space,
-            external_id=self.external_id,
-            category_name=self.category_name,
-        )
+        return CategoryNodeWrite.model_validate(self.model_dump(by_alias=True))
 
 
 class CategoryNodeList(InstanceList[CategoryNode]):
     """List of CategoryNode instances."""
 
     _INSTANCE: ClassVar[type[CategoryNode]] = CategoryNode
+
+
+class CategoryNodeFilter(FilterContainer):
+    def __init__(self, operator: Literal["and", "or"] = "and") -> None:
+        view_id = CategoryNode._view_id
+        self.category_name = TextFilter(view_id, "categoryName", operator)
+        super().__init__(
+            data_type_filters=[
+                self.category_name,
+            ],
+            operator=operator,
+            instance_type="node",
+        )
 
 
 class RelatesToWrite(InstanceWrite):
@@ -157,18 +167,27 @@ class RelatesTo(Instance):
 
     def as_write(self) -> RelatesToWrite:
         """Convert to write representation."""
-        return RelatesToWrite(
-            space=self.space,
-            external_id=self.external_id,
-            start_node=self.start_node,
-            end_node=self.end_node,
-            relation_type=self.relation_type,
-            strength=self.strength,
-            created_at=self.created_at,
-        )
+        return RelatesToWrite.model_validate(self.model_dump(by_alias=True))
 
 
 class RelatesToList(InstanceList[RelatesTo]):
     """List of RelatesTo edge instances."""
 
     _INSTANCE: ClassVar[type[RelatesTo]] = RelatesTo
+
+
+class RelatesToFilter(FilterContainer):
+    def __init__(self, operator: Literal["and", "or"] = "and") -> None:
+        view_id = RelatesTo._view_id
+        self.relation_type = TextFilter(view_id, "relationType", operator)
+        self.strength = FloatFilter(view_id, "strength", operator)
+        self.created_at = DateFilter(view_id, "createdAt", operator)
+        super().__init__(
+            data_type_filters=[
+                self.relation_type,
+                self.strength,
+                self.created_at,
+            ],
+            operator=operator,
+            instance_type="edge",
+        )
