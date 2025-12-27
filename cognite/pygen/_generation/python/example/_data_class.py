@@ -1,13 +1,22 @@
-from typing import Literal
+"""Data classes for the example SDK.
 
-from pydantic import Field, JsonValue
+This module contains the data classes for the example data model with:
+- ProductNode: Node view with various property types and a direct relation to CategoryNode
+- CategoryNode: Node view with a reverse direct relation to ProductNode
+- RelatesTo: Edge view for relating nodes
+"""
 
-from cognite.pygen._generation.python.instance_api.models._references import ViewReference
+from typing import ClassVar, Literal
+
+from pydantic import Field
+
+from cognite.pygen._generation.python.instance_api.models._references import NodeReference, ViewReference
 from cognite.pygen._generation.python.instance_api.models._types import Date, DateTime
 from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
     BooleanFilter,
     DateFilter,
     DateTimeFilter,
+    DirectRelationFilter,
     FilterContainer,
     FloatFilter,
     IntegerFilter,
@@ -15,67 +24,172 @@ from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
 )
 from cognite.pygen._generation.python.instance_api.models.instance import (
     Instance,
+    InstanceId,
     InstanceList,
     InstanceWrite,
 )
 
 
-class PrimitiveNullableWrite(InstanceWrite):
+class ProductNodeWrite(InstanceWrite):
+    """Write class for ProductNode instances."""
+
+    _view_id: ClassVar[ViewReference] = ViewReference(
+        space="pygen_example", external_id="ProductNodeWrite", version="v1"
+    )
     instance_type: Literal["node"] = Field("node", alias="instanceType")
-    text: str | None = None
-    boolean: bool | None = None
-    float32: float | None = None
-    float64: float | None = None
-    int32: int | None = None
-    int64: int | None = None
-    timestamp: DateTime | None = None
-    date_: Date | None = None
-    json_: JsonValue | None = Field(None, alias="json")
+    name: str
+    description: str | None = None
+    tags: list[str] | None = None
+    price: float
+    prices: list[float] | None = None
+    quantity: int
+    quantities: list[int] | None = None
+    active: bool | None = None
+    created_date: Date = Field(alias="createdDate")
+    updated_timestamp: DateTime | None = Field(None, alias="updatedTimestamp")
+    category: InstanceId | tuple[str, str] | None = None
 
 
-class PrimitiveNullable(Instance):
-    _view_id = ViewReference(space="sp_pygen_models", external_id="PrimitiveNullable", version="v1")
+class ProductNode(Instance):
+    """Read class for ProductNode instances."""
+
+    _view_id: ClassVar[ViewReference] = ViewReference(space="pygen_example", external_id="ProductNode", version="v1")
     instance_type: Literal["node"] = Field("node", alias="instanceType")
-    text: str | None
-    boolean: bool | None
-    float32: float | None
-    float64: float | None
-    int32: int | None
-    int64: int | None
-    timestamp: DateTime | None
-    date_: Date | None = Field(None, alias="date")
-    json_: JsonValue | None = Field(None, alias="json")
+    name: str
+    description: str | None = None
+    tags: list[str] | None = None
+    price: float
+    prices: list[float] | None = None
+    quantity: int
+    quantities: list[int] | None = None
+    active: bool | None = None
+    created_date: Date = Field(alias="createdDate")
+    updated_timestamp: DateTime | None = Field(None, alias="updatedTimestamp")
+    category: InstanceId | None = None
 
-    def as_write(self) -> PrimitiveNullableWrite:
-        return PrimitiveNullableWrite.model_validate(self.dump())
+    def as_write(self) -> ProductNodeWrite:
+        """Convert to write representation."""
+        return ProductNodeWrite.model_validate(self.model_dump(by_alias=True))
 
 
-class PrimitiveNullableList(InstanceList[PrimitiveNullable]):
-    _INSTANCE = PrimitiveNullable
+class ProductNodeList(InstanceList[ProductNode]):
+    """List of ProductNode instances."""
+
+    _INSTANCE: ClassVar[type[ProductNode]] = ProductNode
 
 
-class PrimitiveNullableFilter(FilterContainer):
-    def __init__(self, operator: Literal["and", "or"]) -> None:
-        view_id = PrimitiveNullable._view_id
-        self.text = TextFilter(view_id, "text", operator)
-        self.boolean = BooleanFilter(view_id, "boolean", operator)
-        self.float32 = FloatFilter(view_id, "float32", operator)
-        self.float64 = FloatFilter(view_id, "float64", operator)
-        self.int32 = IntegerFilter(view_id, "int32", operator)
-        self.int64 = IntegerFilter(view_id, "int64", operator)
-        self.timestamp = DateTimeFilter(view_id, "timestamp", operator)
-        self.date_ = DateFilter(view_id, "date", operator)
+class ProductNodeFilter(FilterContainer):
+    def __init__(self, operator: Literal["and", "or"] = "and") -> None:
+        view_id = ProductNode._view_id
+        self.name = TextFilter(view_id, "name", operator)
+        self.description = TextFilter(view_id, "description", operator)
+        self.price = FloatFilter(view_id, "price", operator)
+        self.quantity = IntegerFilter(view_id, "quantity", operator)
+        self.active = BooleanFilter(view_id, "active", operator)
+        self.created_date = DateFilter(view_id, "createdDate", operator)
+        self.category = DirectRelationFilter(view_id, "category", operator)
         super().__init__(
-            [
-                self.text,
-                self.boolean,
-                self.float32,
-                self.float64,
-                self.int32,
-                self.int64,
-                self.timestamp,
-                self.date_,
+            data_type_filters=[
+                self.name,
+                self.description,
+                self.price,
+                self.quantity,
+                self.active,
+                self.created_date,
+                self.category,
             ],
-            operator,
-            "node",
+            operator=operator,
+            instance_type="node",
+        )
+
+
+class CategoryNodeWrite(InstanceWrite):
+    """Write class for CategoryNode instances."""
+
+    _view_id: ClassVar[ViewReference] = ViewReference(
+        space="pygen_example", external_id="CategoryNodeWrite", version="v1"
+    )
+    instance_type: Literal["node"] = Field("node", alias="instanceType")
+    category_name: str = Field(alias="categoryName")
+
+
+class CategoryNode(Instance):
+    """Read class for CategoryNode instances."""
+
+    _view_id: ClassVar[ViewReference] = ViewReference(space="pygen_example", external_id="CategoryNode", version="v1")
+    instance_type: Literal["node"] = Field("node", alias="instanceType")
+    category_name: str = Field(alias="categoryName")
+
+    def as_write(self) -> CategoryNodeWrite:
+        """Convert to write representation."""
+        return CategoryNodeWrite.model_validate(self.model_dump(by_alias=True))
+
+
+class CategoryNodeList(InstanceList[CategoryNode]):
+    """List of CategoryNode instances."""
+
+    _INSTANCE: ClassVar[type[CategoryNode]] = CategoryNode
+
+
+class CategoryNodeFilter(FilterContainer):
+    def __init__(self, operator: Literal["and", "or"] = "and") -> None:
+        view_id = CategoryNode._view_id
+        self.category_name = TextFilter(view_id, "categoryName", operator)
+        super().__init__(
+            data_type_filters=[
+                self.category_name,
+            ],
+            operator=operator,
+            instance_type="node",
+        )
+
+
+class RelatesToWrite(InstanceWrite):
+    """Write class for RelatesTo edge instances."""
+
+    _view_id: ClassVar[ViewReference] = ViewReference(space="pygen_example", external_id="RelatesToWrite", version="v1")
+    instance_type: Literal["edge"] = Field("edge", alias="instanceType")
+    start_node: NodeReference = Field(alias="startNode")
+    end_node: NodeReference = Field(alias="endNode")
+    relation_type: str = Field(alias="relationType")
+    strength: float | None = None
+    created_at: DateTime = Field(alias="createdAt")
+
+
+class RelatesTo(Instance):
+    """Read class for RelatesTo edge instances."""
+
+    _view_id: ClassVar[ViewReference] = ViewReference(space="pygen_example", external_id="RelatesTo", version="v1")
+    instance_type: Literal["edge"] = Field("edge", alias="instanceType")
+    start_node: NodeReference = Field(alias="startNode")
+    end_node: NodeReference = Field(alias="endNode")
+    relation_type: str = Field(alias="relationType")
+    strength: float | None = None
+    created_at: DateTime = Field(alias="createdAt")
+
+    def as_write(self) -> RelatesToWrite:
+        """Convert to write representation."""
+        return RelatesToWrite.model_validate(self.model_dump(by_alias=True))
+
+
+class RelatesToList(InstanceList[RelatesTo]):
+    """List of RelatesTo edge instances."""
+
+    _INSTANCE: ClassVar[type[RelatesTo]] = RelatesTo
+
+
+class RelatesToFilter(FilterContainer):
+    def __init__(self, operator: Literal["and", "or"] = "and") -> None:
+        view_id = RelatesTo._view_id
+        self.relation_type = TextFilter(view_id, "relationType", operator)
+        self.strength = FloatFilter(view_id, "strength", operator)
+        self.created_at = DateTimeFilter(view_id, "createdAt", operator)
+        super().__init__(
+            data_type_filters=[
+                self.relation_type,
+                self.strength,
+                self.created_at,
+            ],
+            operator=operator,
+            instance_type="edge",
         )

@@ -75,7 +75,11 @@ class InstanceModel(BaseModel, populate_by_name=True):
             data_record = data.pop("data_record", {})
             property_values: dict[str, Any] = {}
             for key in list(data.keys()):
-                if key not in InstanceModel.model_fields and key not in _INSTANCE_MODEL_ALIASES:
+                if (
+                    key not in InstanceModel.model_fields
+                    and key not in _INSTANCE_MODEL_ALIASES
+                    and key not in {"startNode", "endNode"}
+                ):
                     property_values[key] = data.pop(key)
             data["properties"] = {
                 self._view_id.space: {f"{self._view_id.external_id}/{self._view_id.version}": property_values}
