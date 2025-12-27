@@ -83,26 +83,26 @@ class FilterContainer:
 class FloatFilter(DataTypeFilter):
     """Filter for float/numeric properties."""
 
-    def _validate_value(self, value: float | int) -> float:
-        return float(value)
+    def _validate_value(self, value: float | int | None) -> float | None:
+        return float(value) if value is not None else None
 
-    def equals(self, value: float | int) -> Self:
+    def equals(self, value: float | int | None) -> Self:
         """Filter for values equal to the given value."""
         return self._add_filter("equals", "value", self._validate_value(value))
 
-    def less_than(self, value: float | int) -> Self:
+    def less_than(self, value: float | int | None) -> Self:
         """Filter for values less than the given value."""
         return self._add_filter("range", "lt", self._validate_value(value))
 
-    def less_than_or_equals(self, value: float | int) -> Self:
+    def less_than_or_equals(self, value: float | int | None) -> Self:
         """Filter for values less than or equal to the given value."""
         return self._add_filter("range", "lte", self._validate_value(value))
 
-    def greater_than(self, value: float | int) -> Self:
+    def greater_than(self, value: float | int | None) -> Self:
         """Filter for values greater than the given value."""
         return self._add_filter("range", "gt", self._validate_value(value))
 
-    def greater_than_or_equals(self, value: float | int) -> Self:
+    def greater_than_or_equals(self, value: float | int | None) -> Self:
         """Filter for values greater than or equal to the given value."""
         return self._add_filter("range", "gte", self._validate_value(value))
 
@@ -110,26 +110,26 @@ class FloatFilter(DataTypeFilter):
 class IntegerFilter(DataTypeFilter):
     """Filter for integer properties."""
 
-    def _validate_value(self, value: int) -> int:
-        return int(value)
+    def _validate_value(self, value: int | None) -> int | None:
+        return int(value) if value is not None else None
 
-    def equals(self, value: int) -> Self:
+    def equals(self, value: int | None) -> Self:
         """Filter for values equal to the given value."""
         return self._add_filter("equals", "value", self._validate_value(value))
 
-    def less_than(self, value: int) -> Self:
+    def less_than(self, value: int | None) -> Self:
         """Filter for values less than the given value."""
         return self._add_filter("range", "lt", self._validate_value(value))
 
-    def less_than_or_equals(self, value: int) -> Self:
+    def less_than_or_equals(self, value: int | None) -> Self:
         """Filter for values less than or equal to the given value."""
         return self._add_filter("range", "lte", self._validate_value(value))
 
-    def greater_than(self, value: int) -> Self:
+    def greater_than(self, value: int | None) -> Self:
         """Filter for values greater than the given value."""
         return self._add_filter("range", "gt", self._validate_value(value))
 
-    def greater_than_or_equals(self, value: int) -> Self:
+    def greater_than_or_equals(self, value: int | None) -> Self:
         """Filter for values greater than or equal to the given value."""
         return self._add_filter("range", "gte", self._validate_value(value))
 
@@ -137,7 +137,9 @@ class IntegerFilter(DataTypeFilter):
 class DateTimeFilter(DataTypeFilter):
     """Filter for datetime properties."""
 
-    def _validate_value(self, value: datetime | str) -> str:
+    def _validate_value(self, value: datetime | str | None) -> str | None:
+        if value is None:
+            return None
         if isinstance(value, datetime):
             return value.isoformat(timespec="milliseconds")
         if isinstance(value, str):
@@ -146,23 +148,23 @@ class DateTimeFilter(DataTypeFilter):
             return value
         raise TypeError(f"Expected datetime or ISO format string, got {type(value)}")
 
-    def equals(self, value: datetime | str) -> Self:
+    def equals(self, value: datetime | str | None) -> Self:
         """Filter for values equal to the given value."""
         return self._add_filter("equals", "value", self._validate_value(value))
 
-    def less_than(self, value: datetime | str) -> Self:
+    def less_than(self, value: datetime | str | None) -> Self:
         """Filter for values less than the given value."""
         return self._add_filter("range", "lt", self._validate_value(value))
 
-    def less_than_or_equals(self, value: datetime | str) -> Self:
+    def less_than_or_equals(self, value: datetime | str | None) -> Self:
         """Filter for values less than or equal to the given value."""
         return self._add_filter("range", "lte", self._validate_value(value))
 
-    def greater_than(self, value: datetime | str) -> Self:
+    def greater_than(self, value: datetime | str | None) -> Self:
         """Filter for values greater than the given value."""
         return self._add_filter("range", "gt", self._validate_value(value))
 
-    def greater_than_or_equals(self, value: datetime | str) -> Self:
+    def greater_than_or_equals(self, value: datetime | str | None) -> Self:
         """Filter for values greater than or equal to the given value."""
         return self._add_filter("range", "gte", self._validate_value(value))
 
@@ -170,7 +172,9 @@ class DateTimeFilter(DataTypeFilter):
 class DateFilter(DataTypeFilter):
     """Filter for date properties."""
 
-    def _validate_value(self, value: date | str) -> str:
+    def _validate_value(self, value: date | str | None) -> str | None:
+        if value is None:
+            return None
         if isinstance(value, date) and not isinstance(value, datetime):
             return value.isoformat()
         if isinstance(value, str):
@@ -179,23 +183,23 @@ class DateFilter(DataTypeFilter):
             return value
         raise TypeError(f"Expected date or ISO format string, got {type(value)}")
 
-    def equals(self, value: date | str) -> Self:
+    def equals(self, value: date | str | None) -> Self:
         """Filter for values equal to the given value."""
         return self._add_filter("equals", "value", self._validate_value(value))
 
-    def less_than(self, value: date | str) -> Self:
+    def less_than(self, value: date | str | None) -> Self:
         """Filter for values less than the given value."""
         return self._add_filter("range", "lt", self._validate_value(value))
 
-    def less_than_or_equals(self, value: date | str) -> Self:
+    def less_than_or_equals(self, value: date | str | None) -> Self:
         """Filter for values less than or equal to the given value."""
         return self._add_filter("range", "lte", self._validate_value(value))
 
-    def greater_than(self, value: date | str) -> Self:
+    def greater_than(self, value: date | str | None) -> Self:
         """Filter for values greater than the given value."""
         return self._add_filter("range", "gt", self._validate_value(value))
 
-    def greater_than_or_equals(self, value: date | str) -> Self:
+    def greater_than_or_equals(self, value: date | str | None) -> Self:
         """Filter for values greater than or equal to the given value."""
         return self._add_filter("range", "gte", self._validate_value(value))
 
