@@ -10,7 +10,7 @@
 
 **Timeline**: 28-42 weeks (7-10 months)
 
-**Status**: Phase 2 In Progress (75% complete) 🔄
+**Status**: Phase 2 Complete ✅ - Ready for Phase 3
 
 ---
 
@@ -30,7 +30,7 @@
 |-------|------|----------|--------|-----------------|
 | 0 | Foundation | 1 week | ✅ Complete | Project reorganized, v1 in legacy/ |
 | 1 | Pygen Client | 3-4 weeks | ✅ Complete | httpx-based CDF client with HTTPClient |
-| 2 | Generic Instance API (Python) | 3-4 weeks | 🔄 In Progress (75%) | InstanceClient, InstanceAPI, Example SDK |
+| 2 | Generic Instance API (Python) | 3-4 weeks | ✅ Complete | InstanceClient, InstanceAPI, Example SDK |
 | 3 | Generic Instance API (TypeScript) | 3-4 weeks | ⏳ Pending | TypeScript equivalent of Phase 2 |
 | 4 | Intermediate Representation (IR) | 3-4 weeks | ⏳ Pending | Validation + Language-agnostic IR |
 | 5 | Code Generation from IR | 4-6 weeks | ⏳ Pending | Python & TypeScript SDK generation |
@@ -210,8 +210,7 @@ pygen generate --config pygen.yaml
 ### Technical
 - [x] Phase 0 complete (Foundation)
 - [x] Phase 1 complete (Full client with HTTPClient, Auth, Resource Clients)
-- [x] Phase 2 Tasks 1-3.b complete (InstanceClient, InstanceAPI)
-- [ ] Phase 2 complete (Example SDK)
+- [x] Phase 2 complete (InstanceClient, InstanceAPI, Example SDK)
 - [ ] Test coverage >90%
 - [ ] 5-10x performance improvement
 - [ ] Memory usage O(chunk_size)
@@ -301,7 +300,7 @@ pygen generate --config pygen.yaml
 | **M0** | Phase 0 complete (Foundation) | Week 1 | ✅ Complete |
 | **M1** | Phase 1 complete (Full client) | Week 2 | ✅ Complete |
 | **M1.5** | Phase 2 Tasks 1-3.b complete (InstanceClient, InstanceAPI) | Week 3 | ✅ Complete |
-| **M2** | Phase 2 complete (Example SDK) | Month 1 | 🔄 In Progress |
+| **M2** | Phase 2 complete (Example SDK) | Month 1 | ✅ Complete |
 | **M3** | Phase 5 complete (Can generate Python & TypeScript) | Month 4 | ⏳ Pending |
 | **M4** | Phase 6 complete (Feature parity) | Month 6 | ⏳ Pending |
 | **M5** | Phase 10 complete (v2.0.0) | Month 9 | ⏳ Pending |
@@ -448,7 +447,7 @@ A: Modern type hints, pattern matching, performance.
 
 **Phase 1**: ✅ Complete (December 22, 2025)
 
-**Phase 2**: 🔄 In Progress (75% complete)
+**Phase 2**: ✅ Complete (December 27, 2025)
 
 **Current Progress**:
 - ✅ Phase 0 complete - Project reorganized
@@ -460,33 +459,29 @@ A: Modern type hints, pattern matching, performance.
   - Resource clients (Spaces, DataModels, Views, Containers)
   - Error handling with custom exception hierarchy
   - Comprehensive test suite
-- ✅ Phase 2 Task 1: Generic Instance Models complete
+- ✅ Phase 2 complete - Generic Instance API & Example SDK (Python)
   - InstanceModel, Instance, InstanceWrite base classes
   - InstanceList with pagination and pandas integration
   - ViewRef, DataRecord, DataRecordWrite
-- ✅ Phase 2 Task 2: Generic InstanceClient complete
-  - CRUD operations (upsert, delete)
+  - InstanceClient with CRUD operations (upsert, delete)
   - Thread pool executors for concurrency
   - InstanceResult tracking
-- ✅ Phase 2 Task 3.a: Generic InstanceAPI Part 1 complete
-  - iterate(), list(), search() methods
+  - InstanceAPI with iterate(), list(), search(), retrieve(), aggregate()
   - Filtering, sorting, unit data structures
-- ✅ Phase 2 Task 3.b: Generic InstanceAPI Part 2 complete
-  - retrieve() with single/batch support
-  - aggregate() for aggregations
-- ⏳ Phase 2 Task 4: Example API Classes (next)
+  - Example client and API classes based on example data model
+  - Type-safe retrieve/list/iterate methods with unpacked parameters
 
-**Next Phase**: Phase 3 - Generic Instance API (TypeScript)
+**Next Phase**: Phase 3 - Generic Instance API & Example SDK (TypeScript)
 
 **Next Steps**:
-1. Build example client and API classes based on example data model
-2. Create ExampleClient extending InstanceClient
-3. Create view-specific API classes extending InstanceAPI
-4. Implement type-safe methods with unpacked parameters
+1. Create TypeScript equivalent of Python generic API
+2. Build TypeScript InstanceClient and InstanceAPI
+3. Create TypeScript example SDK following same patterns
+4. Ensure type safety with TypeScript generics
 
 ---
 
-**Document Version**: 1.3
-**Last Updated**: December 26, 2025
+**Document Version**: 1.4
+**Last Updated**: December 27, 2025
 **For Details**: See full planning documents in `plan/` folder
 
