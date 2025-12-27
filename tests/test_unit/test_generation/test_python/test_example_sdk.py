@@ -1,26 +1,27 @@
 """Tests for the Example SDK (ProductNode, CategoryNode, RelatesTo)."""
 
-import gzip
-import json
+from collections import UserList
 from collections.abc import Iterator
-from datetime import date
-from typing import Any
+from typing import Any, ClassVar
 
 import pytest
 import respx
 
 from cognite.pygen._generation.python.example import (
     CategoryNode,
-    CategoryNodeList,
-    CategoryNodeWrite,
     ExampleClient,
     ProductNode,
-    ProductNodeList,
-    ProductNodeWrite,
     RelatesTo,
-    RelatesToList,
 )
-from cognite.pygen._generation.python.instance_api import Instance, InstanceWrite
+from cognite.pygen._generation.python.example._api import CategoryNodeAPI, ProductNodeAPI, RelatesToAPI
+from cognite.pygen._generation.python.instance_api import (
+    AggregatedNumberValue,
+    AggregateResponse,
+    Count,
+    Instance,
+    InstanceAPI,
+    InstanceWrite,
+)
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 
 
@@ -32,26 +33,32 @@ def example_client(pygen_client_config: PygenClientConfig) -> Iterator[ExampleCl
 
 
 @pytest.fixture
-def list_url(config: PygenClientConfig) -> str:
+def list_url(pygen_client_config: PygenClientConfig) -> str:
     """Return the URL for listing instances."""
-    return config.create_api_url("/models/instances/list")
+    return pygen_client_config.create_api_url("/models/instances/list")
 
 
 @pytest.fixture
-def retrieve_url(config: PygenClientConfig) -> str:
+def retrieve_url(pygen_client_config: PygenClientConfig) -> str:
     """Return the URL for retrieving instances."""
-    return config.create_api_url("/models/instances/byids")
+    return pygen_client_config.create_api_url("/models/instances/byids")
 
 
 @pytest.fixture
-def search_url(config: PygenClientConfig) -> str:
+def search_url(pygen_client_config: PygenClientConfig) -> str:
     """Return the URL for searching instances."""
-    return config.create_api_url("/models/instances/search")
+    return pygen_client_config.create_api_url("/models/instances/search")
+
+
+@pytest.fixture
+def aggregate_url(pygen_client_config: PygenClientConfig) -> str:
+    """Return the URL for aggregating instances."""
+    return pygen_client_config.create_api_url("/models/instances/aggregate")
 
 
 def _get_raw_response(item_type: str) -> dict[str, Any]:
     """Helper to get raw data for different item types."""
-    if item_type == "product":
+    if item_type == "product_node":
         return {
             "instanceType": "node",
             "space": "pygen_example",
@@ -78,7 +85,7 @@ def _get_raw_response(item_type: str) -> dict[str, Any]:
                 }
             },
         }
-    elif item_type == "category":
+    elif item_type == "category_node":
         return {
             "instanceType": "node",
             "space": "pygen_example",
@@ -115,18 +122,18 @@ def _get_raw_response(item_type: str) -> dict[str, Any]:
 
 
 class TestExampleAPI:
-    @pytest.mark.parametrize(
-        "item_type, item_cls",
-        [
-            pytest.param("product", ProductNode, id="ProductNode"),
-            pytest.param("category", CategoryNode, id="CategoryNode"),
-            pytest.param("relates_to", RelatesTo, id="RelatesTo edge"),
-        ],
-    )
+    API_CLASSES: ClassVar[list[tuple]] = [
+        pytest.param("product_node", ProductNode, ProductNodeAPI, id="ProductNode"),
+        pytest.param("category_node", CategoryNode, CategoryNodeAPI, id="CategoryNode"),
+        pytest.param("relates_to", RelatesTo, RelatesToAPI, id="RelatesTo edge"),
+    ]
+
+    @pytest.mark.parametrize("item_type, item_cls, api_cls", API_CLASSES)
     def test_data_class_serialization(
         self,
         item_type: str,
         item_cls: type[Instance],
+        api_cls: type[InstanceAPI],
     ) -> None:
         """Test data class parsing and serialization."""
         raw_data = _get_raw_response(item_type)
@@ -137,417 +144,122 @@ class TestExampleAPI:
         writable = item.as_write()
         assert isinstance(writable, InstanceWrite)
 
-
-def make_list_response(items: list[dict[str, Any]], next_cursor: str | None = None) -> dict[str, Any]:
-    """Helper to create a list response JSON."""
-    response: dict[str, Any] = {"items": items}
-    if next_cursor:
-        response["nextCursor"] = next_cursor
-    return response
-
-
-def make_product_item(
-    external_id: str,
-    name: str,
-    price: float,
-    quantity: int,
-    created_date: str = "2024-01-01",
-    description: str | None = None,
-    active: bool | None = None,
-) -> dict[str, Any]:
-    """Helper to create a ProductNode instance JSON."""
-    props = {
-        "name": name,
-        "price": price,
-        "quantity": quantity,
-        "createdDate": created_date,
-    }
-    if description is not None:
-        props["description"] = description
-    if active is not None:
-        props["active"] = active
-    return {
-        "instanceType": "node",
-        "space": "pygen_example",
-        "externalId": external_id,
-        "version": 1,
-        "lastUpdatedTime": 1234567890000,
-        "createdTime": 1234567890000,
-        "properties": {"pygen_example": {"ProductNode/v1": props}},
-    }
-
-
-def make_category_item(external_id: str, category_name: str) -> dict[str, Any]:
-    """Helper to create a CategoryNode instance JSON."""
-    return {
-        "instanceType": "node",
-        "space": "pygen_example",
-        "externalId": external_id,
-        "version": 1,
-        "lastUpdatedTime": 1234567890000,
-        "createdTime": 1234567890000,
-        "properties": {"pygen_example": {"CategoryNode/v1": {"categoryName": category_name}}},
-    }
-
-
-def make_relates_to_item(
-    external_id: str,
-    relation_type: str,
-    created_at: str = "2024-01-01T00:00:00.000",
-    strength: float | None = None,
-) -> dict[str, Any]:
-    """Helper to create a RelatesTo edge instance JSON."""
-    props: dict[str, Any] = {"relationType": relation_type, "createdAt": created_at}
-    if strength is not None:
-        props["strength"] = strength
-    return {
-        "instanceType": "edge",
-        "space": "pygen_example",
-        "externalId": external_id,
-        "version": 1,
-        "lastUpdatedTime": 1234567890000,
-        "createdTime": 1234567890000,
-        "startNode": {"space": "pygen_example", "externalId": "start-node"},
-        "endNode": {"space": "pygen_example", "externalId": "end-node"},
-        "properties": {"pygen_example": {"RelatesTo/v1": props}},
-    }
-
-
-class TestProductNodeDataClass:
-    """Tests for ProductNode data classes."""
-
-    def test_product_node_parse_from_api(self) -> None:
-        """Test parsing ProductNode from API response format."""
-        data = make_product_item("product-1", "Widget", 19.99, 100, description="A widget", active=True)
-        product = ProductNode.model_validate(data)
-
-        assert product.external_id == "product-1"
-        assert product.name == "Widget"
-        assert product.price == 19.99
-        assert product.quantity == 100
-        assert product.description == "A widget"
-        assert product.active is True
-        assert product.created_date == date(2024, 1, 1)
-
-    def test_product_node_write_serialization(self) -> None:
-        """Test ProductNodeWrite serialization to API format."""
-        write = ProductNodeWrite(
-            space="pygen_example",
-            external_id="product-1",
-            name="Widget",
-            price=19.99,
-            quantity=100,
-            created_date=date(2024, 1, 15),
-        )
-        dumped = write.dump(camel_case=True, format="model")
-
-        assert dumped["space"] == "pygen_example"
-        assert dumped["externalId"] == "product-1"
-        assert dumped["name"] == "Widget"
-        assert dumped["price"] == 19.99
-        assert dumped["quantity"] == 100
-        assert dumped["createdDate"] == "2024-01-15"
-
-    def test_product_node_as_write(self) -> None:
-        """Test converting ProductNode to ProductNodeWrite."""
-        data = make_product_item("product-1", "Widget", 19.99, 100)
-        product = ProductNode.model_validate(data)
-        write = product.as_write()
-
-        assert isinstance(write, ProductNodeWrite)
-        assert write.name == product.name
-        assert write.price == product.price
-        assert write.quantity == product.quantity
-
-
-class TestProductNodeAPI:
-    """Tests for ProductNodeAPI."""
-
-    def test_list_returns_product_node_list(
+    @pytest.mark.parametrize("item_type, item_cls, api_cls", API_CLASSES)
+    def test_retrieve(
         self,
-        respx_mock: respx.MockRouter,
+        item_type: str,
+        item_cls: type[Instance],
+        api_cls: type[InstanceAPI],
         example_client: ExampleClient,
+        respx_mock: respx.MockRouter,
+        retrieve_url: str,
+    ) -> None:
+        """Test retrieving an item by external ID."""
+        raw_data = _get_raw_response(item_type)
+        instance_api = getattr(example_client, item_type)
+        assert isinstance(instance_api, api_cls)
+
+        respx_mock.post(retrieve_url).respond(json={"items": [raw_data]})
+        assert hasattr(instance_api, "retrieve")
+        result = instance_api.retrieve(raw_data["externalId"], space="pygen_example")
+
+        assert isinstance(result, item_cls)
+        assert result.dump(format="instance") == raw_data
+
+    @pytest.mark.parametrize("item_type, item_cls, api_cls", API_CLASSES)
+    def test_list(
+        self,
+        item_type: str,
+        item_cls: type[Instance],
+        api_cls: type[InstanceAPI],
+        example_client: ExampleClient,
+        respx_mock: respx.MockRouter,
         list_url: str,
     ) -> None:
-        """Test that list returns a ProductNodeList."""
-        items = [make_product_item("product-1", "Widget", 19.99, 100)]
-        respx_mock.post(list_url).respond(json=make_list_response(items))
+        """Test listing items."""
+        raw_data = _get_raw_response(item_type)
+        instance_api = getattr(example_client, item_type)
+        assert isinstance(instance_api, api_cls)
 
-        result = example_client.product_node.list()
+        respx_mock.post(list_url).respond(json={"items": [raw_data]})
+        assert hasattr(instance_api, "list")
+        result = instance_api.list()
 
-        assert isinstance(result, ProductNodeList)
+        assert isinstance(result, UserList)
         assert len(result) == 1
-        assert result[0].name == "Widget"
+        assert isinstance(result[0], item_cls)
+        assert result[0].dump(format="instance") == raw_data
 
-    def test_list_with_name_filter(
+    @pytest.mark.parametrize("item_type, item_cls, api_cls", API_CLASSES)
+    def test_iterate(
         self,
-        respx_mock: respx.MockRouter,
+        item_type: str,
+        item_cls: type[Instance],
+        api_cls: type[InstanceAPI],
         example_client: ExampleClient,
+        respx_mock: respx.MockRouter,
         list_url: str,
     ) -> None:
-        """Test list with name filter."""
-        items = [make_product_item("product-1", "Widget", 19.99, 100)]
-        route = respx_mock.post(list_url).respond(json=make_list_response(items))
+        """Test iterating over items with pagination."""
+        raw_data = _get_raw_response(item_type)
+        instance_api = getattr(example_client, item_type)
+        assert isinstance(instance_api, api_cls)
 
-        example_client.product_node.list(name="Widget")
+        respx_mock.post(list_url).respond(json={"items": [raw_data], "nextCursor": "cursor123"})
+        assert hasattr(instance_api, "iterate")
+        page = instance_api.iterate(limit=10)
 
-        request = route.calls[-1].request
-        body = json.loads(gzip.decompress(request.content))
-        assert "filter" in body
-        assert body["filter"]["equals"]["property"] == ["pygen_example", "ProductNode/v1", "name"]
-        assert body["filter"]["equals"]["value"] == "Widget"
-
-    def test_list_with_price_range(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        list_url: str,
-    ) -> None:
-        """Test list with price range filter."""
-        items = [make_product_item("product-1", "Widget", 19.99, 100)]
-        route = respx_mock.post(list_url).respond(json=make_list_response(items))
-
-        example_client.product_node.list(min_price=10.0, max_price=50.0)
-
-        request = route.calls[-1].request
-        body = json.loads(gzip.decompress(request.content))
-        assert "filter" in body
-        assert body["filter"]["range"]["gte"] == 10.0
-        assert body["filter"]["range"]["lte"] == 50.0
-
-    def test_list_with_multiple_filters_uses_and(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        list_url: str,
-    ) -> None:
-        """Test that multiple filters are combined with AND."""
-        items = [make_product_item("product-1", "Widget", 19.99, 100, active=True)]
-        route = respx_mock.post(list_url).respond(json=make_list_response(items))
-
-        example_client.product_node.list(name="Widget", active=True)
-
-        request = route.calls[-1].request
-        body = json.loads(gzip.decompress(request.content))
-        assert "filter" in body
-        assert "and" in body["filter"]
-        assert len(body["filter"]["and"]) == 2
-
-    def test_retrieve_single_returns_product_node(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        retrieve_url: str,
-    ) -> None:
-        """Test retrieving a single ProductNode."""
-        items = [make_product_item("product-1", "Widget", 19.99, 100)]
-        respx_mock.post(retrieve_url).respond(json=make_list_response(items))
-
-        result = example_client.product_node.retrieve("product-1", space="pygen_example")
-
-        assert isinstance(result, ProductNode)
-        assert result.name == "Widget"
-
-    def test_retrieve_multiple_returns_product_node_list(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        retrieve_url: str,
-    ) -> None:
-        """Test retrieving multiple ProductNodes."""
-        items = [
-            make_product_item("product-1", "Widget", 19.99, 100),
-            make_product_item("product-2", "Gadget", 29.99, 50),
-        ]
-        respx_mock.post(retrieve_url).respond(json=make_list_response(items))
-
-        result = example_client.product_node.retrieve(["product-1", "product-2"], space="pygen_example")
-
-        assert isinstance(result, ProductNodeList)
-        assert len(result) == 2
-
-    def test_iterate_with_pagination(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        list_url: str,
-    ) -> None:
-        """Test iterate returns Page with cursor."""
-        items = [make_product_item("product-1", "Widget", 19.99, 100)]
-        respx_mock.post(list_url).respond(json=make_list_response(items, next_cursor="cursor123"))
-
-        page = example_client.product_node.iterate(limit=10)
-
+        assert hasattr(page, "items")
         assert len(page.items) == 1
+        assert isinstance(page.items[0], item_cls)
+        assert page.items[0].dump(format="instance") == raw_data
         assert page.next_cursor == "cursor123"
 
+    @pytest.mark.parametrize("item_type, item_cls, api_cls", API_CLASSES)
+    def test_search(
+        self,
+        item_type: str,
+        item_cls: type[Instance],
+        api_cls: type[InstanceAPI],
+        example_client: ExampleClient,
+        respx_mock: respx.MockRouter,
+        search_url: str,
+    ) -> None:
+        """Test searching for items."""
+        raw_data = _get_raw_response(item_type)
+        instance_api = getattr(example_client, item_type)
+        assert isinstance(instance_api, api_cls)
 
-# =============================================================================
-# CategoryNode Tests
-# =============================================================================
+        respx_mock.post(search_url).respond(json={"items": [raw_data]})
+        assert hasattr(instance_api, "search")
+        result = instance_api.search()
 
+        assert isinstance(result, UserList)
+        assert len(result) == 1
+        assert isinstance(result[0], item_cls)
+        assert result[0].dump(format="instance") == raw_data
 
-class TestCategoryNodeDataClass:
-    """Tests for CategoryNode data classes."""
+    @pytest.mark.parametrize("item_type, item_cls, api_cls", API_CLASSES)
+    def test_aggregate(
+        self,
+        item_type: str,
+        item_cls: type[Instance],
+        api_cls: type[InstanceAPI],
+        example_client: ExampleClient,
+        respx_mock: respx.MockRouter,
+        aggregate_url: str,
+    ) -> None:
+        """Test aggregating items."""
+        instance_api = getattr(example_client, item_type)
+        assert isinstance(instance_api, api_cls)
 
-    def test_category_node_parse_from_api(self) -> None:
-        """Test parsing CategoryNode from API response format."""
-        data = make_category_item("category-1", "Electronics")
-        category = CategoryNode.model_validate(data)
-
-        assert category.external_id == "category-1"
-        assert category.category_name == "Electronics"
-
-    def test_category_node_write_serialization(self) -> None:
-        """Test CategoryNodeWrite serialization."""
-        write = CategoryNodeWrite(
-            space="pygen_example",
-            external_id="category-1",
-            category_name="Electronics",
+        respx_mock.post(aggregate_url).respond(
+            json={"items": [{"instanceType": "node", "aggregates": [{"aggregate": "count", "value": 37}]}]}
         )
-        dumped = write.dump(camel_case=True, format="model")
+        assert hasattr(instance_api, "aggregate")
+        result = instance_api.aggregate(Count())
 
-        assert dumped["space"] == "pygen_example"
-        assert dumped["externalId"] == "category-1"
-        assert dumped["categoryName"] == "Electronics"
-
-
-class TestCategoryNodeAPI:
-    """Tests for CategoryNodeAPI."""
-
-    def test_list_returns_category_node_list(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        list_url: str,
-    ) -> None:
-        """Test that list returns a CategoryNodeList."""
-        items = [make_category_item("category-1", "Electronics")]
-        respx_mock.post(list_url).respond(json=make_list_response(items))
-
-        result = example_client.category_node.list()
-
-        assert isinstance(result, CategoryNodeList)
-        assert len(result) == 1
-        assert result[0].category_name == "Electronics"
-
-    def test_list_with_category_name_filter(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        list_url: str,
-    ) -> None:
-        """Test list with category_name filter."""
-        items = [make_category_item("category-1", "Electronics")]
-        route = respx_mock.post(list_url).respond(json=make_list_response(items))
-
-        example_client.category_node.list(category_name="Electronics")
-
-        request = route.calls[-1].request
-        body = json.loads(gzip.decompress(request.content))
-        assert "filter" in body
-        assert body["filter"]["equals"]["value"] == "Electronics"
-
-
-# =============================================================================
-# RelatesTo Tests
-# =============================================================================
-
-
-class TestRelatesToDataClass:
-    """Tests for RelatesTo data classes."""
-
-    def test_relates_to_parse_from_api(self) -> None:
-        """Test parsing RelatesTo from API response format."""
-        data = make_relates_to_item("edge-1", "similar", strength=0.8)
-        edge = RelatesTo.model_validate(data)
-
-        assert edge.external_id == "edge-1"
-        assert edge.relation_type == "similar"
-        assert edge.strength == 0.8
-        assert edge.instance_type == "edge"
-
-
-class TestRelatesToAPI:
-    """Tests for RelatesToAPI."""
-
-    def test_list_returns_relates_to_list(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        list_url: str,
-    ) -> None:
-        """Test that list returns a RelatesToList."""
-        items = [make_relates_to_item("edge-1", "similar", strength=0.8)]
-        respx_mock.post(list_url).respond(json=make_list_response(items))
-
-        result = example_client.relates_to.list()
-
-        assert isinstance(result, RelatesToList)
-        assert len(result) == 1
-        assert result[0].relation_type == "similar"
-
-    def test_list_with_relation_type_filter(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        list_url: str,
-    ) -> None:
-        """Test list with relation_type filter."""
-        items = [make_relates_to_item("edge-1", "similar")]
-        route = respx_mock.post(list_url).respond(json=make_list_response(items))
-
-        example_client.relates_to.list(relation_type="similar")
-
-        request = route.calls[-1].request
-        body = json.loads(gzip.decompress(request.content))
-        assert "filter" in body
-        assert body["filter"]["equals"]["value"] == "similar"
-
-    def test_list_with_strength_range(
-        self,
-        respx_mock: respx.MockRouter,
-        example_client: ExampleClient,
-        list_url: str,
-    ) -> None:
-        """Test list with strength range filter."""
-        items = [make_relates_to_item("edge-1", "similar", strength=0.8)]
-        route = respx_mock.post(list_url).respond(json=make_list_response(items))
-
-        example_client.relates_to.list(min_strength=0.5, max_strength=1.0)
-
-        request = route.calls[-1].request
-        body = json.loads(gzip.decompress(request.content))
-        assert "filter" in body
-        assert body["filter"]["range"]["gte"] == 0.5
-        assert body["filter"]["range"]["lte"] == 1.0
-
-
-# =============================================================================
-# ExampleClient Tests
-# =============================================================================
-
-
-class TestExampleClient:
-    """Tests for ExampleClient."""
-
-    def test_client_context_manager(self, config: PygenClientConfig) -> None:
-        """Test that ExampleClient works as a context manager."""
-        with ExampleClient(config) as client:
-            assert client is not None
-
-    def test_client_list_products(
-        self,
-        respx_mock: respx.MockRouter,
-        config: PygenClientConfig,
-        list_url: str,
-    ) -> None:
-        """Test listing products through ExampleClient."""
-        items = [make_product_item("product-1", "Widget", 19.99, 100)]
-        respx_mock.post(list_url).respond(json=make_list_response(items))
-
-        with ExampleClient(config) as client:
-            products = client.product_node.list()
-
-        assert len(products) == 1
-        assert products[0].name == "Widget"
+        assert isinstance(result, AggregateResponse)
+        assert len(result.items) == 1
+        assert isinstance(result.items[0], AggregatedNumberValue)
+        assert result.items[0].aggregates[0].value == 37

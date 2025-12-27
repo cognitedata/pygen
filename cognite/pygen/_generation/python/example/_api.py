@@ -20,7 +20,6 @@ from cognite.pygen._generation.python.instance_api.models import (
 )
 from cognite.pygen._generation.python.instance_api.models.responses import (
     AggregateResponse,
-    ListResponse,
     Page,
 )
 
@@ -132,7 +131,7 @@ class ProductNodeAPI(InstanceAPI[ProductNode, ProductNodeList]):
 
     def search(
         self,
-        query: str,
+        query: str | None = None,
         properties: str | Sequence[str] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
@@ -147,7 +146,7 @@ class ProductNodeAPI(InstanceAPI[ProductNode, ProductNodeList]):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = 25,
-    ) -> ListResponse[ProductNodeList]:
+    ) -> ProductNodeList:
         """Search ProductNode instances using full-text search.
 
         Args:
@@ -180,7 +179,7 @@ class ProductNodeAPI(InstanceAPI[ProductNode, ProductNodeList]):
         filter_.category.equals_or_in(category)
         filter_.external_id.prefix(external_id_prefix)
         filter_.space.equals_or_in(space)
-        return self._search(query=query, properties=properties, limit=limit, filter=filter_.as_filter())
+        return self._search(query=query, properties=properties, limit=limit, filter=filter_.as_filter()).items
 
     def aggregate(
         self,
@@ -359,14 +358,14 @@ class CategoryNodeAPI(InstanceAPI[CategoryNode, CategoryNodeList]):
 
     def search(
         self,
-        query: str,
+        query: str | None = None,
         properties: str | Sequence[str] | None = None,
         category_name: str | list[str] | None = None,
         category_name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = 25,
-    ) -> ListResponse[CategoryNodeList]:
+    ) -> CategoryNodeList:
         """Search CategoryNode instances using full-text search.
 
         Args:
@@ -386,7 +385,7 @@ class CategoryNodeAPI(InstanceAPI[CategoryNode, CategoryNodeList]):
         filter_.category_name.prefix(category_name_prefix)
         filter_.external_id.prefix(external_id_prefix)
         filter_.space.equals_or_in(space)
-        return self._search(query=query, properties=properties, limit=limit, filter=filter_.as_filter())
+        return self._search(query=query, properties=properties, limit=limit, filter=filter_.as_filter()).items
 
     def aggregate(
         self,
@@ -530,7 +529,7 @@ class RelatesToAPI(InstanceAPI[RelatesTo, RelatesToList]):
 
     def search(
         self,
-        query: str,
+        query: str | None = None,
         properties: str | Sequence[str] | None = None,
         relation_type: str | list[str] | None = None,
         min_strength: float | None = None,
@@ -540,7 +539,7 @@ class RelatesToAPI(InstanceAPI[RelatesTo, RelatesToList]):
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = 25,
-    ) -> ListResponse[RelatesToList]:
+    ) -> RelatesToList:
         """Search RelatesTo edge instances using full-text search.
 
         Args:
@@ -564,7 +563,7 @@ class RelatesToAPI(InstanceAPI[RelatesTo, RelatesToList]):
         filter_.created_at.greater_than_or_equals(min_created_at).less_than_or_equals(max_created_at)
         filter_.external_id.prefix(external_id_prefix)
         filter_.space.equals_or_in(space)
-        return self._search(query=query, properties=properties, limit=limit, filter=filter_.as_filter())
+        return self._search(query=query, properties=properties, limit=limit, filter=filter_.as_filter()).items
 
     def aggregate(
         self,
