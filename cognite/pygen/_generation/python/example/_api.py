@@ -38,6 +38,9 @@ from ._data_class import (
     ProductNodeList,
     RelatesTo,
     RelatesToList,
+    ProductNodeFilter,
+    CategoryNodeFilter,
+    RelatesToFilter,
 )
 
 
@@ -52,118 +55,6 @@ class ProductNodeAPI(InstanceAPI[ProductNode, ProductNodeList]):
     def __init__(self, http_client: HTTPClient) -> None:
         view_ref = ViewReference(space="pygen_example", external_id="ProductNode", version="v1")
         super().__init__(http_client, view_ref, "node", ProductNodeList)
-
-    def _build_filter(
-        self,
-        name: str | list[str] | None = None,
-        name_prefix: str | None = None,
-        min_price: float | None = None,
-        max_price: float | None = None,
-        min_quantity: int | None = None,
-        max_quantity: int | None = None,
-        active: bool | None = None,
-        min_created_date: date | None = None,
-        max_created_date: date | None = None,
-        category: str | InstanceId | tuple[str, str] | list[str | InstanceId | tuple[str, str]] | None = None,
-        external_id_prefix: str | None = None,
-        space: str | list[str] | None = None,
-        filter: Filter | None = None,
-    ) -> Filter | None:
-        """Build a filter from the provided parameters."""
-        filters: list[Filter] = []
-
-        # Name filter
-        if name is not None:
-            prop_ref = _create_property_ref(self._view_ref, "name")
-            if isinstance(name, str):
-                filters.append({"equals": EqualsFilterData(property=prop_ref, value=name)})
-            else:
-                filters.append({"in": InFilterData(property=prop_ref, values=name)})
-
-        # Name prefix filter
-        if name_prefix is not None:
-            prop_ref = _create_property_ref(self._view_ref, "name")
-            filters.append({"prefix": {"property": prop_ref, "value": name_prefix}})
-
-        # Price range filter
-        if min_price is not None or max_price is not None:
-            prop_ref = _create_property_ref(self._view_ref, "price")
-            range_data = RangeFilterData(property=prop_ref)
-            if min_price is not None:
-                range_data.gte = min_price
-            if max_price is not None:
-                range_data.lte = max_price
-            filters.append({"range": range_data})
-
-        # Quantity range filter
-        if min_quantity is not None or max_quantity is not None:
-            prop_ref = _create_property_ref(self._view_ref, "quantity")
-            range_data = RangeFilterData(property=prop_ref)
-            if min_quantity is not None:
-                range_data.gte = min_quantity
-            if max_quantity is not None:
-                range_data.lte = max_quantity
-            filters.append({"range": range_data})
-
-        # Active filter
-        if active is not None:
-            prop_ref = _create_property_ref(self._view_ref, "active")
-            filters.append({"equals": EqualsFilterData(property=prop_ref, value=active)})
-
-        # Created date range filter
-        if min_created_date is not None or max_created_date is not None:
-            prop_ref = _create_property_ref(self._view_ref, "createdDate")
-            range_data = RangeFilterData(property=prop_ref)
-            if min_created_date is not None:
-                range_data.gte = min_created_date.isoformat()
-            if max_created_date is not None:
-                range_data.lte = max_created_date.isoformat()
-            filters.append({"range": range_data})
-
-        # Category filter (direct relation)
-        if category is not None:
-            prop_ref = _create_property_ref(self._view_ref, "category")
-            if isinstance(category, list):
-                # Convert list items to space/externalId dicts
-                values = []
-                for item in category:
-                    if isinstance(item, InstanceId):
-                        values.append({"space": item.space, "externalId": item.external_id})
-                    elif isinstance(item, tuple):
-                        values.append({"space": item[0], "externalId": item[1]})
-                    else:
-                        # Assume string is external_id in default space
-                        values.append({"space": self._view_ref.space, "externalId": item})
-                filters.append({"in": InFilterData(property=prop_ref, values=values)})
-            else:
-                if isinstance(category, InstanceId):
-                    value = {"space": category.space, "externalId": category.external_id}
-                elif isinstance(category, tuple):
-                    value = {"space": category[0], "externalId": category[1]}
-                else:
-                    value = {"space": self._view_ref.space, "externalId": category}
-                filters.append({"equals": EqualsFilterData(property=prop_ref, value=value)})
-
-        # External ID prefix filter
-        if external_id_prefix is not None:
-            filters.append({"prefix": {"property": ["node", "externalId"], "value": external_id_prefix}})
-
-        # Space filter
-        if space is not None:
-            if isinstance(space, str):
-                filters.append({"equals": EqualsFilterData(property=["node", "space"], value=space)})
-            else:
-                filters.append({"in": InFilterData(property=["node", "space"], values=space)})
-
-        # Additional custom filter
-        if filter is not None:
-            filters.append(filter)
-
-        if not filters:
-            return None
-        if len(filters) == 1:
-            return filters[0]
-        return {"and": AndFilter(data=filters)}
 
     @overload
     def retrieve(
@@ -213,7 +104,6 @@ class ProductNodeAPI(InstanceAPI[ProductNode, ProductNodeList]):
         sort_by: str | None = None,
         sort_direction: Literal["ascending", "descending"] = "ascending",
         limit: int | None = 25,
-        filter: Filter | None = None,
     ) -> ProductNodeList:
         """List ProductNode instances with type-safe filtering.
 
@@ -233,32 +123,26 @@ class ProductNodeAPI(InstanceAPI[ProductNode, ProductNodeList]):
             sort_by: Property name to sort by.
             sort_direction: Sort direction.
             limit: Maximum number of results. None for no limit.
-            filter: Additional custom filter to combine with the above.
 
         Returns:
             A ProductNodeList of matching instances.
         """
-        combined_filter = self._build_filter(
-            name=name,
-            name_prefix=name_prefix,
-            min_price=min_price,
-            max_price=max_price,
-            min_quantity=min_quantity,
-            max_quantity=max_quantity,
-            active=active,
-            min_created_date=min_created_date,
-            max_created_date=max_created_date,
-            category=category,
-            external_id_prefix=external_id_prefix,
-            space=space,
-            filter=filter,
-        )
+        filter = ProductNodeFilter("and")
+        filter.name.equals_or_in(name)
+        filter.name.prefix(name_prefix)
+        filter.price.greater_than_or_equals(min_price).less_than_or_equals(max_price)
+        filter.quantity.greater_than_or_equals(min_quantity).less_than_or_equals(max_quantity)
+        filter.active.equals(active)
+        filter.created_date.greater_than_or_equals(min_created_date).less_than_or_equals(max_created_date)
+        filter.category.equals_or_in(category)
+        filter.external_id.prefix(external_id_prefix)
+        filter.space.equals_or_in(space)
         sort = None
         if sort_by is not None:
             prop_ref = _create_property_ref(self._view_ref, sort_by)
             sort = PropertySort(property=prop_ref, direction=sort_direction)
 
-        return self._list(limit=limit, filter=combined_filter, sort=sort)
+        return self._list(limit=limit, filter=filter.as_filter(), sort=sort)
 
     def iterate(
         self,

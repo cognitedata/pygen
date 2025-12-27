@@ -20,6 +20,7 @@ from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
     FloatFilter,
     IntegerFilter,
     TextFilter,
+    DirectRelationFilter,
 )
 from cognite.pygen._generation.python.instance_api.models.instance import (
     Instance,
@@ -86,6 +87,7 @@ class ProductNodeFilter(FilterContainer):
         self.quantity = IntegerFilter(view_id, "quantity", operator)
         self.active = BooleanFilter(view_id, "active", operator)
         self.created_date = DateFilter(view_id, "createdDate", operator)
+        self.category = DirectRelationFilter(view_id, "category", operator)
         super().__init__(
             data_type_filters=[
                 self.name,
@@ -94,6 +96,7 @@ class ProductNodeFilter(FilterContainer):
                 self.quantity,
                 self.active,
                 self.created_date,
+                self.category,
             ],
             operator=operator,
             instance_type="node",
