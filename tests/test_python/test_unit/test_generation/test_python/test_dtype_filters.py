@@ -124,14 +124,14 @@ class TestDataTypeFilters:
 
     def test_datetime_filter_range_with_str(self, example_filters: ExampleFilter) -> None:
         start = "2024-01-01T00:00:00.000Z"
-        end = "2024-12-31T23:59:59.999Z"
+        end = "2024-12-31T22:59:59.999+01:00"
         datetime_filter = example_filters.timestamp
         datetime_filter.greater_than(start).less_than_or_equals(end)
         assert datetime_filter.dump(exclude_none=True) == {
             "range": {
                 "property": _get_property_path("timestamp"),
-                "gt": start,
-                "lte": end,
+                "gt": "2024-01-01T00:00:00.000",
+                "lte": "2024-12-31T22:59:59.999+01:00",
             }
         }
 

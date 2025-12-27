@@ -178,8 +178,12 @@ class DateTimeFilter(DataTypeFilter):
             return value.isoformat(timespec="milliseconds")
         if isinstance(value, str):
             # Validate it's a valid ISO format by parsing it
-            datetime.fromisoformat(value)
-            return value
+            for format in ["%Y-%m-%dT%H:%M:%S.%fZ", "%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S.%f%Z"]:
+                try:
+                    return datetime.strptime(value, format).isoformat(timespec="milliseconds")
+                except ValueError:
+                    continue
+            raise ValueError(f"String '{value}' is not a valid ISO format datetime.")
         raise TypeError(f"Expected datetime or ISO format string, got {type(value)}")
 
     def equals(self, value: datetime | str | None) -> Self:
