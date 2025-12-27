@@ -77,4 +77,5 @@ class PrimitiveNullableFilter(FilterContainer):
                 self.date_,
             ],
             operator,
+            "node",
         )
