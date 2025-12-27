@@ -291,12 +291,18 @@ All tasks, deliverables, and success criteria have been met. The project is read
      - **fetch** (recommended) - Native browser/Node.js API, no dependencies
      - axios - More features, interceptors, but adds dependency
    - **Project Structure Setup**:
-     - Create `cognite/pygen/_generation/typescript/` directory structure
-     - Set up `package.json` with TypeScript, testing, and build dependencies
-     - Configure `tsconfig.json` for strict mode and ESM output
+     - Create `cognite/pygen/_generation/typescript/` directory structure for source code
+     - Place all TypeScript configuration at the repository root level:
+       - `package.json` - TypeScript dev dependencies (shared across project)
+       - `tsconfig.json` - TypeScript configuration (strict mode, ESM output)
+       - `vitest.config.ts` - Test runner configuration
+     - `node_modules/` at root level (shared, gitignored)
+     - TypeScript tests in `tests/tests_typescript/` directory
      - Set up ESLint and Prettier for code quality
+     - Use the same `.gitignore` for both Python and TypeScript artifacts
    - **CI/CD Pipeline**:
      - Add TypeScript testing job to existing CI/CD workflow
+     - Run `npm install` from repository root (uses root package.json)
      - Configure test coverage reporting (c8 or istanbul)
      - Add TypeScript compilation check
      - Add linting and formatting checks

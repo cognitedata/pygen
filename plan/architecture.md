@@ -664,23 +664,27 @@ cognite/pygen/
 
 tests/                                 # NOT SHIPPED - tests only
 ├── conftest.py                        # Shared fixtures
-├── test_python/                       # Python SDK tests
+├── tests_python/                      # Python SDK tests
 │   ├── test_instance_api.py
 │   ├── test_generation.py
 │   └── generated/                     # Temp generated code for testing
-├── test_typescript/                   # TypeScript SDK tests
+├── tests_typescript/                  # TypeScript SDK tests
 │   ├── test_generation.py             # Python wrapper tests
-│   ├── __tests__/                     # Jest/Vitest tests
+│   ├── __tests__/                     # Vitest tests
 │   │   ├── instance.test.ts
 │   │   └── client.test.ts
-│   ├── generated/                     # Temp generated code for testing
-│   ├── package.json                   # Test dependencies
-│   └── tsconfig.json
-├── csharp/                            # Future: C# tests
+│   └── generated/                     # Temp generated code for testing
+├── tests_csharp/                      # Future: C# tests
 │   ├── test_generation.py
 │   └── Tests/                         # NUnit/xUnit tests
 └── integration/                       # Cross-language integration tests
     └── ...
+
+# Root level TypeScript configuration (shared)
+package.json                           # TypeScript dev dependencies
+tsconfig.json                          # TypeScript configuration
+vitest.config.ts                       # Vitest test runner configuration
+node_modules/                          # Shared dependencies (gitignored)
 ```
 
 ### What Gets Shipped
@@ -743,11 +747,11 @@ pytest (orchestrator)
     ├── Python tests (direct)
     │   └── test_*.py files using pytest
     │
-    ├── TypeScript tests (via subprocess)
+    ├── TypeScript tests (via subprocess, from repository root)
     │   ├── Generate SDK → temp directory
-    │   ├── npm install
-    │   ├── npm run build (tsc compilation)
-    │   └── npm test (vitest/jest)
+    │   ├── npm install (runs from root, uses root package.json)
+    │   ├── npm run build (tsc compilation from root)
+    │   └── npm test (vitest from root)
     │
     ├── C# tests (via subprocess)
     │   ├── Generate SDK → temp directory
@@ -762,10 +766,14 @@ pytest (orchestrator)
 ### Python Test Wrappers for Other Languages
 
 ```python
-# tests/typescript/test_generation.py
+# tests/tests_typescript/test_generation.py
 import subprocess
 from pathlib import Path
 import pytest
+
+
+# Root directory where package.json and node_modules are located
+ROOT_DIR = Path(__file__).parent.parent.parent
 
 
 @pytest.fixture(scope="session")
@@ -775,9 +783,6 @@ def generated_ts_sdk(tmp_path_factory: pytest.TempPathFactory) -> Path:
     # Generate SDK using pygen
     from cognite.pygen._generation.typescript import generate_typescript_sdk
     generate_typescript_sdk(data_model=..., output_dir=output_dir)
-    
-    # Install dependencies
-    subprocess.run(["npm", "install"], cwd=output_dir, check=True)
     return output_dir
 
 
@@ -785,7 +790,7 @@ def test_typescript_compiles(generated_ts_sdk: Path) -> None:
     """Verify generated TypeScript compiles without errors."""
     result = subprocess.run(
         ["npm", "run", "build"],
-        cwd=generated_ts_sdk,
+        cwd=ROOT_DIR,  # Run from root where tsconfig.json is
         capture_output=True,
         text=True,
     )
@@ -796,7 +801,7 @@ def test_typescript_tests_pass(generated_ts_sdk: Path) -> None:
     """Run TypeScript unit tests on generated SDK."""
     result = subprocess.run(
         ["npm", "test"],
-        cwd=generated_ts_sdk,
+        cwd=ROOT_DIR,  # Run from root where vitest.config.ts is
         capture_output=True,
         text=True,
     )
@@ -807,7 +812,7 @@ def test_typescript_lint_passes(generated_ts_sdk: Path) -> None:
     """Verify generated TypeScript passes linting."""
     result = subprocess.run(
         ["npm", "run", "lint"],
-        cwd=generated_ts_sdk,
+        cwd=ROOT_DIR,  # Run from root
         capture_output=True,
         text=True,
     )
@@ -816,12 +821,18 @@ def test_typescript_lint_passes(generated_ts_sdk: Path) -> None:
 
 ### TypeScript Test Project Structure
 
+All TypeScript configuration files (package.json, tsconfig.json, etc.) are placed at the repository root level to share the same `node_modules` directory. TypeScript tests are placed in `tests/tests_typescript/` following the same pattern as Python tests.
+
 ```
-tests/typescript/
+# Root level (shared TypeScript configuration)
+package.json                     # TypeScript dependencies (dev dependencies)
+tsconfig.json                    # TypeScript config
+vitest.config.ts                 # Test runner config
+node_modules/                    # Shared node_modules (gitignored)
+
+# Test files
+tests/tests_typescript/
 ├── test_generation.py           # Python wrapper tests
-├── package.json                 # Test dependencies
-├── tsconfig.json                # TypeScript config
-├── vitest.config.ts             # Test runner config
 ├── __tests__/                   # TypeScript unit tests
 │   ├── instance.test.ts         # Tests for instance_api
 │   ├── client.test.ts           # Tests for client
@@ -829,16 +840,18 @@ tests/typescript/
 └── generated/                   # .gitignore'd, temp generated code
 ```
 
-### tests/typescript/package.json
+### Root package.json (TypeScript Configuration)
+
+The root `package.json` contains all TypeScript development dependencies. This allows sharing `node_modules` across all TypeScript code in the project.
 
 ```json
 {
-  "name": "@cognite/pygen-typescript-tests",
+  "name": "@cognite/pygen",
   "private": true,
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
@@ -850,6 +863,8 @@ tests/typescript/
   }
 }
 ```
+
+Note: The `.gitignore` file is shared for both Python and TypeScript, including entries for `node_modules/`, `*.js` build artifacts, and other TypeScript-specific ignores alongside Python ignores.
 
 ### CI/CD Configuration
 
@@ -868,7 +883,7 @@ jobs:
         with:
           python-version: "3.10"
       - run: pip install -e ".[dev]"
-      - run: pytest tests/python
+      - run: pytest tests/tests_python
 
   test-typescript:
     runs-on: ubuntu-latest
@@ -881,8 +896,8 @@ jobs:
         with:
           node-version: "20"
       - run: pip install -e ".[dev]"
-      - run: cd tests/typescript && npm install
-      - run: pytest tests/typescript
+      - run: npm install  # Uses root package.json
+      - run: pytest tests/tests_typescript
 
   test-csharp:
     runs-on: ubuntu-latest
@@ -895,7 +910,7 @@ jobs:
         with:
           dotnet-version: "8.0"
       - run: pip install -e ".[dev]"
-      - run: pytest tests/csharp
+      - run: pytest tests/tests_csharp
 ```
 
 ### Test Categories
