@@ -2,6 +2,7 @@
 
 import gzip
 import json
+from collections.abc import Iterator
 from unittest.mock import patch
 
 import httpx
@@ -34,9 +35,10 @@ def config() -> PygenClientConfig:
 
 
 @pytest.fixture
-def client(config: PygenClientConfig) -> InstanceClient:
+def client(config: PygenClientConfig) -> Iterator[InstanceClient]:
     """Create an InstanceClient for testing."""
-    return InstanceClient(config)
+    with InstanceClient(config) as client:
+        yield client
 
 
 class PersonWrite(InstanceWrite):
