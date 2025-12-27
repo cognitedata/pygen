@@ -1,0 +1,52 @@
+{
+  "name": "@cognite/pygen-typescript",
+  "version": "0.0.1",
+  "description": "Pygen TypeScript SDK for CDF Data Modeling",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"cognite/pygen/_generation/typescript/**/*.ts\" \"tests/typescript/**/*.ts\"",
+    "format:check": "prettier --check \"cognite/pygen/_generation/typescript/**/*.ts\" \"tests/typescript/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint tests/typescript",
+    "lint:fix": "eslint tests/typescript --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "cognite/pygen/_generation/typescript/instance_api"
+  ],
+  "keywords": [
+    "cognite",
+    "cdf",
+    "data-modeling",
+    "sdk",
+    "typescript"
+  ],
+  "license": "Apache-2.0"
+}

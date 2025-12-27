@@ -66,8 +66,6 @@ docs/examples/movie_domain
 docs/quickstart/apm_domain/
 *.zip
 node_modules/
-package-lock.json
-package.json
 *.env
 playground.ipynb
 wind-data/
