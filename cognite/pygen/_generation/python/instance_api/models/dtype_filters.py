@@ -207,17 +207,24 @@ class DateFilter(DataTypeFilter):
 class TextFilter(DataTypeFilter):
     """Filter for text/string properties."""
 
+    def _validate_value(self, value: str | list[str] | None) -> str | list[str] | None:
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        return [str(v) for v in value]
+
     def equals(self, value: str | None) -> Self:
         """Filter for values equal to the given string."""
-        return self._add_filter("equals", "value", str(value) if value is not None else None)
+        return self._add_filter("equals", "value", self._validate_value(value))
 
     def prefix(self, value: str | None) -> Self:
         """Filter for values starting with the given prefix."""
-        return self._add_filter("prefix", "value", str(value) if value is not None else None)
+        return self._add_filter("prefix", "value", self._validate_value(value))
 
     def in_(self, values: list[str] | None) -> Self:
         """Filter for values that are in the given list."""
-        return self._add_filter("in", "values", [str(v) for v in values] if values is not None else None)
+        return self._add_filter("in", "values", self._validate_value(values))
 
     def equals_or_in(self, value: str | list[str] | None) -> Self:
         """Filter for values equal to the given string or in the given list."""
