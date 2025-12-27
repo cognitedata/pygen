@@ -647,8 +647,6 @@ cognite/pygen/
 │   │   │   │   ├── instance.ts
 │   │   │   │   ├── client.ts
 │   │   │   │   └── api.ts
-│   │   │   ├── package.json
-│   │   │   └── tsconfig.json
 │   │   ├── examples/                  # Basic examples (SHIPPED)
 │   │   │   └── ...
 │   │   └── templates/                 # Code generation templates (SHIPPED)
