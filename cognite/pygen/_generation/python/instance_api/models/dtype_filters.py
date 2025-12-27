@@ -19,8 +19,10 @@ else:
 class DataTypeFilter:
     """Base class for all data type filters."""
 
-    def __init__(self, view_ref: ViewReference, property_id: str, operator: Literal["and", "or"]) -> None:
-        self._view_ref = view_ref
+    def __init__(
+        self, prop_ref: ViewReference | Literal["node", "edge"], property_id: str, operator: Literal["and", "or"]
+    ) -> None:
+        self._prop_ref = prop_ref
         self._property_id = property_id
         self._operator = operator
         self._filters: dict[FilterTypes, FilterData] = {}
@@ -40,7 +42,10 @@ class DataTypeFilter:
     @property
     def _property_path(self) -> list[str]:
         """Get the property path for the filter."""
-        return [self._view_ref.space, f"{self._view_ref.external_id}/{self._view_ref.version}", self._property_id]
+        if isinstance(self._prop_ref, ViewReference):
+            return [self._prop_ref.space, f"{self._prop_ref.external_id}/{self._prop_ref.version}", self._property_id]
+        else:
+            return [self._prop_ref, self._property_id]
 
     def as_filter(self) -> Filter | None:
         """Convert the accumulated conditions to a Filter."""
