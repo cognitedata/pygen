@@ -43,10 +43,7 @@ describe("Reference Types", () => {
 
   describe("createContainerReference", () => {
     it("should create a ContainerReference with correct properties", () => {
-      const ref: ContainerReference = createContainerReference(
-        "my-space",
-        "my-container"
-      );
+      const ref: ContainerReference = createContainerReference("my-space", "my-container");
 
       expect(ref).toEqual({
         space: "my-space",
@@ -57,11 +54,7 @@ describe("Reference Types", () => {
 
   describe("createDataModelReference", () => {
     it("should create a DataModelReference with correct properties", () => {
-      const ref: DataModelReference = createDataModelReference(
-        "my-space",
-        "my-model",
-        "v2"
-      );
+      const ref: DataModelReference = createDataModelReference("my-space", "my-model", "v2");
 
       expect(ref).toEqual({
         space: "my-space",
@@ -71,4 +64,3 @@ describe("Reference Types", () => {
     });
   });
 });
-

@@ -107,10 +107,7 @@ export function createViewReference(
  * console.log(ref); // { space: "my-space", externalId: "my-container" }
  * ```
  */
-export function createContainerReference(
-  space: string,
-  externalId: string
-): ContainerReference {
+export function createContainerReference(space: string, externalId: string): ContainerReference {
   return { space, externalId };
 }
 
@@ -135,4 +132,3 @@ export function createDataModelReference(
 ): DataModelReference {
   return { space, externalId, version };
 }
-
