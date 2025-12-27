@@ -741,20 +741,21 @@ All language SDKs are tested, but tests are orchestrated through Python/pytest f
 
 ### Testing Architecture
 
+Each language runs its native test framework independently in CI:
+
 ```
-pytest (orchestrator)
+CI Pipeline
     │
-    ├── Python tests (direct)
-    │   └── test_*.py files using pytest
+    ├── Python tests (pytest)
+    │   └── pytest tests/tests_python
     │
-    ├── TypeScript tests (via subprocess, from repository root)
-    │   ├── Generate SDK → temp directory
-    │   ├── npm install (runs from root, uses root package.json)
-    │   ├── npm run build (tsc compilation from root)
-    │   └── npm test (vitest from root)
+    ├── TypeScript tests (vitest, from repository root)
+    │   ├── npm install (uses root package.json)
+    │   ├── npm run build (tsc compilation)
+    │   ├── npm run lint (ESLint)
+    │   └── npm test (vitest)
     │
-    ├── C# tests (via subprocess)
-    │   ├── Generate SDK → temp directory
+    ├── C# tests (dotnet test)
     │   ├── dotnet restore
     │   ├── dotnet build
     │   └── dotnet test
@@ -763,60 +764,59 @@ pytest (orchestrator)
         └── Cross-language consistency checks
 ```
 
-### Python Test Wrappers for Other Languages
+### TypeScript Test Examples
 
-```python
-# tests/tests_typescript/test_generation.py
-import subprocess
-from pathlib import Path
-import pytest
+TypeScript tests use Vitest and are located in `tests/tests_typescript/__tests__/`:
 
+```typescript
+// tests/tests_typescript/__tests__/instance.test.ts
+import { describe, it, expect } from 'vitest';
+import { Instance, InstanceWrite } from '../../cognite/pygen/_generation/typescript/instance_api';
 
-# Root directory where package.json and node_modules are located
-ROOT_DIR = Path(__file__).parent.parent.parent
+describe('Instance', () => {
+  it('should create an instance with required fields', () => {
+    const instance = new Instance({
+      space: 'test_space',
+      externalId: 'test_id',
+    });
+    expect(instance.space).toBe('test_space');
+    expect(instance.externalId).toBe('test_id');
+  });
 
+  it('should convert to write format', () => {
+    const instance = new Instance({
+      space: 'test_space',
+      externalId: 'test_id',
+    });
+    const write = instance.asWrite();
+    expect(write).toBeInstanceOf(InstanceWrite);
+  });
+});
+```
 
-@pytest.fixture(scope="session")
-def generated_ts_sdk(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    """Generate TypeScript SDK once per test session."""
-    output_dir = tmp_path_factory.mktemp("ts_sdk")
-    # Generate SDK using pygen
-    from cognite.pygen._generation.typescript import generate_typescript_sdk
-    generate_typescript_sdk(data_model=..., output_dir=output_dir)
-    return output_dir
+```typescript
+// tests/tests_typescript/__tests__/client.test.ts
+import { describe, it, expect, vi } from 'vitest';
+import { InstanceClient } from '../../cognite/pygen/_generation/typescript/instance_api';
 
-
-def test_typescript_compiles(generated_ts_sdk: Path) -> None:
-    """Verify generated TypeScript compiles without errors."""
-    result = subprocess.run(
-        ["npm", "run", "build"],
-        cwd=ROOT_DIR,  # Run from root where tsconfig.json is
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, f"TypeScript compilation failed: {result.stderr}"
-
-
-def test_typescript_tests_pass(generated_ts_sdk: Path) -> None:
-    """Run TypeScript unit tests on generated SDK."""
-    result = subprocess.run(
-        ["npm", "test"],
-        cwd=ROOT_DIR,  # Run from root where vitest.config.ts is
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, f"TypeScript tests failed: {result.stderr}"
-
-
-def test_typescript_lint_passes(generated_ts_sdk: Path) -> None:
-    """Verify generated TypeScript passes linting."""
-    result = subprocess.run(
-        ["npm", "run", "lint"],
-        cwd=ROOT_DIR,  # Run from root
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, f"TypeScript linting failed: {result.stderr}"
+describe('InstanceClient', () => {
+  it('should upsert instances', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ items: [] }),
+    });
+    
+    const client = new InstanceClient({
+      baseUrl: 'https://api.cognitedata.com',
+      project: 'test',
+      credentials: { token: 'test-token' },
+      fetch: mockFetch,
+    });
+    
+    const result = await client.upsert([]);
+    expect(result).toBeDefined();
+  });
+});
 ```
 
 ### TypeScript Test Project Structure
@@ -889,28 +889,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: pip install -e ".[dev]"
-      - run: npm install  # Uses root package.json
-      - run: pytest tests/tests_typescript
+      - run: npm install      # Uses root package.json
+      - run: npm run build    # Compile TypeScript
+      - run: npm run lint     # Run ESLint
+      - run: npm test         # Run vitest
 
   test-csharp:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0"
-      - run: pip install -e ".[dev]"
-      - run: pytest tests/tests_csharp
+      - run: dotnet restore
+      - run: dotnet build
+      - run: dotnet test
 ```
 
 ### Test Categories
