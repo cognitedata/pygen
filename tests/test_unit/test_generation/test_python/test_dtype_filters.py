@@ -40,6 +40,7 @@ class ExampleFilter(FilterContainer):
                 self.date_,
             ],
             operator,
+            "node",
         )
 
 
@@ -185,7 +186,7 @@ class TestDataTypeFilters:
 
 class TestFilterContainer:
     def test_null_filter_container(self) -> None:
-        assert FilterContainer([], "or").as_filter() is None
+        assert FilterContainer([], "or", "node").as_filter() is None
 
     def test_empty_filter_container(self) -> None:
         assert ExampleFilter(operator="and").as_filter() is None

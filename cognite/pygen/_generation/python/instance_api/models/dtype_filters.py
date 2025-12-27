@@ -2,6 +2,8 @@ import sys
 from datetime import date, datetime
 from typing import Any, Literal
 
+from cognite.pygen._generation.python.instance_api.models.instance import InstanceId
+
 from ._references import ViewReference
 from .filters import (
     Filter,
@@ -67,9 +69,16 @@ class DataTypeFilter:
 
 
 class FilterContainer:
-    def __init__(self, data_type_filters: list[DataTypeFilter], operator: Literal["and", "or"]) -> None:
+    def __init__(
+        self,
+        data_type_filters: list[DataTypeFilter],
+        operator: Literal["and", "or"],
+        instance_type: Literal["node", "edge"],
+    ) -> None:
         self._data_type_filters = data_type_filters
         self._operator = operator
+        self.space = TextFilter(instance_type, "space", operator)
+        self.external_id = TextFilter(instance_type, "externalId", operator)
 
     def as_filter(self) -> Filter | None:
         """Convert the accumulated conditions to a Filter."""
@@ -245,3 +254,46 @@ class BooleanFilter(DataTypeFilter):
     def equals(self, value: bool | None) -> Self:
         """Filter for values equal to the given boolean."""
         return self._add_filter("equals", "value", value if value is None else bool(value))
+
+
+class DirectRelationFilter(DataTypeFilter):
+    """Filter for direct relation properties."""
+
+    def _validate_value(
+        self,
+        value: str | InstanceId | tuple[str, str] | None,
+        space: str | None = None,
+    ) -> dict[str, str] | None:
+        if value is None:
+            return None
+        elif isinstance(value, tuple) and len(value) == 2:
+            return {"space": value[0], "externalId": value[1]}
+        elif isinstance(value, InstanceId):
+            return value.model_dump(exclude={"instanceType"})
+        elif isinstance(value, str):
+            if space is None:
+                raise ValueError("Space must be provided when value is a string.")
+            return {"space": space, "externalId": value}
+        else:
+            raise TypeError(f"Expected str, InstanceId, tuple[str, str], or list thereof, got {type(value)}")
+
+    def equals(self, value: str | InstanceId | tuple[str, str] | None, space: str | None = None) -> Self:
+        """Filter for values equal to the given relation ID."""
+        return self._add_filter("equals", "value", self._validate_value(value, space))
+
+    def in_(self, values: list[str | InstanceId | tuple[str, str]] | None, space: str | None = None) -> Self:
+        """Filter for values that are in the given list of relation IDs."""
+        return self._add_filter(
+            "in", "values", [self._validate_value(value, space) for value in values] if values is not None else None
+        )
+
+    def equals_or_in(
+        self,
+        value: str | InstanceId | tuple[str, str] | list[str | InstanceId | tuple[str, str]] | None,
+        space: str | None = None,
+    ) -> Self:
+        """Filter for values equal to the given relation ID or in the given list."""
+        if isinstance(value, list):
+            return self.in_(value, space)
+        else:
+            return self.equals(value, space)
