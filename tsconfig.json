@@ -12,7 +12,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./cognite/pygen/_generation/typescript/instance_api",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noUnusedLocals": true,
@@ -23,10 +23,11 @@
     "noUncheckedIndexedAccess": true
   },
   "include": [
-    "src/**/*.ts"
+    "cognite/pygen/_generation/typescript/instance_api/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "tests"
   ]
 }

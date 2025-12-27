@@ -1,6 +1,15 @@
 import { defineConfig } from "vitest/config";
+import { resolve } from "path";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@cognite/pygen-typescript": resolve(
+        __dirname,
+        "../../cognite/pygen/_generation/typescript/instance_api/index.ts"
+      ),
+    },
+  },
   test: {
     globals: true,
     environment: "node",
@@ -8,7 +17,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      include: ["../../cognite/pygen/_generation/typescript/instance_api/src/**/*.ts"],
+      include: ["../../cognite/pygen/_generation/typescript/**/*.ts"],
       exclude: ["node_modules", "__tests__"],
       thresholds: {
         lines: 90,

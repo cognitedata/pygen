@@ -15,7 +15,10 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals", "node"]
+    "types": ["vitest/globals", "node"],
+    "paths": {
+      "@cognite/pygen-typescript": ["../../cognite/pygen/_generation/typescript/instance_api/index.ts"]
+    }
   },
   "include": [
     "__tests__/**/*.ts",
