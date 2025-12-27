@@ -79,6 +79,14 @@ class FilterContainer:
         self._operator = operator
         self.space = TextFilter(instance_type, "space", operator)
         self.external_id = TextFilter(instance_type, "externalId", operator)
+        self.version = IntegerFilter(instance_type, "version", operator)
+        self.type = DirectRelationFilter(instance_type, "type", operator)
+        self.created_time = DateTimeFilter(instance_type, "createdTime", operator)
+        self.last_updated_time = DateTimeFilter(instance_type, "lastUpdatedTime", operator)
+        self.deleted_time = DateTimeFilter(instance_type, "deletedTime", operator)
+        if instance_type == "edge":
+            self.start_node = DirectRelationFilter(instance_type, "startNode", operator)
+            self.end_node = DirectRelationFilter(instance_type, "endNode", operator)
 
     def as_filter(self) -> Filter | None:
         """Convert the accumulated conditions to a Filter."""
