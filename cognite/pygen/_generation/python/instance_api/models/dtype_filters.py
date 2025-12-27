@@ -84,9 +84,21 @@ class FilterContainer:
         self.created_time = DateTimeFilter(instance_type, "createdTime", operator)
         self.last_updated_time = DateTimeFilter(instance_type, "lastUpdatedTime", operator)
         self.deleted_time = DateTimeFilter(instance_type, "deletedTime", operator)
+        self._data_type_filters.extend(
+            [
+                self.space,
+                self.external_id,
+                self.version,
+                self.type,
+                self.created_time,
+                self.last_updated_time,
+                self.deleted_time,
+            ]
+        )
         if instance_type == "edge":
             self.start_node = DirectRelationFilter(instance_type, "startNode", operator)
             self.end_node = DirectRelationFilter(instance_type, "endNode", operator)
+            self._data_type_filters.extend([self.start_node, self.end_node])
 
     def as_filter(self) -> Filter | None:
         """Convert the accumulated conditions to a Filter."""
