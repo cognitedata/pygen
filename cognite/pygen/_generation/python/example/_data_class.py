@@ -6,7 +6,6 @@ This module contains the data classes for the example data model with:
 - RelatesTo: Edge view for relating nodes
 """
 
-from datetime import date, datetime
 from typing import ClassVar, Literal
 
 from pydantic import Field
@@ -63,8 +62,8 @@ class ProductNode(Instance):
     quantity: int
     quantities: list[int] | None = None
     active: bool | None = None
-    created_date: date = Field(alias="createdDate")
-    updated_timestamp: datetime | None = Field(None, alias="updatedTimestamp")
+    created_date: Date = Field(alias="createdDate")
+    updated_timestamp: DateTime | None = Field(None, alias="updatedTimestamp")
     category: InstanceId | None = None
 
     def as_write(self) -> ProductNodeWrite:
@@ -149,8 +148,8 @@ class RelatesToWrite(InstanceWrite):
 
     _view_id: ClassVar[ViewReference] = ViewReference(space="pygen_example", external_id="RelatesToWrite", version="v1")
     instance_type: Literal["edge"] = Field("edge", alias="instanceType")
-    start_node: InstanceId | tuple[str, str] = Field(alias="startNode")
-    end_node: InstanceId | tuple[str, str] = Field(alias="endNode")
+    start_node: NodeReference = Field(alias="startNode")
+    end_node: NodeReference = Field(alias="endNode")
     relation_type: str = Field(alias="relationType")
     strength: float | None = None
     created_at: DateTime = Field(alias="createdAt")
@@ -165,7 +164,7 @@ class RelatesTo(Instance):
     end_node: NodeReference = Field(alias="endNode")
     relation_type: str = Field(alias="relationType")
     strength: float | None = None
-    created_at: datetime = Field(alias="createdAt")
+    created_at: DateTime = Field(alias="createdAt")
 
     def as_write(self) -> RelatesToWrite:
         """Convert to write representation."""

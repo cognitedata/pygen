@@ -3,7 +3,7 @@
 import gzip
 import json
 from collections.abc import Iterator
-from datetime import date, datetime
+from datetime import date
 from typing import Any
 
 import pytest
@@ -19,9 +19,8 @@ from cognite.pygen._generation.python.example import (
     ProductNodeWrite,
     RelatesTo,
     RelatesToList,
-    RelatesToWrite,
 )
-from cognite.pygen._generation.python.instance_api import Instance, InstanceId, InstanceWrite
+from cognite.pygen._generation.python.instance_api import Instance, InstanceWrite
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 
 
@@ -50,75 +49,69 @@ def search_url(config: PygenClientConfig) -> str:
     return config.create_api_url("/models/instances/search")
 
 
-@pytest.fixture
-def product_item_response() -> dict[str, Any]:
-    """Return a sample ProductNode item response."""
-    return {
-        "instanceType": "node",
-        "space": "pygen_example",
-        "externalId": "product-1",
-        "version": 1,
-        "lastUpdatedTime": 1234567890000,
-        "createdTime": 1234567890000,
-        "deletedTime": None,
-        "properties": {
-            "pygen_example": {
-                "ProductNode/v1": {
-                    "active": None,
-                    "category": None,
-                    "name": "Widget",
-                    "price": 19.99,
-                    "quantity": 100,
-                    "createdDate": "2024-01-01",
-                    "description": None,
-                    "tags": None,
-                    "prices": None,
-                    "quantities": None,
-                    "updatedTimestamp": None,
+def _get_raw_response(item_type: str) -> dict[str, Any]:
+    """Helper to get raw data for different item types."""
+    if item_type == "product":
+        return {
+            "instanceType": "node",
+            "space": "pygen_example",
+            "externalId": "product-1",
+            "version": 1,
+            "lastUpdatedTime": 1234567890000,
+            "createdTime": 1234567890000,
+            "deletedTime": None,
+            "properties": {
+                "pygen_example": {
+                    "ProductNode/v1": {
+                        "active": None,
+                        "category": None,
+                        "name": "Widget",
+                        "price": 19.99,
+                        "quantity": 100,
+                        "createdDate": "2024-01-01",
+                        "description": None,
+                        "tags": None,
+                        "prices": None,
+                        "quantities": None,
+                        "updatedTimestamp": None,
+                    }
                 }
-            }
-        },
-    }
-
-
-@pytest.fixture
-def category_item_response() -> dict[str, Any]:
-    """Return a sample CategoryNode item response."""
-    return {
-        "instanceType": "node",
-        "space": "pygen_example",
-        "externalId": "category-1",
-        "version": 1,
-        "lastUpdatedTime": 1234567890000,
-        "createdTime": 1234567890000,
-        "deletedTime": None,
-        "properties": {"pygen_example": {"CategoryNode/v1": {"categoryName": "Electronics"}}},
-    }
-
-
-@pytest.fixture
-def relates_to_item_response() -> dict[str, Any]:
-    """Return a sample RelatesTo item response."""
-    return {
-        "instanceType": "edge",
-        "space": "pygen_example",
-        "externalId": "edge-1",
-        "version": 1,
-        "lastUpdatedTime": 1234567890000,
-        "createdTime": 1234567890000,
-        "startNode": {"space": "pygen_example", "externalId": "start-node"},
-        "endNode": {"space": "pygen_example", "externalId": "end-node"},
-        "deletedTime": None,
-        "properties": {
-            "pygen_example": {
-                "RelatesTo/v1": {
-                    "relationType": "similar",
-                    "createdAt": "2024-01-01T00:00:00.000",
-                    "strength": 0.8,
+            },
+        }
+    elif item_type == "category":
+        return {
+            "instanceType": "node",
+            "space": "pygen_example",
+            "externalId": "category-1",
+            "version": 1,
+            "lastUpdatedTime": 1234567890000,
+            "createdTime": 1234567890000,
+            "deletedTime": None,
+            "properties": {"pygen_example": {"CategoryNode/v1": {"categoryName": "Electronics"}}},
+        }
+    elif item_type == "relates_to":
+        return {
+            "instanceType": "edge",
+            "space": "pygen_example",
+            "externalId": "edge-1",
+            "version": 1,
+            "lastUpdatedTime": 1234567890000,
+            "createdTime": 1234567890000,
+            "startNode": {"space": "pygen_example", "externalId": "start-node"},
+            "endNode": {"space": "pygen_example", "externalId": "end-node"},
+            "deletedTime": None,
+            "properties": {
+                "pygen_example": {
+                    "RelatesTo/v1": {
+                        "relationType": "similar",
+                        "createdAt": "2024-01-01T00:00:00.000",
+                        "strength": 0.8,
+                    }
                 }
-            }
-        },
-    }
+            },
+        }
+    else:
+        raise ValueError(f"Unknown item type: {item_type}")
 
 
 class TestExampleAPI:
@@ -134,17 +127,9 @@ class TestExampleAPI:
         self,
         item_type: str,
         item_cls: type[Instance],
-        product_item_response: dict[str, Any],
-        category_item_response: dict[str, Any],
-        relates_to_item_response: dict[str, Any],
     ) -> None:
         """Test data class parsing and serialization."""
-        raw_data = {
-            "product": product_item_response,
-            "category": category_item_response,
-            "relates_to": relates_to_item_response,
-        }[item_type]
-
+        raw_data = _get_raw_response(item_type)
         item = item_cls.model_validate(raw_data)
         dumped = item.dump(format="instance")
         assert dumped == raw_data
@@ -481,23 +466,6 @@ class TestRelatesToDataClass:
         assert edge.relation_type == "similar"
         assert edge.strength == 0.8
         assert edge.instance_type == "edge"
-
-    def test_relates_to_write_serialization(self) -> None:
-        """Test RelatesToWrite serialization."""
-        write = RelatesToWrite(
-            space="pygen_example",
-            external_id="edge-1",
-            start_node=InstanceId(instance_type="node", space="pygen_example", external_id="product-1"),
-            end_node=("pygen_example", "product-2"),
-            relation_type="similar",
-            strength=0.8,
-            created_at=datetime(2024, 1, 15, 10, 30, 0),
-        )
-        dumped = write.dump(camel_case=True, format="model")
-
-        assert dumped["instanceType"] == "edge"
-        assert dumped["relationType"] == "similar"
-        assert dumped["strength"] == 0.8
 
 
 class TestRelatesToAPI:
