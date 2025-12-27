@@ -16,11 +16,11 @@ from cognite.pygen._generation.python.instance_api.models._types import Date, Da
 from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
     BooleanFilter,
     DateFilter,
+    DirectRelationFilter,
     FilterContainer,
     FloatFilter,
     IntegerFilter,
     TextFilter,
-    DirectRelationFilter,
 )
 from cognite.pygen._generation.python.instance_api.models.instance import (
     Instance,
