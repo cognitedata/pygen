@@ -617,6 +617,308 @@ Phase 3: Build Generic TypeScript API
 - Request/response logging (opt-in)
 - Generation analytics
 
+## Package Structure and Shipping
+
+The SDK generator supports multiple languages. Each language has a generic part (Instance API) and templates for generating model-specific code. Tests are run for all languages but are not shipped with the package.
+
+### Directory Structure
+
+```
+cognite/pygen/
+├── _client/                           # Pygen Client (internal)
+│   └── ...
+├── _generation/                       # Code generation for all languages
+│   ├── __init__.py
+│   ├── python/
+│   │   ├── instance_api/              # Generic Python SDK (SHIPPED)
+│   │   │   ├── __init__.py
+│   │   │   ├── _instance.py
+│   │   │   ├── _client.py
+│   │   │   ├── _api.py
+│   │   │   └── _utils.py
+│   │   ├── examples/                  # Basic examples (SHIPPED)
+│   │   │   └── ...
+│   │   └── templates/                 # Jinja2 templates (SHIPPED)
+│   │       └── ...
+│   ├── typescript/
+│   │   ├── instance_api/              # Generic TypeScript SDK (SHIPPED)
+│   │   │   ├── src/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── instance.ts
+│   │   │   │   ├── client.ts
+│   │   │   │   └── api.ts
+│   │   │   ├── package.json
+│   │   │   └── tsconfig.json
+│   │   ├── examples/                  # Basic examples (SHIPPED)
+│   │   │   └── ...
+│   │   └── templates/                 # Code generation templates (SHIPPED)
+│   │       └── ...
+│   ├── csharp/                        # Future: C# support
+│   │   ├── instance_api/
+│   │   ├── examples/
+│   │   └── templates/
+│   └── ...                            # Future languages
+├── _ir/                               # Intermediate Representation
+│   └── ...
+└── ...
+
+tests/                                 # NOT SHIPPED - tests only
+├── conftest.py                        # Shared fixtures
+├── python/                            # Python SDK tests
+│   ├── test_instance_api.py
+│   ├── test_generation.py
+│   └── generated/                     # Temp generated code for testing
+├── typescript/                        # TypeScript SDK tests
+│   ├── test_generation.py             # Python wrapper tests
+│   ├── __tests__/                     # Jest/Vitest tests
+│   │   ├── instance.test.ts
+│   │   └── client.test.ts
+│   ├── generated/                     # Temp generated code for testing
+│   ├── package.json                   # Test dependencies
+│   └── tsconfig.json
+├── csharp/                            # Future: C# tests
+│   ├── test_generation.py
+│   └── Tests/                         # NUnit/xUnit tests
+└── integration/                       # Cross-language integration tests
+    └── ...
+```
+
+### What Gets Shipped
+
+The Python package ships:
+- `instance_api/` - Generic runtime code for each language
+- `examples/` - Basic examples showing extension patterns
+- `templates/` - Code generation templates
+
+The package does NOT ship:
+- `tests/` - Test code stays in the repository
+- `generated/` - Temporary generated code for testing
+- Language-specific test files (`__tests__/`, `Tests/`, etc.)
+
+### pyproject.toml Configuration
+
+```toml
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cognite.pygen*"]
+
+[tool.setuptools.package-data]
+"cognite.pygen._generation.python" = [
+    "instance_api/**/*.py",
+    "examples/**/*.py",
+    "templates/**/*.jinja",
+]
+"cognite.pygen._generation.typescript" = [
+    "instance_api/**/*",
+    "examples/**/*",
+    "templates/**/*",
+]
+"cognite.pygen._generation.csharp" = [
+    "instance_api/**/*",
+    "examples/**/*",
+    "templates/**/*",
+]
+
+[tool.setuptools.exclude-package-data]
+"*" = [
+    "tests/*",
+    "**/generated/*",
+    "**/__tests__/*",
+    "**/Tests/*",
+    "**/*.test.ts",
+    "**/*.test.js",
+    "**/test_*.py",
+]
+```
+
+## Multi-Language Testing Strategy
+
+All language SDKs are tested, but tests are orchestrated through Python/pytest for consistency.
+
+### Testing Architecture
+
+```
+pytest (orchestrator)
+    │
+    ├── Python tests (direct)
+    │   └── test_*.py files using pytest
+    │
+    ├── TypeScript tests (via subprocess)
+    │   ├── Generate SDK → temp directory
+    │   ├── npm install
+    │   ├── npm run build (tsc compilation)
+    │   └── npm test (vitest/jest)
+    │
+    ├── C# tests (via subprocess)
+    │   ├── Generate SDK → temp directory
+    │   ├── dotnet restore
+    │   ├── dotnet build
+    │   └── dotnet test
+    │
+    └── Integration tests
+        └── Cross-language consistency checks
+```
+
+### Python Test Wrappers for Other Languages
+
+```python
+# tests/typescript/test_generation.py
+import subprocess
+from pathlib import Path
+import pytest
+
+
+@pytest.fixture(scope="session")
+def generated_ts_sdk(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Generate TypeScript SDK once per test session."""
+    output_dir = tmp_path_factory.mktemp("ts_sdk")
+    # Generate SDK using pygen
+    from cognite.pygen._generation.typescript import generate_typescript_sdk
+    generate_typescript_sdk(data_model=..., output_dir=output_dir)
+    
+    # Install dependencies
+    subprocess.run(["npm", "install"], cwd=output_dir, check=True)
+    return output_dir
+
+
+def test_typescript_compiles(generated_ts_sdk: Path) -> None:
+    """Verify generated TypeScript compiles without errors."""
+    result = subprocess.run(
+        ["npm", "run", "build"],
+        cwd=generated_ts_sdk,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, f"TypeScript compilation failed: {result.stderr}"
+
+
+def test_typescript_tests_pass(generated_ts_sdk: Path) -> None:
+    """Run TypeScript unit tests on generated SDK."""
+    result = subprocess.run(
+        ["npm", "test"],
+        cwd=generated_ts_sdk,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, f"TypeScript tests failed: {result.stderr}"
+
+
+def test_typescript_lint_passes(generated_ts_sdk: Path) -> None:
+    """Verify generated TypeScript passes linting."""
+    result = subprocess.run(
+        ["npm", "run", "lint"],
+        cwd=generated_ts_sdk,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, f"TypeScript linting failed: {result.stderr}"
+```
+
+### TypeScript Test Project Structure
+
+```
+tests/typescript/
+├── test_generation.py           # Python wrapper tests
+├── package.json                 # Test dependencies
+├── tsconfig.json                # TypeScript config
+├── vitest.config.ts             # Test runner config
+├── __tests__/                   # TypeScript unit tests
+│   ├── instance.test.ts         # Tests for instance_api
+│   ├── client.test.ts           # Tests for client
+│   └── api.test.ts              # Tests for API classes
+└── generated/                   # .gitignore'd, temp generated code
+```
+
+### tests/typescript/package.json
+
+```json
+{
+  "name": "@cognite/pygen-typescript-tests",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0"
+  }
+}
+```
+
+### CI/CD Configuration
+
+```yaml
+# .github/workflows/test.yml
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/python
+
+  test-typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: pip install -e ".[dev]"
+      - run: cd tests/typescript && npm install
+      - run: pytest tests/typescript
+
+  test-csharp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/csharp
+```
+
+### Test Categories
+
+1. **Unit Tests**: Test individual components in isolation
+   - IR parsing and transformation
+   - Template rendering
+   - Type mappings
+
+2. **Generation Tests**: Test that generated code is valid
+   - Compiles without errors
+   - Passes linting
+   - Has correct structure
+
+3. **Runtime Tests**: Test that generated SDK works correctly
+   - CRUD operations
+   - Serialization/deserialization
+   - Type safety
+
+4. **Integration Tests**: Test cross-language consistency
+   - Same data model generates equivalent SDKs
+   - API behavior is consistent across languages
+
 ## Documentation Strategy
 
 - API reference (auto-generated from docstrings)
@@ -625,4 +927,3 @@ Phase 3: Build Generic TypeScript API
 - Contributing guide
 - Examples and tutorials
 - Migration guide
-
