@@ -664,11 +664,11 @@ cognite/pygen/
 
 tests/                                 # NOT SHIPPED - tests only
 ├── conftest.py                        # Shared fixtures
-├── python/                            # Python SDK tests
+├── test_python/                       # Python SDK tests
 │   ├── test_instance_api.py
 │   ├── test_generation.py
 │   └── generated/                     # Temp generated code for testing
-├── typescript/                        # TypeScript SDK tests
+├── test_typescript/                   # TypeScript SDK tests
 │   ├── test_generation.py             # Python wrapper tests
 │   ├── __tests__/                     # Jest/Vitest tests
 │   │   ├── instance.test.ts
