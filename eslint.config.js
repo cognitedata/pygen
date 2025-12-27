@@ -30,7 +30,14 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["node_modules/**", "coverage/**", "vitest.config.ts", "eslint.config.js"],
+    ignores: [
+      "node_modules/**",
+      "dist/**",
+      "coverage/**",
+      "vitest.config.ts",
+      "eslint.config.js",
+      "test-pyodide.js",
+    ],
   }
 );
 

@@ -158,7 +158,7 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install root dependencies
+      - name: Install dependencies
         run: npm install
 
       - name: TypeScript compilation check
@@ -167,16 +167,10 @@ jobs:
       - name: Format check
         run: npm run format:check
 
-      - name: Install test dependencies
-        working-directory: tests/typescript
-        run: npm install
-
       - name: Lint check
-        working-directory: tests/typescript
         run: npm run lint
 
       - name: Run tests with coverage
-        working-directory: tests/typescript
         run: npm run test:coverage
 
   validate-description:

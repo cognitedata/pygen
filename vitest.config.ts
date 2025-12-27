@@ -6,19 +6,19 @@ export default defineConfig({
     alias: {
       "@cognite/pygen-typescript": resolve(
         __dirname,
-        "../../cognite/pygen/_generation/typescript/instance_api/index.ts"
+        "cognite/pygen/_generation/typescript/instance_api/index.ts"
       ),
     },
   },
   test: {
     globals: true,
     environment: "node",
-    include: ["__tests__/**/*.test.ts"],
+    include: ["tests/typescript/**/*.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      include: ["../../cognite/pygen/_generation/typescript/**/*.ts"],
-      exclude: ["node_modules", "__tests__"],
+      include: ["cognite/pygen/_generation/typescript/**/*.ts"],
+      exclude: ["node_modules", "tests"],
       thresholds: {
         lines: 90,
         functions: 90,
@@ -28,3 +28,4 @@ export default defineConfig({
     },
   },
 });
+
