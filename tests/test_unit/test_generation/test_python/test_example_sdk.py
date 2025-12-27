@@ -21,32 +21,14 @@ from cognite.pygen._generation.python.example import (
     RelatesToList,
     RelatesToWrite,
 )
-from cognite.pygen._generation.python.instance_api import InstanceId
-from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
+from cognite.pygen._generation.python.instance_api import Instance, InstanceId, InstanceWrite
 from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
 
 
-class MockCredentials(Credentials):
-    """Mock credentials for testing."""
-
-    def authorization_header(self) -> tuple[str, str]:
-        return "Authorization", "Bearer mock-token"
-
-
 @pytest.fixture
-def config() -> PygenClientConfig:
-    """Create a test configuration."""
-    return PygenClientConfig(
-        cdf_url="https://test.cognitedata.com",
-        project="test-project",
-        credentials=MockCredentials(),
-    )
-
-
-@pytest.fixture
-def example_client(config: PygenClientConfig) -> Iterator[ExampleClient]:
+def example_client(pygen_client_config: PygenClientConfig) -> Iterator[ExampleClient]:
     """Create an ExampleClient for testing."""
-    with ExampleClient(config) as client:
+    with ExampleClient(pygen_client_config) as client:
         yield client
 
 
@@ -66,6 +48,109 @@ def retrieve_url(config: PygenClientConfig) -> str:
 def search_url(config: PygenClientConfig) -> str:
     """Return the URL for searching instances."""
     return config.create_api_url("/models/instances/search")
+
+
+@pytest.fixture
+def product_item_response() -> dict[str, Any]:
+    """Return a sample ProductNode item response."""
+    return {
+        "instanceType": "node",
+        "space": "pygen_example",
+        "externalId": "product-1",
+        "version": 1,
+        "lastUpdatedTime": 1234567890000,
+        "createdTime": 1234567890000,
+        "deletedTime": None,
+        "properties": {
+            "pygen_example": {
+                "ProductNode/v1": {
+                    "active": None,
+                    "category": None,
+                    "name": "Widget",
+                    "price": 19.99,
+                    "quantity": 100,
+                    "createdDate": "2024-01-01",
+                    "description": None,
+                    "tags": None,
+                    "prices": None,
+                    "quantities": None,
+                    "updatedTimestamp": None,
+                }
+            }
+        },
+    }
+
+
+@pytest.fixture
+def category_item_response() -> dict[str, Any]:
+    """Return a sample CategoryNode item response."""
+    return {
+        "instanceType": "node",
+        "space": "pygen_example",
+        "externalId": "category-1",
+        "version": 1,
+        "lastUpdatedTime": 1234567890000,
+        "createdTime": 1234567890000,
+        "deletedTime": None,
+        "properties": {"pygen_example": {"CategoryNode/v1": {"categoryName": "Electronics"}}},
+    }
+
+
+@pytest.fixture
+def relates_to_item_response() -> dict[str, Any]:
+    """Return a sample RelatesTo item response."""
+    return {
+        "instanceType": "edge",
+        "space": "pygen_example",
+        "externalId": "edge-1",
+        "version": 1,
+        "lastUpdatedTime": 1234567890000,
+        "createdTime": 1234567890000,
+        "startNode": {"space": "pygen_example", "externalId": "start-node"},
+        "endNode": {"space": "pygen_example", "externalId": "end-node"},
+        "deletedTime": None,
+        "properties": {
+            "pygen_example": {
+                "RelatesTo/v1": {
+                    "relationType": "similar",
+                    "createdAt": "2024-01-01T00:00:00.000",
+                    "strength": 0.8,
+                }
+            }
+        },
+    }
+
+
+class TestExampleAPI:
+    @pytest.mark.parametrize(
+        "item_type, item_cls",
+        [
+            pytest.param("product", ProductNode, id="ProductNode"),
+            pytest.param("category", CategoryNode, id="CategoryNode"),
+            pytest.param("relates_to", RelatesTo, id="RelatesTo edge"),
+        ],
+    )
+    def test_data_class_serialization(
+        self,
+        item_type: str,
+        item_cls: type[Instance],
+        product_item_response: dict[str, Any],
+        category_item_response: dict[str, Any],
+        relates_to_item_response: dict[str, Any],
+    ) -> None:
+        """Test data class parsing and serialization."""
+        raw_data = {
+            "product": product_item_response,
+            "category": category_item_response,
+            "relates_to": relates_to_item_response,
+        }[item_type]
+
+        item = item_cls.model_validate(raw_data)
+        dumped = item.dump(format="instance")
+        assert dumped == raw_data
+        assert hasattr(item, "as_write")
+        writable = item.as_write()
+        assert isinstance(writable, InstanceWrite)
 
 
 def make_list_response(items: list[dict[str, Any]], next_cursor: str | None = None) -> dict[str, Any]:
@@ -141,11 +226,6 @@ def make_relates_to_item(
         "endNode": {"space": "pygen_example", "externalId": "end-node"},
         "properties": {"pygen_example": {"RelatesTo/v1": props}},
     }
-
-
-# =============================================================================
-# ProductNode Tests
-# =============================================================================
 
 
 class TestProductNodeDataClass:

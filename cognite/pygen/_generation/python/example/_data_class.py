@@ -119,7 +119,6 @@ class CategoryNode(Instance):
     _view_id: ClassVar[ViewReference] = ViewReference(space="pygen_example", external_id="CategoryNode", version="v1")
     instance_type: Literal["node"] = Field("node", alias="instanceType")
     category_name: str = Field(alias="categoryName")
-    products: list[InstanceId] | None = None
 
     def as_write(self) -> CategoryNodeWrite:
         """Convert to write representation."""
