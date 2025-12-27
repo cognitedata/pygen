@@ -25,8 +25,10 @@ class DataTypeFilter:
         self._operator = operator
         self._filters: dict[FilterTypes, FilterData] = {}
 
-    def _add_filter(self, filter_type: FilterTypes, key: str, value: Any) -> Self:
+    def _add_filter(self, filter_type: FilterTypes, key: str, value: Any | None) -> Self:
         """Add a filter condition and return self for chaining."""
+        if value is None:
+            return self
         if filter_type in self._filters:
             filter_data = self._filters[filter_type]
             self._filters[filter_type] = filter_data.model_copy(update={key: value})
@@ -201,22 +203,29 @@ class DateFilter(DataTypeFilter):
 class TextFilter(DataTypeFilter):
     """Filter for text/string properties."""
 
-    def equals(self, value: str) -> Self:
+    def equals(self, value: str | None) -> Self:
         """Filter for values equal to the given string."""
-        return self._add_filter("equals", "value", str(value))
+        return self._add_filter("equals", "value", str(value) if value is not None else None)
 
-    def prefix(self, value: str) -> Self:
+    def prefix(self, value: str | None) -> Self:
         """Filter for values starting with the given prefix."""
-        return self._add_filter("prefix", "value", str(value))
+        return self._add_filter("prefix", "value", str(value) if value is not None else None)
 
-    def in_(self, values: list[str]) -> Self:
+    def in_(self, values: list[str] | None) -> Self:
         """Filter for values that are in the given list."""
-        return self._add_filter("in", "values", [str(v) for v in values])
+        return self._add_filter("in", "values", [str(v) for v in values] if values is not None else None)
+
+    def equals_or_in(self, value: str | list[str] | None) -> Self:
+        """Filter for values equal to the given string or in the given list."""
+        if isinstance(value, list):
+            return self.in_(value)
+        else:
+            return self.equals(value)
 
 
 class BooleanFilter(DataTypeFilter):
     """Filter for boolean properties."""
 
-    def equals(self, value: bool) -> Self:
+    def equals(self, value: bool | None) -> Self:
         """Filter for values equal to the given boolean."""
-        return self._add_filter("equals", "value", bool(value))
+        return self._add_filter("equals", "value", value if value is None else bool(value))
