@@ -1,4 +1,5 @@
 import concurrent.futures
+import sys
 from collections.abc import Callable, Sequence
 from typing import Literal, TypeVar
 
@@ -18,6 +19,11 @@ from cognite.pygen._generation.python.instance_api.http_client import (
 from cognite.pygen._generation.python.instance_api.models.instance import InstanceModel, InstanceWrite
 from cognite.pygen._generation.python.instance_api.models.responses import DeleteResponse, UpsertResult
 from cognite.pygen._utils.collection import chunker_sequence
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 T = TypeVar("T")
 
@@ -58,7 +64,7 @@ class InstanceClient:
             max_workers=retrieve_workers, thread_name_prefix="pygen-retrieve"
         )
 
-    def __enter__(self) -> "InstanceClient":
+    def __enter__(self) -> Self:
         """Enter context manager."""
         return self
 
