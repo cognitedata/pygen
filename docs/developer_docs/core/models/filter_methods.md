@@ -1,1 +1,1 @@
-::: cognite.pygen._core.models.filter_methods
+::: cognite.pygen.legacy._core.models.filter_methods

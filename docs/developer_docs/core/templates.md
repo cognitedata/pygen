@@ -1,1 +1,1 @@
-::: cognite.pygen._core.templates
+::: cognite.pygen.legacy._core.templates

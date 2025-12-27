@@ -5,7 +5,7 @@ on:
   pull_request:
 
 env:
-  PYTHON_VERSION: '3.10'
+  PYTHON_VERSION: '3.13'
 
 jobs:
   lint:
@@ -59,8 +59,8 @@ jobs:
 
       - run: uv sync --all-extras
 
-      - name: Test
-        run: uv run pytest cognite tests/test_unit -v
+      - name: Test Legacy
+        run: uv run pytest cognite tests/test_python/test_unit -v
 
       - name: Test CLI
         run: uv run pygen --help
@@ -70,7 +70,6 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
-    environment: dev
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - name: Install uv and set the python version
@@ -87,7 +86,7 @@ jobs:
           CDF_PROJECT: ${{ vars.CDF_PROJECT }}
           IDP_CLIENT_ID: ${{ vars.IDP_CLIENT_ID }}
           IDP_CLIENT_SECRET: ${{ secrets.IDP_CLIENT_SECRET }}
-          IDP_TENANT_ID: ${{ secrets.IDP_TENANT_ID }}
+          IDP_TENANT_ID: ${{ vars.IDP_TENANT_ID }}
         run: uv run pytest --cov=cognite/ --cov-config=pyproject.toml --cov-report=xml:coverage.xml tests/
 
       - name: Push coverage report to PR
@@ -95,7 +94,7 @@ jobs:
         with:
             coverageFile: coverage.xml
             token: ${{ secrets.GITHUB_TOKEN }}
-            thresholdAll: 0.6
+            thresholdAll: 0.95
 
   build_and_test_streamlit_pyodide:
     runs-on: ubuntu-latest
