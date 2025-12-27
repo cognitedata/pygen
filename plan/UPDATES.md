@@ -1,11 +1,44 @@
 # Plan Updates Summary
 
-**Date**: December 26, 2025  
-**Status**: Phase 2 In Progress - Tasks 1-3.b Complete (75%)
+**Date**: December 27, 2025  
+**Status**: Phase 2 Complete ✅ - Ready for Phase 3
 
 ---
 
-## Latest Update: Phase 2 Task 3.b Complete (December 26, 2025)
+## Latest Update: Phase 2 Complete (December 27, 2025)
+
+### Completed Work
+
+**Phase 2, Task 4: Example API Classes** ✅
+- Built example client and API classes based on example data model
+  - Location: `cognite/pygen/_generation/python/example/`
+- Removed existing `PrimitiveNullable` example
+- Created `ExampleClient` extending `InstanceClient`
+  - Three view-specific API classes extending `InstanceAPI`
+  - One for each view in the example model
+- Demonstrated HTTPClient and ViewReference initialization
+- Implemented type-safe retrieve/list/iterate methods with unpacked parameters
+  - Uses primary Python types (int, float, str, bool, datetime, None)
+  - Proper list versions of these types in method signatures
+
+### Phase 2 Summary
+
+**Phase 2: Generic Instance API & Example SDK (Python)** is now complete:
+- ✅ Task 1: Generic Instance Models (Foundation)
+- ✅ Task 2: Generic InstanceClient
+- ✅ Task 3.a: Generic InstanceAPI Part 1
+- ✅ Task 3.b: Generic InstanceAPI Part 2
+- ✅ Task 4: Example API Classes
+
+### Next Steps
+
+- Begin **Phase 3: Generic Instance API & Example SDK (TypeScript)**
+  - Create TypeScript equivalent of Python generic API
+  - Build TypeScript example SDK following same patterns
+
+---
+
+## Previous Update: Phase 2 Task 3.b Complete (December 26, 2025)
 
 ### Completed Work
 
@@ -17,13 +50,6 @@
   - Uses aggregateInstances API endpoint
   - Reuses sort, filtering, and unit data structures from Part 1
 - Location: `cognite/pygen/_generation/`
-
-### Next Steps for Phase 2
-
-- Task 4: Build example client and API classes based on example data model
-  - Create `ExampleClient` extending `InstanceClient`
-  - Create view-specific API classes extending `InstanceAPI`
-  - Implement type-safe methods with unpacked parameters
 
 ---
 
@@ -348,8 +374,8 @@ V1 and V2 development in parallel:
 2. ✅ Phase 0 Complete: Moved v1 to legacy/
 3. ✅ V2 project structure set up
 4. ✅ Phase 1 Complete: HTTPClient, Auth, Models, Resource Clients, Error Handling, Testing
-5. ✅ Phase 2 Tasks 1-3.b Complete: Generic Instance Models, InstanceClient, InstanceAPI
-6. ⏳ Phase 2 Task 4: Example API classes with type-safe methods
+5. ✅ Phase 2 Complete: Generic Instance Models, InstanceClient, InstanceAPI, Example SDK
+6. ⏳ Phase 3: Generic Instance API & Example SDK (TypeScript)
 
 ---
 
@@ -424,5 +450,5 @@ A: Allows v1 bug fixes during v2 development, maintains functional v1 for users,
 
 ---
 
-**Plan Status**: ✅ Implementation In Progress - Phase 2 (75% complete)
+**Plan Status**: ✅ Implementation In Progress - Phase 2 Complete, Ready for Phase 3
 

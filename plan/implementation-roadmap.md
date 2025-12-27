@@ -22,7 +22,7 @@ Phase 1: Pygen Client Core (3-4 weeks)
     ↓
 Phase 2: Generic Instance API & Example SDK - Python (3-4 weeks)
     ↓
-Phase 3: Generic Instance API & Example SDK - TypeScript (3-4 weeks)
+Phase 3: Generic Instance API & Example SDK - TypeScript (4-5 weeks)
     ↓
 Phase 4: Intermediate Representation (IR) for Multi-Language (3-4 weeks)
     ↓
@@ -38,7 +38,7 @@ Phase 9: Production Hardening (2-3 weeks)
     ↓
 Phase 10: Migration & Documentation (2-3 weeks)
 
-Total Estimated Time: 28-42 weeks
+Total Estimated Time: 29-43 weeks
 ```
 
 ## Phase 0: Foundation & Setup
@@ -218,16 +218,16 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - ✅ Implement `aggregate()` for aggregations support built on https://api-docs.cognite.com/20230101/tag/Instances/operation/aggregateInstances
    - ✅ The `.aggregate` method should reuse the sort, filtering, unit data structures from part 1.
 
-4. **Example API Classes**
-   - Build an example client and API classes based on the example data model
+4. **Example API Classes** ✅
+   - ✅ Build an example client and API classes based on the example data model
      located in `cognite/pygen/_generation/example_model/`
-   - Remove the existing `PrimitiveNullable` example.
-   - This should have a `ExampleClient` extending `InstanceClient` with three view-specific API classes
+   - ✅ Remove the existing `PrimitiveNullable` example.
+   - ✅ This should have a `ExampleClient` extending `InstanceClient` with three view-specific API classes
      extending `InstanceAPI`, one for each view in the example model. Note this subclassing
      should be trivial to implement, a simple subclassing of `InstanceClient` and add three
      attributes for the view-specific API classes.
-   - Demonstrate how to initialize API classes with HTTPClient and ViewReference
-   - Implement type-safe retrieve/list/iterate methods with unpacked parameters. The goal is to use
+   - ✅ Demonstrate how to initialize API classes with HTTPClient and ViewReference
+   - ✅ Implement type-safe retrieve/list/iterate methods with unpacked parameters. The goal is to use
      as much primary Python typing features as possible, such as:
      int, float, str, bool, datetime, None or list version of these in the method signatures. If absolute necessary, use
      a more complex data structures that you create from pydantic or data classes. 
@@ -243,13 +243,24 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - ✅ Documentation and usage examples
 
 ### Success Criteria
-- Can perform CRUD operations on instances using generic InstanceClient
-- Can retrieve, list, and filter instances using view-specific API classes
-- Example SDK demonstrates clear patterns for extending generic classes
-- Type safety maintained throughout with proper generics
-- All tests pass with >90% coverage
-- Generated code is clean and well-documented
-- Pandas integration works for data analysis
+- ✅ Can perform CRUD operations on instances using generic InstanceClient
+- ✅ Can retrieve, list, and filter instances using view-specific API classes
+- ✅ Example SDK demonstrates clear patterns for extending generic classes
+- ✅ Type safety maintained throughout with proper generics
+- ✅ All tests pass with >90% coverage
+- ✅ Generated code is clean and well-documented
+- ✅ Pandas integration works for data analysis
+
+### Status
+**✅ PHASE 2 COMPLETE** (December 27, 2025)
+
+- ✅ Task 1: Generic Instance Models - Complete
+- ✅ Task 2: Generic InstanceClient - Complete
+- ✅ Task 3.a: Generic InstanceAPI Part 1 - Complete
+- ✅ Task 3.b: Generic InstanceAPI Part 2 - Complete
+- ✅ Task 4: Example API Classes - Complete
+
+**Progress**: 4/4 tasks complete (100%)
 
 ### Dependencies
 - Phase 1 complete (need HTTPClient and PygenClient)
@@ -261,77 +272,190 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 **Goal**: Build TypeScript equivalent of Phase 2 - generic instance API with InstanceClient and InstanceAPI, plus an example SDK.
 
-**Duration**: 3-4 weeks
+**Duration**: 4-5 weeks
 
 ### Tasks
 
-1. **Generic Instance Models (TypeScript)**
+0. **Development Environment & Tooling Setup**
+   - **Testing Framework Selection**: Choose between:
+     - **Vitest** (recommended) - Fast, native ESM support, Jest-compatible API, excellent TypeScript support
+     - Jest - Mature ecosystem, widely used, but slower with TypeScript
+     - Mocha + Chai - Flexible but requires more setup
+   - **Data Validation/Schema Library Selection**: Evaluate options:
+     - **Plain TypeScript** (recommended for SDK) - Minimal dependencies, compile-time type safety
+     - Zod - Runtime validation with TypeScript inference, useful for API responses
+     - io-ts - Functional approach to validation, pairs well with fp-ts
+     - Note: Unlike Python's Pydantic, TypeScript types are compile-time only. For runtime
+       validation of API responses, consider Zod for critical paths.
+   - **HTTP Client Selection**: Evaluate options:
+     - **fetch** (recommended) - Native browser/Node.js API, no dependencies
+     - axios - More features, interceptors, but adds dependency
+   - **Project Structure Setup**:
+     - Create `cognite/pygen/_generation/typescript/` directory structure
+     - Set up `package.json` with TypeScript, testing, and build dependencies
+     - Configure `tsconfig.json` for strict mode and ESM output
+     - Set up ESLint and Prettier for code quality
+   - **CI/CD Pipeline**:
+     - Add TypeScript testing job to existing CI/CD workflow
+     - Configure test coverage reporting (c8 or istanbul)
+     - Add TypeScript compilation check
+     - Add linting and formatting checks
+     - Ensure CI runs on PRs affecting TypeScript files
+   - **Documentation**:
+     - Document chosen packages and rationale
+     - Create CONTRIBUTING guide for TypeScript code
+
+1. **HTTP Client Foundation (TypeScript)**
+   - Implement `HTTPClient` class wrapping fetch API
+   - Implement retry logic with exponential backoff
+   - Add rate limiting support (handle 429 responses with Retry-After)
+   - Connection timeout handling
+   - Request/response logging capability
+   - Create `RequestMessage`, `SuccessResponse`, `FailedResponse`, `FailedRequest` types
+   - Error response parsing (match Python's ErrorDetails)
+
+2. **Authentication Support (TypeScript)**
+   - Create `Credentials` interface (abstract base)
+   - Implement `TokenCredentials` for static token auth
+   - Implement `OAuthCredentials` with token refresh logic
+   - Support for different authentication providers
+   - Token caching and refresh handling
+   - Create `PygenClientConfig` interface for client configuration
+
+3. **Generic Instance Models (TypeScript)**
    - Create `InstanceModel`, `Instance`, `InstanceWrite` base interfaces/classes
-   - Implement `InstanceList` with pagination support
-   - Implement `ViewRef` interface for view references
+   - Implement `InstanceList<T>` with array-like behavior and utility methods
+   - Implement reference types: `ViewReference`, `NodeReference`, `ContainerReference`
    - Implement `DataRecord` and `DataRecordWrite` interfaces
-   - Generic serialization/deserialization (to/from CDF API format)
+   - Implement `InstanceId` type for instance identification
+   - Generic serialization/deserialization (to/from CDF API format with camelCase conversion)
    - Support for both `node` and `edge` instance types
-   - Proper TypeScript type definitions
+   - Custom date/datetime handling (milliseconds since epoch like Python's `DateTimeMS`)
 
-2. **Generic InstanceClient (TypeScript)**
+4. **Filter System (TypeScript)**
+   - Implement filter data types matching Python's `filters.py`:
+     - `EqualsFilter`, `InFilter`, `RangeFilter`, `PrefixFilter`, `ExistsFilter`
+     - `ContainsAnyFilter`, `ContainsAllFilter`, `MatchAllFilter`, `NestedFilter`
+     - `OverlapsFilter`, `HasDataFilter`, `InstanceReferencesFilter`
+     - Logical filters: `AndFilter`, `OrFilter`, `NotFilter`
+   - Implement data type filter builders matching Python's `dtype_filters.py`:
+     - `TextFilter`, `FloatFilter`, `IntegerFilter`, `BooleanFilter`
+     - `DateFilter`, `DateTimeFilter`, `DirectRelationFilter`
+   - Create `FilterContainer` base class for view-specific filter containers
+   - Ensure type-safe filter construction with method chaining
+
+5. **Query & Response Models (TypeScript)**
+   - Implement query parameter types:
+     - `PropertySort` for sorting configuration
+     - `UnitConversion`, `UnitReference`, `UnitSystemReference` for unit handling
+     - `DebugParameters` for debug mode
+   - Implement aggregation types:
+     - `Count`, `Sum`, `Avg`, `Min`, `Max`, `Histogram`
+     - `Aggregation` union type with discriminator
+   - Implement response types:
+     - `ListResponse<T>`, `Page<T>` for paginated responses
+     - `UpsertResult` with created/updated/unchanged/deleted tracking
+     - `DeleteResponse`, `AggregateResponse`, `AggregateItem`
+
+6. **Exception Hierarchy (TypeScript)**
+   - Create `PygenAPIError` base error class
+   - Implement `OAuth2Error` for authentication failures
+   - Implement `MultiRequestError` for partial batch failures (with successful results)
+   - Proper error message formatting and stack traces
+
+7. **Generic InstanceClient (TypeScript)**
    - Build `InstanceClient` class for instance CRUD operations
-   - Implement `upsert()` method (create and update modes)
-   - Implement `delete()` method
-   - Support batch operations for efficiency
-   - Integration with HTTP client (fetch or axios)
-   - Proper error handling and validation
-   - Return `InstanceResult` with created/updated/unchanged/deleted items
+   - Implement `upsert()` method with modes: "replace", "update", "apply"
+   - Implement `delete()` method with flexible input types
+   - Support batch operations with chunking (1000 items per request)
+   - Use `Promise.all` or similar for parallel request execution
+   - Implement `_collectResults()` for aggregating batch results
+   - Context manager pattern equivalent (using `Disposable` or explicit close)
+   - Configurable worker counts for write/delete/retrieve operations
 
-3. **Generic InstanceAPI (TypeScript)**
-   - Build `InstanceAPI` base class for view-specific operations
-   - Implement `retrieve()` with single/batch support
-   - Implement `list()` with async iteration
-   - Implement `iterate()` for pagination
-   - Implement `aggregate()` for aggregations
-   - Implement `search()` for full-text search
-   - Generic filtering support
-   - Support different connection retrieval modes
+8. **Generic InstanceAPI (TypeScript)**
+   - Build `InstanceAPI<TInstance, TInstanceList>` base class
+   - Implement `_iterate()` for single-page retrieval with cursor
+   - Implement `_list()` with automatic pagination (collects all pages)
+   - Implement `_search()` for full-text search
+   - Implement `_retrieve()` with single/batch support and parallel execution
+   - Implement `_aggregate()` for aggregation queries
+   - Generic filter support via `Filter` type
+   - All methods should use protected underscore prefix for subclass overriding
 
-4. **Example Data Classes (TypeScript)**
-   - Create example view-specific interfaces/classes extending `Instance`
-   - Create example write interfaces extending `InstanceWrite`
-   - Create example list classes
-   - Demonstrate property type mappings (string, number, boolean, Date, etc.)
-   - Demonstrate optional and required fields
+9. **Example Data Classes (TypeScript)**
+   - Create `ProductNode`, `ProductNodeWrite`, `ProductNodeList` (node with various types)
+   - Create `CategoryNode`, `CategoryNodeWrite`, `CategoryNodeList` (simple node)
+   - Create `RelatesTo`, `RelatesToWrite`, `RelatesToList` (edge type)
+   - Create view-specific filter containers:
+     - `ProductNodeFilter` with type-safe property filters
+     - `CategoryNodeFilter`
+     - `RelatesToFilter`
+   - Demonstrate property type mappings:
+     - `string`, `number`, `boolean`, `Date` (for date/datetime)
+     - Optional fields with `| undefined` or `?`
+     - Arrays: `string[]`, `number[]`
+     - Direct relations as `InstanceId | [string, string]`
+   - Implement `asWrite()` conversion method on read classes
    - Include comprehensive JSDoc comments
 
-5. **Example API Classes (TypeScript)**
-   - Create example client extending `InstanceClient`
-   - Create view-specific API classes extending `InstanceAPI`
-   - Demonstrate how to initialize API classes with HTTP client and ViewRef
-   - Implement type-safe retrieve/list/iterate methods
-   - Show proper type hints with TypeScript generics
-   - Include examples of different view types
-
+10. **Example API Classes (TypeScript)**
+    - Create `ProductNodeAPI` extending `InstanceAPI` with unpacked filter parameters
+    - Create `CategoryNodeAPI` extending `InstanceAPI`
+    - Create `RelatesToAPI` extending `InstanceAPI` for edge operations
+    - Each API class should have:
+      - `retrieve()` with overloads for single/batch
+      - `iterate()` with unpacked filter parameters
+      - `list()` with unpacked filter parameters and sorting
+      - `search()` with query and filter parameters
+      - `aggregate()` with aggregation and filter parameters
+    - Create `ExampleClient` extending `InstanceClient` that composes all APIs
 
 ### Deliverables
-- ✅ Complete generic TypeScript instance models
-- ✅ Generic InstanceClient with CRUD operations
-- ✅ Generic InstanceAPI with retrieve/list/iterate/aggregate/search
-- ✅ Example TypeScript data classes
-- ✅ Example TypeScript API classes
-- ✅ Example TypeScript client
-- ✅ Comprehensive test suite with >90% coverage
-- ✅ Documentation and usage examples
+- Complete development environment with chosen tooling
+- CI/CD pipeline for TypeScript testing and linting
+- HTTP client with retry and authentication support
+- Complete generic TypeScript instance models
+- Type-safe filter system with builder pattern
+- Generic InstanceClient with CRUD operations
+- Generic InstanceAPI with retrieve/list/iterate/aggregate/search
+- Example TypeScript data classes, filters, APIs, and client
+- Comprehensive test suite with >90% coverage
+- Documentation and usage examples
 
 ### Success Criteria
+- Development environment allows quick iteration with good DX
+- CI/CD catches type errors and test failures before merge
+- Can authenticate to CDF using various credential types
 - Can perform CRUD operations using TypeScript InstanceClient
 - Can retrieve, list, and filter instances using TypeScript API classes
+- Filter builders provide type-safe, chainable filter construction
 - Example SDK demonstrates clear patterns for extending generic classes
 - Type safety maintained throughout with TypeScript generics
 - All tests pass with >90% coverage
 - Generated code is clean and well-documented
-- Follows TypeScript best practices
+- Follows TypeScript best practices (strict mode, ESM, etc.)
 
 ### Dependencies
 - Phase 1 complete (need to understand client patterns)
 - Phase 2 complete (need Python patterns to mirror)
+
+### Status
+**NOT STARTED**
+
+- ⬜ Task 0: Development Environment & Tooling Setup
+- ⬜ Task 1: HTTP Client Foundation
+- ⬜ Task 2: Authentication Support
+- ⬜ Task 3: Generic Instance Models
+- ⬜ Task 4: Filter System
+- ⬜ Task 5: Query & Response Models
+- ⬜ Task 6: Exception Hierarchy
+- ⬜ Task 7: Generic InstanceClient
+- ⬜ Task 8: Generic InstanceAPI
+- ⬜ Task 9: Example Data Classes
+- ⬜ Task 10: Example API Classes
+
+**Progress**: 0/11 tasks complete (0%)
 
 ---
 
