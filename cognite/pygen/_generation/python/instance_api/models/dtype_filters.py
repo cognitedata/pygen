@@ -277,7 +277,7 @@ class DirectRelationFilter(DataTypeFilter):
         elif isinstance(value, tuple) and len(value) == 2:
             return {"space": value[0], "externalId": value[1]}
         elif isinstance(value, InstanceId):
-            return value.model_dump(exclude={"instanceType"})
+            return value.model_dump(exclude={"instance_type"}, by_alias=True)
         elif isinstance(value, str):
             if space is None:
                 raise ValueError("Space must be provided when value is a string.")

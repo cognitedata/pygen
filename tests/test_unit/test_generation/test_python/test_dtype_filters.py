@@ -1,13 +1,15 @@
 from datetime import date, datetime
-from typing import Literal
+from typing import Any, Literal
 
 import pytest
 
+from cognite.pygen._generation.python.instance_api import InstanceId
 from cognite.pygen._generation.python.instance_api.models._references import ViewReference
 from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
     BooleanFilter,
     DateFilter,
     DateTimeFilter,
+    DirectRelationFilter,
     FilterContainer,
     FloatFilter,
     IntegerFilter,
@@ -28,6 +30,7 @@ class ExampleFilter(FilterContainer):
         self.int64 = IntegerFilter(VIEW_ID, "int64", operator)
         self.timestamp = DateTimeFilter(VIEW_ID, "timestamp", operator)
         self.date_ = DateFilter(VIEW_ID, "date", operator)
+        self.direct_relation = DirectRelationFilter(VIEW_ID, "relatedNodes", operator)
         super().__init__(
             [
                 self.text,
@@ -40,7 +43,7 @@ class ExampleFilter(FilterContainer):
                 self.date_,
             ],
             operator,
-            "node",
+            "edge",
         )
 
 
@@ -132,6 +135,16 @@ class TestDataTypeFilters:
             }
         }
 
+    def test_datatime_filter_none(self, example_filters: ExampleFilter) -> None:
+        datetime_filter = example_filters.timestamp
+        datetime_filter.equals(None)
+        assert datetime_filter.dump() == {}
+
+    def test_datatime_filter_invalid_type(self, example_filters: ExampleFilter) -> None:
+        datetime_filter = example_filters.timestamp
+        with pytest.raises(TypeError):
+            datetime_filter.equals(12345)  # type: ignore[arg-type]
+
     def test_date_filter_equals(self, example_filters: ExampleFilter) -> None:
         d = date(2024, 1, 15)
         date_filter = example_filters.date_
@@ -156,9 +169,19 @@ class TestDataTypeFilters:
             "range": {"property": _get_property_path("date"), "gt": start, "lt": end}
         }
 
+    def test_date_filter_none(self, example_filters: ExampleFilter) -> None:
+        date_filter = example_filters.date_
+        date_filter.equals(None)
+        assert date_filter.dump() == {}
+
+    def test_date_filter_invalid_type(self, example_filters: ExampleFilter) -> None:
+        date_filter = example_filters.date_
+        with pytest.raises(TypeError):
+            date_filter.equals(20240101)  # type: ignore[arg-type]
+
     def test_text_filter_equals(self, example_filters: ExampleFilter) -> None:
         text_filter = example_filters.text
-        text_filter.equals("hello")
+        text_filter.equals_or_in("hello")
         assert text_filter.dump() == {"equals": {"property": _get_property_path("text"), "value": "hello"}}
 
     def test_text_filter_prefix(self, example_filters: ExampleFilter) -> None:
@@ -168,7 +191,7 @@ class TestDataTypeFilters:
 
     def test_text_filter_in(self, example_filters: ExampleFilter) -> None:
         text_filter = example_filters.text
-        text_filter.in_(["value1", "value2", "value3"])
+        text_filter.equals_or_in(["value1", "value2", "value3"])
         assert text_filter.dump() == {
             "in": {"property": _get_property_path("text"), "values": ["value1", "value2", "value3"]}
         }
@@ -182,6 +205,67 @@ class TestDataTypeFilters:
                 {"equals": {"property": _get_property_path("text"), "value": "exact"}},
             ]
         }
+
+    def test_text_filter_none(self, example_filters: ExampleFilter) -> None:
+        text_filter = example_filters.text
+        text_filter.equals_or_in(None)
+        assert text_filter.dump() == {}
+
+    def test_direct_relation_filter_equals(self, example_filters: ExampleFilter) -> None:
+        direct_relation_filter = example_filters.direct_relation
+        direct_relation_filter.equals_or_in("relatedNode1", space="related_space")
+        assert direct_relation_filter.dump() == {
+            "equals": {
+                "property": _get_property_path("relatedNodes"),
+                "value": {
+                    "space": "related_space",
+                    "externalId": "relatedNode1",
+                },
+            }
+        }
+
+    def test_direct_relation_filter_in(self, example_filters: ExampleFilter) -> None:
+        direct_relation_filter = example_filters.direct_relation
+        direct_relation_filter.equals_or_in(
+            [
+                ("related_space", "relatedNode1"),
+                InstanceId(space="related_space", external_id="relatedNode2", instance_type="node"),
+            ]
+        )
+        assert direct_relation_filter.dump() == {
+            "in": {
+                "property": _get_property_path("relatedNodes"),
+                "values": [
+                    {"space": "related_space", "externalId": "relatedNode1"},
+                    {"space": "related_space", "externalId": "relatedNode2"},
+                ],
+            }
+        }
+
+    def test_direct_relation_none_filter(self, example_filters: ExampleFilter) -> None:
+        direct_relation_filter = example_filters.direct_relation
+        direct_relation_filter.equals_or_in(None)
+        assert direct_relation_filter.dump() == {}
+
+    @pytest.mark.parametrize(
+        "input_,expected_exception",
+        [
+            pytest.param({"value": 123}, TypeError, id="Invalid type for equals"),
+            pytest.param({"value": "relatedNode1"}, ValueError, id="Missing space for equals"),
+            pytest.param({"value": [123, 456]}, TypeError, id="Invalid type in list for in"),
+        ],
+    )
+    def test_direct_relation_filter_invalid_input(
+        self, input_: dict[str, Any], expected_exception: type[Exception], example_filters: ExampleFilter
+    ) -> None:
+        direct_relation_filter = example_filters.direct_relation
+        with pytest.raises(expected_exception):
+            direct_relation_filter.equals_or_in(**input_)
+
+    def test_edge_property(self, example_filters: ExampleFilter) -> None:
+        external_id_filter = example_filters.external_id
+        external_id_filter.prefix("my_edge_")
+        assert external_id_filter.dump() == {"prefix": {"property": ["edge", "externalId"], "value": "my_edge_"}}
 
 
 class TestFilterContainer:
