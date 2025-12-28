@@ -120,9 +120,9 @@ export class HTTPClient {
   }
 
   private async createHeaders(message: RequestMessage): Promise<Record<string, string>> {
-    const [, authValue] = await this.credentials.authorizationHeader();
+    const [authName, authValue] = await this.credentials.authorizationHeader();
     return {
-      Authorization: authValue,
+      [authName]: authValue,
       "Content-Type": message.contentType ?? "application/json",
       Accept: message.accept ?? "application/json",
       "x-cdp-app": this.clientName,
