@@ -4,10 +4,17 @@ import {
   createViewReference,
   createContainerReference,
   createDataModelReference,
+  createNodeReference,
+  createEdgeReference,
+  instanceIdEquals,
+  instanceIdToString,
+  viewReferenceToString,
   type InstanceId,
   type ViewReference,
   type ContainerReference,
   type DataModelReference,
+  type NodeReference,
+  type EdgeReference,
 } from "@cognite/pygen-typescript";
 
 describe("Reference Types", () => {
@@ -61,6 +68,67 @@ describe("Reference Types", () => {
         externalId: "my-model",
         version: "v2",
       });
+    });
+  });
+
+  describe("createNodeReference", () => {
+    it("should create a NodeReference with correct properties", () => {
+      const ref: NodeReference = createNodeReference("my-space", "my-node");
+
+      expect(ref).toEqual({
+        space: "my-space",
+        externalId: "my-node",
+      });
+    });
+  });
+
+  describe("createEdgeReference", () => {
+    it("should create an EdgeReference with correct properties", () => {
+      const ref: EdgeReference = createEdgeReference("my-space", "my-edge");
+
+      expect(ref).toEqual({
+        space: "my-space",
+        externalId: "my-edge",
+      });
+    });
+  });
+
+  describe("instanceIdEquals", () => {
+    it("should return true for equal InstanceIds", () => {
+      const a = createInstanceId("my-space", "my-instance");
+      const b = createInstanceId("my-space", "my-instance");
+
+      expect(instanceIdEquals(a, b)).toBe(true);
+    });
+
+    it("should return false for different spaces", () => {
+      const a = createInstanceId("space-1", "my-instance");
+      const b = createInstanceId("space-2", "my-instance");
+
+      expect(instanceIdEquals(a, b)).toBe(false);
+    });
+
+    it("should return false for different externalIds", () => {
+      const a = createInstanceId("my-space", "instance-1");
+      const b = createInstanceId("my-space", "instance-2");
+
+      expect(instanceIdEquals(a, b)).toBe(false);
+    });
+  });
+
+  describe("instanceIdToString", () => {
+    it("should format InstanceId as space:externalId", () => {
+      const id = createInstanceId("my-space", "my-instance");
+
+      expect(instanceIdToString(id)).toBe("my-space:my-instance");
+    });
+  });
+
+  describe("viewReferenceToString", () => {
+    it("should format ViewReference with version", () => {
+      const ref = createViewReference("my-space", "my-view", "v1");
+
+      expect(viewReferenceToString(ref)).toBe("my-space:my-view(version=v1)");
     });
   });
 });
