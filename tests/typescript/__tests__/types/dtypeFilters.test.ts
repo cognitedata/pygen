@@ -218,7 +218,7 @@ describe("DateTimeFilter", () => {
   it("should throw error for invalid datetime string", () => {
     expect(() => {
       filter.equals("not a date");
-    }).toThrow("not a valid ISO format datetime");
+    }).toThrow("String 'not a date' is not a valid ISO 8601 datetime format.");
   });
 
   it("should create a range filter", () => {
