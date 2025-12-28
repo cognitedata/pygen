@@ -6,6 +6,7 @@
  * @packageDocumentation
  */
 
+import type { Credentials, PygenClientConfig } from "../auth/index.js";
 import type {
   HTTPResult,
   RequestMessage,
@@ -16,26 +17,8 @@ import type {
 } from "./types.js";
 import { createRequestState, getTotalAttempts, parseErrorDetails } from "./types.js";
 
-/** Configuration for the HTTP client */
-export interface HTTPClientConfig {
-  /** Base URL for CDF API (e.g., "https://api.cognitedata.com") */
-  readonly baseUrl: string;
-  /** CDF project name */
-  readonly project: string;
-  /** Function to get authorization header value */
-  readonly getAuthHeader: () => Promise<string> | string;
-  /** Client application name for x-cdp-app header */
-  readonly clientName?: string;
-  /** Request timeout in milliseconds (default: 30000) */
-  readonly timeout?: number;
-  /** CDF API version (default: "v1") */
-  readonly apiSubversion?: string;
-}
-
 /** Options for HTTP client behavior */
 export interface HTTPClientOptions {
-  /** Maximum retry attempts (default: 10) */
-  readonly maxRetries?: number;
   /** HTTP status codes that should trigger a retry */
   readonly retryStatusCodes?: ReadonlySet<number>;
   /** Maximum backoff time in seconds (default: 60) */
@@ -54,7 +37,7 @@ const DEFAULT_RETRY_STATUS_CODES = new Set([408, 429, 502, 503, 504]);
  * const client = new HTTPClient({
  *   baseUrl: "https://api.cognitedata.com",
  *   project: "my-project",
- *   getAuthHeader: () => `Bearer ${token}`,
+ *   credentials: new TokenCredentials("my-token"),
  * });
  *
  * const result = await client.request({
@@ -64,18 +47,33 @@ const DEFAULT_RETRY_STATUS_CODES = new Set([408, 429, 502, 503, 504]);
  * ```
  */
 export class HTTPClient {
-  private readonly config: HTTPClientConfig;
+  private readonly credentials: Credentials;
+  private readonly baseUrl: string;
+  private readonly project: string;
+  private readonly clientName: string;
+  private readonly apiSubversion: string;
+  private readonly timeout: number;
   private readonly maxRetries: number;
   private readonly retryStatusCodes: ReadonlySet<number>;
   private readonly maxRetryBackoff: number;
-  private readonly timeout: number;
 
-  constructor(config: HTTPClientConfig, options: HTTPClientOptions = {}) {
-    this.config = config;
-    this.maxRetries = options.maxRetries ?? 10;
+  constructor(config: PygenClientConfig, options: HTTPClientOptions = {}) {
+    this.credentials = config.credentials;
+    this.baseUrl = config.baseUrl;
+    this.project = config.project;
+    this.clientName = config.clientName ?? "pygen-typescript";
+    this.apiSubversion = config.apiSubversion ?? "v1";
+    this.timeout = config.timeout ?? 30000;
+    this.maxRetries = config.maxRetries ?? 10;
     this.retryStatusCodes = options.retryStatusCodes ?? DEFAULT_RETRY_STATUS_CODES;
     this.maxRetryBackoff = options.maxRetryBackoff ?? 60;
-    this.timeout = config.timeout ?? 30000;
+  }
+
+  /**
+   * Get the project name this client is configured for.
+   */
+  get projectName(): string {
+    return this.project;
   }
 
   /**
@@ -130,18 +128,18 @@ export class HTTPClient {
   }
 
   private async createHeaders(message: RequestMessage): Promise<Record<string, string>> {
-    const authHeader = await this.config.getAuthHeader();
+    const [, authValue] = await this.credentials.authorizationHeader();
     return {
-      Authorization: authHeader,
+      Authorization: authValue,
       "Content-Type": message.contentType ?? "application/json",
       Accept: message.accept ?? "application/json",
-      "x-cdp-app": this.config.clientName ?? "pygen-typescript",
-      "cdf-version": message.apiVersion ?? this.config.apiSubversion ?? "v1",
+      "x-cdp-app": this.clientName,
+      "cdf-version": message.apiVersion ?? this.apiSubversion,
     };
   }
 
   private buildUrl(message: RequestMessage): string {
-    const url = new URL(message.endpointUrl, this.config.baseUrl);
+    const url = new URL(message.endpointUrl, this.baseUrl);
     if (message.parameters) {
       for (const [key, value] of Object.entries(message.parameters)) {
         url.searchParams.set(key, String(value));

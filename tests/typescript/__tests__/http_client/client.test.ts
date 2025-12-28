@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { HTTPClient, isSuccess } from "@cognite/pygen-typescript";
+import {
+  HTTPClient,
+  TokenCredentials,
+  isSuccess,
+  type Credentials,
+} from "@cognite/pygen-typescript";
 
 describe("HTTPClient", () => {
   let originalFetch: typeof global.fetch;
@@ -18,7 +23,7 @@ describe("HTTPClient", () => {
     return new HTTPClient({
       baseUrl: "https://api.cognitedata.com",
       project: "test-project",
-      getAuthHeader: (): string => "Bearer test-token",
+      credentials: new TokenCredentials("test-token"),
       timeout: 5000,
     });
   };
@@ -28,7 +33,7 @@ describe("HTTPClient", () => {
       const client = new HTTPClient({
         baseUrl: "https://api.cognitedata.com",
         project: "my-project",
-        getAuthHeader: (): string => "Bearer token",
+        credentials: new TokenCredentials("token"),
       });
 
       expect(client).toBeInstanceOf(HTTPClient);
@@ -39,17 +44,27 @@ describe("HTTPClient", () => {
         {
           baseUrl: "https://api.cognitedata.com",
           project: "my-project",
-          getAuthHeader: (): string => "Bearer token",
+          credentials: new TokenCredentials("token"),
           timeout: 60000,
           clientName: "my-app",
+          maxRetries: 5,
         },
         {
-          maxRetries: 5,
           maxRetryBackoff: 30,
         }
       );
 
       expect(client).toBeInstanceOf(HTTPClient);
+    });
+
+    it("should expose project name", (): void => {
+      const client = new HTTPClient({
+        baseUrl: "https://api.cognitedata.com",
+        project: "my-project",
+        credentials: new TokenCredentials("token"),
+      });
+
+      expect(client.projectName).toBe("my-project");
     });
   });
 
@@ -120,7 +135,7 @@ describe("HTTPClient", () => {
       const client = new HTTPClient({
         baseUrl: "https://api.cognitedata.com",
         project: "test",
-        getAuthHeader: (): string => "Bearer my-token",
+        credentials: new TokenCredentials("my-token"),
         clientName: "my-app",
         apiSubversion: "beta",
       });
@@ -298,8 +313,55 @@ describe("HTTPClient", () => {
     });
   });
 
-  describe("async auth header", () => {
-    it("should support async getAuthHeader", async () => {
+  describe("credentials integration", () => {
+    it("should call credentials for each request", async () => {
+      let requestCount = 0;
+      global.fetch = vi.fn().mockImplementation((): Promise<Response> => {
+        requestCount++;
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: (): Promise<string> => Promise.resolve("{}"),
+          headers: new Headers(),
+        } as Response);
+      });
+
+      const authorizationHeaderMock = vi
+        .fn()
+        .mockResolvedValue(["Authorization", "Bearer dynamic-token"]);
+
+      const mockCredentials: Credentials = {
+        authorizationHeader: authorizationHeaderMock,
+      };
+
+      const client = new HTTPClient({
+        baseUrl: "https://api.cognitedata.com",
+        project: "test",
+        credentials: mockCredentials,
+      });
+
+      // Make first request
+      const result1Promise = client.request({
+        endpointUrl: "/test1",
+        method: "GET",
+      });
+      await vi.runAllTimersAsync();
+      await result1Promise;
+
+      // Make second request
+      const result2Promise = client.request({
+        endpointUrl: "/test2",
+        method: "GET",
+      });
+      await vi.runAllTimersAsync();
+      await result2Promise;
+
+      // Credentials should be called for each request
+      expect(authorizationHeaderMock).toHaveBeenCalledTimes(2);
+      expect(requestCount).toBe(2);
+    });
+
+    it("should use token from credentials in Authorization header", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
@@ -310,11 +372,7 @@ describe("HTTPClient", () => {
       const client = new HTTPClient({
         baseUrl: "https://api.cognitedata.com",
         project: "test",
-        getAuthHeader: async (): Promise<string> => {
-          // Simulate async token fetch
-          await Promise.resolve();
-          return "Bearer async-token";
-        },
+        credentials: new TokenCredentials("my-secret-token"),
       });
 
       const resultPromise = client.request({
@@ -328,13 +386,10 @@ describe("HTTPClient", () => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          headers: {
-            Authorization: "Bearer async-token",
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "x-cdp-app": "pygen-typescript",
-            "cdf-version": "v1",
-          },
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          headers: expect.objectContaining({
+            Authorization: "Bearer my-secret-token",
+          }),
         })
       );
     });
@@ -406,14 +461,12 @@ describe("HTTPClient", () => {
       abortError.name = "AbortError";
       global.fetch = vi.fn().mockRejectedValue(abortError);
 
-      const client = new HTTPClient(
-        {
-          baseUrl: "https://api.cognitedata.com",
-          project: "test",
-          getAuthHeader: (): string => "Bearer token",
-        },
-        { maxRetries: 2 }
-      );
+      const client = new HTTPClient({
+        baseUrl: "https://api.cognitedata.com",
+        project: "test",
+        credentials: new TokenCredentials("token"),
+        maxRetries: 2,
+      });
 
       const resultPromise = client.request({
         endpointUrl: "/api/v1/test",
@@ -432,14 +485,12 @@ describe("HTTPClient", () => {
     it("should return failed request after max connection retries", async () => {
       global.fetch = vi.fn().mockRejectedValue(new TypeError("fetch failed"));
 
-      const client = new HTTPClient(
-        {
-          baseUrl: "https://api.cognitedata.com",
-          project: "test",
-          getAuthHeader: (): string => "Bearer token",
-        },
-        { maxRetries: 2 }
-      );
+      const client = new HTTPClient({
+        baseUrl: "https://api.cognitedata.com",
+        project: "test",
+        credentials: new TokenCredentials("token"),
+        maxRetries: 2,
+      });
 
       const resultPromise = client.request({
         endpointUrl: "/api/v1/test",

@@ -7,7 +7,7 @@
 import type { Credentials } from "./credentials.js";
 
 /**
- * Configuration for the Pygen client.
+ * Configuration for the Pygen client and HTTP client.
  *
  * @example
  * ```typescript
@@ -24,25 +24,35 @@ export interface PygenClientConfig {
    *
    * @example "https://api.cognitedata.com"
    */
-  baseUrl: string;
+  readonly baseUrl: string;
 
   /**
    * The CDF project name.
    */
-  project: string;
+  readonly project: string;
 
   /**
    * The credentials to use for authentication.
    */
-  credentials: Credentials;
+  readonly credentials: Credentials;
+
+  /**
+   * Optional client application name for x-cdp-app header (default: "pygen-typescript").
+   */
+  readonly clientName?: string;
 
   /**
    * Optional request timeout in milliseconds (default: 30000).
    */
-  timeout?: number;
+  readonly timeout?: number;
 
   /**
-   * Optional maximum number of retries for failed requests (default: 3).
+   * Optional CDF API version (default: "v1").
    */
-  maxRetries?: number;
+  readonly apiSubversion?: string;
+
+  /**
+   * Optional maximum number of retries for failed requests (default: 10).
+   */
+  readonly maxRetries?: number;
 }
