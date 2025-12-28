@@ -28,29 +28,6 @@ import { chunker } from "./types/utils.ts";
 export type UpsertMode = "replace" | "update" | "apply";
 
 /**
- * Options for configuring worker counts in InstanceClient.
- */
-export interface InstanceClientOptions {
-  /**
-   * Number of concurrent workers for write operations.
-   * @default 5
-   */
-  writeWorkers?: number;
-
-  /**
-   * Number of concurrent workers for delete operations.
-   * @default 3
-   */
-  deleteWorkers?: number;
-
-  /**
-   * Number of concurrent workers for retrieve operations.
-   * @default 10
-   */
-  retrieveWorkers?: number;
-}
-
-/**
  * InstanceId with required instanceType for delete operations.
  */
 type InstanceIdWithType = Required<Pick<InstanceId, "instanceType">> & InstanceId;
@@ -114,14 +91,21 @@ export class InstanceClient {
    * Creates a new InstanceClient.
    *
    * @param config - Configuration for the client including URL, project, and credentials
-   * @param options - Optional configuration for worker counts
+   * @param writeWorkers - Number of concurrent workers for write operations (default: 5)
+   * @param deleteWorkers - Number of concurrent workers for delete operations (default: 3)
+   * @param retrieveWorkers - Number of concurrent workers for retrieve operations (default: 10)
    */
-  constructor(config: PygenClientConfig, options: InstanceClientOptions = {}) {
+  constructor(
+    config: PygenClientConfig,
+    writeWorkers = 5,
+    deleteWorkers = 3,
+    retrieveWorkers = 10,
+  ) {
     this.config = config;
     this.httpClient = new HTTPClient(config);
-    this.writeWorkers = options.writeWorkers ?? 5;
-    this.deleteWorkers = options.deleteWorkers ?? 3;
-    this.retrieveWorkers = options.retrieveWorkers ?? 10;
+    this.writeWorkers = writeWorkers;
+    this.deleteWorkers = deleteWorkers;
+    this.retrieveWorkers = retrieveWorkers;
   }
 
   /**
@@ -448,41 +432,4 @@ export class InstanceClient {
     return combinedResult;
   }
 
-  /**
-   * Closes the client and releases any resources.
-   *
-   * In TypeScript, there's no need for explicit cleanup like thread pools,
-   * but this method is provided for API consistency with Python.
-   */
-  close(): void {
-    // No cleanup needed in TypeScript - fetch API handles connection pooling
-  }
-}
-
-/**
- * Creates an InstanceClient with the using statement pattern.
- *
- * Note: TypeScript's using statement (Disposable) is still experimental.
- * This function is provided for future compatibility.
- *
- * @param config - Configuration for the client
- * @param options - Optional configuration for worker counts
- * @returns An InstanceClient
- *
- * @example
- * ```typescript
- * // Current usage
- * const client = createInstanceClient(config);
- * try {
- *   const result = await client.upsert(instances, viewRef);
- * } finally {
- *   client.close();
- * }
- * ```
- */
-export function createInstanceClient(
-  config: PygenClientConfig,
-  options?: InstanceClientOptions,
-): InstanceClient {
-  return new InstanceClient(config, options);
 }

@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   chunker,
-  createInstanceClient,
   type HTTPResult,
   InstanceClient,
-  type InstanceClientOptions,
   type InstanceWrite,
   MultiRequestError,
   type PygenClientConfig,
@@ -22,18 +20,13 @@ describe("InstanceClient", () => {
   });
 
   describe("constructor", () => {
-    it("should create instance with default options", () => {
+    it("should create instance with default worker counts", () => {
       const client = new InstanceClient(createConfig());
       expect(client).toBeInstanceOf(InstanceClient);
     });
 
-    it("should create instance with custom options", () => {
-      const options: InstanceClientOptions = {
-        writeWorkers: 10,
-        deleteWorkers: 5,
-        retrieveWorkers: 20,
-      };
-      const client = new InstanceClient(createConfig(), options);
+    it("should create instance with custom worker counts", () => {
+      const client = new InstanceClient(createConfig(), 10, 5, 20);
       expect(client).toBeInstanceOf(InstanceClient);
     });
   });
@@ -43,26 +36,6 @@ describe("InstanceClient", () => {
       expect(InstanceClient.UPSERT_LIMIT).toBe(1000);
       expect(InstanceClient.DELETE_LIMIT).toBe(1000);
       expect(InstanceClient.RETRIEVE_LIMIT).toBe(1000);
-    });
-  });
-
-  describe("createInstanceClient", () => {
-    it("should create an InstanceClient", () => {
-      const client = createInstanceClient(createConfig());
-      expect(client).toBeInstanceOf(InstanceClient);
-    });
-
-    it("should create an InstanceClient with options", () => {
-      const options: InstanceClientOptions = { writeWorkers: 10 };
-      const client = createInstanceClient(createConfig(), options);
-      expect(client).toBeInstanceOf(InstanceClient);
-    });
-  });
-
-  describe("close", () => {
-    it("should not throw when called", () => {
-      const client = new InstanceClient(createConfig());
-      expect(() => client.close()).not.toThrow();
     });
   });
 });
