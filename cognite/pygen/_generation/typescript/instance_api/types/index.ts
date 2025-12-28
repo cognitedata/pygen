@@ -14,3 +14,9 @@ export * from "./utils.js";
 
 // Instance types and classes
 export * from "./instance.js";
+
+// Filter types
+export * from "./filters.js";
+
+// Data type filters
+export * from "./dtypeFilters.js";
