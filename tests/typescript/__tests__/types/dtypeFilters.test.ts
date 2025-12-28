@@ -739,7 +739,7 @@ describe("DataTypeFilter property paths", () => {
 });
 
 describe("Filter combination with operator", () => {
-  it("should combine multiple conditions with AND operator", () => {
+  it("should combine multiple conditions with AND operator (range merge)", () => {
     const viewRef: ViewReference = { space: "mySpace", externalId: "myView", version: "v1" };
     const filter = new FloatFilter(viewRef, "temperature", "and");
 
@@ -754,6 +754,21 @@ describe("Filter combination with operator", () => {
         lt: 100,
       },
     });
+  });
+
+  it("should combine multiple conditions with AND operator (multiple filters)", () => {
+    const viewRef: ViewReference = { space: "mySpace", externalId: "myView", version: "v1" };
+    const filter = new FloatFilter(viewRef, "value", "and");
+
+    // Create two separate filter types to force multiple filter objects
+    filter.equals(10);
+    filter.greaterThan(100);
+    const result = filter.asFilter();
+
+    // Should combine with AND
+    expect(result).toHaveProperty("and");
+    const andFilter = result as { and: unknown[] };
+    expect(andFilter.and).toHaveLength(2);
   });
 
   it("should combine multiple conditions with OR operator", () => {

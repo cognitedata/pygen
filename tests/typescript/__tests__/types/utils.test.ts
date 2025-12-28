@@ -57,6 +57,30 @@ describe("Date Utilities", () => {
 
       expect(dateToMs(date)).toBe(0);
     });
+
+    it("should throw for date before minimum", () => {
+      const date = new Date(MIN_TIMESTAMP_MS - 1);
+
+      expect(() => dateToMs(date)).toThrow("outside valid CDF range");
+    });
+
+    it("should throw for date after maximum", () => {
+      const date = new Date(MAX_TIMESTAMP_MS + 1);
+
+      expect(() => dateToMs(date)).toThrow("outside valid CDF range");
+    });
+
+    it("should accept minimum valid date", () => {
+      const date = new Date(MIN_TIMESTAMP_MS);
+
+      expect(dateToMs(date)).toBe(MIN_TIMESTAMP_MS);
+    });
+
+    it("should accept maximum valid date", () => {
+      const date = new Date(MAX_TIMESTAMP_MS);
+
+      expect(dateToMs(date)).toBe(MAX_TIMESTAMP_MS);
+    });
   });
 
   describe("parseDate", () => {
