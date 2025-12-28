@@ -350,7 +350,36 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Create `FilterContainer` base class for view-specific filter containers
    - Ensure type-safe filter construction with method chaining
 
-5. **Query & Response Models (TypeScript)**
+5. **Runtime Migration (Node to Deno)**
+   - **Rationale**: Migrate from Node.js to Deno for better TypeScript support, modern standards, and improved security
+   - **Benefits**:
+     - Native TypeScript support (no transpilation needed for development)
+     - Built-in test runner and assertion library
+     - Modern ES modules by default
+     - Secure by default (explicit permissions)
+     - Built-in tooling (formatter, linter, bundler)
+     - Better standard library
+     - NPM compatibility with `npm:` specifier
+   - **Migration Tasks**:
+     - Update `package.json` to use Deno-compatible dependencies (npm: prefix)
+     - Convert `vitest.config.ts` to use Deno's built-in test runner configuration
+     - Update test files to use Deno test API (`Deno.test()` instead of Vitest)
+     - Update CI/CD pipeline to use Deno instead of Node.js
+     - Create `deno.json` configuration file for project settings
+     - Update import statements to use explicit file extensions (.ts)
+     - Replace Node.js-specific APIs with Deno equivalents
+     - Update build scripts and tooling commands
+     - Test all existing functionality works with Deno runtime
+   - **Compatibility**:
+     - Ensure generated TypeScript code works with both Deno and Node.js/browser environments
+     - Use standard Web APIs where possible (fetch, etc.)
+     - Avoid Deno-specific APIs in generated SDK code
+   - **Documentation**:
+     - Update development setup instructions for Deno
+     - Document how to run tests with Deno
+     - Add Deno installation instructions
+
+6. **Query & Response Models (TypeScript)**
    - Implement query parameter types:
      - `PropertySort` for sorting configuration
      - `UnitConversion`, `UnitReference`, `UnitSystemReference` for unit handling
@@ -363,13 +392,13 @@ All tasks, deliverables, and success criteria have been met. The project is read
      - `UpsertResult` with created/updated/unchanged/deleted tracking
      - `DeleteResponse`, `AggregateResponse`, `AggregateItem`
 
-6. **Exception Hierarchy (TypeScript)**
+7. **Exception Hierarchy (TypeScript)**
    - Create `PygenAPIError` base error class
    - Implement `OAuth2Error` for authentication failures
    - Implement `MultiRequestError` for partial batch failures (with successful results)
    - Proper error message formatting and stack traces
 
-7. **Generic InstanceClient (TypeScript)**
+8. **Generic InstanceClient (TypeScript)**
    - Build `InstanceClient` class for instance CRUD operations
    - Implement `upsert()` method with modes: "replace", "update", "apply"
    - Implement `delete()` method with flexible input types
@@ -379,7 +408,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Context manager pattern equivalent (using `Disposable` or explicit close)
    - Configurable worker counts for write/delete/retrieve operations
 
-8. **Generic InstanceAPI (TypeScript)**
+9. **Generic InstanceAPI (TypeScript)**
    - Build `InstanceAPI<TInstance, TInstanceList>` base class
    - Implement `_iterate()` for single-page retrieval with cursor
    - Implement `_list()` with automatic pagination (collects all pages)
@@ -389,7 +418,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Generic filter support via `Filter` type
    - All methods should use protected underscore prefix for subclass overriding
 
-9. **Example Data Classes (TypeScript)**
+10. **Example Data Classes (TypeScript)**
    - Create `ProductNode`, `ProductNodeWrite`, `ProductNodeList` (node with various types)
    - Create `CategoryNode`, `CategoryNodeWrite`, `CategoryNodeList` (simple node)
    - Create `RelatesTo`, `RelatesToWrite`, `RelatesToList` (edge type)
@@ -405,7 +434,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
    - Implement `asWrite()` conversion method on read classes
    - Include comprehensive JSDoc comments
 
-10. **Example API Classes (TypeScript)**
+11. **Example API Classes (TypeScript)**
     - Create `ProductNodeAPI` extending `InstanceAPI` with unpacked filter parameters
     - Create `CategoryNodeAPI` extending `InstanceAPI`
     - Create `RelatesToAPI` extending `InstanceAPI` for edge operations
@@ -454,14 +483,15 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - ✅ Task 2: Authentication Support - Complete (December 28, 2025)
 - ✅ Task 3: Generic Instance Models - Complete (December 28, 2025)
 - ✅ Task 4: Filter System - Complete (December 28, 2025)
-- ⬜ Task 5: Query & Response Models
-- ⬜ Task 6: Exception Hierarchy
-- ⬜ Task 7: Generic InstanceClient
-- ⬜ Task 8: Generic InstanceAPI
-- ⬜ Task 9: Example Data Classes
-- ⬜ Task 10: Example API Classes
+- ⬜ Task 5: Runtime Migration (Node to Deno)
+- ⬜ Task 6: Query & Response Models
+- ⬜ Task 7: Exception Hierarchy
+- ⬜ Task 8: Generic InstanceClient
+- ⬜ Task 9: Generic InstanceAPI
+- ⬜ Task 10: Example Data Classes
+- ⬜ Task 11: Example API Classes
 
-**Progress**: 5/11 tasks complete (45%)
+**Progress**: 5/12 tasks complete (42%)
 
 ---
 
