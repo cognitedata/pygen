@@ -112,7 +112,7 @@ describe("Authentication Integration", () => {
     const client = new HTTPClient(config);
 
     const result = await client.request({
-      endpointUrl: `/api/v1/projects/${config.project}/`,
+      endpointUrl: `/api/v1/projects/${config.project}`,
       method: "GET",
     });
 
