@@ -195,6 +195,15 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:coverage
 
+      - name: Run integration tests
+        env:
+          CDF_CLUSTER: ${{ vars.CDF_CLUSTER }}
+          CDF_PROJECT: ${{ vars.CDF_PROJECT }}
+          IDP_CLIENT_ID: ${{ vars.IDP_CLIENT_ID }}
+          IDP_CLIENT_SECRET: ${{ secrets.IDP_CLIENT_SECRET }}
+          IDP_TENANT_ID: ${{ vars.IDP_TENANT_ID }}
+        run: npm run test:integration
+
   validate-description:
     name: Validate PR description
     runs-on: ubuntu-latest
