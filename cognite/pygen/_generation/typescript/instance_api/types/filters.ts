@@ -136,8 +136,10 @@ export interface OverlapsFilter {
 
 /** HasData filter - instance has data in specified views/containers */
 export interface HasDataFilter {
-  readonly hasData: (| ({ readonly type: "view" } & ViewReference)
-    | ({ readonly type: "container" } & ContainerReference))[];
+  readonly hasData: (
+    | ({ readonly type: "view" } & ViewReference)
+    | ({ readonly type: "container" } & ContainerReference)
+  )[];
 }
 
 /** InstanceReferences filter - matches specific instance IDs */
