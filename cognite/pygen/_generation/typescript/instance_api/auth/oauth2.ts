@@ -5,6 +5,7 @@
  */
 
 import type { Credentials } from "./credentials.ts";
+import { OAuth2Error } from "../exceptions.ts";
 
 /**
  * Configuration options for OAuth2 Client Credentials flow.
@@ -22,16 +23,6 @@ export interface OAuth2Config {
   audience?: string;
   /** Time in seconds before expiry to refresh the token (default: 300) */
   refreshMargin?: number;
-}
-
-/**
- * OAuth2 authentication error.
- */
-export class OAuth2Error extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "OAuth2Error";
-  }
 }
 
 interface TokenResponse {
