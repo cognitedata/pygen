@@ -15,3 +15,6 @@ export * from "./http_client/index.ts";
 
 // Re-export authentication
 export * from "./auth/index.ts";
+
+// Re-export exceptions
+export * from "./exceptions.ts";
