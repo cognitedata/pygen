@@ -146,9 +146,9 @@ describe("MultiRequestError", () => {
     expect(error.failedRequests).toHaveLength(1);
   });
 
-  it("should inherit from PygenAPIError", () => {
-    const error = new MultiRequestError([], [], createUpsertResult());
-
+    it("should inherit from PygenAPIError", () => {
+    const failedResponses = [createFailedResponse(400, "Bad request")];
+    const error = new MultiRequestError(failedResponses, [], createUpsertResult());
     expect(error).toBeInstanceOf(Error);
     expect(error).toBeInstanceOf(PygenAPIError);
     expect(error).toBeInstanceOf(MultiRequestError);
