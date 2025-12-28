@@ -54,7 +54,7 @@ export class HTTPClient {
     this.baseUrl = config.baseUrl;
     this.project = config.project;
     this.clientName = config.clientName ?? "pygen-typescript";
-    this.apiSubversion = config.apiSubversion ?? "v1";
+    this.apiSubversion = config.apiSubversion ?? "20230101";
     this.timeout = config.timeout ?? 30000;
     this.maxRetries = config.maxRetries ?? 10;
     this.retryStatusCodes = config.retryStatusCodes ?? DEFAULT_RETRY_STATUS_CODES;

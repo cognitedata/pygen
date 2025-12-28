@@ -47,7 +47,7 @@ export interface PygenClientConfig {
   readonly timeout?: number;
 
   /**
-   * Optional CDF API version (default: "v1").
+   * Optional CDF API version (default: "20230101").
    */
   readonly apiSubversion?: string;
 
