@@ -230,6 +230,25 @@ export class InstanceList<T extends Instance> implements Iterable<T> {
   }
 
   /**
+   * Maps items to a new array using the provided callback.
+   */
+  map<U>(callbackfn: (value: T, index: number, array: readonly T[]) => U, thisArg?: unknown): U[] {
+    return this._items.map(callbackfn, thisArg);
+  }
+
+  /**
+   * Filters items based on the provided predicate.
+   *
+   * @returns A new InstanceList containing the filtered items
+   */
+  filter(
+    predicate: (value: T, index: number, array: readonly T[]) => boolean,
+    thisArg?: unknown
+  ): InstanceList<T> {
+    return new InstanceList(this._items.filter(predicate, thisArg), this._viewId);
+  }
+
+  /**
    * Creates a new InstanceList from an array.
    *
    * @param items - Array of instances
