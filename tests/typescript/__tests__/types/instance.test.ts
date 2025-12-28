@@ -1,24 +1,24 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  parseDataRecord,
-  serializeDataRecordWrite,
-  parseInstance,
-  parseInstances,
+  type DataRecord,
+  type DataRecordRaw,
+  type DataRecordWrite,
   dumpInstance,
   dumpInstanceForAPI,
-  InstanceList,
-  isNode,
-  isEdge,
-  isNodeWrite,
-  isEdgeWrite,
-  type DataRecord,
-  type DataRecordWrite,
-  type DataRecordRaw,
-  type NodeInstance,
   type EdgeInstance,
-  type NodeInstanceWrite,
   type EdgeInstanceWrite,
+  InstanceList,
   type InstanceRaw,
+  isEdge,
+  isEdgeWrite,
+  isNode,
+  isNodeWrite,
+  type NodeInstance,
+  type NodeInstanceWrite,
+  parseDataRecord,
+  parseInstance,
+  parseInstances,
+  serializeDataRecordWrite,
   type ViewReference,
 } from "@cognite/pygen-typescript";
 
@@ -114,7 +114,7 @@ describe("Instance Parsing", () => {
     it("should parse a node instance", () => {
       const result = parseInstance<NodeInstance & { name: string; value: number }>(
         TEST_NODE_RAW,
-        TEST_VIEW_ID
+        TEST_VIEW_ID,
       );
 
       expect(result.instanceType).toBe("node");
@@ -197,7 +197,7 @@ describe("Instance Parsing", () => {
       };
 
       expect(() => parseInstance<EdgeInstance>(edgeWithoutStart, TEST_VIEW_ID)).toThrow(
-        "missing startNode or endNode"
+        "missing startNode or endNode",
       );
     });
 
@@ -213,7 +213,7 @@ describe("Instance Parsing", () => {
       };
 
       expect(() => parseInstance<EdgeInstance>(edgeWithoutEnd, TEST_VIEW_ID)).toThrow(
-        "missing startNode or endNode"
+        "missing startNode or endNode",
       );
     });
   });
@@ -410,7 +410,7 @@ describe("Instance Serialization", () => {
       const result = dumpInstanceForAPI(nodeWrite, TEST_VIEW_ID);
 
       expect(
-        (result.sources as { properties: Record<string, unknown> }[])[0].properties.createdAt
+        (result.sources as { properties: Record<string, unknown> }[])[0].properties.createdAt,
       ).toBe(1703721600000);
     });
   });

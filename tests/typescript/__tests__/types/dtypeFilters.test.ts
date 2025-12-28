@@ -2,17 +2,17 @@
  * Tests for data type filter builders.
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
-  type DataTypeFilter,
-  FloatFilter,
-  IntegerFilter,
-  DateTimeFilter,
-  DateFilter,
-  TextFilter,
   BooleanFilter,
+  type DataTypeFilter,
+  DateFilter,
+  DateTimeFilter,
   DirectRelationFilter,
   FilterContainer,
+  FloatFilter,
+  IntegerFilter,
+  TextFilter,
   type ViewReference,
 } from "@cognite/pygen-typescript";
 

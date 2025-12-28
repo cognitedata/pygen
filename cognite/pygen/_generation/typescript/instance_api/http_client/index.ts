@@ -6,19 +6,19 @@
 
 export { HTTPClient } from "./client.ts";
 export type {
+  ErrorDetails,
+  FailedRequest,
+  FailedResponse,
   HTTPMethod,
   HTTPResult,
-  SuccessResponse,
-  FailedResponse,
-  FailedRequest,
-  ErrorDetails,
   RequestMessage,
   RequestState,
+  SuccessResponse,
 } from "./types.ts";
 export {
-  isSuccess,
-  getSuccessOrThrow,
-  parseErrorDetails,
   createRequestState,
+  getSuccessOrThrow,
   getTotalAttempts,
+  isSuccess,
+  parseErrorDetails,
 } from "./types.ts";

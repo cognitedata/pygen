@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  TokenCredentials,
-  OAuthClientCredentials,
-  OAuth2Error,
   type Credentials,
   type OAuth2Config,
+  OAuth2Error,
+  OAuthClientCredentials,
   type PygenClientConfig,
+  TokenCredentials,
 } from "@cognite/pygen-typescript";
 
 describe("TokenCredentials", () => {
@@ -75,7 +75,7 @@ describe("OAuthClientCredentials", () => {
       expect.objectContaining({
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      })
+      }),
     );
   });
 
@@ -150,7 +150,7 @@ describe("OAuthClientCredentials", () => {
 
     await expect(credentials.authorizationHeader()).rejects.toThrow(OAuth2Error);
     await expect(credentials.authorizationHeader()).rejects.toThrow(
-      "Token request failed: Error: Network error"
+      "Token request failed: Error: Network error",
     );
   });
 
@@ -166,7 +166,7 @@ describe("OAuthClientCredentials", () => {
 
     await expect(credentials.authorizationHeader()).rejects.toThrow(OAuth2Error);
     await expect(credentials.authorizationHeader()).rejects.toThrow(
-      "Token request failed with status 401: Unauthorized"
+      "Token request failed with status 401: Unauthorized",
     );
   });
 
@@ -181,7 +181,7 @@ describe("OAuthClientCredentials", () => {
 
     await expect(credentials.authorizationHeader()).rejects.toThrow(OAuth2Error);
     await expect(credentials.authorizationHeader()).rejects.toThrow(
-      "Invalid token response from server"
+      "Invalid token response from server",
     );
   });
 
@@ -196,7 +196,7 @@ describe("OAuthClientCredentials", () => {
 
     await expect(credentials.authorizationHeader()).rejects.toThrow(OAuth2Error);
     await expect(credentials.authorizationHeader()).rejects.toThrow(
-      "Token response missing access_token"
+      "Token response missing access_token",
     );
   });
 

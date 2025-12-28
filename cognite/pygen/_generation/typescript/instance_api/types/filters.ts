@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import type { ViewReference, ContainerReference, NodeReference } from "./references.ts";
+import type { ContainerReference, NodeReference, ViewReference } from "./references.ts";
 
 // ============================================================================
 // Base Filter Types
@@ -256,7 +256,7 @@ export function equals(property: PropertyPath, value: JsonValue | PropertyRefere
  */
 export function inFilter(
   property: PropertyPath,
-  values: JsonValue[] | PropertyReference
+  values: JsonValue[] | PropertyReference,
 ): InFilter {
   return { in: { property, values } };
 }
@@ -275,7 +275,7 @@ export function range(
     gte?: string | number;
     lt?: string | number;
     lte?: string | number;
-  }
+  },
 ): RangeFilter {
   return { range: { property, ...options } };
 }

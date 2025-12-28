@@ -7,8 +7,8 @@
  * @packageDocumentation
  */
 
-import type { InstanceId, InstanceType, ViewReference, NodeReference } from "./references.ts";
-import { msToDate, dateToMs, toSnakeCaseKey } from "./utils.ts";
+import type { InstanceId, InstanceType, NodeReference, ViewReference } from "./references.ts";
+import { dateToMs, msToDate, toSnakeCaseKey } from "./utils.ts";
 
 // ============================================================================
 // Data Record Types
@@ -243,7 +243,7 @@ export class InstanceList<T extends Instance> implements Iterable<T> {
    */
   filter(
     predicate: (value: T, index: number, array: readonly T[]) => boolean,
-    thisArg?: unknown
+    thisArg?: unknown,
   ): InstanceList<T> {
     return new InstanceList(this._items.filter(predicate, thisArg), this._viewId);
   }
@@ -315,7 +315,7 @@ export class InstanceList<T extends Instance> implements Iterable<T> {
   filterBySpace(space: string): InstanceList<T> {
     return new InstanceList(
       this._items.filter((item) => item.space === space),
-      this._viewId
+      this._viewId,
     );
   }
 
@@ -375,7 +375,7 @@ const EDGE_FIELDS = new Set(["startNode", "endNode"]);
 
 function extractViewProperties(
   properties: InstanceRaw["properties"] | undefined,
-  viewId?: ViewReference
+  viewId?: ViewReference,
 ): Record<string, unknown> {
   if (!properties || !viewId) {
     return {};
@@ -441,7 +441,7 @@ export function parseInstance<T extends Instance>(raw: InstanceRaw, viewId?: Vie
  */
 export function parseInstances<T extends Instance>(
   items: readonly InstanceRaw[],
-  viewId?: ViewReference
+  viewId?: ViewReference,
 ): InstanceList<T> {
   const parsed = items.map((item) => parseInstance<T>(item, viewId));
   return new InstanceList(parsed, viewId);
@@ -449,7 +449,7 @@ export function parseInstances<T extends Instance>(
 
 function collectPropertyValues(
   instance: Instance | InstanceWrite,
-  camelCase: boolean
+  camelCase: boolean,
 ): Record<string, unknown> {
   const propertyValues: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(instance)) {
@@ -476,7 +476,7 @@ function collectPropertyValues(
  */
 export function dumpInstance(
   instance: Instance | InstanceWrite,
-  camelCase = true
+  camelCase = true,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   const setKey = (key: string, value: unknown): void => {
@@ -518,7 +518,7 @@ export function dumpInstance(
  */
 export function dumpInstanceForAPI(
   instance: InstanceWrite,
-  viewId: ViewReference
+  viewId: ViewReference,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {
     instanceType: instance.instanceType,

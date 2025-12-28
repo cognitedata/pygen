@@ -116,7 +116,7 @@ export function createInstanceId(space: string, externalId: string): InstanceId 
 export function createViewReference(
   space: string,
   externalId: string,
-  version: string
+  version: string,
 ): ViewReference {
   return { space, externalId, version };
 }
@@ -155,7 +155,7 @@ export function createContainerReference(space: string, externalId: string): Con
 export function createDataModelReference(
   space: string,
   externalId: string,
-  version: string
+  version: string,
 ): DataModelReference {
   return { space, externalId, version };
 }
