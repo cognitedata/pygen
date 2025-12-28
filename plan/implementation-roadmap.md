@@ -377,18 +377,20 @@ All tasks, deliverables, and success criteria have been met. The project is read
      - ✅ Documented how to run tests with Deno
      - ✅ Added Deno installation instructions
 
-6. **Query & Response Models (TypeScript)**
-   - Implement query parameter types:
-     - `PropertySort` for sorting configuration
-     - `UnitConversion`, `UnitReference`, `UnitSystemReference` for unit handling
-     - `DebugParameters` for debug mode
-   - Implement aggregation types:
-     - `Count`, `Sum`, `Avg`, `Min`, `Max`, `Histogram`
-     - `Aggregation` union type with discriminator
-   - Implement response types:
-     - `ListResponse<T>`, `Page<T>` for paginated responses
-     - `UpsertResult` with created/updated/unchanged/deleted tracking
-     - `DeleteResponse`, `AggregateResponse`, `AggregateItem`
+6. **Query & Response Models (TypeScript)** ✅
+   - ✅ Implement query parameter types:
+     - ✅ `PropertySort` for sorting configuration
+     - ✅ `UnitConversion`, `UnitReference`, `UnitSystemReference` for unit handling
+     - ✅ `DebugParameters` for debug mode
+   - ✅ Implement aggregation types:
+     - ✅ `Count`, `Sum`, `Avg`, `Min`, `Max`, `Histogram`
+     - ✅ `Aggregation` union type with discriminator
+     - ✅ `validateAggregationRequest` helper function
+   - ✅ Implement response types:
+     - ✅ `ListResponse<T>`, `Page<T>` for paginated responses
+     - ✅ `UpsertResult` with created/updated/unchanged/deleted tracking
+     - ✅ `DeleteResponse`, `AggregateResponse`, `AggregateItem`
+     - ✅ Helper functions: `getCreated`, `getUpdated`, `getUnchanged`, `extendUpsertResult`
 
 7. **Exception Hierarchy (TypeScript)**
    - Create `PygenAPIError` base error class
@@ -482,14 +484,14 @@ All tasks, deliverables, and success criteria have been met. The project is read
 - ✅ Task 3: Generic Instance Models - Complete (December 28, 2025)
 - ✅ Task 4: Filter System - Complete (December 28, 2025)
 - ✅ Task 5: Runtime Migration (Node to Deno) - Complete (December 28, 2025)
-- ⬜ Task 6: Query & Response Models
+- ✅ Task 6: Query & Response Models - Complete (December 28, 2025)
 - ⬜ Task 7: Exception Hierarchy
 - ⬜ Task 8: Generic InstanceClient
 - ⬜ Task 9: Generic InstanceAPI
 - ⬜ Task 10: Example Data Classes
 - ⬜ Task 11: Example API Classes
 
-**Progress**: 6/12 tasks complete (50%)
+**Progress**: 7/12 tasks complete (58%)
 
 ---
 
