@@ -431,5 +431,4 @@ export class InstanceClient {
 
     return combinedResult;
   }
-
 }
