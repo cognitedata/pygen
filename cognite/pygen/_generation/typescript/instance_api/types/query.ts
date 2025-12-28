@@ -343,6 +343,5 @@ export function validateAggregationRequest(value: unknown): AggregationRequest {
       [key]: { aggregate: key, ...data },
     } as AggregationRequest;
   }
-
-  return value as AggregationRequest;
+  throw new Error(`Aggregate data for '${key}' must be an object.`);
 }

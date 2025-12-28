@@ -137,9 +137,9 @@ export interface InstanceResultItem {
  * };
  *
  * // Access categorized results
- * console.log(`Created: ${result.created.length}`);
- * console.log(`Updated: ${result.updated.length}`);
- * console.log(`Unchanged: ${result.unchanged.length}`);
+ * console.log(`Created: ${getCreated(result).length}`);
+ * console.log(`Updated: ${getUpdated(result).length}`);
+ * console.log(`Unchanged: ${getUnchanged(result).length}`);
  * ```
  */
 export interface UpsertResult {
