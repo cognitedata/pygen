@@ -381,10 +381,11 @@ export class DateTimeFilter extends DataTypeFilter {
     if (value instanceof Date) {
       return value.toISOString();
     }
-        // Stricter validation for ISO 8601 datetime format.
+    // Stricter validation for ISO 8601 datetime format.
     // This regex matches YYYY-MM-DDTHH:mm:ss.sssZ or YYYY-MM-DDTHH:mm:ss.sss[+-]HH:mm.
     // It allows for optional milliseconds and optional timezone offset.
-    const iso8601Regex = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})?)$/;
+    const iso8601Regex =
+      /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})?)$/;
     if (!iso8601Regex.test(value)) {
       throw new Error(`String '${value}' is not a valid ISO 8601 datetime format.`);
     }
@@ -393,7 +394,7 @@ export class DateTimeFilter extends DataTypeFilter {
     if (isNaN(parsed.getTime())) {
       throw new Error(`String '${value}' is not a valid ISO 8601 datetime format.`);
     }
-    return parsed.toISOString()
+    return parsed.toISOString();
   }
 
   /**
