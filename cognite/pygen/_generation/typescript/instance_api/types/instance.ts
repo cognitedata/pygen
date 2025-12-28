@@ -467,7 +467,6 @@ function collectPropertyValues(
     if (
       value === undefined ||
       key === "dataRecord" ||
-      DATA_RECORD_FIELDS.has(key) ||
       INSTANCE_MODEL_FIELDS.has(key) ||
       EDGE_FIELDS.has(key)
     ) {
