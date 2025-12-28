@@ -12,3 +12,6 @@ export * from "./types/index.js";
 
 // Re-export HTTP client
 export * from "./http_client/index.js";
+
+// Re-export authentication
+export * from "./auth/index.js";
