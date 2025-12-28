@@ -193,10 +193,10 @@ export class HTTPClient {
     return { kind: "done", result };
   }
 
-  private handleError(
+  private async handleError(
     error: unknown,
     state: RequestState
-  ): { kind: "done"; result: HTTPResult } | { kind: "retry" } {
+  ): Promise<{ kind: "done"; result: HTTPResult } | { kind: "retry" }> {
     const isTimeout =
       error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError");
     const isConnectionError = error instanceof TypeError && error.message.includes("fetch");
@@ -204,13 +204,13 @@ export class HTTPClient {
     if (isTimeout) {
       state.readAttempt++;
       if (state.readAttempt <= this.maxRetries) {
-        // Schedule retry with backoff (sync return, async sleep happens in loop)
-        setTimeout(() => {}, this.backoffTime(getTotalAttempts(state)));
+        await this.sleep(this.backoffTime(getTotalAttempts(state)));
         return { kind: "retry" };
       }
     } else if (isConnectionError) {
       state.connectAttempt++;
       if (state.connectAttempt <= this.maxRetries) {
+        await this.sleep(this.backoffTime(getTotalAttempts(state)));
         return { kind: "retry" };
       }
     }
