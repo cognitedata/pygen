@@ -221,6 +221,12 @@ describe("DateTimeFilter", () => {
     }).toThrow("String 'not a date' is not a valid ISO 8601 datetime format.");
   });
 
+  it("should throw error for invalid date that matches ISO format but is not a real date", () => {
+    expect(() => {
+      filter.equals("9999-99-99T99:99:99.999Z");
+    }).toThrow("String '9999-99-99T99:99:99.999Z' is not a valid ISO 8601 datetime format.");
+  });
+
   it("should create a range filter", () => {
     filter
       .greaterThanOrEquals(new Date("2023-01-01T00:00:00Z"))

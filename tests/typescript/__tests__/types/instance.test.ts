@@ -598,6 +598,26 @@ describe("InstanceList", () => {
 
       expect(ids).toEqual(["node-1", "node-2", "node-3"]);
     });
+
+    it("should support push", () => {
+      const list = new InstanceList<NodeInstance>();
+      const newNode: NodeInstance = {
+        instanceType: "node",
+        space: "space-1",
+        externalId: "node-4",
+        dataRecord: {
+          version: 1,
+          lastUpdatedTime: new Date("2023-12-28T00:00:00.000Z"),
+          createdTime: new Date("2023-12-27T00:00:00.000Z"),
+        },
+      };
+
+      const newLength = list.push(newNode);
+
+      expect(newLength).toBe(1);
+      expect(list.length).toBe(1);
+      expect(list.at(0)?.externalId).toBe("node-4");
+    });
   });
 });
 

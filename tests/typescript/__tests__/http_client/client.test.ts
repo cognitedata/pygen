@@ -252,6 +252,42 @@ describe("HTTPClient", () => {
       expect(result.kind).toBe("success");
     });
 
+    it("should handle invalid Retry-After header value", async () => {
+      let callCount = 0;
+      global.fetch = vi.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount === 1) {
+          return Promise.resolve({
+            ok: false,
+            status: 429,
+            text: () => Promise.resolve('{"error":{"code":429,"message":"Rate limited"}}'),
+            headers: new Headers({ "Retry-After": "invalid" }),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: () => Promise.resolve('{"success":true}'),
+          headers: new Headers(),
+        });
+      });
+
+      const client = createClient();
+
+      const resultPromise = client.request({
+        endpointUrl: "/api/v1/test",
+        method: "GET",
+      });
+
+      // Run timers to process retries
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      // Should still retry but use exponential backoff instead
+      expect(callCount).toBe(2);
+      expect(result.kind).toBe("success");
+    });
+
     it("should retry on 503 with exponential backoff", async () => {
       let callCount = 0;
       global.fetch = vi.fn().mockImplementation(() => {
