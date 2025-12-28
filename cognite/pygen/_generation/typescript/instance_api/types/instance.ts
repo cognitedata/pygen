@@ -8,7 +8,7 @@
  */
 
 import type { InstanceId, InstanceType, ViewReference, NodeReference } from "./references.js";
-import { msToDate, dateToMs } from "./utils.js";
+import { msToDate, dateToMs, toSnakeCaseKey } from "./utils.js";
 
 // ============================================================================
 // Data Record Types
@@ -241,76 +241,6 @@ export class InstanceList<T extends Instance> implements Iterable<T> {
   }
 
   /**
-   * Maps over the instances.
-   *
-   * @param fn - Mapping function
-   * @returns Array of mapped results
-   */
-  map<U>(fn: (item: T, index: number) => U): U[] {
-    return this._items.map(fn);
-  }
-
-  /**
-   * Filters the instances.
-   *
-   * @param fn - Filter predicate
-   * @returns Array of matching instances
-   */
-  filter(fn: (item: T, index: number) => boolean): T[] {
-    return this._items.filter(fn);
-  }
-
-  /**
-   * Finds an instance matching the predicate.
-   *
-   * @param fn - Predicate function
-   * @returns The first matching instance or undefined
-   */
-  find(fn: (item: T, index: number) => boolean): T | undefined {
-    return this._items.find(fn);
-  }
-
-  /**
-   * Checks if some instance matches the predicate.
-   *
-   * @param fn - Predicate function
-   * @returns true if any instance matches
-   */
-  some(fn: (item: T, index: number) => boolean): boolean {
-    return this._items.some(fn);
-  }
-
-  /**
-   * Checks if every instance matches the predicate.
-   *
-   * @param fn - Predicate function
-   * @returns true if all instances match
-   */
-  every(fn: (item: T, index: number) => boolean): boolean {
-    return this._items.every(fn);
-  }
-
-  /**
-   * Reduces the instances.
-   *
-   * @param fn - Reducer function
-   * @param initial - Initial value
-   * @returns Reduced value
-   */
-  reduce<U>(fn: (acc: U, item: T, index: number) => U, initial: U): U {
-    return this._items.reduce(fn, initial);
-  }
-
-  /**
-   * Executes a function for each instance.
-   *
-   * @param fn - Function to execute
-   */
-  forEach(fn: (item: T, index: number) => void): void {
-    this._items.forEach(fn);
-  }
-
-  /**
    * Dumps all instances to a list of objects.
    *
    * @param camelCase - Whether to use camelCase keys (default: true)
@@ -435,6 +365,22 @@ const INSTANCE_MODEL_FIELDS = new Set(["instanceType", "space", "externalId"]);
  */
 const EDGE_FIELDS = new Set(["startNode", "endNode"]);
 
+function extractViewProperties(
+  properties: InstanceRaw["properties"] | undefined,
+  viewId?: ViewReference
+): Record<string, unknown> {
+  if (!properties || !viewId) {
+    return {};
+  }
+  const spaceData = properties[viewId.space];
+  if (!spaceData) {
+    return {};
+  }
+  const viewKey = `${viewId.externalId}/${viewId.version}`;
+  const viewData = spaceData[viewKey];
+  return viewData ? { ...viewData } : {};
+}
+
 /**
  * Parses a raw instance from CDF API format.
  *
@@ -450,28 +396,15 @@ export function parseInstance<T extends Instance>(
   viewId?: ViewReference
 ): T {
   // Extract data record
-  const rawDataRecord: DataRecordRaw = {
+  const dataRecord = parseDataRecord({
     version: raw.version,
     lastUpdatedTime: raw.lastUpdatedTime,
     createdTime: raw.createdTime,
-  };
-  if (raw.deletedTime !== undefined) {
-    rawDataRecord.deletedTime = raw.deletedTime;
-  }
-  const dataRecord = parseDataRecord(rawDataRecord);
+    ...(raw.deletedTime !== undefined ? { deletedTime: raw.deletedTime } : {}),
+  });
 
   // Extract properties from nested structure
-  let properties: Record<string, unknown> = {};
-  if (raw.properties && viewId) {
-    const spaceData = raw.properties[viewId.space];
-    if (spaceData) {
-      const viewKey = `${viewId.externalId}/${viewId.version}`;
-      const viewData = spaceData[viewKey];
-      if (viewData) {
-        properties = { ...viewData };
-      }
-    }
-  }
+  const properties = extractViewProperties(raw.properties, viewId);
 
   // Build the instance
   const instance: Record<string, unknown> = {
@@ -510,6 +443,27 @@ export function parseInstances<T extends Instance>(
   return new InstanceList(parsed, viewId);
 }
 
+function collectPropertyValues(
+  instance: Instance | InstanceWrite,
+  camelCase: boolean
+): Record<string, unknown> {
+  const propertyValues: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(instance)) {
+    if (
+      value === undefined ||
+      key === "dataRecord" ||
+      DATA_RECORD_FIELDS.has(key) ||
+      INSTANCE_MODEL_FIELDS.has(key) ||
+      EDGE_FIELDS.has(key)
+    ) {
+      continue;
+    }
+    const outputKey = camelCase ? key : toSnakeCaseKey(key);
+    propertyValues[outputKey] = value instanceof Date ? dateToMs(value) : value;
+  }
+  return propertyValues;
+}
+
 /**
  * Dumps an instance to a plain object.
  *
@@ -522,35 +476,32 @@ export function dumpInstance(
   camelCase = true
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
+  const setKey = (key: string, value: unknown): void => {
+    result[camelCase ? key : toSnakeCaseKey(key)] = value;
+  };
 
-  for (const [key, value] of Object.entries(instance)) {
-    if (value === undefined) {
-      continue;
-    }
+  setKey("instanceType", instance.instanceType);
+  setKey("space", instance.space);
+  setKey("externalId", instance.externalId);
 
-    // Use camelCase or snake_case based on parameter
-    const outputKey = camelCase ? key : toSnakeCaseKey(key);
-
-    if (key === "dataRecord") {
-      // Flatten data record fields into result
-      const record = value as DataRecord | DataRecordWrite;
-      for (const [recordKey, recordValue] of Object.entries(record)) {
-        if (recordValue !== undefined) {
-          const recordOutputKey = camelCase ? recordKey : toSnakeCaseKey(recordKey);
-          // Convert Date to milliseconds for timestamps
-          if (recordValue instanceof Date) {
-            result[recordOutputKey] = dateToMs(recordValue);
-          } else {
-            result[recordOutputKey] = recordValue;
-          }
-        }
+  if (instance.dataRecord) {
+    for (const [recordKey, recordValue] of Object.entries(instance.dataRecord)) {
+      if (recordValue === undefined) {
+        continue;
       }
-    } else if (value instanceof Date) {
-      result[outputKey] = dateToMs(value);
-    } else {
-      result[outputKey] = value;
+      const normalizedValue = recordValue instanceof Date ? dateToMs(recordValue) : recordValue;
+      setKey(recordKey, normalizedValue);
     }
   }
+
+  if (instance.instanceType === "edge") {
+    const edgeInstance = instance as EdgeInstance | EdgeInstanceWrite;
+    setKey("startNode", edgeInstance.startNode);
+    setKey("endNode", edgeInstance.endNode);
+  }
+
+  const properties = collectPropertyValues(instance, camelCase);
+  Object.assign(result, properties);
 
   return result;
 }
@@ -585,27 +536,7 @@ export function dumpInstanceForAPI(
   }
 
   // Collect property values
-  const propertyValues: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(instance)) {
-    if (value === undefined) {
-      continue;
-    }
-    // Skip non-property fields
-    if (
-      DATA_RECORD_FIELDS.has(key) ||
-      INSTANCE_MODEL_FIELDS.has(key) ||
-      EDGE_FIELDS.has(key) ||
-      key === "dataRecord"
-    ) {
-      continue;
-    }
-    // Convert Date to milliseconds
-    if (value instanceof Date) {
-      propertyValues[key] = dateToMs(value);
-    } else {
-      propertyValues[key] = value;
-    }
-  }
+  const propertyValues = collectPropertyValues(instance, true);
 
   // Nest properties in the CDF format
   if (Object.keys(propertyValues).length > 0) {
@@ -624,17 +555,6 @@ export function dumpInstanceForAPI(
 
   return result;
 }
-
-/**
- * Converts a camelCase key to snake_case.
- */
-function toSnakeCaseKey(key: string): string {
-  return key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-}
-
-// ============================================================================
-// Type Guards
-// ============================================================================
 
 /**
  * Type guard to check if an instance is a node.

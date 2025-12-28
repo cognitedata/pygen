@@ -56,6 +56,13 @@ export function dateToMs(date: Date): number {
 }
 
 /**
+ * Converts a camelCase key to snake_case.
+ */
+export function toSnakeCaseKey(key: string): string {
+  return key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+}
+
+/**
  * Parses a value as a Date if it's a number (milliseconds), or returns it if already a Date.
  *
  * @param value - Either a number (milliseconds) or a Date object
