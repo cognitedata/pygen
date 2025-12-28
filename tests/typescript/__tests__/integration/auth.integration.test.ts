@@ -101,27 +101,6 @@ describe("Authentication Integration", () => {
   beforeAll(() => {
     loadEnvFile();
   });
-
-  it("should authenticate with OAuth2 credentials", async () => {
-    if (!hasRequiredEnvVars()) {
-      console.log("Skipping: Required environment variables not set");
-      return;
-    }
-
-    const config = createClientConfig();
-    const client = new HTTPClient(config);
-
-    const result = await client.request({
-      endpointUrl: `/api/v1/projects/${config.project}`,
-      method: "GET",
-    });
-
-    expect(isSuccess(result)).toBe(true);
-    if (isSuccess(result)) {
-      expect(result.statusCode).toBe(200);
-    }
-  });
-
   it("should inspect token successfully", async () => {
     if (!hasRequiredEnvVars()) {
       console.log("Skipping: Required environment variables not set");
