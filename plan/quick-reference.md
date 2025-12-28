@@ -10,7 +10,7 @@
 
 **Timeline**: 28-42 weeks (7-10 months)
 
-**Status**: Phase 3 In Progress ⏳ - Task 0 Complete
+**Status**: Phase 3 In Progress ⏳ - Tasks 0-3 Complete
 
 ---
 
@@ -301,7 +301,7 @@ pygen generate --config pygen.yaml
 | **M1** | Phase 1 complete (Full client) | Week 2 | ✅ Complete |
 | **M1.5** | Phase 2 Tasks 1-3.b complete (InstanceClient, InstanceAPI) | Week 3 | ✅ Complete |
 | **M2** | Phase 2 complete (Example SDK) | Month 1 | ✅ Complete |
-| **M2.1** | Phase 3 Task 0 complete (TypeScript dev environment) | Month 1 | ✅ Complete |
+| **M2.1** | Phase 3 Tasks 0-3 complete (TypeScript dev environment, HTTPClient, Auth, Instance Models) | Month 1 | ✅ Complete |
 | **M3** | Phase 5 complete (Can generate Python & TypeScript) | Month 4 | ⏳ Pending |
 | **M4** | Phase 6 complete (Feature parity) | Month 6 | ⏳ Pending |
 | **M5** | Phase 10 complete (v2.0.0) | Month 9 | ⏳ Pending |
@@ -480,14 +480,33 @@ A: Modern type hints, pattern matching, performance.
     - Native fetch API as HTTP client
     - TypeScript config at repository root level
     - CI/CD pipeline updated for TypeScript testing
+  - ✅ Task 1: HTTP Client Foundation complete
+    - HTTPClient class wrapping fetch API
+    - Retry logic with exponential backoff
+    - Rate limiting support (429 responses with Retry-After)
+    - Request/response type system (RequestMessage, SuccessResponse, FailedResponse)
+    - Error response parsing matching Python patterns
+  - ✅ Task 2: Authentication Support complete
+    - Credentials interface (abstract base)
+    - TokenCredentials for static token auth
+    - OAuthCredentials with token refresh logic
+    - PygenClientConfig interface for client configuration
+  - ✅ Task 3: Generic Instance Models complete
+    - InstanceModel, Instance, InstanceWrite base interfaces/classes
+    - InstanceList<T> with array-like behavior
+    - Reference types: ViewReference, NodeReference, ContainerReference, InstanceId
+    - DataRecord and DataRecordWrite interfaces
+    - Serialization/deserialization with camelCase conversion
+    - Support for both node and edge instance types
+    - Custom date/datetime handling (milliseconds since epoch)
 
-**Current Phase**: Phase 3 - Generic Instance API & Example SDK (TypeScript) (1/11 tasks complete)
+**Current Phase**: Phase 3 - Generic Instance API & Example SDK (TypeScript) (4/11 tasks complete)
 
 **Next Steps**:
-1. Continue Phase 3: HTTP Client Foundation (TypeScript)
-2. Implement TypeScript authentication support
-3. Build TypeScript generic instance models
-4. Ensure type safety with TypeScript generics
+1. Continue Phase 3: Filter System (TypeScript)
+2. Implement query & response models for TypeScript
+3. Build exception hierarchy for TypeScript
+4. Implement generic InstanceClient for TypeScript
 
 ---
 
