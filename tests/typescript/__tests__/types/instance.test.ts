@@ -160,6 +160,62 @@ describe("Instance Parsing", () => {
       expect(result.instanceType).toBe("node");
       expect(result.externalId).toBe("node-2");
     });
+
+    it("should handle instance with properties but no matching space", () => {
+      const rawWrongSpace: InstanceRaw = {
+        instanceType: "node",
+        space: "test-space",
+        externalId: "node-3",
+        version: 1,
+        lastUpdatedTime: 1703721600000,
+        createdTime: 1703635200000,
+        properties: {
+          "wrong-space": {
+            "test-view/v1": {
+              name: "Test Node",
+            },
+          },
+        },
+      };
+      const result = parseInstance<NodeInstance>(rawWrongSpace, TEST_VIEW_ID);
+
+      expect(result.instanceType).toBe("node");
+      expect(result.externalId).toBe("node-3");
+      // Properties should not be present since space doesn't match
+      expect((result as unknown as Record<string, unknown>).name).toBeUndefined();
+    });
+
+    it("should throw error when edge instance is missing startNode", () => {
+      const edgeWithoutStart: InstanceRaw = {
+        instanceType: "edge",
+        space: "test-space",
+        externalId: "edge-broken",
+        version: 1,
+        lastUpdatedTime: 1703721600000,
+        createdTime: 1703635200000,
+        endNode: { space: "test-space", externalId: "node-2" },
+      };
+
+      expect(() => parseInstance<EdgeInstance>(edgeWithoutStart, TEST_VIEW_ID)).toThrow(
+        "missing startNode or endNode"
+      );
+    });
+
+    it("should throw error when edge instance is missing endNode", () => {
+      const edgeWithoutEnd: InstanceRaw = {
+        instanceType: "edge",
+        space: "test-space",
+        externalId: "edge-broken",
+        version: 1,
+        lastUpdatedTime: 1703721600000,
+        createdTime: 1703635200000,
+        startNode: { space: "test-space", externalId: "node-1" },
+      };
+
+      expect(() => parseInstance<EdgeInstance>(edgeWithoutEnd, TEST_VIEW_ID)).toThrow(
+        "missing startNode or endNode"
+      );
+    });
   });
 
   describe("parseInstances", () => {
@@ -226,6 +282,49 @@ describe("Instance Serialization", () => {
       expect(result.lastUpdatedTime).toBe(1703721600000);
       // dataRecord should not be present as a nested object
       expect(result.dataRecord).toBeUndefined();
+    });
+
+    it("should skip undefined values in dataRecord", () => {
+      const nodeWithUndefined: NodeInstance & { name: string } = {
+        instanceType: "node",
+        space: "test-space",
+        externalId: "node-1",
+        dataRecord: {
+          version: 1,
+          lastUpdatedTime: new Date("2023-12-28T00:00:00.000Z"),
+          createdTime: undefined as unknown as Date, // Explicitly undefined
+        },
+        name: "Test Node",
+      };
+      const result = dumpInstance(nodeWithUndefined, true);
+
+      expect(result.version).toBe(1);
+      expect(result.lastUpdatedTime).toBe(1703721600000);
+      expect(result.createdTime).toBeUndefined(); // Should not be included
+    });
+
+    it("should dump edge instance with startNode and endNode", () => {
+      const edgeInstance: EdgeInstance & { weight: number } = {
+        instanceType: "edge",
+        space: "test-space",
+        externalId: "edge-1",
+        startNode: { space: "test-space", externalId: "node-1" },
+        endNode: { space: "test-space", externalId: "node-2" },
+        dataRecord: {
+          version: 1,
+          lastUpdatedTime: new Date("2023-12-28T00:00:00.000Z"),
+          createdTime: new Date("2023-12-27T00:00:00.000Z"),
+        },
+        weight: 0.5,
+      };
+      const result = dumpInstance(edgeInstance, true);
+
+      expect(result.instanceType).toBe("edge");
+      expect(result.space).toBe("test-space");
+      expect(result.externalId).toBe("edge-1");
+      expect(result.startNode).toEqual({ space: "test-space", externalId: "node-1" });
+      expect(result.endNode).toEqual({ space: "test-space", externalId: "node-2" });
+      expect(result.weight).toBe(0.5);
     });
   });
 
@@ -498,6 +597,26 @@ describe("InstanceList", () => {
       }
 
       expect(ids).toEqual(["node-1", "node-2", "node-3"]);
+    });
+
+    it("should support push", () => {
+      const list = new InstanceList<NodeInstance>();
+      const newNode: NodeInstance = {
+        instanceType: "node",
+        space: "space-1",
+        externalId: "node-4",
+        dataRecord: {
+          version: 1,
+          lastUpdatedTime: new Date("2023-12-28T00:00:00.000Z"),
+          createdTime: new Date("2023-12-27T00:00:00.000Z"),
+        },
+      };
+
+      const newLength = list.push(newNode);
+
+      expect(newLength).toBe(1);
+      expect(list.length).toBe(1);
+      expect(list.at(0)?.externalId).toBe("node-4");
     });
   });
 });
