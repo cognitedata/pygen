@@ -339,4 +339,158 @@ describe("HTTPClient", () => {
       );
     });
   });
+
+  describe("error handling", () => {
+    it("should retry on timeout (AbortError) and eventually succeed", async () => {
+      let callCount = 0;
+      global.fetch = vi.fn().mockImplementation((): Promise<Response> => {
+        callCount++;
+        if (callCount === 1) {
+          const error = new Error("The operation was aborted");
+          error.name = "AbortError";
+          return Promise.reject(error);
+        }
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: (): Promise<string> => Promise.resolve('{"success":true}'),
+          headers: new Headers(),
+        } as Response);
+      });
+
+      const client = createClient();
+
+      const resultPromise = client.request({
+        endpointUrl: "/api/v1/test",
+        method: "GET",
+      });
+
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(callCount).toBe(2);
+      expect(result.kind).toBe("success");
+    });
+
+    it("should retry on connection error (TypeError) and eventually succeed", async () => {
+      let callCount = 0;
+      global.fetch = vi.fn().mockImplementation((): Promise<Response> => {
+        callCount++;
+        if (callCount === 1) {
+          return Promise.reject(new TypeError("fetch failed"));
+        }
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: (): Promise<string> => Promise.resolve('{"success":true}'),
+          headers: new Headers(),
+        } as Response);
+      });
+
+      const client = createClient();
+
+      const resultPromise = client.request({
+        endpointUrl: "/api/v1/test",
+        method: "GET",
+      });
+
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(callCount).toBe(2);
+      expect(result.kind).toBe("success");
+    });
+
+    it("should return failed request after max timeout retries", async () => {
+      const abortError = new Error("The operation was aborted");
+      abortError.name = "AbortError";
+      global.fetch = vi.fn().mockRejectedValue(abortError);
+
+      const client = new HTTPClient(
+        {
+          baseUrl: "https://api.cognitedata.com",
+          project: "test",
+          getAuthHeader: (): string => "Bearer token",
+        },
+        { maxRetries: 2 }
+      );
+
+      const resultPromise = client.request({
+        endpointUrl: "/api/v1/test",
+        method: "GET",
+      });
+
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(result.kind).toBe("failed_request");
+      if (result.kind === "failed_request") {
+        expect(result.error).toContain("aborted");
+      }
+    });
+
+    it("should return failed request after max connection retries", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new TypeError("fetch failed"));
+
+      const client = new HTTPClient(
+        {
+          baseUrl: "https://api.cognitedata.com",
+          project: "test",
+          getAuthHeader: (): string => "Bearer token",
+        },
+        { maxRetries: 2 }
+      );
+
+      const resultPromise = client.request({
+        endpointUrl: "/api/v1/test",
+        method: "GET",
+      });
+
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(result.kind).toBe("failed_request");
+      if (result.kind === "failed_request") {
+        expect(result.error).toContain("fetch failed");
+      }
+    });
+
+    it("should return failed request for unknown errors", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Unknown error"));
+
+      const client = createClient();
+
+      const resultPromise = client.request({
+        endpointUrl: "/api/v1/test",
+        method: "GET",
+      });
+
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(result.kind).toBe("failed_request");
+      if (result.kind === "failed_request") {
+        expect(result.error).toBe("Unknown error");
+      }
+    });
+
+    it("should handle non-Error thrown values", async () => {
+      global.fetch = vi.fn().mockRejectedValue("string error");
+
+      const client = createClient();
+
+      const resultPromise = client.request({
+        endpointUrl: "/api/v1/test",
+        method: "GET",
+      });
+
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(result.kind).toBe("failed_request");
+      if (result.kind === "failed_request") {
+        expect(result.error).toBe("string error");
+      }
+    });
+  });
 });
