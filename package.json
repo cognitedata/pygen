@@ -1,0 +1,11 @@
+{
+  "name": "@cognite/pygen-typescript",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Minimal package.json for Deno npm compatibility - used only for Vitest coverage in CI/CD",
+  "type": "module",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.8"
+  }
+}
+
