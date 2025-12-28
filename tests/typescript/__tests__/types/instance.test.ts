@@ -128,10 +128,7 @@ describe("Instance Parsing", () => {
     });
 
     it("should parse an edge instance", () => {
-      const result = parseInstance<EdgeInstance & { weight: number }>(
-        TEST_EDGE_RAW,
-        TEST_VIEW_ID
-      );
+      const result = parseInstance<EdgeInstance & { weight: number }>(TEST_EDGE_RAW, TEST_VIEW_ID);
 
       expect(result.instanceType).toBe("edge");
       expect(result.space).toBe("test-space");
@@ -315,9 +312,9 @@ describe("Instance Serialization", () => {
       };
       const result = dumpInstanceForAPI(nodeWrite, TEST_VIEW_ID);
 
-      expect((result.sources as Array<{ properties: Record<string, unknown> }>)[0].properties.createdAt).toBe(
-        1703721600000
-      );
+      expect(
+        (result.sources as Array<{ properties: Record<string, unknown> }>)[0].properties.createdAt
+      ).toBe(1703721600000);
     });
   });
 });
@@ -586,4 +583,3 @@ describe("Type Guards", () => {
     });
   });
 });
-

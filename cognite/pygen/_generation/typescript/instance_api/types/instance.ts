@@ -391,10 +391,7 @@ function extractViewProperties(
  * @typeParam T - The specific instance type to return (for type inference)
  */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-export function parseInstance<T extends Instance>(
-  raw: InstanceRaw,
-  viewId?: ViewReference
-): T {
+export function parseInstance<T extends Instance>(raw: InstanceRaw, viewId?: ViewReference): T {
   // Extract data record
   const dataRecord = parseDataRecord({
     version: raw.version,
@@ -583,4 +580,3 @@ export function isNodeWrite(instance: InstanceWrite): instance is NodeInstanceWr
 export function isEdgeWrite(instance: InstanceWrite): instance is EdgeInstanceWrite {
   return instance.instanceType === "edge";
 }
-
