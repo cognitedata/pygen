@@ -91,6 +91,30 @@ describe("FloatFilter", () => {
       },
     });
   });
+
+  it("should handle lessThanOrEquals", () => {
+    filter.lessThanOrEquals(100);
+    const result = filter.asFilter();
+
+    expect(result).toEqual({
+      range: {
+        property: ["mySpace", "myView/v1", "temperature"],
+        lte: 100,
+      },
+    });
+  });
+
+  it("should handle greaterThanOrEquals", () => {
+    filter.greaterThanOrEquals(0);
+    const result = filter.asFilter();
+
+    expect(result).toEqual({
+      range: {
+        property: ["mySpace", "myView/v1", "temperature"],
+        gte: 0,
+      },
+    });
+  });
 });
 
 describe("IntegerFilter", () => {
@@ -133,6 +157,26 @@ describe("IntegerFilter", () => {
         property: ["node", "count"],
         gte: 1,
         lte: 10,
+      },
+    });
+  });
+
+  it("should handle all range methods", () => {
+    const filter1 = new IntegerFilter("node", "value1", "and");
+    filter1.lessThan(100);
+    expect(filter1.asFilter()).toEqual({
+      range: {
+        property: ["node", "value1"],
+        lt: 100,
+      },
+    });
+
+    const filter2 = new IntegerFilter("node", "value2", "and");
+    filter2.greaterThan(0);
+    expect(filter2.asFilter()).toEqual({
+      range: {
+        property: ["node", "value2"],
+        gt: 0,
       },
     });
   });
@@ -198,6 +242,20 @@ describe("DateTimeFilter", () => {
 
     expect(result).toBeUndefined();
   });
+
+  it("should handle all range methods individually", () => {
+    const filter1 = new DateTimeFilter(viewRef, "time1", "and");
+    filter1.lessThan(new Date("2024-01-01T00:00:00Z"));
+    expect(filter1.asFilter()).toHaveProperty("range");
+
+    const filter2 = new DateTimeFilter(viewRef, "time2", "and");
+    filter2.greaterThan(new Date("2023-01-01T00:00:00Z"));
+    expect(filter2.asFilter()).toHaveProperty("range");
+
+    const filter3 = new DateTimeFilter(viewRef, "time3", "and");
+    filter3.lessThanOrEquals(new Date("2024-01-01T00:00:00Z"));
+    expect(filter3.asFilter()).toHaveProperty("range");
+  });
 });
 
 describe("DateFilter", () => {
@@ -243,6 +301,23 @@ describe("DateFilter", () => {
         lt: "2024-01-01",
       },
     });
+  });
+
+  it("should handle all range methods individually", () => {
+    const filter1 = new DateFilter("node", "date1", "and");
+    filter1.lessThanOrEquals("2024-01-01");
+    expect(filter1.asFilter()).toHaveProperty("range");
+
+    const filter2 = new DateFilter("node", "date2", "and");
+    filter2.greaterThan("2023-01-01");
+    expect(filter2.asFilter()).toHaveProperty("range");
+
+    const filter3 = new DateFilter("node", "date3", "and");
+    filter3.equals(null);
+    expect(filter3.asFilter()).toBeUndefined();
+
+    const filter4 = new DateFilter("node", "date4", "and");
+    expect(() => filter4.equals("invalid-date")).toThrow("not a valid ISO format date");
   });
 });
 
@@ -480,6 +555,45 @@ describe("DirectRelationFilter", () => {
 
     expect(result).toBeUndefined();
   });
+
+  it("should throw error for invalid value type", () => {
+    expect(() => {
+      // @ts-expect-error - Testing invalid type
+      filter.equals(123);
+    }).toThrow("Expected string, InstanceId, or [string, string]");
+  });
+
+  it("should skip null values in equalsOrIn", () => {
+    filter.equalsOrIn(null);
+    const result = filter.asFilter();
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should handle string value in equalsOrIn with space", () => {
+    filter.equalsOrIn("id1", "space1");
+    const result = filter.asFilter();
+
+    expect(result).toEqual({
+      equals: {
+        property: ["mySpace", "myView/v1", "relatedTo"],
+        value: { space: "space1", externalId: "id1" },
+      },
+    });
+  });
+
+  it("should skip null values in in filter", () => {
+    filter.in(null);
+    const result = filter.asFilter();
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should filter out null values from in array", () => {
+    // Create a filter that will have null after validation
+    const result = filter.in([]);
+    expect(result.asFilter()).toBeUndefined();
+  });
 });
 
 describe("FilterContainer", () => {
@@ -564,6 +678,8 @@ describe("FilterContainer", () => {
     const result = orContainer.asFilter();
 
     expect(result).toHaveProperty("or");
+    const orFilter = result as { or: unknown[] };
+    expect(orFilter.or.length).toBeGreaterThan(1);
   });
 
   it("should skip filters that have no conditions", () => {
@@ -638,6 +754,21 @@ describe("Filter combination with operator", () => {
         lt: 100,
       },
     });
+  });
+
+  it("should combine multiple conditions with OR operator", () => {
+    const viewRef: ViewReference = { space: "mySpace", externalId: "myView", version: "v1" };
+    const filter = new FloatFilter(viewRef, "value", "or");
+
+    // Create two separate filter types to force multiple filter objects
+    filter.equals(10);
+    filter.greaterThan(100);
+    const result = filter.asFilter();
+
+    // Should combine with OR
+    expect(result).toHaveProperty("or");
+    const orFilter = result as { or: unknown[] };
+    expect(orFilter.or).toHaveLength(2);
   });
 
   it("should handle dump method", () => {
