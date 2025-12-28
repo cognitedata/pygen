@@ -2,6 +2,7 @@
   "version": "5",
   "specifiers": {
     "npm:@vitest/coverage-v8@^2.1.8": "2.1.9_vitest@2.1.9__vite@5.4.21",
+    "npm:dotenv@^17.2.3": "17.2.3",
     "npm:vitest@^2.1.8": "2.1.9_vite@5.4.21"
   },
   "npm": {
@@ -443,6 +444,9 @@
     "deep-eql@5.0.2": {
       "integrity": "sha512-h5k/5U50IJJFpzfL6nO9jaaumfjO/f2NjK/oYB2Djzm4p9L+3T9qWpZqZ2hAbLPuuYq9wrU08WQyBTL5GbPk5Q=="
     },
+    "dotenv@17.2.3": {
+      "integrity": "sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w=="
+    },
     "eastasianwidth@0.2.0": {
       "integrity": "sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA=="
     },
@@ -838,7 +842,8 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@vitest/coverage-v8@^2.1.8"
+        "npm:@vitest/coverage-v8@^2.1.8",
+        "npm:dotenv@^17.2.3"
       ]
     }
   }

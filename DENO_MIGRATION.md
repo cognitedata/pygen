@@ -14,6 +14,11 @@ The Pygen TypeScript SDK has been successfully migrated from Node.js to Deno as 
 - Configures formatter, linter, and compiler options
 - Sets up import maps for module resolution
 
+#### Minimal: `package.json`
+- Minimal package.json containing only `@vitest/coverage-v8` dependency
+- Required for `deno task test:coverage` in CI/CD
+- Deno automatically installs npm packages as needed via `nodeModulesDir: "auto"`
+
 #### Updated: CI/CD (`.github/workflows/build.yml`)
 - TypeScript job now uses Deno instead of Node.js
 - Uses `denoland/setup-deno@v2` action

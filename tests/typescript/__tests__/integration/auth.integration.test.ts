@@ -11,9 +11,9 @@
  */
 
 import { beforeAll, describe, expect, it } from "vitest";
-import { execSync } from "child_process";
-import { existsSync } from "fs";
-import { resolve } from "path";
+import { execSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { config as loadDotenv } from "dotenv";
 import {
   HTTPClient,
