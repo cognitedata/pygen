@@ -7,9 +7,6 @@
 import type { Credentials } from "./credentials.ts";
 import { OAuth2Error } from "../exceptions.ts";
 
-// Re-export OAuth2Error for backwards compatibility
-export { OAuth2Error };
-
 /**
  * Configuration options for OAuth2 Client Credentials flow.
  */
