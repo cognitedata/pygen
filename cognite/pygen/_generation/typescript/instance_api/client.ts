@@ -18,6 +18,7 @@ import type {
   RequestMessage,
 } from "./http_client/types.ts";
 import type { Instance, InstanceWrite } from "./types/instance.ts";
+import { dumpInstanceForAPI } from "./types/instance.ts";
 import type { InstanceId, InstanceType, ViewReference } from "./types/references.ts";
 import type { DeleteResponse, UpsertResult } from "./types/responses.ts";
 import { extendUpsertResult } from "./types/responses.ts";
@@ -47,27 +48,6 @@ export interface InstanceClientOptions {
    * @default 10
    */
   retrieveWorkers?: number;
-}
-
-/**
- * Serialized instance for API upsert operations.
- */
-interface SerializedInstanceWrite {
-  instanceType: InstanceType;
-  space: string;
-  externalId: string;
-  existingVersion?: number;
-  startNode?: { space: string; externalId: string };
-  endNode?: { space: string; externalId: string };
-  sources?: Array<{
-    source: {
-      type: "view";
-      space: string;
-      externalId: string;
-      version: string;
-    };
-    properties: Record<string, unknown>;
-  }>;
 }
 
 /**
@@ -233,7 +213,7 @@ export class InstanceClient {
     mode: UpsertMode,
     skipOnVersionConflict: boolean,
   ): Promise<HTTPResult> {
-    const serializedItems = items.map((item) => this.serializeInstanceWrite(item, viewRef));
+    const serializedItems = items.map((item) => dumpInstanceForAPI(item, viewRef));
 
     const body: Record<string, unknown> = {
       items: serializedItems,
@@ -248,83 +228,6 @@ export class InstanceClient {
     };
 
     return this.httpClient.request(request);
-  }
-
-  /**
-   * Serializes an InstanceWrite to CDF API format.
-   */
-  private serializeInstanceWrite(
-    instance: InstanceWrite,
-    viewRef: ViewReference,
-  ): SerializedInstanceWrite {
-    const result: SerializedInstanceWrite = {
-      instanceType: instance.instanceType,
-      space: instance.space,
-      externalId: instance.externalId,
-    };
-
-    // Add existingVersion if present
-    if (instance.dataRecord?.existingVersion !== undefined) {
-      result.existingVersion = instance.dataRecord.existingVersion;
-    }
-
-    // Add edge-specific fields
-    if (instance.instanceType === "edge") {
-      const edgeInstance = instance as InstanceWrite & {
-        startNode: { space: string; externalId: string };
-        endNode: { space: string; externalId: string };
-      };
-      result.startNode = edgeInstance.startNode;
-      result.endNode = edgeInstance.endNode;
-    }
-
-    // Collect property values
-    const propertyValues = this.collectPropertyValues(instance);
-
-    // Nest properties in the CDF format
-    if (Object.keys(propertyValues).length > 0) {
-      result.sources = [
-        {
-          source: {
-            type: "view",
-            space: viewRef.space,
-            externalId: viewRef.externalId,
-            version: viewRef.version,
-          },
-          properties: propertyValues,
-        },
-      ];
-    }
-
-    return result;
-  }
-
-  /**
-   * Fields that are part of the instance model base (not properties).
-   */
-  private static readonly INSTANCE_MODEL_FIELDS = new Set([
-    "instanceType",
-    "space",
-    "externalId",
-    "dataRecord",
-    "startNode",
-    "endNode",
-  ]);
-
-  /**
-   * Collects property values from an instance, converting Dates to milliseconds.
-   */
-  private collectPropertyValues(instance: InstanceWrite): Record<string, unknown> {
-    const propertyValues: Record<string, unknown> = {};
-
-    for (const [key, value] of Object.entries(instance)) {
-      if (value === undefined || InstanceClient.INSTANCE_MODEL_FIELDS.has(key)) {
-        continue;
-      }
-      propertyValues[key] = value instanceof Date ? value.getTime() : value;
-    }
-
-    return propertyValues;
   }
 
   /**
