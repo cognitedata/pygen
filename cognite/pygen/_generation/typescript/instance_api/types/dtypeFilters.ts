@@ -716,7 +716,7 @@ export class DirectRelationFilter extends DataTypeFilter {
    * @param space - Space for the relations (required if values are strings)
    * @returns This instance for chaining
    */
-  in(values: Array<string | InstanceId | [string, string]> | null, space?: string): this {
+  in(values: (string | InstanceId | [string, string])[] | null, space?: string): this {
     if (values === null) return this;
     const validated = values
       .map((v) => this._validateValue(v, space))
@@ -740,7 +740,7 @@ export class DirectRelationFilter extends DataTypeFilter {
       | string
       | InstanceId
       | [string, string]
-      | Array<string | InstanceId | [string, string]>
+      | (string | InstanceId | [string, string])[]
       | null,
     space?: string
   ): this {
