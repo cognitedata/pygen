@@ -6,4 +6,11 @@
  * @packageDocumentation
  */
 
+// Reference types
 export * from "./references.js";
+
+// Utility functions
+export * from "./utils.js";
+
+// Instance types and classes
+export * from "./instance.js";
