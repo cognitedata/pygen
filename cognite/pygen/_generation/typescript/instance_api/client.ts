@@ -378,22 +378,17 @@ export class InstanceClient {
 
     // Use a pool pattern for larger numbers
     // Create indexed tasks that we'll process
-    const indexedTasks = chunks.map((chunk, index) => ({ chunk, index }));
     const results: HTTPResult[] = new Array(chunks.length);
+    const taskIterator = chunks.entries();
 
-    // Process tasks in batches of maxWorkers
-    for (let i = 0; i < indexedTasks.length; i += maxWorkers) {
-      const batch = indexedTasks.slice(i, i + maxWorkers);
-      const batchResults = await Promise.all(
-        batch.map(async ({ chunk, index }) => {
-          const result = await taskFn(chunk);
-          return { index, result };
-        }),
-      );
-      for (const { index, result } of batchResults) {
-        results[index] = result;
+    const worker = async () => {
+      for (const [index, chunk] of taskIterator) {
+        results[index] = await taskFn(chunk);
       }
-    }
+    };
+
+    const workers = Array.from({ length: Math.min(maxWorkers, chunks.length) }, worker);
+    await Promise.all(workers);
 
     return results;
   }
