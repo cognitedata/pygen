@@ -98,3 +98,29 @@ export function parseDate(value: number | Date): Date {
   }
   return value;
 }
+
+/**
+ * Chunks an array into smaller arrays of a specified size.
+ *
+ * @typeParam T - The type of elements in the array
+ * @param items - The array to chunk
+ * @param chunkSize - Maximum size of each chunk
+ * @returns An array of chunks
+ *
+ * @example
+ * ```typescript
+ * const items = [1, 2, 3, 4, 5];
+ * const chunks = chunker(items, 2);
+ * console.log(chunks); // [[1, 2], [3, 4], [5]]
+ * ```
+ */
+export function chunker<T>(items: readonly T[], chunkSize: number): T[][] {
+  if (chunkSize <= 0) {
+    throw new Error("Chunk size must be positive");
+  }
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += chunkSize) {
+    chunks.push(items.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
