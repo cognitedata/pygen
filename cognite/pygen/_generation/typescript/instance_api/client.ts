@@ -51,22 +51,9 @@ export interface InstanceClientOptions {
 }
 
 /**
- * Serialized instance ID for API delete operations.
+ * InstanceId with required instanceType for delete operations.
  */
-interface SerializedInstanceId {
-  instanceType: InstanceType;
-  space: string;
-  externalId: string;
-}
-
-/**
- * Internal representation of an instance ID with instance type.
- */
-interface InternalInstanceId {
-  instanceType: InstanceType;
-  space: string;
-  externalId: string;
-}
+type InstanceIdWithType = Required<Pick<InstanceId, "instanceType">> & InstanceId;
 
 /**
  * Client for performing CRUD operations on CDF instances.
@@ -288,9 +275,9 @@ export class InstanceClient {
       return [];
     }
 
-    // Convert all items to InternalInstanceId
+    // Convert all items to InstanceIdWithType
     const instanceIds = itemList.map((item) =>
-      this.toInternalInstanceId(item, space, instanceType)
+      this.toInstanceIdWithType(item, space, instanceType)
     );
 
     const httpResults = await this.executeInParallel(
@@ -305,13 +292,13 @@ export class InstanceClient {
   }
 
   /**
-   * Converts various input types to InternalInstanceId.
+   * Converts various input types to InstanceIdWithType.
    */
-  private toInternalInstanceId(
+  private toInstanceIdWithType(
     item: string | InstanceId | Instance | InstanceWrite,
     space: string | undefined,
     defaultInstanceType: InstanceType,
-  ): InternalInstanceId {
+  ): InstanceIdWithType {
     if (typeof item === "string") {
       if (!space) {
         throw new Error("space parameter is required when deleting by external_id string");
@@ -323,8 +310,8 @@ export class InstanceClient {
       };
     }
 
-    // Check if it's an Instance or InstanceWrite (has instanceType)
-    if ("instanceType" in item) {
+    // Check if it's an Instance or InstanceWrite (has required instanceType)
+    if ("instanceType" in item && item.instanceType !== undefined) {
       return {
         instanceType: item.instanceType,
         space: item.space,
@@ -332,19 +319,21 @@ export class InstanceClient {
       };
     }
 
-    // It's an InstanceId (space and externalId only)
+    // It's an InstanceId - use the instanceType if present, otherwise default
+    const instanceId = item as InstanceId;
     return {
-      instanceType: defaultInstanceType,
-      space: item.space,
-      externalId: item.externalId,
+      instanceType: instanceId.instanceType ?? defaultInstanceType,
+      space: instanceId.space,
+      externalId: instanceId.externalId,
     };
   }
 
   /**
    * Deletes a single chunk of instances.
    */
-  private async deleteChunk(items: readonly InternalInstanceId[]): Promise<HTTPResult> {
-    const serializedItems: SerializedInstanceId[] = items.map((item) => ({
+  private async deleteChunk(items: readonly InstanceIdWithType[]): Promise<HTTPResult> {
+    // InstanceIdWithType already has the correct shape for the API
+    const serializedItems = items.map((item) => ({
       instanceType: item.instanceType,
       space: item.space,
       externalId: item.externalId,
