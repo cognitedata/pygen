@@ -17,14 +17,6 @@ import type {
 } from "./types.js";
 import { createRequestState, getTotalAttempts, parseErrorDetails } from "./types.js";
 
-/** Options for HTTP client behavior */
-export interface HTTPClientOptions {
-  /** HTTP status codes that should trigger a retry */
-  readonly retryStatusCodes?: ReadonlySet<number>;
-  /** Maximum backoff time in seconds (default: 60) */
-  readonly maxRetryBackoff?: number;
-}
-
 const DEFAULT_RETRY_STATUS_CODES = new Set([408, 429, 502, 503, 504]);
 
 /**
@@ -57,7 +49,7 @@ export class HTTPClient {
   private readonly retryStatusCodes: ReadonlySet<number>;
   private readonly maxRetryBackoff: number;
 
-  constructor(config: PygenClientConfig, options: HTTPClientOptions = {}) {
+  constructor(config: PygenClientConfig) {
     this.credentials = config.credentials;
     this.baseUrl = config.baseUrl;
     this.project = config.project;
@@ -65,8 +57,8 @@ export class HTTPClient {
     this.apiSubversion = config.apiSubversion ?? "v1";
     this.timeout = config.timeout ?? 30000;
     this.maxRetries = config.maxRetries ?? 10;
-    this.retryStatusCodes = options.retryStatusCodes ?? DEFAULT_RETRY_STATUS_CODES;
-    this.maxRetryBackoff = options.maxRetryBackoff ?? 60;
+    this.retryStatusCodes = config.retryStatusCodes ?? DEFAULT_RETRY_STATUS_CODES;
+    this.maxRetryBackoff = config.maxRetryBackoff ?? 60;
   }
 
   /**

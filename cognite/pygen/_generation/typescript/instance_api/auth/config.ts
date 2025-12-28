@@ -55,4 +55,14 @@ export interface PygenClientConfig {
    * Optional maximum number of retries for failed requests (default: 10).
    */
   readonly maxRetries?: number;
+
+  /**
+   * Optional HTTP status codes that should trigger a retry (default: 408, 429, 502, 503, 504).
+   */
+  readonly retryStatusCodes?: ReadonlySet<number>;
+
+  /**
+   * Optional maximum backoff time in seconds for retries (default: 60).
+   */
+  readonly maxRetryBackoff?: number;
 }

@@ -40,19 +40,15 @@ describe("HTTPClient", () => {
     });
 
     it("should accept custom options", (): void => {
-      const client = new HTTPClient(
-        {
-          baseUrl: "https://api.cognitedata.com",
-          project: "my-project",
-          credentials: new TokenCredentials("token"),
-          timeout: 60000,
-          clientName: "my-app",
-          maxRetries: 5,
-        },
-        {
-          maxRetryBackoff: 30,
-        }
-      );
+      const client = new HTTPClient({
+        baseUrl: "https://api.cognitedata.com",
+        project: "my-project",
+        credentials: new TokenCredentials("token"),
+        timeout: 60000,
+        clientName: "my-app",
+        maxRetries: 5,
+        maxRetryBackoff: 30,
+      });
 
       expect(client).toBeInstanceOf(HTTPClient);
     });

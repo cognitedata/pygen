@@ -5,7 +5,6 @@
  */
 
 export { HTTPClient } from "./client.js";
-export type { HTTPClientOptions } from "./client.js";
 export type {
   HTTPMethod,
   HTTPResult,
