@@ -92,7 +92,7 @@ export function parseErrorDetails(statusCode: number, body: string): ErrorDetail
       return parsed.error;
     }
   } catch {
-    // Ignore parse errors
+    // Ignore parse and type errors
   }
   return { code: statusCode, message: body };
 }

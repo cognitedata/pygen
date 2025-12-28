@@ -199,7 +199,7 @@ export class HTTPClient {
   ): Promise<{ kind: "done"; result: HTTPResult } | { kind: "retry" }> {
     const isTimeout =
       error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError");
-    const isConnectionError = error instanceof TypeError && error.message.includes("fetch");
+    const isConnectionError = error instanceof TypeError;
 
     if (isTimeout) {
       state.readAttempt++;
