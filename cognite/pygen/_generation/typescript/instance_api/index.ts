@@ -9,3 +9,6 @@
 
 // Re-export all types
 export * from "./types/index.js";
+
+// Re-export HTTP client
+export * from "./http_client/index.js";
