@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  MultiRequestError,
-  OAuth2Error,
-  PygenAPIError,
+  type FailedRequest,
+  type FailedResponse,
   isMultiRequestError,
   isOAuth2Error,
   isPygenAPIError,
-  type FailedRequest,
-  type FailedResponse,
+  MultiRequestError,
+  OAuth2Error,
+  PygenAPIError,
   type UpsertResult,
 } from "@cognite/pygen-typescript";
 
@@ -146,7 +146,7 @@ describe("MultiRequestError", () => {
     expect(error.failedRequests).toHaveLength(1);
   });
 
-    it("should inherit from PygenAPIError", () => {
+  it("should inherit from PygenAPIError", () => {
     const failedResponses = [createFailedResponse(400, "Bad request")];
     const error = new MultiRequestError(failedResponses, [], createUpsertResult());
     expect(error).toBeInstanceOf(Error);
@@ -376,4 +376,3 @@ describe("Error hierarchy integration", () => {
     expect(multiErrors).toBe(1);
   });
 });
-

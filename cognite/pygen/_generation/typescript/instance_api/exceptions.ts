@@ -226,4 +226,3 @@ export function isOAuth2Error(error: unknown): error is OAuth2Error {
 export function isMultiRequestError(error: unknown): error is MultiRequestError {
   return error instanceof MultiRequestError;
 }
-
