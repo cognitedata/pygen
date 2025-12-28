@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-export type { Credentials } from "./credentials.js";
-export { TokenCredentials } from "./token.js";
-export { OAuthClientCredentials, OAuth2Error } from "./oauth2.js";
-export type { OAuth2Config } from "./oauth2.js";
-export type { PygenClientConfig } from "./config.js";
+export type { Credentials } from "./credentials.ts";
+export { TokenCredentials } from "./token.ts";
+export { OAuth2Error, OAuthClientCredentials } from "./oauth2.ts";
+export type { OAuth2Config } from "./oauth2.ts";
+export type { PygenClientConfig } from "./config.ts";

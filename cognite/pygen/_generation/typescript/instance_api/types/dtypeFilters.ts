@@ -7,8 +7,8 @@
  * @packageDocumentation
  */
 
-import type { Filter, PropertyPath } from "./filters.js";
-import type { ViewReference, InstanceId } from "./references.js";
+import type { Filter, PropertyPath } from "./filters.ts";
+import type { InstanceId, ViewReference } from "./references.ts";
 
 // ============================================================================
 // Base Filter Builder
@@ -35,7 +35,7 @@ export class DataTypeFilter {
   constructor(
     propRef: ViewReference | "node" | "edge",
     propertyId: string,
-    operator: "and" | "or"
+    operator: "and" | "or",
   ) {
     this._propRef = propRef;
     this._propertyId = propertyId;
@@ -146,7 +146,7 @@ export class FilterContainer {
   constructor(
     dataTypeFilters: DataTypeFilter[],
     operator: "and" | "or",
-    instanceType: "node" | "edge"
+    instanceType: "node" | "edge",
   ) {
     this._dataTypeFilters = dataTypeFilters;
     this._operator = operator;
@@ -166,7 +166,7 @@ export class FilterContainer {
       this.type,
       this.createdTime,
       this.lastUpdatedTime,
-      this.deletedTime
+      this.deletedTime,
     );
 
     if (instanceType === "edge") {
@@ -688,7 +688,7 @@ export class DirectRelationFilter extends DataTypeFilter {
    */
   private _validateValue(
     value: string | InstanceId | [string, string] | null,
-    space?: string
+    space?: string,
   ): { space: string; externalId: string } | null {
     if (value === null) return null;
 
@@ -757,7 +757,7 @@ export class DirectRelationFilter extends DataTypeFilter {
       | [string, string]
       | (string | InstanceId | [string, string])[]
       | null,
-    space?: string
+    space?: string,
   ): this {
     if (value === null) {
       return this;

@@ -6,16 +6,16 @@
  * @packageDocumentation
  */
 
-import type { Credentials, PygenClientConfig } from "../auth/index.js";
+import type { Credentials, PygenClientConfig } from "../auth/index.ts";
 import type {
+  FailedRequest,
+  FailedResponse,
   HTTPResult,
   RequestMessage,
   RequestState,
   SuccessResponse,
-  FailedResponse,
-  FailedRequest,
-} from "./types.js";
-import { createRequestState, getTotalAttempts, parseErrorDetails } from "./types.js";
+} from "./types.ts";
+import { createRequestState, getTotalAttempts, parseErrorDetails } from "./types.ts";
 
 const DEFAULT_RETRY_STATUS_CODES = new Set([408, 429, 502, 503, 504]);
 
@@ -87,7 +87,7 @@ export class HTTPClient {
   }
 
   private async executeRequest(
-    state: RequestState
+    state: RequestState,
   ): Promise<{ kind: "done"; result: HTTPResult } | { kind: "retry" }> {
     try {
       const response = await this.makeRequest(state.message);
@@ -142,7 +142,7 @@ export class HTTPClient {
 
   private async handleResponse(
     response: Response,
-    state: RequestState
+    state: RequestState,
   ): Promise<{ kind: "done"; result: HTTPResult } | { kind: "retry" }> {
     const body = await response.text();
 
@@ -185,10 +185,10 @@ export class HTTPClient {
 
   private async handleError(
     error: unknown,
-    state: RequestState
+    state: RequestState,
   ): Promise<{ kind: "done"; result: HTTPResult } | { kind: "retry" }> {
-    const isTimeout =
-      error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError");
+    const isTimeout = error instanceof Error &&
+      (error.name === "AbortError" || error.name === "TimeoutError");
     const isConnectionError = error instanceof TypeError;
 
     if (isTimeout) {

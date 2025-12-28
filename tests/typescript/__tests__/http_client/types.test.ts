@@ -1,15 +1,15 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   createRequestState,
-  getTotalAttempts,
-  parseErrorDetails,
-  isSuccess,
+  type FailedRequest,
+  type FailedResponse,
   getSuccessOrThrow,
+  getTotalAttempts,
+  type HTTPResult,
+  isSuccess,
+  parseErrorDetails,
   type RequestMessage,
   type SuccessResponse,
-  type FailedResponse,
-  type FailedRequest,
-  type HTTPResult,
 } from "@cognite/pygen-typescript";
 
 describe("HTTP Client Types", () => {
@@ -145,7 +145,7 @@ describe("HTTP Client Types", () => {
       };
 
       expect(() => getSuccessOrThrow(result)).toThrow(
-        "Request failed with status 404: Resource not found"
+        "Request failed with status 404: Resource not found",
       );
     });
 

@@ -2,24 +2,24 @@
  * Tests for filter types and helper functions.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  equals,
-  inFilter,
-  range,
-  prefix,
-  exists,
   and,
-  or,
-  not,
+  equals,
+  exists,
+  type Filter,
+  inFilter,
+  isAndFilter,
   isEqualsFilter,
   isInFilter,
-  isRangeFilter,
-  isPrefixFilter,
-  isAndFilter,
-  isOrFilter,
   isNotFilter,
-  type Filter,
+  isOrFilter,
+  isPrefixFilter,
+  isRangeFilter,
+  not,
+  or,
+  prefix,
+  range,
 } from "@cognite/pygen-typescript";
 
 describe("Filter helper functions", () => {

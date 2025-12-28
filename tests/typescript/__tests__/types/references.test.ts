@@ -1,20 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  createInstanceId,
-  createViewReference,
+  type ContainerReference,
   createContainerReference,
   createDataModelReference,
-  createNodeReference,
   createEdgeReference,
+  createInstanceId,
+  createNodeReference,
+  createViewReference,
+  type DataModelReference,
+  type EdgeReference,
+  type InstanceId,
   instanceIdEquals,
   instanceIdToString,
-  viewReferenceToString,
-  type InstanceId,
-  type ViewReference,
-  type ContainerReference,
-  type DataModelReference,
   type NodeReference,
-  type EdgeReference,
+  type ViewReference,
+  viewReferenceToString,
 } from "@cognite/pygen-typescript";
 
 describe("Reference Types", () => {

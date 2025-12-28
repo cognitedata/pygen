@@ -33,7 +33,9 @@ export const MAX_TIMESTAMP_MS = 4102444799999;
 export function msToDate(ms: number): Date {
   if (ms < MIN_TIMESTAMP_MS || ms > MAX_TIMESTAMP_MS) {
     throw new Error(
-      `Timestamp ${String(ms)} is outside valid CDF range [${String(MIN_TIMESTAMP_MS)}, ${String(MAX_TIMESTAMP_MS)}]`
+      `Timestamp ${String(ms)} is outside valid CDF range [${String(MIN_TIMESTAMP_MS)}, ${
+        String(MAX_TIMESTAMP_MS)
+      }]`,
     );
   }
   return new Date(ms);
@@ -55,7 +57,9 @@ export function dateToMs(date: Date): number {
   const ms = date.getTime();
   if (ms < MIN_TIMESTAMP_MS || ms > MAX_TIMESTAMP_MS) {
     throw new Error(
-      `Timestamp ${String(ms)} is outside valid CDF range [${String(MIN_TIMESTAMP_MS)}, ${String(MAX_TIMESTAMP_MS)}]`
+      `Timestamp ${String(ms)} is outside valid CDF range [${String(MIN_TIMESTAMP_MS)}, ${
+        String(MAX_TIMESTAMP_MS)
+      }]`,
     );
   }
   return ms;

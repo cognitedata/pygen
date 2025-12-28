@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  HTTPClient,
-  TokenCredentials,
-  isSuccess,
   type Credentials,
+  HTTPClient,
+  isSuccess,
+  TokenCredentials,
 } from "@cognite/pygen-typescript";
 
 describe("HTTPClient", () => {
@@ -116,7 +116,7 @@ describe("HTTPClient", () => {
         expect.objectContaining({
           method: "POST",
           body: JSON.stringify({ name: "test-model" }),
-        })
+        }),
       );
     });
 
@@ -154,7 +154,7 @@ describe("HTTPClient", () => {
             "x-cdp-app": "my-app",
             "cdf-version": "beta",
           },
-        })
+        }),
       );
     });
 
@@ -166,7 +166,7 @@ describe("HTTPClient", () => {
           Promise.resolve(
             JSON.stringify({
               error: { code: 404, message: "Not found" },
-            })
+            }),
           ),
         headers: new Headers(),
       });
@@ -422,7 +422,7 @@ describe("HTTPClient", () => {
           headers: expect.objectContaining({
             Authorization: "Bearer my-secret-token",
           }),
-        })
+        }),
       );
     });
   });

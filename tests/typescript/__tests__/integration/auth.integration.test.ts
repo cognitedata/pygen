@@ -10,15 +10,15 @@
  *   - IDP_CLIENT_SECRET: OAuth2 client secret
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
-import { execSync } from "child_process";
-import { existsSync } from "fs";
-import { resolve } from "path";
+import { beforeAll, describe, expect, it } from "vitest";
+import { execSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { config as loadDotenv } from "dotenv";
 import {
   HTTPClient,
-  OAuthClientCredentials,
   isSuccess,
+  OAuthClientCredentials,
   type PygenClientConfig,
 } from "@cognite/pygen-typescript";
 

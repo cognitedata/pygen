@@ -175,25 +175,22 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
         with:
-          node-version: "22"
-
-      - name: Install dependencies
-        run: npm install
+          deno-version: v2.x
 
       - name: TypeScript compilation check
-        run: npm run typecheck
+        run: deno task typecheck
 
       - name: Format check
-        run: npm run format:check
+        run: deno task format:check
 
       - name: Lint check
-        run: npm run lint
+        run: deno task lint
 
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: deno task test:coverage
 
       - name: Run integration tests
         env:
@@ -202,7 +199,7 @@ jobs:
           IDP_CLIENT_ID: ${{ vars.IDP_CLIENT_ID }}
           IDP_CLIENT_SECRET: ${{ secrets.IDP_CLIENT_SECRET }}
           IDP_TENANT_ID: ${{ vars.IDP_TENANT_ID }}
-        run: npm run test:integration
+        run: deno task test:integration
 
   validate-description:
     name: Validate PR description

@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  msToDate,
   dateToMs,
-  parseDate,
-  MIN_TIMESTAMP_MS,
   MAX_TIMESTAMP_MS,
+  MIN_TIMESTAMP_MS,
+  msToDate,
+  parseDate,
 } from "@cognite/pygen-typescript";
 
 describe("Date Utilities", () => {
