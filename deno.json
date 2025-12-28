@@ -1,0 +1,52 @@
+{
+  "name": "@cognite/pygen-typescript",
+  "version": "0.0.1",
+  "exports": "./cognite/pygen/_generation/typescript/instance_api/index.ts",
+  "tasks": {
+    "typecheck": "deno check cognite/pygen/_generation/typescript/**/*.ts",
+    "test": "deno task npm:vitest run",
+    "test:watch": "deno task npm:vitest",
+    "test:coverage": "deno task npm:vitest run --coverage",
+    "test:integration": "deno task npm:vitest run --config vitest.integration.config.ts",
+    "format": "deno fmt cognite/pygen/_generation/typescript/ tests/typescript/",
+    "format:check": "deno fmt --check cognite/pygen/_generation/typescript/ tests/typescript/",
+    "lint": "deno lint cognite/pygen/_generation/typescript/",
+    "lint:fix": "deno lint --fix cognite/pygen/_generation/typescript/",
+    "npm:vitest": "deno run -A npm:vitest@^2.1.8"
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve",
+    "include": [
+      "cognite/pygen/_generation/typescript/",
+      "tests/typescript/"
+    ]
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "exclude": ["no-explicit-any"]
+    },
+    "include": [
+      "cognite/pygen/_generation/typescript/"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "lib": ["ES2022", "DOM"]
+  },
+  "imports": {
+    "@cognite/pygen-typescript": "./cognite/pygen/_generation/typescript/instance_api/index.ts"
+  },
+  "nodeModulesDir": "auto"
+}
+

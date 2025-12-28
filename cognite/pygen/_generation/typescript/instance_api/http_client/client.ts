@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import type { Credentials, PygenClientConfig } from "../auth/index.js";
+import type { Credentials, PygenClientConfig } from "../auth/index.ts";
 import type {
   HTTPResult,
   RequestMessage,
@@ -14,8 +14,8 @@ import type {
   SuccessResponse,
   FailedResponse,
   FailedRequest,
-} from "./types.js";
-import { createRequestState, getTotalAttempts, parseErrorDetails } from "./types.js";
+} from "./types.ts";
+import { createRequestState, getTotalAttempts, parseErrorDetails } from "./types.ts";
 
 const DEFAULT_RETRY_STATUS_CODES = new Set([408, 429, 502, 503, 504]);
 

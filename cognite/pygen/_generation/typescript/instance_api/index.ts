@@ -8,10 +8,10 @@
  */
 
 // Re-export all types
-export * from "./types/index.js";
+export * from "./types/index.ts";
 
 // Re-export HTTP client
-export * from "./http_client/index.js";
+export * from "./http_client/index.ts";
 
 // Re-export authentication
-export * from "./auth/index.js";
+export * from "./auth/index.ts";

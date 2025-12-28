@@ -7,8 +7,8 @@
  * @packageDocumentation
  */
 
-import type { InstanceId, InstanceType, ViewReference, NodeReference } from "./references.js";
-import { msToDate, dateToMs, toSnakeCaseKey } from "./utils.js";
+import type { InstanceId, InstanceType, ViewReference, NodeReference } from "./references.ts";
+import { msToDate, dateToMs, toSnakeCaseKey } from "./utils.ts";
 
 // ============================================================================
 // Data Record Types

@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import type { ViewReference, ContainerReference, NodeReference } from "./references.js";
+import type { ViewReference, ContainerReference, NodeReference } from "./references.ts";
 
 // ============================================================================
 // Base Filter Types

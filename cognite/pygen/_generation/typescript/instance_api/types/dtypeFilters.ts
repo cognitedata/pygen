@@ -7,8 +7,8 @@
  * @packageDocumentation
  */
 
-import type { Filter, PropertyPath } from "./filters.js";
-import type { ViewReference, InstanceId } from "./references.js";
+import type { Filter, PropertyPath } from "./filters.ts";
+import type { ViewReference, InstanceId } from "./references.ts";
 
 // ============================================================================
 // Base Filter Builder

@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import type { Credentials } from "./credentials.js";
+import type { Credentials } from "./credentials.ts";
 
 /**
  * Simple token-based credentials for static authentication.

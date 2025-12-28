@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-export { HTTPClient } from "./client.js";
+export { HTTPClient } from "./client.ts";
 export type {
   HTTPMethod,
   HTTPResult,
@@ -14,11 +14,11 @@ export type {
   ErrorDetails,
   RequestMessage,
   RequestState,
-} from "./types.js";
+} from "./types.ts";
 export {
   isSuccess,
   getSuccessOrThrow,
   parseErrorDetails,
   createRequestState,
   getTotalAttempts,
-} from "./types.js";
+} from "./types.ts";

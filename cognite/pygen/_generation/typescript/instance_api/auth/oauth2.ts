@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import type { Credentials } from "./credentials.js";
+import type { Credentials } from "./credentials.ts";
 
 /**
  * Configuration options for OAuth2 Client Credentials flow.

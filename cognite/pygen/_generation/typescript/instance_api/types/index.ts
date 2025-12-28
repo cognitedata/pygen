@@ -7,16 +7,16 @@
  */
 
 // Reference types
-export * from "./references.js";
+export * from "./references.ts";
 
 // Utility functions
-export * from "./utils.js";
+export * from "./utils.ts";
 
 // Instance types and classes
-export * from "./instance.js";
+export * from "./instance.ts";
 
 // Filter types
-export * from "./filters.js";
+export * from "./filters.ts";
 
 // Data type filters
-export * from "./dtypeFilters.js";
+export * from "./dtypeFilters.ts";
