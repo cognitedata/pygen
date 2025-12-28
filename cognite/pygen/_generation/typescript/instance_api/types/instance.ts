@@ -364,17 +364,6 @@ export interface InstanceRaw {
 }
 
 /**
- * Fields that are part of the data record (not properties).
- */
-const DATA_RECORD_FIELDS = new Set([
-  "version",
-  "lastUpdatedTime",
-  "createdTime",
-  "deletedTime",
-  "existingVersion",
-]);
-
-/**
  * Fields that are part of the instance model base (not properties).
  */
 const INSTANCE_MODEL_FIELDS = new Set(["instanceType", "space", "externalId"]);
