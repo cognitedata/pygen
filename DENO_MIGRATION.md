@@ -81,7 +81,7 @@ Tests continue to use **Vitest** but run through Deno via npm compatibility:
 
 Added comprehensive documentation:
 - `docs/developer_docs/typescript-deno-setup.md` - Complete Deno setup guide
-- `test-deno-runtime.ts` - Runtime compatibility test script
+
 
 ## Benefits
 
