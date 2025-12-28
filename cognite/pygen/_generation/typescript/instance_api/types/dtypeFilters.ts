@@ -486,7 +486,16 @@ export class DateFilter extends DataTypeFilter {
       return parts[0]!; // Non-null assertion: ISO string always has date part
     }
     // Validate it's a valid ISO format by parsing it
-    const parsed = new Date(value);
+    // For strings, we need to handle date-only and full datetime strings carefully.
+    let parsed: Date;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      // If it's a date-only string, treat it as UTC to avoid timezone shifts.
+      parsed = new Date(`${value}T00:00:00.000Z`);
+    } else {
+      // Otherwise, parse as-is, assuming it's a full ISO-like string.
+      parsed = new Date(value);
+    }
+
     if (isNaN(parsed.getTime())) {
       throw new Error(`String '${value}' is not a valid ISO format date.`);
     }
@@ -703,9 +712,8 @@ export class DirectRelationFilter extends DataTypeFilter {
   equals(value: string | InstanceId | [string, string] | null, space?: string): this {
     const validated = this._validateValue(value, space);
     if (validated === null) return this;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this._addFilter("equals", {
-      equals: { property: this._propertyPath, value: validated as any },
+      equals: { property: this._propertyPath, value: validated },
     });
   }
 
@@ -722,9 +730,8 @@ export class DirectRelationFilter extends DataTypeFilter {
       .map((v) => this._validateValue(v, space))
       .filter((v): v is NonNullable<typeof v> => v !== null);
     if (validated.length === 0) return this;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this._addFilter("in", {
-      in: { property: this._propertyPath, values: validated as any[] },
+      in: { property: this._propertyPath, values: validated },
     });
   }
 

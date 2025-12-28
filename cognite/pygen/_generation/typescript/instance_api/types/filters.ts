@@ -45,7 +45,7 @@ export type JsonValue = string | number | boolean | null;
 export interface EqualsFilter {
   readonly equals: {
     readonly property: PropertyPath;
-    readonly value: JsonValue | PropertyReference;
+    readonly value: JsonValue | PropertyReference | NodeReference;
   };
 }
 
@@ -53,7 +53,7 @@ export interface EqualsFilter {
 export interface InFilter {
   readonly in: {
     readonly property: PropertyPath;
-    readonly values: JsonValue[] | PropertyReference;
+    readonly values: (JsonValue | NodeReference)[] | PropertyReference;
   };
 }
 
