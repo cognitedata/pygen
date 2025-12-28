@@ -15,8 +15,11 @@ export type InstanceType = "node" | "edge";
 /**
  * Represents an instance identifier in CDF.
  * An instance is uniquely identified by a space and an external ID.
+ * The instanceType is optional but required for some operations like delete.
  */
 export interface InstanceId {
+  /** The type of the instance (node or edge). Optional for some use cases. */
+  readonly instanceType?: InstanceType;
   /** The space containing the instance */
   readonly space: string;
   /** The external ID of the instance within the space */
@@ -83,19 +86,30 @@ export interface DataModelReference {
 }
 
 /**
- * Creates an InstanceId from space and external ID.
+ * Creates an InstanceId from space, external ID, and optional instance type.
  *
  * @param space - The space containing the instance
  * @param externalId - The external ID of the instance
+ * @param instanceType - Optional instance type (node or edge)
  * @returns An InstanceId object
  *
  * @example
  * ```typescript
  * const id = createInstanceId("my-space", "my-instance");
  * console.log(id); // { space: "my-space", externalId: "my-instance" }
+ *
+ * const nodeId = createInstanceId("my-space", "my-node", "node");
+ * console.log(nodeId); // { instanceType: "node", space: "my-space", externalId: "my-node" }
  * ```
  */
-export function createInstanceId(space: string, externalId: string): InstanceId {
+export function createInstanceId(
+  space: string,
+  externalId: string,
+  instanceType?: InstanceType,
+): InstanceId {
+  if (instanceType !== undefined) {
+    return { instanceType, space, externalId };
+  }
   return { space, externalId };
 }
 

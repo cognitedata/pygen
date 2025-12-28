@@ -18,3 +18,6 @@ export * from "./auth/index.ts";
 
 // Re-export exceptions
 export * from "./exceptions.ts";
+
+// Re-export instance client
+export * from "./client.ts";
