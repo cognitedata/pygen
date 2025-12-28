@@ -14,8 +14,6 @@ import {
   type DataRecord,
   type DataRecordWrite,
   type DataRecordRaw,
-  type Instance,
-  type InstanceWrite,
   type NodeInstance,
   type EdgeInstance,
   type NodeInstanceWrite,
@@ -313,7 +311,7 @@ describe("Instance Serialization", () => {
       const result = dumpInstanceForAPI(nodeWrite, TEST_VIEW_ID);
 
       expect(
-        (result.sources as Array<{ properties: Record<string, unknown> }>)[0].properties.createdAt
+        (result.sources as { properties: Record<string, unknown> }[])[0].properties.createdAt
       ).toBe(1703721600000);
     });
   });

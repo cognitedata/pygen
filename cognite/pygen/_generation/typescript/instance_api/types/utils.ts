@@ -52,14 +52,28 @@ export function msToDate(ms: number): Date {
  * ```
  */
 export function dateToMs(date: Date): number {
-  return date.getTime();
+  const ms = date.getTime();
+  if (ms < MIN_TIMESTAMP_MS || ms > MAX_TIMESTAMP_MS) {
+    throw new Error(
+      `Timestamp ${String(ms)} is outside valid CDF range [${String(MIN_TIMESTAMP_MS)}, ${String(MAX_TIMESTAMP_MS)}]`
+    );
+  }
+  return ms;
 }
 
 /**
  * Converts a camelCase key to snake_case.
  */
 export function toSnakeCaseKey(key: string): string {
-  return key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+  const step1 = key
+    // Break acronym runs followed by a capitalized word part: HTTPServer -> HTTP_Server
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2")
+    // Break lower/number followed by capital: serverID -> server_ID
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    // Break letter/number boundaries: id2X -> id2_X, 2Id -> 2_Id
+    .replace(/([a-zA-Z])(\d)/g, "$1_$2")
+    .replace(/(\d)([a-zA-Z])/g, "$1_$2");
+  return step1.toLowerCase();
 }
 
 /**

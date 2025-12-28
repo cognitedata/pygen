@@ -414,12 +414,11 @@ export function parseInstance<T extends Instance>(raw: InstanceRaw, viewId?: Vie
 
   // Add edge-specific fields
   if (raw.instanceType === "edge") {
-    if (raw.startNode) {
-      instance.startNode = raw.startNode;
+    if (!raw.startNode || !raw.endNode) {
+      throw new Error("Edge instance is missing startNode or endNode");
     }
-    if (raw.endNode) {
-      instance.endNode = raw.endNode;
-    }
+    instance.startNode = raw.startNode;
+    instance.endNode = raw.endNode;
   }
 
   return instance as T;
