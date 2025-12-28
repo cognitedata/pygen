@@ -103,7 +103,7 @@ export class HTTPClient {
       const response = await this.makeRequest(state.message);
       return this.handleResponse(response, state);
     } catch (error) {
-      return this.handleError(error, state);
+      return await this.handleError(error, state);
     }
   }
 
