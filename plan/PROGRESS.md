@@ -227,11 +227,35 @@ This document tracks the actual progress of the Pygen rewrite implementation.
      - Linting and formatting checks added
    - ✅ Documentation: Development environment documented
 
+1. **HTTP Client Foundation (TypeScript)** ✅ (Completed December 28, 2025)
+   - ✅ Implemented `HTTPClient` class wrapping fetch API
+   - ✅ Retry logic with exponential backoff
+   - ✅ Rate limiting support (handle 429 responses with Retry-After)
+   - ✅ Connection timeout handling
+   - ✅ Request/response logging capability
+   - ✅ Created `RequestMessage`, `SuccessResponse`, `FailedResponse`, `FailedRequest` types
+   - ✅ Error response parsing (matches Python's ErrorDetails)
+
+2. **Authentication Support (TypeScript)** ✅ (Completed December 28, 2025)
+   - ✅ Created `Credentials` interface (abstract base)
+   - ✅ Implemented `TokenCredentials` for static token auth
+   - ✅ Implemented `OAuthCredentials` with token refresh logic
+   - ✅ Support for different authentication providers
+   - ✅ Token caching and refresh handling
+   - ✅ Created `PygenClientConfig` interface for client configuration
+
+3. **Generic Instance Models (TypeScript)** ✅ (Completed December 28, 2025)
+   - ✅ Created `InstanceModel`, `Instance`, `InstanceWrite` base interfaces/classes
+   - ✅ Implemented `InstanceList<T>` with array-like behavior and utility methods
+   - ✅ Implemented reference types: `ViewReference`, `NodeReference`, `ContainerReference`
+   - ✅ Implemented `DataRecord` and `DataRecordWrite` interfaces
+   - ✅ Implemented `InstanceId` type for instance identification
+   - ✅ Generic serialization/deserialization (to/from CDF API format with camelCase conversion)
+   - ✅ Support for both `node` and `edge` instance types
+   - ✅ Custom date/datetime handling (milliseconds since epoch like Python's `DateTimeMS`)
+
 ### Pending Tasks
 
-1. **HTTP Client Foundation (TypeScript)** - ⬜ Not Started
-2. **Authentication Support (TypeScript)** - ⬜ Not Started
-3. **Generic Instance Models (TypeScript)** - ⬜ Not Started
 4. **Filter System (TypeScript)** - ⬜ Not Started
 5. **Query & Response Models (TypeScript)** - ⬜ Not Started
 6. **Exception Hierarchy (TypeScript)** - ⬜ Not Started
@@ -240,12 +264,12 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 9. **Example Data Classes (TypeScript)** - ⬜ Not Started
 10. **Example API Classes (TypeScript)** - ⬜ Not Started
 
-### Deliverables (Pending)
+### Deliverables
 
-- ⬜ Complete development environment with chosen tooling
-- ⬜ CI/CD pipeline for TypeScript testing and linting
-- ⬜ HTTP client with retry and authentication support
-- ⬜ Complete generic TypeScript instance models
+- ✅ Complete development environment with chosen tooling
+- ✅ CI/CD pipeline for TypeScript testing and linting
+- ✅ HTTP client with retry and authentication support
+- ✅ Complete generic TypeScript instance models
 - ⬜ Type-safe filter system with builder pattern
 - ⬜ Generic InstanceClient with CRUD operations
 - ⬜ Generic InstanceAPI with retrieve/list/iterate/aggregate/search
@@ -281,7 +305,7 @@ Details for Phases 4-10 will be updated as they are started and completed.
 
 **Phases Complete**: 3 / 10 (30%)  
 **Current Phase**: Phase 3 - Generic Instance API & Example SDK (TypeScript) (In Progress)  
-**Tasks Complete Current Phase**: 1 / 11 tasks (9%)  
+**Tasks Complete Current Phase**: 4 / 11 tasks (36%)  
 **Estimated Time Remaining**: 22-36 weeks  
 
 ---
@@ -395,11 +419,39 @@ Details for Phases 4-10 will be updated as they are started and completed.
 - Configured CI/CD pipeline with TypeScript testing job
 - Added ESLint and Prettier for code quality
 
+#### Task 1: HTTP Client Foundation ✅ (Completed Dec 28, 2025)
+- Implemented `HTTPClient` class wrapping fetch API
+- Added retry logic with exponential backoff
+- Added rate limiting support (handle 429 responses)
+- Connection timeout handling implemented
+- Request/response logging capability added
+- Created request/response type system (RequestMessage, SuccessResponse, FailedResponse, FailedRequest)
+- Error response parsing matches Python's ErrorDetails pattern
+
+#### Task 2: Authentication Support ✅ (Completed Dec 28, 2025)
+- Created `Credentials` interface (abstract base)
+- Implemented `TokenCredentials` for static token auth
+- Implemented `OAuthCredentials` with token refresh logic
+- Support for multiple authentication providers
+- Token caching and refresh handling with thread-safety
+- Created `PygenClientConfig` interface for client configuration
+
+#### Task 3: Generic Instance Models ✅ (Completed Dec 28, 2025)
+- Created `InstanceModel`, `Instance`, `InstanceWrite` base interfaces/classes
+- Implemented `InstanceList<T>` with array-like behavior and utility methods
+- Implemented reference types: `ViewReference`, `NodeReference`, `ContainerReference`
+- Implemented `DataRecord` and `DataRecordWrite` interfaces
+- Implemented `InstanceId` type for instance identification
+- Generic serialization/deserialization with camelCase conversion
+- Support for both `node` and `edge` instance types
+- Custom date/datetime handling (milliseconds since epoch)
+
 ### Next Steps
 
-1. Continue Phase 3: HTTP Client Foundation (TypeScript)
-2. Implement authentication support for TypeScript
-3. Build generic instance models in TypeScript
+1. Continue Phase 3: **Task 4: Filter System (TypeScript)**
+2. Implement query & response models
+3. Build exception hierarchy
+4. Implement generic InstanceClient and InstanceAPI
 
 ---
 
