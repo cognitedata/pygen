@@ -4,23 +4,23 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CATEGORY_NODE_VIEW,
   CategoryNode,
+  categoryNodeAsWrite,
   CategoryNodeFilter,
   CategoryNodeList,
-  categoryNodeAsWrite,
-  CATEGORY_NODE_VIEW,
   EXAMPLE_SPACE,
   EXAMPLE_VERSION,
+  PRODUCT_NODE_VIEW,
   ProductNode,
+  productNodeAsWrite,
   ProductNodeFilter,
   ProductNodeList,
-  productNodeAsWrite,
-  PRODUCT_NODE_VIEW,
+  RELATES_TO_VIEW,
   RelatesTo,
+  relatesToAsWrite,
   RelatesToFilter,
   RelatesToList,
-  relatesToAsWrite,
-  RELATES_TO_VIEW,
 } from "../../../../cognite/pygen/_generation/typescript/example/dataClasses.ts";
 
 // ============================================================================
@@ -415,4 +415,3 @@ describe("RelatesToFilter", () => {
     expect(result).toHaveProperty("range");
   });
 });
-

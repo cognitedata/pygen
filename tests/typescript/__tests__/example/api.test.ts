@@ -6,9 +6,9 @@ import { describe, expect, it } from "vitest";
 import {
   HTTPClient,
   type HTTPResult,
+  type PygenClientConfig,
   type RequestMessage,
   TokenCredentials,
-  type PygenClientConfig,
 } from "@cognite/pygen-typescript";
 
 import {
@@ -17,12 +17,12 @@ import {
   RelatesToAPI,
 } from "../../../../cognite/pygen/_generation/typescript/example/api.ts";
 import {
-  CategoryNode,
-  ProductNode,
-  RelatesTo,
   CATEGORY_NODE_VIEW,
+  CategoryNode,
   PRODUCT_NODE_VIEW,
+  ProductNode,
   RELATES_TO_VIEW,
+  RelatesTo,
 } from "../../../../cognite/pygen/_generation/typescript/example/dataClasses.ts";
 
 // Mockable HTTPClient subclass
@@ -197,12 +197,17 @@ function createMockAggregateResponse(): HTTPResult {
 }
 
 // Helper to create mock search response (same format as list)
-function createMockSearchResponse<T>(items: T[], createFn: (items: T[], cursor?: string) => HTTPResult): HTTPResult {
+function createMockSearchResponse<T>(
+  items: T[],
+  createFn: (items: T[], cursor?: string) => HTTPResult,
+): HTTPResult {
   return createFn(items);
 }
 
 // Create test config and API helper
-function createTestableAPI<T>(APIClass: new (config: PygenClientConfig) => T): { api: T; mockClient: MockHTTPClient; config: PygenClientConfig } {
+function createTestableAPI<T>(
+  APIClass: new (config: PygenClientConfig) => T,
+): { api: T; mockClient: MockHTTPClient; config: PygenClientConfig } {
   const credentials = new TokenCredentials({ tokenProvider: async () => "test-token" });
   const config: PygenClientConfig = {
     baseUrl: "https://test.cognitedata.com",
@@ -287,7 +292,8 @@ describe("ProductNodeAPI", () => {
       const { api, mockClient } = createTestableAPI(ProductNodeAPI);
       const testProduct = createTestProduct("product-1", "Test Product");
 
-      mockClient.mockRequestFn = async () => createMockProductListResponse([testProduct], "next-cursor");
+      mockClient.mockRequestFn = async () =>
+        createMockProductListResponse([testProduct], "next-cursor");
 
       const result = await api.iterate({ cursor: "start-cursor", limit: 10 });
 
@@ -616,4 +622,3 @@ describe("RelatesToAPI", () => {
     });
   });
 });
-

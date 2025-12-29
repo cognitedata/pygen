@@ -15,18 +15,18 @@ import type { AggregateResponse, Page } from "../instance_api/types/responses.ts
 import { InstanceList } from "../instance_api/types/instance.ts";
 
 import {
+  CATEGORY_NODE_VIEW,
   CategoryNode,
   CategoryNodeFilter,
   CategoryNodeList,
-  CATEGORY_NODE_VIEW,
+  PRODUCT_NODE_VIEW,
   ProductNode,
   ProductNodeFilter,
   ProductNodeList,
-  PRODUCT_NODE_VIEW,
+  RELATES_TO_VIEW,
   RelatesTo,
   RelatesToFilter,
   RelatesToList,
-  RELATES_TO_VIEW,
 } from "./dataClasses.ts";
 
 // ============================================================================
@@ -114,10 +114,16 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
       (id.length === 2 && typeof id[0] === "string" && typeof id[1] === "string");
 
     if (isSingle) {
-      const result = await this._retrieve(id as string | InstanceId | readonly [string, string], options);
+      const result = await this._retrieve(
+        id as string | InstanceId | readonly [string, string],
+        options,
+      );
       return result as ProductNode | undefined;
     } else {
-      const result = await this._retrieve(id as readonly (string | InstanceId | readonly [string, string])[], options);
+      const result = await this._retrieve(
+        id as readonly (string | InstanceId | readonly [string, string])[],
+        options,
+      );
       return new ProductNodeList([...(result as InstanceList<ProductNode>)]);
     }
   }
@@ -138,7 +144,11 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
     active?: boolean;
     minCreatedDate?: Date | string;
     maxCreatedDate?: Date | string;
-    category?: string | InstanceId | readonly [string, string] | readonly (string | InstanceId | readonly [string, string])[];
+    category?:
+      | string
+      | InstanceId
+      | readonly [string, string]
+      | readonly (string | InstanceId | readonly [string, string])[];
     externalIdPrefix?: string;
     space?: string | readonly string[];
     cursor?: string;
@@ -148,10 +158,16 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
 
     filter.name.equalsOrIn(options.name ?? null);
     filter.name.prefix(options.namePrefix ?? null);
-    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(options.maxPrice ?? null);
-    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(options.maxQuantity ?? null);
+    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
+      options.maxPrice ?? null,
+    );
+    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
+      options.maxQuantity ?? null,
+    );
     filter.active.equals(options.active ?? null);
-    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(options.maxCreatedDate ?? null);
+    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
+      options.maxCreatedDate ?? null,
+    );
     filter.category.equalsOrIn(options.category ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
     filter.space.equalsOrIn(options.space ?? null);
@@ -188,7 +204,11 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
     active?: boolean;
     minCreatedDate?: Date | string;
     maxCreatedDate?: Date | string;
-    category?: string | InstanceId | readonly [string, string] | readonly (string | InstanceId | readonly [string, string])[];
+    category?:
+      | string
+      | InstanceId
+      | readonly [string, string]
+      | readonly (string | InstanceId | readonly [string, string])[];
     externalIdPrefix?: string;
     space?: string | readonly string[];
     limit?: number;
@@ -197,10 +217,16 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
 
     filter.name.equalsOrIn(options.name ?? null);
     filter.name.prefix(options.namePrefix ?? null);
-    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(options.maxPrice ?? null);
-    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(options.maxQuantity ?? null);
+    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
+      options.maxPrice ?? null,
+    );
+    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
+      options.maxQuantity ?? null,
+    );
     filter.active.equals(options.active ?? null);
-    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(options.maxCreatedDate ?? null);
+    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
+      options.maxCreatedDate ?? null,
+    );
     filter.category.equalsOrIn(options.category ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
     filter.space.equalsOrIn(options.space ?? null);
@@ -235,7 +261,11 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
       active?: boolean;
       minCreatedDate?: Date | string;
       maxCreatedDate?: Date | string;
-      category?: string | InstanceId | readonly [string, string] | readonly (string | InstanceId | readonly [string, string])[];
+      category?:
+        | string
+        | InstanceId
+        | readonly [string, string]
+        | readonly (string | InstanceId | readonly [string, string])[];
       externalIdPrefix?: string;
       space?: string | readonly string[];
     } = {},
@@ -244,10 +274,16 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
 
     filter.name.equalsOrIn(options.name ?? null);
     filter.name.prefix(options.namePrefix ?? null);
-    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(options.maxPrice ?? null);
-    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(options.maxQuantity ?? null);
+    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
+      options.maxPrice ?? null,
+    );
+    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
+      options.maxQuantity ?? null,
+    );
     filter.active.equals(options.active ?? null);
-    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(options.maxCreatedDate ?? null);
+    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
+      options.maxCreatedDate ?? null,
+    );
     filter.category.equalsOrIn(options.category ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
     filter.space.equalsOrIn(options.space ?? null);
@@ -274,7 +310,11 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
     active?: boolean;
     minCreatedDate?: Date | string;
     maxCreatedDate?: Date | string;
-    category?: string | InstanceId | readonly [string, string] | readonly (string | InstanceId | readonly [string, string])[];
+    category?:
+      | string
+      | InstanceId
+      | readonly [string, string]
+      | readonly (string | InstanceId | readonly [string, string])[];
     externalIdPrefix?: string;
     space?: string | readonly string[];
     sortBy?: string;
@@ -285,10 +325,16 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
 
     filter.name.equalsOrIn(options.name ?? null);
     filter.name.prefix(options.namePrefix ?? null);
-    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(options.maxPrice ?? null);
-    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(options.maxQuantity ?? null);
+    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
+      options.maxPrice ?? null,
+    );
+    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
+      options.maxQuantity ?? null,
+    );
     filter.active.equals(options.active ?? null);
-    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(options.maxCreatedDate ?? null);
+    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
+      options.maxCreatedDate ?? null,
+    );
     filter.category.equalsOrIn(options.category ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
     filter.space.equalsOrIn(options.space ?? null);
@@ -367,10 +413,16 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
       (id.length === 2 && typeof id[0] === "string" && typeof id[1] === "string");
 
     if (isSingle) {
-      const result = await this._retrieve(id as string | InstanceId | readonly [string, string], options);
+      const result = await this._retrieve(
+        id as string | InstanceId | readonly [string, string],
+        options,
+      );
       return result as CategoryNode | undefined;
     } else {
-      const result = await this._retrieve(id as readonly (string | InstanceId | readonly [string, string])[], options);
+      const result = await this._retrieve(
+        id as readonly (string | InstanceId | readonly [string, string])[],
+        options,
+      );
       return new CategoryNodeList([...(result as InstanceList<CategoryNode>)]);
     }
   }
@@ -569,10 +621,16 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
       (id.length === 2 && typeof id[0] === "string" && typeof id[1] === "string");
 
     if (isSingle) {
-      const result = await this._retrieve(id as string | InstanceId | readonly [string, string], options);
+      const result = await this._retrieve(
+        id as string | InstanceId | readonly [string, string],
+        options,
+      );
       return result as RelatesTo | undefined;
     } else {
-      const result = await this._retrieve(id as readonly (string | InstanceId | readonly [string, string])[], options);
+      const result = await this._retrieve(
+        id as readonly (string | InstanceId | readonly [string, string])[],
+        options,
+      );
       return new RelatesToList([...(result as InstanceList<RelatesTo>)]);
     }
   }
@@ -597,8 +655,12 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
     const filter = new RelatesToFilter("and");
 
     filter.relationType.equalsOrIn(options.relationType ?? null);
-    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(options.maxStrength ?? null);
-    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(options.maxCreatedAt ?? null);
+    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
+      options.maxStrength ?? null,
+    );
+    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
+      options.maxCreatedAt ?? null,
+    );
     filter.externalId.prefix(options.externalIdPrefix ?? null);
     filter.space.equalsOrIn(options.space ?? null);
 
@@ -637,8 +699,12 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
     const filter = new RelatesToFilter("and");
 
     filter.relationType.equalsOrIn(options.relationType ?? null);
-    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(options.maxStrength ?? null);
-    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(options.maxCreatedAt ?? null);
+    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
+      options.maxStrength ?? null,
+    );
+    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
+      options.maxCreatedAt ?? null,
+    );
     filter.externalId.prefix(options.externalIdPrefix ?? null);
     filter.space.equalsOrIn(options.space ?? null);
 
@@ -675,8 +741,12 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
     const filter = new RelatesToFilter("and");
 
     filter.relationType.equalsOrIn(options.relationType ?? null);
-    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(options.maxStrength ?? null);
-    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(options.maxCreatedAt ?? null);
+    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
+      options.maxStrength ?? null,
+    );
+    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
+      options.maxCreatedAt ?? null,
+    );
     filter.externalId.prefix(options.externalIdPrefix ?? null);
     filter.space.equalsOrIn(options.space ?? null);
 
@@ -707,8 +777,12 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
     const filter = new RelatesToFilter("and");
 
     filter.relationType.equalsOrIn(options.relationType ?? null);
-    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(options.maxStrength ?? null);
-    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(options.maxCreatedAt ?? null);
+    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
+      options.maxStrength ?? null,
+    );
+    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
+      options.maxCreatedAt ?? null,
+    );
     filter.externalId.prefix(options.externalIdPrefix ?? null);
     filter.space.equalsOrIn(options.space ?? null);
 
@@ -729,4 +803,3 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
     return new RelatesToList([...result]);
   }
 }
-

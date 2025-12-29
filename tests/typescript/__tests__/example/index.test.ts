@@ -4,27 +4,27 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  // Data classes
-  ProductNodeList,
-  ProductNodeFilter,
-  productNodeAsWrite,
-  PRODUCT_NODE_VIEW,
-  CategoryNodeList,
-  CategoryNodeFilter,
-  categoryNodeAsWrite,
   CATEGORY_NODE_VIEW,
-  RelatesToList,
-  RelatesToFilter,
-  relatesToAsWrite,
-  RELATES_TO_VIEW,
+  CategoryNodeAPI,
+  categoryNodeAsWrite,
+  CategoryNodeFilter,
+  CategoryNodeList,
   EXAMPLE_SPACE,
   EXAMPLE_VERSION,
-  // API classes
-  ProductNodeAPI,
-  CategoryNodeAPI,
-  RelatesToAPI,
   // Client
   ExampleClient,
+  PRODUCT_NODE_VIEW,
+  // API classes
+  ProductNodeAPI,
+  productNodeAsWrite,
+  ProductNodeFilter,
+  // Data classes
+  ProductNodeList,
+  RELATES_TO_VIEW,
+  RelatesToAPI,
+  relatesToAsWrite,
+  RelatesToFilter,
+  RelatesToList,
 } from "../../../../cognite/pygen/_generation/typescript/example/index.ts";
 
 describe("Example SDK Index Exports", () => {
@@ -109,4 +109,3 @@ describe("Example SDK Index Exports", () => {
     });
   });
 });
-

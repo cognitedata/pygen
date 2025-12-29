@@ -502,4 +502,3 @@ export class RelatesToFilter extends FilterContainer {
     dataTypeFilters.push(this.relationType, this.strength, this.createdAt);
   }
 }
-

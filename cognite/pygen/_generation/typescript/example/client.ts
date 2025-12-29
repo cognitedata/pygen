@@ -74,4 +74,3 @@ export class ExampleClient extends InstanceClient {
     this.relatesTo = new RelatesToAPI(config);
   }
 }
-

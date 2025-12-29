@@ -16,42 +16,34 @@
 
 // Data classes
 export {
-  // ProductNode
-  type ProductNode,
-  type ProductNodeWrite,
-  ProductNodeList,
-  ProductNodeFilter,
-  productNodeAsWrite,
-  PRODUCT_NODE_VIEW,
-
+  CATEGORY_NODE_VIEW,
   // CategoryNode
   type CategoryNode,
-  type CategoryNodeWrite,
-  CategoryNodeList,
-  CategoryNodeFilter,
   categoryNodeAsWrite,
-  CATEGORY_NODE_VIEW,
-
-  // RelatesTo
-  type RelatesTo,
-  type RelatesToWrite,
-  RelatesToList,
-  RelatesToFilter,
-  relatesToAsWrite,
-  RELATES_TO_VIEW,
-
+  CategoryNodeFilter,
+  CategoryNodeList,
+  type CategoryNodeWrite,
   // Constants
   EXAMPLE_SPACE,
   EXAMPLE_VERSION,
+  PRODUCT_NODE_VIEW,
+  // ProductNode
+  type ProductNode,
+  productNodeAsWrite,
+  ProductNodeFilter,
+  ProductNodeList,
+  type ProductNodeWrite,
+  RELATES_TO_VIEW,
+  // RelatesTo
+  type RelatesTo,
+  relatesToAsWrite,
+  RelatesToFilter,
+  RelatesToList,
+  type RelatesToWrite,
 } from "./dataClasses.ts";
 
 // API classes
-export {
-  ProductNodeAPI,
-  CategoryNodeAPI,
-  RelatesToAPI,
-} from "./api.ts";
+export { CategoryNodeAPI, ProductNodeAPI, RelatesToAPI } from "./api.ts";
 
 // Client
 export { ExampleClient } from "./client.ts";
-
