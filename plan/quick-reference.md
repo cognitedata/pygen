@@ -10,7 +10,7 @@
 
 **Timeline**: 28-42 weeks (7-10 months)
 
-**Status**: Phase 3 In Progress ⏳ - Tasks 0-3 Complete
+**Status**: Phase 3 Complete ✅ - Ready for Phase 4
 
 ---
 
@@ -31,7 +31,7 @@
 | 0 | Foundation | 1 week | ✅ Complete | Project reorganized, v1 in legacy/ |
 | 1 | Pygen Client | 3-4 weeks | ✅ Complete | httpx-based CDF client with HTTPClient |
 | 2 | Generic Instance API (Python) | 3-4 weeks | ✅ Complete | InstanceClient, InstanceAPI, Example SDK |
-| 3 | Generic Instance API (TypeScript) | 4-5 weeks | ⏳ In Progress | TypeScript equivalent of Phase 2 |
+| 3 | Generic Instance API (TypeScript) | 4-5 weeks | ✅ Complete | TypeScript equivalent of Phase 2 |
 | 4 | Intermediate Representation (IR) | 3-4 weeks | ⏳ Pending | Validation + Language-agnostic IR |
 | 5 | Code Generation from IR | 4-6 weeks | ⏳ Pending | Python & TypeScript SDK generation |
 | 6 | Feature Parity & Advanced | 4-6 weeks | ⏳ Pending | Match original Pygen |
@@ -210,7 +210,8 @@ pygen generate --config pygen.yaml
 ### Technical
 - [x] Phase 0 complete (Foundation)
 - [x] Phase 1 complete (Full client with HTTPClient, Auth, Resource Clients)
-- [x] Phase 2 complete (InstanceClient, InstanceAPI, Example SDK)
+- [x] Phase 2 complete (InstanceClient, InstanceAPI, Example SDK - Python)
+- [x] Phase 3 complete (TypeScript Generic Instance API & Example SDK)
 - [ ] Test coverage >90%
 - [ ] 5-10x performance improvement
 - [ ] Memory usage O(chunk_size)
@@ -302,6 +303,7 @@ pygen generate --config pygen.yaml
 | **M1.5** | Phase 2 Tasks 1-3.b complete (InstanceClient, InstanceAPI) | Week 3 | ✅ Complete |
 | **M2** | Phase 2 complete (Example SDK) | Month 1 | ✅ Complete |
 | **M2.1** | Phase 3 Tasks 0-3 complete (TypeScript dev environment, HTTPClient, Auth, Instance Models) | Month 1 | ✅ Complete |
+| **M2.5** | Phase 3 complete (TypeScript Generic Instance API & Example SDK) | Month 1 | ✅ Complete |
 | **M3** | Phase 5 complete (Can generate Python & TypeScript) | Month 4 | ⏳ Pending |
 | **M4** | Phase 6 complete (Feature parity) | Month 6 | ⏳ Pending |
 | **M5** | Phase 10 complete (v2.0.0) | Month 9 | ⏳ Pending |
@@ -450,7 +452,7 @@ A: Modern type hints, pattern matching, performance.
 
 **Phase 2**: ✅ Complete (December 27, 2025)
 
-**Phase 3**: ⏳ In Progress (Started December 28, 2025)
+**Phase 3**: ✅ Complete (December 29, 2025)
 
 **Current Progress**:
 - ✅ Phase 0 complete - Project reorganized
@@ -473,44 +475,31 @@ A: Modern type hints, pattern matching, performance.
   - Filtering, sorting, unit data structures
   - Example client and API classes based on example data model
   - Type-safe retrieve/list/iterate methods with unpacked parameters
-- ⏳ Phase 3 in progress - Generic Instance API & Example SDK (TypeScript)
-  - ✅ Task 0: Development Environment & Tooling Setup complete
-    - Vitest selected as testing framework
-    - Plain TypeScript with optional Zod for runtime validation
-    - Native fetch API as HTTP client
-    - TypeScript config at repository root level
-    - CI/CD pipeline updated for TypeScript testing
-  - ✅ Task 1: HTTP Client Foundation complete
-    - HTTPClient class wrapping fetch API
-    - Retry logic with exponential backoff
-    - Rate limiting support (429 responses with Retry-After)
-    - Request/response type system (RequestMessage, SuccessResponse, FailedResponse)
-    - Error response parsing matching Python patterns
-  - ✅ Task 2: Authentication Support complete
-    - Credentials interface (abstract base)
-    - TokenCredentials for static token auth
-    - OAuthCredentials with token refresh logic
-    - PygenClientConfig interface for client configuration
-  - ✅ Task 3: Generic Instance Models complete
-    - InstanceModel, Instance, InstanceWrite base interfaces/classes
-    - InstanceList<T> with array-like behavior
-    - Reference types: ViewReference, NodeReference, ContainerReference, InstanceId
-    - DataRecord and DataRecordWrite interfaces
-    - Serialization/deserialization with camelCase conversion
-    - Support for both node and edge instance types
-    - Custom date/datetime handling (milliseconds since epoch)
+- ✅ Phase 3 complete - Generic Instance API & Example SDK (TypeScript)
+  - ✅ Task 0: Development Environment & Tooling Setup
+  - ✅ Task 1: HTTP Client Foundation
+  - ✅ Task 2: Authentication Support
+  - ✅ Task 3: Generic Instance Models
+  - ✅ Task 4: Filter System
+  - ✅ Task 5: Runtime Migration (Node to Deno)
+  - ✅ Task 6: Query & Response Models
+  - ✅ Task 7: Exception Hierarchy
+  - ✅ Task 8: Generic InstanceClient
+  - ✅ Task 9: Generic InstanceAPI
+  - ✅ Task 10: Example Data Classes
+  - ✅ Task 11: Example API Classes
 
-**Current Phase**: Phase 3 - Generic Instance API & Example SDK (TypeScript) (4/11 tasks complete)
+**Current Phase**: Ready for Phase 4 - Intermediate Representation (IR) for Multi-Language Support
 
 **Next Steps**:
-1. Continue Phase 3: Filter System (TypeScript)
-2. Implement query & response models for TypeScript
-3. Build exception hierarchy for TypeScript
-4. Implement generic InstanceClient for TypeScript
+1. Begin Phase 4: Validation Layer (Foundation for IR)
+2. Implement language-agnostic IR type system
+3. Build parser from CDF models to IR
+4. Create transformer for language-specific IR adaptations
 
 ---
 
-**Document Version**: 1.5
-**Last Updated**: December 28, 2025
+**Document Version**: 1.6
+**Last Updated**: December 29, 2025
 **For Details**: See full planning documents in `plan/` folder
 
