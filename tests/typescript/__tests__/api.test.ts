@@ -258,7 +258,6 @@ describe("InstanceAPI", () => {
         createConfig(),
         viewRef,
         "node",
-        TestInstanceList,
       );
       expect(api).toBeInstanceOf(InstanceAPI);
     });
@@ -268,7 +267,6 @@ describe("InstanceAPI", () => {
         createConfig(),
         viewRef,
         "node",
-        TestInstanceList,
         20,
       );
       expect(api).toBeInstanceOf(InstanceAPI);
@@ -279,7 +277,6 @@ describe("InstanceAPI", () => {
         createConfig(),
         viewRef,
         "edge",
-        TestInstanceList,
       );
       expect(api).toBeInstanceOf(InstanceAPI);
     });
@@ -308,7 +305,6 @@ describe("InstanceAPI", () => {
         createConfig(),
         viewRef,
         "node",
-        TestInstanceList,
       );
       expect(api.getApiUrl("/models/instances")).toBe(
         "https://api.cognitedata.com/api/v1/projects/test-project/models/instances",
@@ -321,7 +317,7 @@ describe("InstanceAPI", () => {
         project: "test-project",
         credentials: new TokenCredentials("test-token"),
       };
-      const api = new TestableInstanceAPI(config, viewRef, "node", TestInstanceList);
+      const api = new TestableInstanceAPI(config, viewRef, "node");
       expect(api.getApiUrl("/models/instances/list")).toBe(
         "https://api.cognitedata.com/api/v1/projects/test-project/models/instances/list",
       );
@@ -456,66 +452,90 @@ describe("InstanceAPI._iterate", () => {
 });
 
 describe("InstanceAPI._list", () => {
-  it("should throw error for negative limit", async () => {
-    const api = createTestAPI();
-    await expect(api.list({ limit: -5 })).rejects.toThrow(
-      "Limit must be a positive integer or undefined for no limit.",
-    );
-  });
+        it("should throw error for negative limit", async () => {
+            const api = createTestAPI();
+            await expect(api.list({limit: -5})).rejects.toThrow(
+                "Limit must be a positive integer or undefined for no limit.",
+            );
+        });
 
-  it("should throw error for zero limit", async () => {
-    const api = createTestAPI();
-    await expect(api.list({ limit: 0 })).rejects.toThrow(
-      "Limit must be a positive integer or undefined for no limit.",
-    );
-  });
+        it("should throw error for zero limit", async () => {
+            const api = createTestAPI();
+            await expect(api.list({limit: 0})).rejects.toThrow(
+                "Limit must be a positive integer or undefined for no limit.",
+            );
+        });
 
-  it("should collect all items from single page", async () => {
-    const api = createTestAPI();
-    const mockItems = [
-      createTestInstance("id1", "Alice", 30),
-      createTestInstance("id2", "Bob", 25),
-    ];
-    api.setMockResponse(async () => createMockListResponse(mockItems));
+        it("should collect all items from single page", async () => {
+            const api = createTestAPI();
+            const mockItems = [
+                createTestInstance("id1", "Alice", 30),
+                createTestInstance("id2", "Bob", 25),
+            ];
+            api.setMockResponse(async () => createMockListResponse(mockItems));
 
-    const result = await api.list({ limit: 10 });
-    expect(result.length).toBe(2);
-  });
+            const result = await api.list({limit: 10});
+            expect(result.length).toBe(2);
+        });
 
-  it("should paginate through multiple pages", async () => {
-    const api = createTestAPI();
-    const page1Items = [createTestInstance("id1", "Alice", 30)];
-    const page2Items = [createTestInstance("id2", "Bob", 25)];
+        it("should paginate through multiple pages", async () => {
+            const api = createTestAPI();
+            const page1Items = [createTestInstance("id1", "Alice", 30)];
+            const page2Items = [createTestInstance("id2", "Bob", 25)];
 
-    let callCount = 0;
-    api.setMockResponse(async () => {
-      callCount++;
-      if (callCount === 1) {
-        return createMockListResponse(page1Items, "next-cursor");
-      }
-      return createMockListResponse(page2Items);
-    });
+            let callCount = 0;
+            api.setMockResponse(async () => {
+                callCount++;
+                if (callCount === 1) {
+                    return createMockListResponse(page1Items, "next-cursor");
+                }
+                return createMockListResponse(page2Items);
+            });
 
-    const result = await api.list({ limit: 100 });
-    expect(result.length).toBe(2);
-    expect(callCount).toBe(2);
-  });
+            const result = await api.list({limit: 100});
+            expect(result.length).toBe(2);
+            expect(callCount).toBe(2);
+        });
 
-  it("should respect limit across pages", async () => {
-    const api = createTestAPI();
-    const page1Items = [
-      createTestInstance("id1", "Alice", 30),
-      createTestInstance("id2", "Bob", 25),
-    ];
+        it("should respect limit across pages", async () => {
+            const api = createTestAPI();
+            const page1Items = [
+                createTestInstance("id1", "Alice", 30),
+                createTestInstance("id2", "Bob", 25),
+            ];
 
-    api.setMockResponse(async () => createMockListResponse(page1Items, "next-cursor"));
+            api.setMockResponse(async () => createMockListResponse(page1Items, "next-cursor"));
 
-    const result = await api.list({ limit: 2 });
-    expect(result.length).toBe(2);
-    // Should not have paginated since limit was reached
-    expect(api.getCapturedRequests().length).toBe(1);
-  });
-});
+            const result = await api.list({limit: 2});
+            expect(result.length).toBe(2);
+            // Should not have paginated since limit was reached
+            expect(api.getCapturedRequests().length).toBe(1);
+        });
+
+        it("Should return all items when no limit is set", async () => {
+            const api = createTestAPI();
+            const page1Items = [
+                createTestInstance("id1", "Alice", 30),
+                createTestInstance("id2", "Bob", 25),
+            ];
+            const page2Items = [
+                createTestInstance("id3", "Charlie", 35),
+            ];
+            let callCount = 0;
+            api.setMockResponse(async () => {
+                    callCount++;
+                    if (callCount === 1) {
+                        return createMockListResponse(page1Items, "next-cursor");
+                    }
+                    return createMockListResponse(page2Items)
+                }
+            );
+            const result = await api.list();
+            expect(result.length).toBe(3);
+            expect(callCount).toBe(2);
+        });
+    }
+)
 
 describe("InstanceAPI._search", () => {
   it("should throw error for limit less than 1", async () => {

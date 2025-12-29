@@ -216,7 +216,7 @@ export class InstanceAPI<TInstance extends Instance> {
     sort?: PropertySort | readonly PropertySort[];
     filter?: Filter;
   } = {}): Promise<InstanceList<TInstance>> {
-    const limit = options.limit ?? InstanceAPI.DEFAULT_LIST_LIMIT;
+    const limit = "limit" in options ? options.limit : InstanceAPI.DEFAULT_LIST_LIMIT;
 
     if (limit !== undefined && limit <= 0) {
       throw new Error("Limit must be a positive integer or undefined for no limit.");
