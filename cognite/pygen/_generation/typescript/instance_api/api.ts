@@ -452,7 +452,7 @@ export class InstanceAPI<TInstance extends Instance> {
     }
 
     if (failedResponses.length > 0 || failedRequests.length > 0) {
-      throw new MultiRequestError(failedResponses, failedRequests, allItems);
+      throw new MultiRequestError<InstanceList<TInstance>>(failedResponses, failedRequests, allItems);
     }
 
     return allItems;
