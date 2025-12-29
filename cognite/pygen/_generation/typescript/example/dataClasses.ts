@@ -144,44 +144,16 @@ export interface ProductNode extends NodeInstance {
  * @returns A ProductNodeWrite instance
  */
 export function productNodeAsWrite(node: ProductNode): ProductNodeWrite {
-  const result: ProductNodeWrite = {
-    instanceType: node.instanceType,
-    space: node.space,
-    externalId: node.externalId,
-    name: node.name,
-    price: node.price,
-    quantity: node.quantity,
-    createdDate: node.createdDate,
+  const { dataRecord, ...rest } = node;
+  const write: ProductNodeWrite = {
+    ...rest,
   };
-
-  if (node.dataRecord) {
-    (result as { dataRecord?: { existingVersion: number } }).dataRecord = {
-      existingVersion: node.dataRecord.version,
+  if (dataRecord) {
+    (write as { dataRecord?: { existingVersion: number } }).dataRecord = {
+      existingVersion: dataRecord.version,
     };
   }
-  if (node.description !== undefined) {
-    (result as { description?: string }).description = node.description;
-  }
-  if (node.tags !== undefined) {
-    (result as { tags?: readonly string[] }).tags = node.tags;
-  }
-  if (node.prices !== undefined) {
-    (result as { prices?: readonly number[] }).prices = node.prices;
-  }
-  if (node.quantities !== undefined) {
-    (result as { quantities?: readonly number[] }).quantities = node.quantities;
-  }
-  if (node.active !== undefined) {
-    (result as { active?: boolean }).active = node.active;
-  }
-  if (node.updatedTimestamp !== undefined) {
-    (result as { updatedTimestamp?: Date }).updatedTimestamp = node.updatedTimestamp;
-  }
-  if (node.category !== undefined) {
-    (result as { category?: InstanceId }).category = node.category;
-  }
-
-  return result;
+  return write;
 }
 
 /**
@@ -304,20 +276,16 @@ export interface CategoryNode extends NodeInstance {
  * @returns A CategoryNodeWrite instance
  */
 export function categoryNodeAsWrite(node: CategoryNode): CategoryNodeWrite {
-  const result: CategoryNodeWrite = {
-    instanceType: node.instanceType,
-    space: node.space,
-    externalId: node.externalId,
-    categoryName: node.categoryName,
+  const { dataRecord, ...rest } = node;
+  const write: CategoryNodeWrite = {
+    ...rest,
   };
-
-  if (node.dataRecord) {
-    (result as { dataRecord?: { existingVersion: number } }).dataRecord = {
-      existingVersion: node.dataRecord.version,
+  if (dataRecord) {
+    (write as { dataRecord?: { existingVersion: number } }).dataRecord = {
+      existingVersion: dataRecord.version,
     };
   }
-
-  return result;
+  return write;
 }
 
 /**
@@ -417,26 +385,16 @@ export interface RelatesTo extends EdgeInstance {
  * @returns A RelatesToWrite instance
  */
 export function relatesToAsWrite(edge: RelatesTo): RelatesToWrite {
-  const result: RelatesToWrite = {
-    instanceType: edge.instanceType,
-    space: edge.space,
-    externalId: edge.externalId,
-    startNode: edge.startNode,
-    endNode: edge.endNode,
-    relationType: edge.relationType,
-    createdAt: edge.createdAt,
+  const { dataRecord, ...rest } = edge;
+  const write: RelatesToWrite = {
+    ...rest,
   };
-
-  if (edge.dataRecord) {
-    (result as { dataRecord?: { existingVersion: number } }).dataRecord = {
-      existingVersion: edge.dataRecord.version,
+  if (dataRecord) {
+    (write as { dataRecord?: { existingVersion: number } }).dataRecord = {
+      existingVersion: dataRecord.version,
     };
   }
-  if (edge.strength !== undefined) {
-    (result as { strength?: number }).strength = edge.strength;
-  }
-
-  return result;
+  return write;
 }
 
 /**
