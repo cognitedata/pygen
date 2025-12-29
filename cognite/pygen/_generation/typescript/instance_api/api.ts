@@ -12,8 +12,8 @@ import { HTTPClient } from "./http_client/index.ts";
 import type { HTTPResult, RequestMessage } from "./http_client/types.ts";
 import { getSuccessOrThrow } from "./http_client/types.ts";
 import type { Filter } from "./types/filters.ts";
-import type { Instance, InstanceList, InstanceRaw } from "./types/instance.ts";
-import { parseInstances } from "./types/instance.ts";
+import type { Instance, InstanceRaw } from "./types/instance.ts";
+import { InstanceList, parseInstances } from "./types/instance.ts";
 import type { Aggregation, DebugParameters, PropertySort, UnitConversion } from "./types/query.ts";
 import type { InstanceId, InstanceType, ViewReference } from "./types/references.ts";
 import type { AggregateResponse, ListResponse, Page } from "./types/responses.ts";
@@ -21,15 +21,6 @@ import { chunker } from "./types/utils.ts";
 
 /** Search operator for combining multiple search terms */
 export type SearchOperator = "and" | "or";
-
-/**
- * Type for an InstanceList constructor function.
- * Used to create type-specific instance lists.
- */
-export type InstanceListConstructor<T extends Instance, TList extends InstanceList<T>> = new (
-  items?: readonly T[],
-  viewId?: ViewReference,
-) => TList;
 
 /**
  * Generic resource API for CDF Data Modeling view-specific operations.
@@ -42,21 +33,19 @@ export type InstanceListConstructor<T extends Instance, TList extends InstanceLi
  * with proper type hints.
  *
  * @typeParam TInstance - The specific instance type returned by this API
- * @typeParam TInstanceList - The specific instance list type returned by this API
  *
  * @example
  * ```typescript
- * class PersonAPI extends InstanceAPI<Person, PersonList> {
- *   constructor(httpClient: HTTPClient) {
+ * class PersonAPI extends InstanceAPI<Person> {
+ *   constructor(config: PygenClientConfig) {
  *     super(
- *       httpClient,
+ *       config,
  *       { space: "mySpace", externalId: "Person", version: "v1" },
  *       "node",
- *       PersonList
  *     );
  *   }
  *
- *   async list(namePrefix?: string): Promise<PersonList> {
+ *   async list(namePrefix?: string): Promise<InstanceList<Person>> {
  *     const filter = namePrefix
  *       ? { prefix: { property: ["mySpace", "Person/v1", "name"], value: namePrefix } }
  *       : undefined;
@@ -65,10 +54,7 @@ export type InstanceListConstructor<T extends Instance, TList extends InstanceLi
  * }
  * ```
  */
-export class InstanceAPI<
-  TInstance extends Instance,
-  TInstanceList extends InstanceList<TInstance>,
-> {
+export class InstanceAPI<TInstance extends Instance> {
   /** API endpoint for list operations */
   protected static readonly LIST_ENDPOINT = "/models/instances/list";
 
@@ -91,7 +77,7 @@ export class InstanceAPI<
   protected static readonly RETRIEVE_LIMIT = 1000;
 
   /** Maximum items per aggregate request */
-  protected static readonly AGGREGATE_LIMIT = 10000;
+  protected static readonly AGGREGATE_LIMIT = 1000;
 
   /** Default limit for list operations */
   protected static readonly DEFAULT_LIST_LIMIT = 25;
@@ -105,9 +91,6 @@ export class InstanceAPI<
   /** The instance type (node or edge) */
   protected readonly instanceType: InstanceType;
 
-  /** Constructor for creating instance lists */
-  protected readonly listCls: InstanceListConstructor<TInstance, TInstanceList>;
-
   /** Number of concurrent workers for retrieve operations */
   protected readonly retrieveWorkers: number;
 
@@ -120,21 +103,18 @@ export class InstanceAPI<
    * @param config - Configuration for the HTTP client
    * @param viewRef - Reference to the view for querying instances
    * @param instanceType - The type of instances to query ("node" or "edge")
-   * @param listCls - The class to use for creating instance lists
-   * @param retrieveWorkers - Number of concurrent workers for retrieve operations (default: 10)
+   * @param retrieveWorkers - Number of concurrent workers for retrieve operations (default: 2)
    */
   constructor(
     config: PygenClientConfig,
     viewRef: ViewReference,
     instanceType: InstanceType,
-    listCls: InstanceListConstructor<TInstance, TInstanceList>,
-    retrieveWorkers = 10,
+    retrieveWorkers = 2,
   ) {
     this.config = config;
     this.httpClient = new HTTPClient(config);
     this.viewRef = viewRef;
     this.instanceType = instanceType;
-    this.listCls = listCls;
     this.retrieveWorkers = retrieveWorkers;
   }
 
@@ -176,7 +156,7 @@ export class InstanceAPI<
     limit?: number;
     sort?: PropertySort | readonly PropertySort[];
     filter?: Filter;
-  } = {}): Promise<Page<TInstanceList>> {
+  } = {}): Promise<Page<InstanceList<TInstance>>> {
     const limit = options.limit ?? InstanceAPI.DEFAULT_LIST_LIMIT;
 
     if (limit < 1 || limit > InstanceAPI.LIST_LIMIT) {
@@ -229,14 +209,14 @@ export class InstanceAPI<
     limit?: number;
     sort?: PropertySort | readonly PropertySort[];
     filter?: Filter;
-  } = {}): Promise<TInstanceList> {
+  } = {}): Promise<InstanceList<TInstance>> {
     const limit = options.limit ?? InstanceAPI.DEFAULT_LIST_LIMIT;
 
     if (limit !== undefined && limit <= 0) {
       throw new Error("Limit must be a positive integer or undefined for no limit.");
     }
 
-    const allItems = new this.listCls([], this.viewRef);
+    const allItems = new InstanceList<TInstance>([], this.viewRef);
     let nextCursor: string | undefined;
     let total = 0;
 
@@ -297,7 +277,7 @@ export class InstanceAPI<
     sort?: PropertySort | readonly PropertySort[];
     operator?: SearchOperator;
     limit?: number;
-  } = {}): Promise<ListResponse<TInstanceList>> {
+  } = {}): Promise<ListResponse<InstanceList<TInstance>>> {
     const limit = options.limit ?? InstanceAPI.DEFAULT_LIST_LIMIT;
 
     if (limit < 1 || limit > InstanceAPI.SEARCH_LIMIT) {
@@ -361,7 +341,7 @@ export class InstanceAPI<
       includeTyping?: boolean;
       targetUnits?: UnitConversion | readonly UnitConversion[];
     },
-  ): Promise<TInstanceList>;
+  ): Promise<InstanceList<TInstance>>;
   protected async _retrieve(
     id:
       | string
@@ -373,7 +353,7 @@ export class InstanceAPI<
       includeTyping?: boolean;
       targetUnits?: UnitConversion | readonly UnitConversion[];
     } = {},
-  ): Promise<TInstance | TInstanceList | undefined> {
+  ): Promise<TInstance | InstanceList<TInstance> | undefined> {
     // Determine if single or batch
     const isSingle = !Array.isArray(id) ||
       (id.length === 2 && typeof id[0] === "string" && typeof id[1] === "string");
@@ -387,14 +367,14 @@ export class InstanceAPI<
       if (isSingle) {
         return undefined;
       }
-      return new this.listCls([], this.viewRef);
+      return new InstanceList<TInstance>([], this.viewRef);
     }
 
     // Convert all ids to InstanceId objects
     const instanceIds = idList.map((item) => this.toInstanceId(item, options.space));
 
     // Retrieve instances in chunks (potentially in parallel)
-    const allItems = new this.listCls([], this.viewRef);
+    const allItems = new InstanceList<TInstance>([], this.viewRef);
     const chunks = chunker(instanceIds, InstanceAPI.RETRIEVE_LIMIT);
 
     if (chunks.length <= this.retrieveWorkers) {
@@ -702,7 +682,7 @@ export class InstanceAPI<
   /**
    * Parses a Page response from the API.
    */
-  private parsePage(body: string): Page<TInstanceList> {
+  private parsePage(body: string): Page<InstanceList<TInstance>> {
     const parsed = JSON.parse(body) as {
       items: InstanceRaw[];
       nextCursor?: string;
@@ -711,7 +691,7 @@ export class InstanceAPI<
     };
 
     const items = parseInstances<TInstance>(parsed.items, this.viewRef);
-    const instanceList = new this.listCls([...items], this.viewRef);
+    const instanceList = new InstanceList([...items], this.viewRef);
 
     return {
       items: instanceList,
@@ -724,14 +704,14 @@ export class InstanceAPI<
   /**
    * Parses a ListResponse from the API.
    */
-  private parseListResponse(body: string): ListResponse<TInstanceList> {
+  private parseListResponse(body: string): ListResponse<InstanceList<TInstance>> {
     const parsed = JSON.parse(body) as {
       items: InstanceRaw[];
       typing?: Record<string, unknown>;
     };
 
     const items = parseInstances<TInstance>(parsed.items, this.viewRef);
-    const instanceList = new this.listCls([...items], this.viewRef);
+    const instanceList = new InstanceList([...items], this.viewRef);
 
     return {
       items: instanceList,

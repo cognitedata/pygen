@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   type AggregateResponse,
   type Aggregation,
+  type DebugParameters,
   type Filter,
   HTTPClient,
   type HTTPResult,
@@ -9,6 +10,8 @@ import {
   InstanceAPI,
   type InstanceId,
   InstanceList,
+  type ListResponse,
+  type Page,
   type PropertySort,
   type PygenClientConfig,
   type RequestMessage,
@@ -109,17 +112,16 @@ class MockHTTPClient extends HTTPClient {
 }
 
 // Testable subclass with mockable HTTP client
-class TestableInstanceAPI extends InstanceAPI<TestInstance, TestInstanceList> {
+class TestableInstanceAPI extends InstanceAPI<TestInstance> {
   public readonly testHttpClient: MockHTTPClient;
 
   constructor(
     config: PygenClientConfig,
     viewRef: ViewReference,
     instanceType: "node" | "edge",
-    listCls: typeof TestInstanceList,
     retrieveWorkers = 10,
   ) {
-    super(config, viewRef, instanceType, listCls, retrieveWorkers);
+    super(config, viewRef, instanceType, retrieveWorkers);
     // Replace httpClient with our mock
     this.testHttpClient = new MockHTTPClient(config);
     // @ts-expect-error - we're overriding readonly for testing
@@ -127,19 +129,39 @@ class TestableInstanceAPI extends InstanceAPI<TestInstance, TestInstanceList> {
   }
 
   // Expose protected methods for testing
-  async iterate(
-    options?: Parameters<typeof this._iterate>[0],
-  ): ReturnType<typeof this._iterate> {
+  async iterate(options?: {
+    includeTyping?: boolean;
+    targetUnits?: UnitConversion | readonly UnitConversion[];
+    debug?: DebugParameters;
+    cursor?: string;
+    limit?: number;
+    sort?: PropertySort | readonly PropertySort[];
+    filter?: Filter;
+  }): Promise<Page<InstanceList<TestInstance>>> {
     return this._iterate(options);
   }
 
-  async list(options?: Parameters<typeof this._list>[0]): ReturnType<typeof this._list> {
+  async list(options?: {
+    includeTyping?: boolean;
+    targetUnits?: UnitConversion | readonly UnitConversion[];
+    debug?: DebugParameters;
+    limit?: number;
+    sort?: PropertySort | readonly PropertySort[];
+    filter?: Filter;
+  }): Promise<InstanceList<TestInstance>> {
     return this._list(options);
   }
 
-  async search(
-    options?: Parameters<typeof this._search>[0],
-  ): ReturnType<typeof this._search> {
+  async search(options?: {
+    query?: string;
+    properties?: string | readonly string[];
+    targetUnits?: UnitConversion | readonly UnitConversion[];
+    filter?: Filter;
+    includeTyping?: boolean;
+    sort?: PropertySort | readonly PropertySort[];
+    operator?: "and" | "or";
+    limit?: number;
+  }): Promise<ListResponse<InstanceList<TestInstance>>> {
     return this._search(options);
   }
 
@@ -161,13 +183,22 @@ class TestableInstanceAPI extends InstanceAPI<TestInstance, TestInstanceList> {
       includeTyping?: boolean;
       targetUnits?: UnitConversion | readonly UnitConversion[];
     },
-  ): Promise<TestInstanceList> {
+  ): Promise<InstanceList<TestInstance>> {
     return this._retrieve(ids, options);
   }
 
   async aggregate(
-    agg: Parameters<typeof this._aggregate>[0],
-    options?: Parameters<typeof this._aggregate>[1],
+    agg: Aggregation | readonly Aggregation[],
+    options?: {
+      query?: string;
+      groupBy?: string | readonly string[];
+      properties?: string | readonly string[];
+      operator?: "and" | "or";
+      targetUnits?: UnitConversion | readonly UnitConversion[];
+      includeTyping?: boolean;
+      filter?: Filter;
+      limit?: number;
+    },
   ): Promise<AggregateResponse> {
     return this._aggregate(agg, options);
   }
@@ -205,7 +236,7 @@ function createTestAPI(instanceType: "node" | "edge" = "node"): TestableInstance
     project: "test-project",
     credentials: new TokenCredentials("test-token"),
   };
-  return new TestableInstanceAPI(config, viewRef, instanceType, TestInstanceList);
+  return new TestableInstanceAPI(config, viewRef, instanceType);
 }
 
 describe("InstanceAPI", () => {
