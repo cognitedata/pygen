@@ -290,7 +290,7 @@ describe("InstanceAPI", () => {
       expect(InstanceAPIAny.LIST_LIMIT).toBe(1000);
       expect(InstanceAPIAny.SEARCH_LIMIT).toBe(1000);
       expect(InstanceAPIAny.RETRIEVE_LIMIT).toBe(1000);
-      expect(InstanceAPIAny.AGGREGATE_LIMIT).toBe(10000);
+      expect(InstanceAPIAny.AGGREGATE_LIMIT).toBe(1000);
       expect(InstanceAPIAny.DEFAULT_LIST_LIMIT).toBe(25);
     });
 
@@ -797,7 +797,7 @@ describe("InstanceAPI._aggregate", () => {
     await api.aggregate({ aggregate: "count" });
 
     const body = api.getCapturedRequests()[0]?.body;
-    expect(body?.limit).toBe(10000);
+    expect(body?.limit).toBe(1000);
   });
 
   it("should use custom limit for aggregation", async () => {
