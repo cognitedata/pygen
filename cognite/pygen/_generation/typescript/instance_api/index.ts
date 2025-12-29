@@ -21,3 +21,6 @@ export * from "./exceptions.ts";
 
 // Re-export instance client
 export * from "./client.ts";
+
+// Re-export instance API
+export * from "./api.ts";
