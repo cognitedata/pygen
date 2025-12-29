@@ -10,7 +10,10 @@ from typing import Any, Generic, Literal, TypeVar, overload
 
 from pydantic import BaseModel, JsonValue, TypeAdapter
 
+from cognite.pygen._generation.python.instance_api.exceptions import MultiRequestError
 from cognite.pygen._generation.python.instance_api.http_client import (
+    FailedRequest,
+    FailedResponse,
     HTTPClient,
     HTTPResult,
     RequestMessage,
@@ -350,8 +353,6 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
         # Convert all ids to InstanceId objects
         instance_ids = [self._to_instance_id(item, space) for item in id_list]
 
-        # Retrieve instances in chunks (potentially in parallel)
-        all_items = self._list_cls()
         if self._retrieve_executor is not None:
             # Parallel execution
             results = self._execute_in_parallel(
@@ -360,19 +361,14 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
                 self._retrieve_executor,
                 lambda chunk: self._retrieve_chunk(chunk, include_typing, target_units),
             )
-            for result in results:
-                if isinstance(result, SuccessResponse):
-                    response = self._list_response_adapter.validate_json(result.body)
-                    all_items.extend(response.items)
-                else:
-                    result.get_success_or_raise()  # Raises appropriate error
         else:
             # Sequential execution
-            for chunk in chunker_sequence(instance_ids, self._RETRIEVE_LIMIT):
-                result = self._retrieve_chunk(chunk, include_typing, target_units)
-                success = result.get_success_or_raise()
-                response = self._list_response_adapter.validate_json(success.body)
-                all_items.extend(response.items)
+            results = [
+                self._retrieve_chunk(chunk, include_typing, target_units)
+                for chunk in chunker_sequence(instance_ids, self._RETRIEVE_LIMIT)
+            ]
+
+        all_items = self._collect_retrieved_items(results)
 
         if is_single:
             return all_items[0] if all_items else None
@@ -414,6 +410,34 @@ class InstanceAPI(Generic[T_Instance, T_InstanceList]):
             body_content=body,
         )
         return self._http_client.request_with_retries(request)
+
+    def _collect_retrieved_items(
+        self,
+        results: list[HTTPResult],
+    ) -> T_InstanceList:
+        """Collect retrieved items from HTTP results.
+
+        Args:
+            results: List of HTTPResult objects from retrieve operations.
+        Returns:
+            A list of retrieved instances.
+        Raises:
+            MultiRequestError: If any requests failed.
+        """
+        all_items = self._list_cls()
+        failed_responses: list[FailedResponse] = []
+        failed_requests: list[FailedRequest] = []
+        for result in results:
+            if isinstance(result, SuccessResponse):
+                response = self._list_response_adapter.validate_json(result.body)
+                all_items.extend(response.items)
+            elif isinstance(result, FailedResponse):
+                failed_responses.append(result)
+            elif isinstance(result, FailedRequest):
+                failed_requests.append(result)
+        if failed_responses or failed_requests:
+            raise MultiRequestError(failed_responses, failed_requests, all_items)
+        return all_items
 
     def _to_instance_id(
         self,
