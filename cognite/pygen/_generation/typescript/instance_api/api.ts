@@ -572,7 +572,10 @@ export class InstanceAPI<TInstance extends Instance> {
     }
 
     // Check if it's an InstanceId object
-    if (typeof item === "object" && item !== null && !Array.isArray(item) && "space" in item && "externalId" in item) {
+    if (
+      typeof item === "object" && item !== null && !Array.isArray(item) && "space" in item &&
+      "externalId" in item
+    ) {
       return {
         instanceType: this.instanceType,
         space: item.space,
