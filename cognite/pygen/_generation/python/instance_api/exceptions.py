@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 if TYPE_CHECKING:
     from .http_client import FailedRequest, FailedResponse
-    from .models import UpsertResult
+
+T_Result = TypeVar("T_Result")
 
 
 class PygenAPIError(Exception):
@@ -17,7 +18,7 @@ class OAuth2Error(PygenAPIError):
     pass
 
 
-class MultiRequestError(PygenAPIError):
+class MultiRequestError(PygenAPIError, Generic[T_Result]):
     """Exception raised when multiple requests are executed and at least one fails.
 
     Attributes:
@@ -27,7 +28,7 @@ class MultiRequestError(PygenAPIError):
     """
 
     def __init__(
-        self, failed_responses: "list[FailedResponse]", failed_requests: "list[FailedRequest]", result: "UpsertResult"
+        self, failed_responses: "list[FailedResponse]", failed_requests: "list[FailedRequest]", result: T_Result
     ) -> None:
         self.failed_responses = failed_responses
         self.failed_requests = failed_requests
