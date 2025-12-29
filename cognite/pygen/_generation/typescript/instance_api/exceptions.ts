@@ -8,7 +8,6 @@
  */
 
 import type { FailedRequest, FailedResponse } from "./http_client/types.ts";
-import type { UpsertResult } from "./types/responses.ts";
 
 /**
  * Base class for all exceptions raised by the Pygen API client.
@@ -74,6 +73,8 @@ export class OAuth2Error extends PygenAPIError {
  * but others fail. It provides access to both the successful results and
  * the failed requests/responses.
  *
+ * @typeParam TResult - The type of the successful result
+ *
  * @example
  * ```typescript
  * try {
@@ -88,7 +89,7 @@ export class OAuth2Error extends PygenAPIError {
  * }
  * ```
  */
-export class MultiRequestError extends PygenAPIError {
+export class MultiRequestError<TResult = unknown> extends PygenAPIError {
   /**
    * List of failed HTTP responses (received response but with error status).
    */
@@ -102,7 +103,7 @@ export class MultiRequestError extends PygenAPIError {
   /**
    * The successful part of the operation.
    */
-  readonly result: UpsertResult;
+  readonly result: TResult;
 
   /**
    * Creates a new MultiRequestError.
@@ -114,7 +115,7 @@ export class MultiRequestError extends PygenAPIError {
   constructor(
     failedResponses: readonly FailedResponse[],
     failedRequests: readonly FailedRequest[],
-    result: UpsertResult,
+    result: TResult,
   ) {
     const message = MultiRequestError.createMessage(
       failedResponses,

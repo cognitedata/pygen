@@ -8,8 +8,14 @@
  */
 
 import type { PygenClientConfig } from "./auth/index.ts";
+import { MultiRequestError } from "./exceptions.ts";
 import { HTTPClient } from "./http_client/index.ts";
-import type { HTTPResult, RequestMessage } from "./http_client/types.ts";
+import type {
+  FailedRequest,
+  FailedResponse,
+  HTTPResult,
+  RequestMessage,
+} from "./http_client/types.ts";
 import { getSuccessOrThrow } from "./http_client/types.ts";
 import type { Filter } from "./types/filters.ts";
 import type { Instance, InstanceRaw } from "./types/instance.ts";
@@ -374,27 +380,19 @@ export class InstanceAPI<TInstance extends Instance> {
     const instanceIds = idList.map((item) => this.toInstanceId(item, options.space));
 
     // Retrieve instances in chunks (potentially in parallel)
-    const allItems = new InstanceList<TInstance>([], this.viewRef);
     const chunks = chunker(instanceIds, InstanceAPI.RETRIEVE_LIMIT);
+    let results: HTTPResult[];
 
     if (chunks.length <= this.retrieveWorkers) {
       // Run all in parallel
-      const results = await Promise.all(
+      results = await Promise.all(
         chunks.map((chunk) =>
           this.retrieveChunk(chunk, options.includeTyping ?? false, options.targetUnits)
         ),
       );
-
-      for (const result of results) {
-        const success = getSuccessOrThrow(result);
-        const response = this.parseListResponse(success.body);
-        for (const item of response.items) {
-          allItems.push(item);
-        }
-      }
     } else {
       // Use a worker pool pattern for larger numbers
-      const results: HTTPResult[] = new Array(chunks.length);
+      results = new Array(chunks.length);
       const taskIterator = chunks.entries();
 
       const worker = async (): Promise<void> => {
@@ -412,19 +410,51 @@ export class InstanceAPI<TInstance extends Instance> {
         worker,
       );
       await Promise.all(workers);
-
-      for (const result of results) {
-        const success = getSuccessOrThrow(result);
-        const response = this.parseListResponse(success.body);
-        for (const item of response.items) {
-          allItems.push(item);
-        }
-      }
     }
+
+    // Collect results, gathering both successes and failures
+    const allItems = this.collectRetrievedItems(results);
 
     if (isSingle) {
       return allItems.at(0);
     }
+    return allItems;
+  }
+
+  /**
+   * Collects retrieved items from HTTP results.
+   *
+   * This method processes HTTP results from retrieve operations, collecting
+   * successful items and tracking failures. If any failures occurred, it throws
+   * a MultiRequestError containing both the failures and the successfully
+   * retrieved items.
+   *
+   * @param results - List of HTTPResult objects from retrieve operations
+   * @returns An InstanceList of successfully retrieved items
+   * @throws MultiRequestError if any requests failed (contains successful results in error.result)
+   */
+  private collectRetrievedItems(results: readonly HTTPResult[]): InstanceList<TInstance> {
+    const allItems = new InstanceList<TInstance>([], this.viewRef);
+    const failedResponses: FailedResponse[] = [];
+    const failedRequests: FailedRequest[] = [];
+
+    for (const result of results) {
+      if (result.kind === "success") {
+        const response = this.parseListResponse(result.body);
+        for (const item of response.items) {
+          allItems.push(item);
+        }
+      } else if (result.kind === "failed_response") {
+        failedResponses.push(result);
+      } else if (result.kind === "failed_request") {
+        failedRequests.push(result);
+      }
+    }
+
+    if (failedResponses.length > 0 || failedRequests.length > 0) {
+      throw new MultiRequestError(failedResponses, failedRequests, allItems);
+    }
+
     return allItems;
   }
 
@@ -542,7 +572,7 @@ export class InstanceAPI<TInstance extends Instance> {
     }
 
     // Check if it's an InstanceId object
-    if (typeof item === "object" && "space" in item && "externalId" in item) {
+    if (typeof item === "object" && item !== null && !Array.isArray(item) && "space" in item && "externalId" in item) {
       return {
         instanceType: this.instanceType,
         space: item.space,
