@@ -12,7 +12,6 @@ import type { PygenClientConfig } from "../instance_api/auth/index.ts";
 import type { InstanceId, ViewReference } from "../instance_api/types/references.ts";
 import type { Aggregation, PropertySort, SortDirection } from "../instance_api/types/query.ts";
 import type { AggregateResponse, Page } from "../instance_api/types/responses.ts";
-import type { TextFilter, DirectRelationFilter } from "../instance_api/types/dtypeFilters.ts";
 import { InstanceList } from "../instance_api/types/instance.ts";
 
 import {
@@ -147,15 +146,15 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
   } = {}): Promise<Page<ProductNodeList>> {
     const filter = new ProductNodeFilter("and");
 
-    this.applyNameFilter(filter.name, options.name);
+    filter.name.equalsOrIn(options.name ?? null);
     filter.name.prefix(options.namePrefix ?? null);
     filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(options.maxPrice ?? null);
     filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(options.maxQuantity ?? null);
     filter.active.equals(options.active ?? null);
     filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(options.maxCreatedDate ?? null);
-    this.applyCategoryFilter(filter.category, options.category);
+    filter.category.equalsOrIn(options.category ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     const page = await this._iterate({
       cursor: options.cursor,
@@ -196,15 +195,15 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
   } = {}): Promise<ProductNodeList> {
     const filter = new ProductNodeFilter("and");
 
-    this.applyNameFilter(filter.name, options.name);
+    filter.name.equalsOrIn(options.name ?? null);
     filter.name.prefix(options.namePrefix ?? null);
     filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(options.maxPrice ?? null);
     filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(options.maxQuantity ?? null);
     filter.active.equals(options.active ?? null);
     filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(options.maxCreatedDate ?? null);
-    this.applyCategoryFilter(filter.category, options.category);
+    filter.category.equalsOrIn(options.category ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     const result = await this._search({
       query: options.query,
@@ -243,15 +242,15 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
   ): Promise<AggregateResponse> {
     const filter = new ProductNodeFilter("and");
 
-    this.applyNameFilter(filter.name, options.name);
+    filter.name.equalsOrIn(options.name ?? null);
     filter.name.prefix(options.namePrefix ?? null);
     filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(options.maxPrice ?? null);
     filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(options.maxQuantity ?? null);
     filter.active.equals(options.active ?? null);
     filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(options.maxCreatedDate ?? null);
-    this.applyCategoryFilter(filter.category, options.category);
+    filter.category.equalsOrIn(options.category ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     return this._aggregate(aggregate, {
       groupBy: options.groupBy,
@@ -284,15 +283,15 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
   } = {}): Promise<ProductNodeList> {
     const filter = new ProductNodeFilter("and");
 
-    this.applyNameFilter(filter.name, options.name);
+    filter.name.equalsOrIn(options.name ?? null);
     filter.name.prefix(options.namePrefix ?? null);
     filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(options.maxPrice ?? null);
     filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(options.maxQuantity ?? null);
     filter.active.equals(options.active ?? null);
     filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(options.maxCreatedDate ?? null);
-    this.applyCategoryFilter(filter.category, options.category);
+    filter.category.equalsOrIn(options.category ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     let sort: PropertySort | undefined;
     if (options.sortBy !== undefined) {
@@ -309,49 +308,6 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
     });
 
     return new ProductNodeList([...result]);
-  }
-
-  // Private helper methods for filter application
-  private applyNameFilter(
-    textFilter: TextFilter,
-    value?: string | readonly string[],
-  ): void {
-    if (value === undefined) return;
-    if (Array.isArray(value)) {
-      textFilter.in([...value]);
-    } else {
-      textFilter.equals(value as string);
-    }
-  }
-
-  private applySpaceFilter(
-    textFilter: TextFilter,
-    value?: string | readonly string[],
-  ): void {
-    if (value === undefined) return;
-    if (Array.isArray(value)) {
-      textFilter.in([...value]);
-    } else {
-      textFilter.equals(value as string);
-    }
-  }
-
-  private applyCategoryFilter(
-    relationFilter: DirectRelationFilter,
-    value?: string | InstanceId | readonly [string, string] | readonly (string | InstanceId | readonly [string, string])[],
-  ): void {
-    if (value === undefined) return;
-    // Check if it's a tuple [space, externalId] or an InstanceId object
-    if (
-      (Array.isArray(value) && value.length === 2 && typeof value[0] === "string" && typeof value[1] === "string") ||
-      (typeof value === "object" && "space" in value && "externalId" in value)
-    ) {
-      relationFilter.equals(value as InstanceId | [string, string]);
-    } else if (Array.isArray(value)) {
-      relationFilter.in([...value] as (string | InstanceId | [string, string])[]);
-    } else {
-      relationFilter.equals(value as string);
-    }
   }
 }
 
@@ -435,10 +391,10 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
   } = {}): Promise<Page<CategoryNodeList>> {
     const filter = new CategoryNodeFilter("and");
 
-    this.applyCategoryNameFilter(filter.categoryName, options.categoryName);
+    filter.categoryName.equalsOrIn(options.categoryName ?? null);
     filter.categoryName.prefix(options.categoryNamePrefix ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     const page = await this._iterate({
       cursor: options.cursor,
@@ -471,10 +427,10 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
   } = {}): Promise<CategoryNodeList> {
     const filter = new CategoryNodeFilter("and");
 
-    this.applyCategoryNameFilter(filter.categoryName, options.categoryName);
+    filter.categoryName.equalsOrIn(options.categoryName ?? null);
     filter.categoryName.prefix(options.categoryNamePrefix ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     const result = await this._search({
       query: options.query,
@@ -505,10 +461,10 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
   ): Promise<AggregateResponse> {
     const filter = new CategoryNodeFilter("and");
 
-    this.applyCategoryNameFilter(filter.categoryName, options.categoryName);
+    filter.categoryName.equalsOrIn(options.categoryName ?? null);
     filter.categoryName.prefix(options.categoryNamePrefix ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     return this._aggregate(aggregate, {
       groupBy: options.groupBy,
@@ -533,10 +489,10 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
   } = {}): Promise<CategoryNodeList> {
     const filter = new CategoryNodeFilter("and");
 
-    this.applyCategoryNameFilter(filter.categoryName, options.categoryName);
+    filter.categoryName.equalsOrIn(options.categoryName ?? null);
     filter.categoryName.prefix(options.categoryNamePrefix ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     let sort: PropertySort | undefined;
     if (options.sortBy !== undefined) {
@@ -553,31 +509,6 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
     });
 
     return new CategoryNodeList([...result]);
-  }
-
-  // Private helper methods for filter application
-  private applyCategoryNameFilter(
-    textFilter: TextFilter,
-    value?: string | readonly string[],
-  ): void {
-    if (value === undefined) return;
-    if (Array.isArray(value)) {
-      textFilter.in([...value]);
-    } else {
-      textFilter.equals(value as string);
-    }
-  }
-
-  private applySpaceFilter(
-    textFilter: TextFilter,
-    value?: string | readonly string[],
-  ): void {
-    if (value === undefined) return;
-    if (Array.isArray(value)) {
-      textFilter.in([...value]);
-    } else {
-      textFilter.equals(value as string);
-    }
   }
 }
 
@@ -665,11 +596,11 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
   } = {}): Promise<Page<RelatesToList>> {
     const filter = new RelatesToFilter("and");
 
-    this.applyRelationTypeFilter(filter.relationType, options.relationType);
+    filter.relationType.equalsOrIn(options.relationType ?? null);
     filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(options.maxStrength ?? null);
     filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(options.maxCreatedAt ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     const page = await this._iterate({
       cursor: options.cursor,
@@ -705,11 +636,11 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
   } = {}): Promise<RelatesToList> {
     const filter = new RelatesToFilter("and");
 
-    this.applyRelationTypeFilter(filter.relationType, options.relationType);
+    filter.relationType.equalsOrIn(options.relationType ?? null);
     filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(options.maxStrength ?? null);
     filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(options.maxCreatedAt ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     const result = await this._search({
       query: options.query,
@@ -743,11 +674,11 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
   ): Promise<AggregateResponse> {
     const filter = new RelatesToFilter("and");
 
-    this.applyRelationTypeFilter(filter.relationType, options.relationType);
+    filter.relationType.equalsOrIn(options.relationType ?? null);
     filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(options.maxStrength ?? null);
     filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(options.maxCreatedAt ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     return this._aggregate(aggregate, {
       groupBy: options.groupBy,
@@ -775,11 +706,11 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
   } = {}): Promise<RelatesToList> {
     const filter = new RelatesToFilter("and");
 
-    this.applyRelationTypeFilter(filter.relationType, options.relationType);
+    filter.relationType.equalsOrIn(options.relationType ?? null);
     filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(options.maxStrength ?? null);
     filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(options.maxCreatedAt ?? null);
     filter.externalId.prefix(options.externalIdPrefix ?? null);
-    this.applySpaceFilter(filter.space, options.space);
+    filter.space.equalsOrIn(options.space ?? null);
 
     let sort: PropertySort | undefined;
     if (options.sortBy !== undefined) {
@@ -796,31 +727,6 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
     });
 
     return new RelatesToList([...result]);
-  }
-
-  // Private helper methods for filter application
-  private applyRelationTypeFilter(
-    textFilter: TextFilter,
-    value?: string | readonly string[],
-  ): void {
-    if (value === undefined) return;
-    if (Array.isArray(value)) {
-      textFilter.in([...value]);
-    } else {
-      textFilter.equals(value as string);
-    }
-  }
-
-  private applySpaceFilter(
-    textFilter: TextFilter,
-    value?: string | readonly string[],
-  ): void {
-    if (value === undefined) return;
-    if (Array.isArray(value)) {
-      textFilter.in([...value]);
-    } else {
-      textFilter.equals(value as string);
-    }
   }
 }
 

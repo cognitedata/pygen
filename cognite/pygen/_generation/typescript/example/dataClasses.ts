@@ -10,7 +10,6 @@
  */
 
 import type {
-  DataRecord,
   EdgeInstance,
   EdgeInstanceWrite,
   NodeInstance,
@@ -110,7 +109,6 @@ export interface ProductNodeWrite extends NodeInstanceWrite {
  */
 export interface ProductNode extends NodeInstance {
   readonly instanceType: "node";
-  readonly dataRecord: DataRecord;
 
   // Required properties
   /** The name of the product */
@@ -146,23 +144,44 @@ export interface ProductNode extends NodeInstance {
  * @returns A ProductNodeWrite instance
  */
 export function productNodeAsWrite(node: ProductNode): ProductNodeWrite {
-  return {
+  const result: ProductNodeWrite = {
     instanceType: node.instanceType,
     space: node.space,
     externalId: node.externalId,
-    dataRecord: node.dataRecord ? { existingVersion: node.dataRecord.version } : undefined,
     name: node.name,
-    description: node.description,
-    tags: node.tags,
     price: node.price,
-    prices: node.prices,
     quantity: node.quantity,
-    quantities: node.quantities,
-    active: node.active,
     createdDate: node.createdDate,
-    updatedTimestamp: node.updatedTimestamp,
-    category: node.category,
   };
+
+  if (node.dataRecord) {
+    (result as { dataRecord?: { existingVersion: number } }).dataRecord = {
+      existingVersion: node.dataRecord.version,
+    };
+  }
+  if (node.description !== undefined) {
+    (result as { description?: string }).description = node.description;
+  }
+  if (node.tags !== undefined) {
+    (result as { tags?: readonly string[] }).tags = node.tags;
+  }
+  if (node.prices !== undefined) {
+    (result as { prices?: readonly number[] }).prices = node.prices;
+  }
+  if (node.quantities !== undefined) {
+    (result as { quantities?: readonly number[] }).quantities = node.quantities;
+  }
+  if (node.active !== undefined) {
+    (result as { active?: boolean }).active = node.active;
+  }
+  if (node.updatedTimestamp !== undefined) {
+    (result as { updatedTimestamp?: Date }).updatedTimestamp = node.updatedTimestamp;
+  }
+  if (node.category !== undefined) {
+    (result as { category?: InstanceId }).category = node.category;
+  }
+
+  return result;
 }
 
 /**
@@ -274,7 +293,6 @@ export interface CategoryNodeWrite extends NodeInstanceWrite {
  */
 export interface CategoryNode extends NodeInstance {
   readonly instanceType: "node";
-  readonly dataRecord: DataRecord;
   /** The name of the category */
   readonly categoryName: string;
 }
@@ -286,13 +304,20 @@ export interface CategoryNode extends NodeInstance {
  * @returns A CategoryNodeWrite instance
  */
 export function categoryNodeAsWrite(node: CategoryNode): CategoryNodeWrite {
-  return {
+  const result: CategoryNodeWrite = {
     instanceType: node.instanceType,
     space: node.space,
     externalId: node.externalId,
-    dataRecord: node.dataRecord ? { existingVersion: node.dataRecord.version } : undefined,
     categoryName: node.categoryName,
   };
+
+  if (node.dataRecord) {
+    (result as { dataRecord?: { existingVersion: number } }).dataRecord = {
+      existingVersion: node.dataRecord.version,
+    };
+  }
+
+  return result;
 }
 
 /**
@@ -377,9 +402,6 @@ export interface RelatesToWrite extends EdgeInstanceWrite {
  */
 export interface RelatesTo extends EdgeInstance {
   readonly instanceType: "edge";
-  readonly dataRecord: DataRecord;
-  readonly startNode: NodeReference;
-  readonly endNode: NodeReference;
   /** The type of relation */
   readonly relationType: string;
   /** The strength of the relation */
@@ -395,17 +417,26 @@ export interface RelatesTo extends EdgeInstance {
  * @returns A RelatesToWrite instance
  */
 export function relatesToAsWrite(edge: RelatesTo): RelatesToWrite {
-  return {
+  const result: RelatesToWrite = {
     instanceType: edge.instanceType,
     space: edge.space,
     externalId: edge.externalId,
-    dataRecord: edge.dataRecord ? { existingVersion: edge.dataRecord.version } : undefined,
     startNode: edge.startNode,
     endNode: edge.endNode,
     relationType: edge.relationType,
-    strength: edge.strength,
     createdAt: edge.createdAt,
   };
+
+  if (edge.dataRecord) {
+    (result as { dataRecord?: { existingVersion: number } }).dataRecord = {
+      existingVersion: edge.dataRecord.version,
+    };
+  }
+  if (edge.strength !== undefined) {
+    (result as { strength?: number }).strength = edge.strength;
+  }
+
+  return result;
 }
 
 /**

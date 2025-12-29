@@ -643,8 +643,8 @@ export class TextFilter extends DataTypeFilter {
    * @param values - List of values to match (or null to skip)
    * @returns This instance for chaining
    */
-  in(values: string[] | null): this {
-    const validated = this._validateValue(values);
+  in(values: readonly string[] | null): this {
+    const validated = this._validateValue(values as string[] | null);
     if (validated === null || !Array.isArray(validated)) return this;
     return this._addFilter("in", { in: { property: this._propertyPath, values: validated } });
   }
@@ -655,7 +655,7 @@ export class TextFilter extends DataTypeFilter {
    * @param value - Single value or list of values (or null to skip)
    * @returns This instance for chaining
    */
-  equalsOrIn(value: string | string[] | null): this {
+  equalsOrIn(value: string | readonly string[] | null): this {
     if (Array.isArray(value)) {
       return this.in(value);
     }
@@ -732,10 +732,10 @@ export class DirectRelationFilter extends DataTypeFilter {
    * @param space - Space for the relations (required if values are strings)
    * @returns This instance for chaining
    */
-  in(values: (string | InstanceId | [string, string])[] | null, space?: string): this {
+  in(values: readonly (string | InstanceId | readonly [string, string])[] | null, space?: string): this {
     if (values === null) return this;
     const validated = values
-      .map((v) => this._validateValue(v, space))
+      .map((v) => this._validateValue(v as string | InstanceId | [string, string], space))
       .filter((v): v is NonNullable<typeof v> => v !== null);
     if (validated.length === 0) return this;
     return this._addFilter("in", {
@@ -754,8 +754,8 @@ export class DirectRelationFilter extends DataTypeFilter {
     value:
       | string
       | InstanceId
-      | [string, string]
-      | (string | InstanceId | [string, string])[]
+      | readonly [string, string]
+      | readonly (string | InstanceId | readonly [string, string])[]
       | null,
     space?: string,
   ): this {
