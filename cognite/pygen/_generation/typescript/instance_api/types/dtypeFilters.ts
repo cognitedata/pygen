@@ -656,10 +656,14 @@ export class TextFilter extends DataTypeFilter {
    * @returns This instance for chaining
    */
   equalsOrIn(value: string | readonly string[] | null): this {
+    if (value === null) {
+      return this;
+    }
     if (Array.isArray(value)) {
       return this.in(value);
     }
-    return this.equals(value);
+    // At this point, value is a string
+    return this.equals(value as string);
   }
 }
 
@@ -776,6 +780,7 @@ export class DirectRelationFilter extends DataTypeFilter {
     if (Array.isArray(value)) {
       return this.in(value, space);
     }
-    return this.equals(value, space);
+    // At this point, value is a string
+    return this.equals(value as string, space);
   }
 }
