@@ -74,6 +74,26 @@ function createPropertyRef(
  * });
  * ```
  */
+/** Filter options for ProductNode queries. */
+interface ProductNodeFilterOptions {
+  name?: string | readonly string[];
+  namePrefix?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minQuantity?: number;
+  maxQuantity?: number;
+  active?: boolean;
+  minCreatedDate?: Date | string;
+  maxCreatedDate?: Date | string;
+  category?:
+    | string
+    | InstanceId
+    | readonly [string, string]
+    | readonly (string | InstanceId | readonly [string, string])[];
+  externalIdPrefix?: string;
+  space?: string | readonly string[];
+}
+
 export class ProductNodeAPI extends InstanceAPI<ProductNode> {
   /**
    * Creates a new ProductNodeAPI.
@@ -82,6 +102,34 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
    */
   constructor(config: PygenClientConfig) {
     super(config, PRODUCT_NODE_VIEW, "node");
+  }
+
+  /**
+   * Builds a ProductNodeFilter from the given options.
+   *
+   * @param options - Filter options
+   * @returns A configured ProductNodeFilter
+   */
+  private _buildFilter(options: ProductNodeFilterOptions): ProductNodeFilter {
+    const filter = new ProductNodeFilter("and");
+
+    filter.name.equalsOrIn(options.name ?? null);
+    filter.name.prefix(options.namePrefix ?? null);
+    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
+      options.maxPrice ?? null,
+    );
+    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
+      options.maxQuantity ?? null,
+    );
+    filter.active.equals(options.active ?? null);
+    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
+      options.maxCreatedDate ?? null,
+    );
+    filter.category.equalsOrIn(options.category ?? null);
+    filter.externalId.prefix(options.externalIdPrefix ?? null);
+    filter.space.equalsOrIn(options.space ?? null);
+
+    return filter;
   }
 
   /**
@@ -134,43 +182,11 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
    * @param options - Filter and pagination options
    * @returns A Page containing items and optional next cursor.
    */
-  async iterate(options: {
-    name?: string | readonly string[];
-    namePrefix?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    minQuantity?: number;
-    maxQuantity?: number;
-    active?: boolean;
-    minCreatedDate?: Date | string;
-    maxCreatedDate?: Date | string;
-    category?:
-      | string
-      | InstanceId
-      | readonly [string, string]
-      | readonly (string | InstanceId | readonly [string, string])[];
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
+  async iterate(options: ProductNodeFilterOptions & {
     cursor?: string;
     limit?: number;
   } = {}): Promise<Page<ProductNodeList>> {
-    const filter = new ProductNodeFilter("and");
-
-    filter.name.equalsOrIn(options.name ?? null);
-    filter.name.prefix(options.namePrefix ?? null);
-    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
-      options.maxPrice ?? null,
-    );
-    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
-      options.maxQuantity ?? null,
-    );
-    filter.active.equals(options.active ?? null);
-    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
-      options.maxCreatedDate ?? null,
-    );
-    filter.category.equalsOrIn(options.category ?? null);
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     const page = await this._iterate({
       cursor: options.cursor,
@@ -192,44 +208,12 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
    * @param options - Search and filter options
    * @returns A ProductNodeList of matching instances.
    */
-  async search(options: {
+  async search(options: ProductNodeFilterOptions & {
     query?: string;
     properties?: string | readonly string[];
-    name?: string | readonly string[];
-    namePrefix?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    minQuantity?: number;
-    maxQuantity?: number;
-    active?: boolean;
-    minCreatedDate?: Date | string;
-    maxCreatedDate?: Date | string;
-    category?:
-      | string
-      | InstanceId
-      | readonly [string, string]
-      | readonly (string | InstanceId | readonly [string, string])[];
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
     limit?: number;
   } = {}): Promise<ProductNodeList> {
-    const filter = new ProductNodeFilter("and");
-
-    filter.name.equalsOrIn(options.name ?? null);
-    filter.name.prefix(options.namePrefix ?? null);
-    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
-      options.maxPrice ?? null,
-    );
-    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
-      options.maxQuantity ?? null,
-    );
-    filter.active.equals(options.active ?? null);
-    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
-      options.maxCreatedDate ?? null,
-    );
-    filter.category.equalsOrIn(options.category ?? null);
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     const result = await this._search({
       query: options.query,
@@ -250,43 +234,11 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
    */
   async aggregate(
     aggregate: Aggregation | readonly Aggregation[],
-    options: {
+    options: ProductNodeFilterOptions & {
       groupBy?: string | readonly string[];
-      name?: string | readonly string[];
-      namePrefix?: string;
-      minPrice?: number;
-      maxPrice?: number;
-      minQuantity?: number;
-      maxQuantity?: number;
-      active?: boolean;
-      minCreatedDate?: Date | string;
-      maxCreatedDate?: Date | string;
-      category?:
-        | string
-        | InstanceId
-        | readonly [string, string]
-        | readonly (string | InstanceId | readonly [string, string])[];
-      externalIdPrefix?: string;
-      space?: string | readonly string[];
     } = {},
   ): Promise<AggregateResponse> {
-    const filter = new ProductNodeFilter("and");
-
-    filter.name.equalsOrIn(options.name ?? null);
-    filter.name.prefix(options.namePrefix ?? null);
-    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
-      options.maxPrice ?? null,
-    );
-    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
-      options.maxQuantity ?? null,
-    );
-    filter.active.equals(options.active ?? null);
-    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
-      options.maxCreatedDate ?? null,
-    );
-    filter.category.equalsOrIn(options.category ?? null);
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     return this._aggregate(aggregate, {
       groupBy: options.groupBy,
@@ -300,44 +252,12 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
    * @param options - Filter, sort, and pagination options.
    * @returns A ProductNodeList of matching instances.
    */
-  async list(options: {
-    name?: string | readonly string[];
-    namePrefix?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    minQuantity?: number;
-    maxQuantity?: number;
-    active?: boolean;
-    minCreatedDate?: Date | string;
-    maxCreatedDate?: Date | string;
-    category?:
-      | string
-      | InstanceId
-      | readonly [string, string]
-      | readonly (string | InstanceId | readonly [string, string])[];
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
+  async list(options: ProductNodeFilterOptions & {
     sortBy?: string;
     sortDirection?: SortDirection;
     limit?: number;
   } = {}): Promise<ProductNodeList> {
-    const filter = new ProductNodeFilter("and");
-
-    filter.name.equalsOrIn(options.name ?? null);
-    filter.name.prefix(options.namePrefix ?? null);
-    filter.price.greaterThanOrEquals(options.minPrice ?? null).lessThanOrEquals(
-      options.maxPrice ?? null,
-    );
-    filter.quantity.greaterThanOrEquals(options.minQuantity ?? null).lessThanOrEquals(
-      options.maxQuantity ?? null,
-    );
-    filter.active.equals(options.active ?? null);
-    filter.createdDate.greaterThanOrEquals(options.minCreatedDate ?? null).lessThanOrEquals(
-      options.maxCreatedDate ?? null,
-    );
-    filter.category.equalsOrIn(options.category ?? null);
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     let sort: PropertySort | undefined;
     if (options.sortBy !== undefined) {
@@ -361,6 +281,14 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
 // CategoryNodeAPI
 // ============================================================================
 
+/** Filter options for CategoryNode queries. */
+interface CategoryNodeFilterOptions {
+  categoryName?: string | readonly string[];
+  categoryNamePrefix?: string;
+  externalIdPrefix?: string;
+  space?: string | readonly string[];
+}
+
 /**
  * API for CategoryNode instances with type-safe filter methods.
  *
@@ -382,6 +310,23 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
    */
   constructor(config: PygenClientConfig) {
     super(config, CATEGORY_NODE_VIEW, "node");
+  }
+
+  /**
+   * Builds a CategoryNodeFilter from the given options.
+   *
+   * @param options - Filter options
+   * @returns A configured CategoryNodeFilter
+   */
+  private _buildFilter(options: CategoryNodeFilterOptions): CategoryNodeFilter {
+    const filter = new CategoryNodeFilter("and");
+
+    filter.categoryName.equalsOrIn(options.categoryName ?? null);
+    filter.categoryName.prefix(options.categoryNamePrefix ?? null);
+    filter.externalId.prefix(options.externalIdPrefix ?? null);
+    filter.space.equalsOrIn(options.space ?? null);
+
+    return filter;
   }
 
   /**
@@ -433,20 +378,11 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
    * @param options - Filter and pagination options
    * @returns A Page containing items and optional next cursor.
    */
-  async iterate(options: {
-    categoryName?: string | readonly string[];
-    categoryNamePrefix?: string;
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
+  async iterate(options: CategoryNodeFilterOptions & {
     cursor?: string;
     limit?: number;
   } = {}): Promise<Page<CategoryNodeList>> {
-    const filter = new CategoryNodeFilter("and");
-
-    filter.categoryName.equalsOrIn(options.categoryName ?? null);
-    filter.categoryName.prefix(options.categoryNamePrefix ?? null);
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     const page = await this._iterate({
       cursor: options.cursor,
@@ -468,21 +404,12 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
    * @param options - Search and filter options
    * @returns A CategoryNodeList of matching instances.
    */
-  async search(options: {
+  async search(options: CategoryNodeFilterOptions & {
     query?: string;
     properties?: string | readonly string[];
-    categoryName?: string | readonly string[];
-    categoryNamePrefix?: string;
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
     limit?: number;
   } = {}): Promise<CategoryNodeList> {
-    const filter = new CategoryNodeFilter("and");
-
-    filter.categoryName.equalsOrIn(options.categoryName ?? null);
-    filter.categoryName.prefix(options.categoryNamePrefix ?? null);
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     const result = await this._search({
       query: options.query,
@@ -503,20 +430,11 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
    */
   async aggregate(
     aggregate: Aggregation | readonly Aggregation[],
-    options: {
+    options: CategoryNodeFilterOptions & {
       groupBy?: string | readonly string[];
-      categoryName?: string | readonly string[];
-      categoryNamePrefix?: string;
-      externalIdPrefix?: string;
-      space?: string | readonly string[];
     } = {},
   ): Promise<AggregateResponse> {
-    const filter = new CategoryNodeFilter("and");
-
-    filter.categoryName.equalsOrIn(options.categoryName ?? null);
-    filter.categoryName.prefix(options.categoryNamePrefix ?? null);
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     return this._aggregate(aggregate, {
       groupBy: options.groupBy,
@@ -530,21 +448,12 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
    * @param options - Filter, sort, and pagination options.
    * @returns A CategoryNodeList of matching instances.
    */
-  async list(options: {
-    categoryName?: string | readonly string[];
-    categoryNamePrefix?: string;
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
+  async list(options: CategoryNodeFilterOptions & {
     sortBy?: string;
     sortDirection?: SortDirection;
     limit?: number;
   } = {}): Promise<CategoryNodeList> {
-    const filter = new CategoryNodeFilter("and");
-
-    filter.categoryName.equalsOrIn(options.categoryName ?? null);
-    filter.categoryName.prefix(options.categoryNamePrefix ?? null);
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     let sort: PropertySort | undefined;
     if (options.sortBy !== undefined) {
@@ -568,6 +477,17 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
 // RelatesToAPI
 // ============================================================================
 
+/** Filter options for RelatesTo queries. */
+interface RelatesToFilterOptions {
+  relationType?: string | readonly string[];
+  minStrength?: number;
+  maxStrength?: number;
+  minCreatedAt?: Date | string;
+  maxCreatedAt?: Date | string;
+  externalIdPrefix?: string;
+  space?: string | readonly string[];
+}
+
 /**
  * API for RelatesTo edge instances with type-safe filter methods.
  *
@@ -590,6 +510,28 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
    */
   constructor(config: PygenClientConfig) {
     super(config, RELATES_TO_VIEW, "edge");
+  }
+
+  /**
+   * Builds a RelatesToFilter from the given options.
+   *
+   * @param options - Filter options
+   * @returns A configured RelatesToFilter
+   */
+  private _buildFilter(options: RelatesToFilterOptions): RelatesToFilter {
+    const filter = new RelatesToFilter("and");
+
+    filter.relationType.equalsOrIn(options.relationType ?? null);
+    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
+      options.maxStrength ?? null,
+    );
+    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
+      options.maxCreatedAt ?? null,
+    );
+    filter.externalId.prefix(options.externalIdPrefix ?? null);
+    filter.space.equalsOrIn(options.space ?? null);
+
+    return filter;
   }
 
   /**
@@ -641,28 +583,11 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
    * @param options - Filter and pagination options
    * @returns A Page containing items and optional next cursor.
    */
-  async iterate(options: {
-    relationType?: string | readonly string[];
-    minStrength?: number;
-    maxStrength?: number;
-    minCreatedAt?: Date | string;
-    maxCreatedAt?: Date | string;
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
+  async iterate(options: RelatesToFilterOptions & {
     cursor?: string;
     limit?: number;
   } = {}): Promise<Page<RelatesToList>> {
-    const filter = new RelatesToFilter("and");
-
-    filter.relationType.equalsOrIn(options.relationType ?? null);
-    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
-      options.maxStrength ?? null,
-    );
-    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
-      options.maxCreatedAt ?? null,
-    );
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     const page = await this._iterate({
       cursor: options.cursor,
@@ -684,29 +609,12 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
    * @param options - Search and filter options
    * @returns A RelatesToList of matching edges.
    */
-  async search(options: {
+  async search(options: RelatesToFilterOptions & {
     query?: string;
     properties?: string | readonly string[];
-    relationType?: string | readonly string[];
-    minStrength?: number;
-    maxStrength?: number;
-    minCreatedAt?: Date | string;
-    maxCreatedAt?: Date | string;
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
     limit?: number;
   } = {}): Promise<RelatesToList> {
-    const filter = new RelatesToFilter("and");
-
-    filter.relationType.equalsOrIn(options.relationType ?? null);
-    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
-      options.maxStrength ?? null,
-    );
-    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
-      options.maxCreatedAt ?? null,
-    );
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     const result = await this._search({
       query: options.query,
@@ -727,28 +635,11 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
    */
   async aggregate(
     aggregate: Aggregation | readonly Aggregation[],
-    options: {
+    options: RelatesToFilterOptions & {
       groupBy?: string | readonly string[];
-      relationType?: string | readonly string[];
-      minStrength?: number;
-      maxStrength?: number;
-      minCreatedAt?: Date | string;
-      maxCreatedAt?: Date | string;
-      externalIdPrefix?: string;
-      space?: string | readonly string[];
     } = {},
   ): Promise<AggregateResponse> {
-    const filter = new RelatesToFilter("and");
-
-    filter.relationType.equalsOrIn(options.relationType ?? null);
-    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
-      options.maxStrength ?? null,
-    );
-    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
-      options.maxCreatedAt ?? null,
-    );
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     return this._aggregate(aggregate, {
       groupBy: options.groupBy,
@@ -762,29 +653,12 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
    * @param options - Filter, sort, and pagination options.
    * @returns A RelatesToList of matching edges.
    */
-  async list(options: {
-    relationType?: string | readonly string[];
-    minStrength?: number;
-    maxStrength?: number;
-    minCreatedAt?: Date | string;
-    maxCreatedAt?: Date | string;
-    externalIdPrefix?: string;
-    space?: string | readonly string[];
+  async list(options: RelatesToFilterOptions & {
     sortBy?: string;
     sortDirection?: SortDirection;
     limit?: number;
   } = {}): Promise<RelatesToList> {
-    const filter = new RelatesToFilter("and");
-
-    filter.relationType.equalsOrIn(options.relationType ?? null);
-    filter.strength.greaterThanOrEquals(options.minStrength ?? null).lessThanOrEquals(
-      options.maxStrength ?? null,
-    );
-    filter.createdAt.greaterThanOrEquals(options.minCreatedAt ?? null).lessThanOrEquals(
-      options.maxCreatedAt ?? null,
-    );
-    filter.externalId.prefix(options.externalIdPrefix ?? null);
-    filter.space.equalsOrIn(options.space ?? null);
+    const filter = this._buildFilter(options);
 
     let sort: PropertySort | undefined;
     if (options.sortBy !== undefined) {
