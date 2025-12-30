@@ -9,7 +9,7 @@ import {
   type PygenClientConfig,
   type RequestMessage,
   TokenCredentials,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 import {
   CategoryNodeAPI,

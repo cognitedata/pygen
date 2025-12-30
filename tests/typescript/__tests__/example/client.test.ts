@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { type PygenClientConfig, TokenCredentials } from "@cognite/pygen-_typescript";
+import { type PygenClientConfig, TokenCredentials } from "@cognite/pygen-typescript";
 
 import { ExampleClient } from "../../../../cognite/pygen/_typescript/example/client.ts";
 import {

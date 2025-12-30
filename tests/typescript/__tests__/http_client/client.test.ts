@@ -4,7 +4,7 @@ import {
   HTTPClient,
   isSuccess,
   TokenCredentials,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 describe("HTTPClient", () => {
   let originalFetch: typeof global.fetch;

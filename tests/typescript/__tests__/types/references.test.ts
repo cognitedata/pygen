@@ -15,7 +15,7 @@ import {
   type NodeReference,
   type ViewReference,
   viewReferenceToString,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 describe("Reference Types", () => {
   describe("createInstanceId", () => {

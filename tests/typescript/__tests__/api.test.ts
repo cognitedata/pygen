@@ -18,7 +18,7 @@ import {
   TokenCredentials,
   type UnitConversion,
   type ViewReference,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 // Test instance type
 interface TestInstance extends Instance {

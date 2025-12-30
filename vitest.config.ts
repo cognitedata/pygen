@@ -18,8 +18,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
-    include: ["tests/_typescript/**/*.test.ts"],
-    exclude: ["tests/_typescript/**/*.integration.test.ts", "node_modules"],
+    include: ["tests/typescript/**/*.test.ts"],
+    exclude: ["tests/typescript/**/*.integration.test.ts", "node_modules"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

@@ -14,7 +14,7 @@ import {
   IntegerFilter,
   TextFilter,
   type ViewReference,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 describe("FloatFilter", () => {
   let filter: FloatFilter;

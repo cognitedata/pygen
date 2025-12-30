@@ -20,7 +20,7 @@ import {
   parseInstances,
   serializeDataRecordWrite,
   type ViewReference,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 // Test fixtures
 const TEST_VIEW_ID: ViewReference = {

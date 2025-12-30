@@ -20,7 +20,7 @@ import {
   isSuccess,
   OAuthClientCredentials,
   type PygenClientConfig,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 /**
  * Try to find the repository root by running git command.

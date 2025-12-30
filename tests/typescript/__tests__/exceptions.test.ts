@@ -9,7 +9,7 @@ import {
   OAuth2Error,
   PygenAPIError,
   type UpsertResult,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 describe("PygenAPIError", () => {
   it("should create error with message", () => {

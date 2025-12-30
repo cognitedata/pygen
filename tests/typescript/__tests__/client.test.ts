@@ -10,7 +10,7 @@ import {
   type UpsertMode,
   type UpsertResult,
   type ViewReference,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 describe("InstanceClient", () => {
   const createConfig = (): PygenClientConfig => ({

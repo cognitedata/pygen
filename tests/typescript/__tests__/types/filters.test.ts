@@ -20,7 +20,7 @@ import {
   or,
   prefix,
   range,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 describe("Filter helper functions", () => {
   describe("equals", () => {

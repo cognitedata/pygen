@@ -6,7 +6,7 @@ import {
   OAuthClientCredentials,
   type PygenClientConfig,
   TokenCredentials,
-} from "@cognite/pygen-_typescript";
+} from "@cognite/pygen-typescript";
 
 describe("TokenCredentials", () => {
   it("should return authorization header with bearer token", async () => {

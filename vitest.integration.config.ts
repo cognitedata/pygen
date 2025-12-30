@@ -11,14 +11,14 @@ export default defineConfig({
     alias: {
       "@cognite/pygen-typescript": resolve(
         __dirname,
-        "cognite/pygen/_generation/_typescript/instance_api/index.ts"
+        "cognite/pygen/_typescript/instance_api/index.ts"
       ),
     },
   },
   test: {
     globals: true,
     environment: "node",
-    include: ["tests/_typescript/**/*.integration.test.ts"],
+    include: ["tests/typescript/**/*.integration.test.ts"],
     testTimeout: 30000, // 30 seconds for integration tests
   },
 });
