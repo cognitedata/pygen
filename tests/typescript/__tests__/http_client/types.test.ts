@@ -10,7 +10,7 @@ import {
   parseErrorDetails,
   type RequestMessage,
   type SuccessResponse,
-} from "@cognite/pygen-typescript";
+} from "@cognite/pygen-_typescript";
 
 describe("HTTP Client Types", () => {
   describe("createRequestState", () => {

@@ -112,7 +112,7 @@ The `deno.json` file configures Deno's behavior:
     "lib": ["ES2022", "DOM"]
   },
   "imports": {
-    "@cognite/pygen-typescript": "./cognite/pygen/_generation/typescript/instance_api/index.ts"
+    "@cognite/pygen-typescript": "./cognite/pygen/_generation/_typescript/instance_api/index.ts"
   },
   "fmt": {
     "useTabs": false,
@@ -129,7 +129,7 @@ The `deno.json` file configures Deno's behavior:
 Deno uses import maps for module resolution. The main SDK can be imported using the alias:
 
 ```typescript
-import { HTTPClient, TokenCredentials } from "@cognite/pygen-typescript";
+import { HTTPClient, TokenCredentials } from "@cognite/pygen-_typescript";
 ```
 
 This alias is configured in `deno.json` under `imports`.

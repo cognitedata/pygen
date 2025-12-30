@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from cognite.pygen._generation.python.instance_api._utils import (
+from cognite.pygen._python.instance_api._utils import (
     MAX_TIMESTAMP_MS,
     MIN_TIMESTAMP_MS,
     datetime_to_ms,

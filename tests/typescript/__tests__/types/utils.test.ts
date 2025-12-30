@@ -5,7 +5,7 @@ import {
   MIN_TIMESTAMP_MS,
   msToDate,
   parseDate,
-} from "@cognite/pygen-typescript";
+} from "@cognite/pygen-_typescript";
 
 describe("Date Utilities", () => {
   describe("msToDate", () => {

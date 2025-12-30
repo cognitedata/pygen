@@ -18,7 +18,7 @@ import {
   TokenCredentials,
   type UnitConversion,
   type ViewReference,
-} from "@cognite/pygen-typescript";
+} from "@cognite/pygen-_typescript";
 
 // Test instance type
 interface TestInstance extends Instance {
@@ -30,7 +30,7 @@ interface TestInstance extends Instance {
 class TestInstanceList extends InstanceList<TestInstance> {}
 
 // Get the InstanceAPI class as any type to access protected members
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @_typescript-eslint/no-explicit-any
 const InstanceAPIAny = InstanceAPI as any;
 
 // Helper function to create a mock response

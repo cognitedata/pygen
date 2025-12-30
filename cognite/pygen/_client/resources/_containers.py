@@ -6,7 +6,7 @@ This module provides the ContainersAPI class for managing CDF containers.
 from collections.abc import Sequence
 
 from cognite.pygen._client.models import ContainerReference, ContainerRequest, ContainerResponse
-from cognite.pygen._generation.python.instance_api.http_client import HTTPClient, SuccessResponse
+from cognite.pygen._python.instance_api.http_client import HTTPClient, SuccessResponse
 
 from ._base import BaseResourceAPI, Page, ReferenceResponseItems, ResourceLimits
 

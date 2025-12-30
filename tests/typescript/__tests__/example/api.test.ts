@@ -9,13 +9,13 @@ import {
   type PygenClientConfig,
   type RequestMessage,
   TokenCredentials,
-} from "@cognite/pygen-typescript";
+} from "@cognite/pygen-_typescript";
 
 import {
   CategoryNodeAPI,
   ProductNodeAPI,
   RelatesToAPI,
-} from "../../../../cognite/pygen/_generation/typescript/example/api.ts";
+} from "../../../../cognite/pygen/_typescript/example/api.ts";
 import {
   CATEGORY_NODE_VIEW,
   CategoryNode,
@@ -23,7 +23,7 @@ import {
   ProductNode,
   RELATES_TO_VIEW,
   RelatesTo,
-} from "../../../../cognite/pygen/_generation/typescript/example/dataClasses.ts";
+} from "../../../../cognite/pygen/_typescript/example/dataClasses.ts";
 
 // Mockable HTTPClient subclass
 class MockHTTPClient extends HTTPClient {

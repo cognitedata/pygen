@@ -4,7 +4,7 @@ import {
   HTTPClient,
   isSuccess,
   TokenCredentials,
-} from "@cognite/pygen-typescript";
+} from "@cognite/pygen-_typescript";
 
 describe("HTTPClient", () => {
   let originalFetch: typeof global.fetch;
@@ -418,7 +418,7 @@ describe("HTTPClient", () => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          // eslint-disable-next-line @_typescript-eslint/no-unsafe-assignment
           headers: expect.objectContaining({
             Authorization: "Bearer my-secret-token",
           }),

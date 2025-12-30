@@ -21,7 +21,7 @@ import {
   relatesToAsWrite,
   RelatesToFilter,
   RelatesToList,
-} from "../../../../cognite/pygen/_generation/typescript/example/dataClasses.ts";
+} from "../../../../cognite/pygen/_typescript/example/dataClasses.ts";
 
 // ============================================================================
 // Constants Tests

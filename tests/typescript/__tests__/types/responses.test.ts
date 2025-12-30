@@ -14,14 +14,14 @@ import type {
   ListResponse,
   Page,
   UpsertResult,
-} from "../../../../cognite/pygen/_generation/typescript/instance_api/types/responses.ts";
+} from "../../../../cognite/pygen/_typescript/instance_api/types/responses.ts";
 import {
   extendUpsertResult,
   getCreated,
   getUnchanged,
   getUpdated,
-} from "../../../../cognite/pygen/_generation/typescript/instance_api/types/responses.ts";
-import type { InstanceId } from "../../../../cognite/pygen/_generation/typescript/instance_api/types/instance.ts";
+} from "../../../../cognite/pygen/_typescript/instance_api/types/responses.ts";
+import type { InstanceId } from "../../../../cognite/pygen/_typescript/instance_api/types/instance.ts";
 
 describe("ListResponse", () => {
   it("should create a valid ListResponse", () => {

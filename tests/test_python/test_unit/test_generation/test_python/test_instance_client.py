@@ -9,11 +9,11 @@ import httpx
 import pytest
 import respx
 
-from cognite.pygen._generation.python.instance_api import InstanceClient, InstanceId, UpsertResult
-from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
-from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
-from cognite.pygen._generation.python.instance_api.exceptions import MultiRequestError
-from cognite.pygen._generation.python.instance_api.models.instance import InstanceWrite, ViewReference
+from cognite.pygen._python.instance_api import InstanceClient, InstanceId, UpsertResult
+from cognite.pygen._python.instance_api.auth.credentials import Credentials
+from cognite.pygen._python.instance_api.config import PygenClientConfig
+from cognite.pygen._python.instance_api.exceptions import MultiRequestError
+from cognite.pygen._python.instance_api.models.instance import InstanceWrite, ViewReference
 
 
 class MockCredentials(Credentials):

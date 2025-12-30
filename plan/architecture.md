@@ -113,7 +113,7 @@ pygen/client/
 
 ```python
 from cognite.pygen._client import PygenClient
-from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
+from cognite.pygen._python.instance_api.config import PygenClientConfig
 from cognite.pygen._client.models import DataModelReference, DataModelRequest
 
 client = PygenClient(config=PygenClientConfig(...))
@@ -769,7 +769,7 @@ TypeScript tests use Vitest and are located in `tests/tests_typescript/__tests__
 ```typescript
 // tests/tests_typescript/__tests__/instance.test.ts
 import { describe, it, expect } from 'vitest';
-import { Instance, InstanceWrite } from '../../cognite/pygen/_generation/typescript/instance_api';
+import { Instance, InstanceWrite } from '../../cognite/pygen/_generation/_typescript/instance_api';
 
 describe('Instance', () => {
   it('should create an instance with required fields', () => {
@@ -795,7 +795,7 @@ describe('Instance', () => {
 ```typescript
 // tests/tests_typescript/__tests__/client.test.ts
 import { describe, it, expect, vi } from 'vitest';
-import { InstanceClient } from '../../cognite/pygen/_generation/typescript/instance_api';
+import { InstanceClient } from '../../cognite/pygen/_generation/_typescript/instance_api';
 
 describe('InstanceClient', () => {
   it('should upsert instances', async () => {

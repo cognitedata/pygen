@@ -3,14 +3,14 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { type PygenClientConfig, TokenCredentials } from "@cognite/pygen-typescript";
+import { type PygenClientConfig, TokenCredentials } from "@cognite/pygen-_typescript";
 
-import { ExampleClient } from "../../../../cognite/pygen/_generation/typescript/example/client.ts";
+import { ExampleClient } from "../../../../cognite/pygen/_typescript/example/client.ts";
 import {
   CategoryNodeAPI,
   ProductNodeAPI,
   RelatesToAPI,
-} from "../../../../cognite/pygen/_generation/typescript/example/api.ts";
+} from "../../../../cognite/pygen/_typescript/example/api.ts";
 
 // Create test config
 function createTestConfig(): PygenClientConfig {
