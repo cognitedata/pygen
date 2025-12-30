@@ -11,6 +11,7 @@ class DataClass(CodeModel):
     name: str
     fields: list[Field]
     instance_type: Literal["node", "edge"]
+    description: str | None = None
 
 
 class ReadDataClass(DataClass):
