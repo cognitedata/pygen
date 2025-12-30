@@ -42,6 +42,8 @@ class ViewCorePropertyRequest(ViewCoreProperty):
 
 class ConstraintOrIndexState(BaseModelObject):
     nullability: Literal["current", "pending", "failed"] | None = None
+    max_list_size: Literal["current", "pending", "failed"] | None = None
+    max_text_size: Literal["current", "pending", "failed"] | None = None
 
 
 class ViewCorePropertyResponse(ViewCoreProperty):
