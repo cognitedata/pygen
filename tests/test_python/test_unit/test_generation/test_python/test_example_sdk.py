@@ -7,14 +7,14 @@ from typing import Any, ClassVar
 import pytest
 import respx
 
-from cognite.pygen._generation.python.example import (
+from cognite.pygen._python.example import (
     CategoryNode,
     ExampleClient,
     ProductNode,
     RelatesTo,
 )
-from cognite.pygen._generation.python.example._api import CategoryNodeAPI, ProductNodeAPI, RelatesToAPI
-from cognite.pygen._generation.python.instance_api import (
+from cognite.pygen._python.example._api import CategoryNodeAPI, ProductNodeAPI, RelatesToAPI
+from cognite.pygen._python.instance_api import (
     AggregatedNumberValue,
     AggregateResponse,
     Count,
@@ -22,7 +22,7 @@ from cognite.pygen._generation.python.instance_api import (
     InstanceAPI,
     InstanceWrite,
 )
-from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
+from cognite.pygen._python.instance_api.config import PygenClientConfig
 
 
 @pytest.fixture

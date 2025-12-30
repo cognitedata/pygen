@@ -1195,7 +1195,7 @@ class GenerateRequest(BaseModel):
     space: str
     external_id: str
     version: str
-    language: Literal["python", "typescript", "csharp", "pyspark"] = "python"
+    language: Literal["python", "_typescript", "csharp", "pyspark"] = "python"
     output_format: Literal["zip", "tarball", "code"] = "zip"
     cdf_url: str
     cdf_credentials: dict[str, str]  # Encrypted/secured
@@ -1338,7 +1338,7 @@ app = typer.Typer(
 
 class Language(str, Enum):
     python = "python"
-    typescript = "typescript"
+    typescript = "_typescript"
     csharp = "csharp"
     pyspark = "pyspark"
 

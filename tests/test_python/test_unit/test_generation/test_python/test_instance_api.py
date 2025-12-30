@@ -9,7 +9,7 @@ import pytest
 import respx
 from httpx import Response
 
-from cognite.pygen._generation.python.instance_api import (
+from cognite.pygen._python.instance_api import (
     AggregatedNumberValue,
     AggregateResponse,
     Avg,
@@ -28,11 +28,11 @@ from cognite.pygen._generation.python.instance_api import (
     UnitConversion,
     ViewReference,
 )
-from cognite.pygen._generation.python.instance_api.auth.credentials import Credentials
-from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
-from cognite.pygen._generation.python.instance_api.http_client import HTTPClient
-from cognite.pygen._generation.python.instance_api.models.filters import EqualsFilterData, Filter
-from cognite.pygen._generation.python.instance_api.models.query import AggregationAdapter, UnitReference
+from cognite.pygen._python.instance_api.auth.credentials import Credentials
+from cognite.pygen._python.instance_api.config import PygenClientConfig
+from cognite.pygen._python.instance_api.http_client import HTTPClient
+from cognite.pygen._python.instance_api.models.filters import EqualsFilterData, Filter
+from cognite.pygen._python.instance_api.models.query import AggregationAdapter, UnitReference
 
 
 class MockCredentials(Credentials):

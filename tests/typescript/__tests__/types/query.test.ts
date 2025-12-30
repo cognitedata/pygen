@@ -19,7 +19,7 @@ import {
   type UnitReference,
   type UnitSystemReference,
   validateAggregationRequest,
-} from "../../../../cognite/pygen/_generation/typescript/instance_api/types/query.ts";
+} from "../../../../cognite/pygen/_typescript/instance_api/types/query.ts";
 
 describe("PropertySort", () => {
   it("should create a valid PropertySort with view property", () => {

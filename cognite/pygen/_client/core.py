@@ -8,8 +8,8 @@ import sys
 from typing import Literal
 
 from cognite.pygen._client.resources import ContainersAPI, DataModelsAPI, SpacesAPI, ViewsAPI
-from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
-from cognite.pygen._generation.python.instance_api.http_client import HTTPClient
+from cognite.pygen._python.instance_api.config import PygenClientConfig
+from cognite.pygen._python.instance_api.http_client import HTTPClient
 
 if sys.version_info >= (3, 11):
     from typing import Self

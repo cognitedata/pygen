@@ -5,9 +5,9 @@ import httpx
 import pytest
 import respx
 
-from cognite.pygen._generation.python.instance_api.config import PygenClientConfig
-from cognite.pygen._generation.python.instance_api.exceptions import PygenAPIError
-from cognite.pygen._generation.python.instance_api.http_client import (
+from cognite.pygen._python.instance_api.config import PygenClientConfig
+from cognite.pygen._python.instance_api.exceptions import PygenAPIError
+from cognite.pygen._python.instance_api.http_client import (
     FailedRequest,
     FailedResponse,
     HTTPClient,

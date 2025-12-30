@@ -1,4 +1,4 @@
-from cognite.pygen._generation.example_datamodel import EXTERNAL_ID, SPACE, VERSION, example_data_model
+from cognite.pygen._example_datamodel import EXTERNAL_ID, SPACE, VERSION, example_data_model
 
 
 def test_example_data_model_is_valid() -> None:

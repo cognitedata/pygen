@@ -11,7 +11,7 @@ export default defineConfig({
     alias: {
       "@cognite/pygen-typescript": resolve(
         __dirname,
-        "cognite/pygen/_generation/typescript/instance_api/index.ts"
+        "cognite/pygen/_typescript/instance_api/index.ts"
       ),
     },
   },

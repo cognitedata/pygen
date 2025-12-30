@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from cognite.pygen._generation.python.instance_api.models.filters import (
+from cognite.pygen._python.instance_api.models.filters import (
     AVAILABLE_FILTERS,
     FilterAdapter,
     FilterDataDefinition,

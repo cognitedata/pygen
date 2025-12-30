@@ -25,7 +25,7 @@ import {
   relatesToAsWrite,
   RelatesToFilter,
   RelatesToList,
-} from "../../../../cognite/pygen/_generation/typescript/example/index.ts";
+} from "../../../../cognite/pygen/_typescript/example/index.ts";
 
 describe("Example SDK Index Exports", () => {
   describe("Data class exports", () => {

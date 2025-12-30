@@ -16,7 +16,7 @@ from cognite.pygen._client.models import (
     T_Reference,
     T_ResponseResource,
 )
-from cognite.pygen._generation.python.instance_api.http_client import HTTPClient, RequestMessage, SuccessResponse
+from cognite.pygen._python.instance_api.http_client import HTTPClient, RequestMessage, SuccessResponse
 from cognite.pygen._utils.collection import chunker_sequence
 
 

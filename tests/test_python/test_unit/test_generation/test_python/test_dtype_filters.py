@@ -3,9 +3,9 @@ from typing import Any, Literal
 
 import pytest
 
-from cognite.pygen._generation.python.instance_api import InstanceId
-from cognite.pygen._generation.python.instance_api.models._references import ViewReference
-from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
+from cognite.pygen._python.instance_api import InstanceId
+from cognite.pygen._python.instance_api.models._references import ViewReference
+from cognite.pygen._python.instance_api.models.dtype_filters import (
     BooleanFilter,
     DateFilter,
     DateTimeFilter,
@@ -15,7 +15,7 @@ from cognite.pygen._generation.python.instance_api.models.dtype_filters import (
     IntegerFilter,
     TextFilter,
 )
-from cognite.pygen._generation.python.instance_api.models.filters import FilterAdapter
+from cognite.pygen._python.instance_api.models.filters import FilterAdapter
 
 VIEW_ID = ViewReference(space="example_space", external_id="ExampleView", version="v1")
 

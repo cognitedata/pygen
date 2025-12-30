@@ -11,7 +11,7 @@ export default defineConfig({
     alias: {
       "@cognite/pygen-typescript": resolve(
         __dirname,
-        "cognite/pygen/_generation/typescript/instance_api/index.ts"
+        "cognite/pygen/_typescript/instance_api/index.ts"
       ),
     },
   },
@@ -23,7 +23,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      include: ["cognite/pygen/_generation/typescript/**/*.ts"],
+      include: ["cognite/pygen/_typescript/**/*.ts"],
       exclude: ["node_modules", "tests"],
       thresholds: {
         lines: 90,
