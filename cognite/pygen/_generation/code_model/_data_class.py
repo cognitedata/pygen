@@ -2,8 +2,8 @@ from typing import Literal
 
 from cognite.pygen._client.models import ViewReference
 
-from .field import Field
-from .model import CodeModel
+from ._field import Field
+from ._model import CodeModel
 
 
 class DataClass(CodeModel):

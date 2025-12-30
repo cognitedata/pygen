@@ -1,4 +1,4 @@
-from .model import CodeModel
+from ._model import CodeModel
 
 
 class Field(CodeModel):
