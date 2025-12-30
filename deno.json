@@ -1,17 +1,17 @@
 {
   "name": "@cognite/pygen-typescript",
   "version": "0.0.1",
-  "exports": "./cognite/pygen/_generation/typescript/instance_api/index.ts",
+  "exports": "./cognite/pygen/_typescript/instance_api/index.ts",
   "tasks": {
-    "typecheck": "deno check cognite/pygen/_generation/typescript/**/*.ts",
+    "typecheck": "deno check cognite/pygen/_typescript/**/*.ts",
     "test": "deno task npm:vitest run",
     "test:watch": "deno task npm:vitest",
     "test:coverage": "deno task npm:vitest run --coverage",
     "test:integration": "deno task npm:vitest run --config vitest.integration.config.ts",
-    "format": "deno fmt cognite/pygen/_generation/typescript/ tests/typescript/",
-    "format:check": "deno fmt --check cognite/pygen/_generation/typescript/ tests/typescript/",
-    "lint": "deno lint cognite/pygen/_generation/typescript/",
-    "lint:fix": "deno lint --fix cognite/pygen/_generation/typescript/",
+    "format": "deno fmt cognite/pygen/_typescript/ tests/typescript/",
+    "format:check": "deno fmt --check cognite/pygen/_typescript/ tests/typescript/",
+    "lint": "deno lint cognite/pygen/_typescript/",
+    "lint:fix": "deno lint --fix cognite/pygen/_typescript/",
     "npm:vitest": "deno run --allow-read --allow-write --allow-env --allow-ffi --allow-sys --allow-run --allow-net npm:vitest@^2.1.8"
   },
   "fmt": {
@@ -22,7 +22,7 @@
     "singleQuote": false,
     "proseWrap": "preserve",
     "include": [
-      "cognite/pygen/_generation/typescript/",
+      "cognite/pygen/_typescript/",
       "tests/typescript/"
     ]
   },
@@ -32,7 +32,7 @@
       "exclude": ["require-await"]
     },
     "include": [
-      "cognite/pygen/_generation/typescript/"
+      "cognite/pygen/_typescript/"
     ]
   },
   "compilerOptions": {
@@ -45,7 +45,7 @@
     "lib": ["ES2022", "DOM"]
   },
   "imports": {
-    "@cognite/pygen-typescript": "./cognite/pygen/_generation/typescript/instance_api/index.ts"
+    "@cognite/pygen-typescript": "./cognite/pygen/_typescript/instance_api/index.ts"
   },
   "nodeModulesDir": "auto"
 }
