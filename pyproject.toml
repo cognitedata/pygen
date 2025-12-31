@@ -132,7 +132,7 @@ output_dir = "docs/examples"
 instance_space = "move_data"
 
 [project.scripts]
-pygen = "cognite.pygen.legacy.cli:main"
+pygen = "cognite.pygen._legacy.cli:main"
 
 [tool.pytest.ini_options]
 filterwarnings = [
