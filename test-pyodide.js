@@ -57,7 +57,11 @@ except Exception as e:
     result = f"Import failed: {type(e).__name__}: {e}\\n{traceback.format_exc()}"
 result
   `);
-
+    if (result !== "Pygen successfully installed and imported!") {
+      console.error("Installation or import failed:", result);
+      server.close();
+      process.exit(1);
+    }
   return result;
 }
 
