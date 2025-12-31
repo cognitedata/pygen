@@ -121,3 +121,24 @@ class ViewResponse(View, ResponseResource[ViewReference, ViewRequest]):
         cls, mapped_containers: list[ContainerReference], info: FieldSerializationInfo
     ) -> list[dict[str, Any]]:
         return [container.model_dump(**vars(info)) | {"type": "container"} for container in mapped_containers]
+
+    @field_serializer("properties", mode="plain")
+    @classmethod
+    def serialize_properties_special_handling_direct_relation_with_source(
+        cls, properties: dict[str, ViewResponseProperty], info: FieldSerializationInfo
+    ) -> dict[str, dict[str, Any]]:
+        output: dict[str, dict[str, Any]] = {}
+        for prop_id, prop in properties.items():
+            output[prop_id] = prop.model_dump(**vars(info))
+            if (
+                isinstance(prop, ViewCorePropertyResponse)
+                and isinstance(prop.type, DirectNodeRelation)
+                and prop.type.source
+            ):
+                # We manually include the source as this is excluded by default. The reason why this is excluded
+                # is that the DirectNodeRelation is used for both request and response, and in the request the source
+                # does not exist on the DirectNodeRelation, but on the Property object.
+                output[prop_id]["type"]["source"] = (
+                    prop.type.source.model_dump(**vars(info)) if prop.type.source else None
+                )
+        return output
