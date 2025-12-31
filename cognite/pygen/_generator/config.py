@@ -16,12 +16,12 @@ class PygenSDKConfig(BaseModel):
     Configuration settings for the Pygen SDK generator.
     """
 
-    top_level_package: str
-    client_name: str
-    default_instance_space: str
-    output_directory: str
-    overwrite: bool
-    format_code: bool
-    exclude_views: Set[str]
-    exclude_spaces: Set[str]
+    top_level_package: str = "pygen_sdk"
+    client_name: str = "PygenClient"
+    default_instance_space: str | None = None
+    output_directory: str = "."
+    overwrite: bool = False
+    format_code: bool = True
+    exclude_views: Set[str] = Field(default_factory=set)
+    exclude_spaces: Set[str] = Field(default_factory=set)
     naming: NamingConfig = Field(default_factory=NamingConfig)

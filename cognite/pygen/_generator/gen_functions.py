@@ -1,8 +1,9 @@
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 from cognite.pygen._python.instance_api.config import PygenClientConfig
 
+from ._types import OutputFormat
 from .config import PygenSDKConfig
 
 
@@ -12,7 +13,7 @@ def generate_sdk(
     version: str | None = None,
     client_config: PygenClientConfig | None = None,
     sdk_config: PygenSDKConfig | None = None,
-    output_format: Literal["python", "typescript"] = "python",
+    output_format: OutputFormat = "python",
 ) -> dict[Path, str]:
     """Generates an SDK for the specified View in Cognite Data Fusion.
 
