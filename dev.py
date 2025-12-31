@@ -14,9 +14,9 @@ import typer
 from cognite.client import data_modeling as dm
 from packaging.version import Version, parse
 
-from cognite.pygen.legacy._generator import SDKGenerator, generate_typed, write_sdk_to_disk
-from cognite.pygen.legacy.utils import MockGenerator, load_cognite_client_from_toml
-from tests.test_python.legacy.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
+from cognite.pygen._legacy._generator import SDKGenerator, generate_typed, write_sdk_to_disk
+from cognite.pygen._legacy.utils import MockGenerator, load_cognite_client_from_toml
+from tests.test_python.test_legacy.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
 
 app = typer.Typer(
     add_completion=False,

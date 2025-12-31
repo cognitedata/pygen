@@ -41,12 +41,29 @@ server.listen(PORT, () => {
 
     const packages = JSON.parse(process.env.PACKAGES);
     for (const pkg of packages) {
+      console.log(`Trying to install ${pkg}`);
       await micropip.install(pkg);
+      console.log(`Installed ${pkg} successfully`);
     }
-    await pyodide.runPythonAsync("from cognite.pygen import generate_sdk");
+    console.log(`INSTALLED ${packages.length} PACKAGES. Now trying to import pygen module.`);
+    const result = await pyodide.runPythonAsync(`
+import sys
+import traceback
 
-    return pyodide.runPythonAsync('"Pygen successfully installed and imported!"');
-  }
+try:
+    from cognite.pygen import generate_sdk
+    result = "Pygen successfully installed and imported!"
+except Exception as e:
+    result = f"Import failed: {type(e).__name__}: {e}\\n{traceback.format_exc()}"
+result
+  `);
+    if (result !== "Pygen successfully installed and imported!") {
+      console.error("Installation or import failed:", result);
+      server.close();
+      process.exit(1);
+    }
+  return result;
+}
 
   test_cognite_sdk().then((result) => {
     console.log("Response from Python =", result);

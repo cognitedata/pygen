@@ -1,1 +1,1 @@
-::: cognite.pygen.legacy.config.PygenConfig
+::: cognite.pygen._legacy.config.PygenConfig

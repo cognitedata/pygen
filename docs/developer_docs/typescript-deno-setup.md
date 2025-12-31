@@ -112,7 +112,7 @@ The `deno.json` file configures Deno's behavior:
     "lib": ["ES2022", "DOM"]
   },
   "imports": {
-    "@cognite/pygen-typescript": "./cognite/pygen/_generation/_typescript/instance_api/index.ts"
+    "@cognite/pygen-typescript": "./cognite/pygen/_typescript/instance_api/index.ts"
   },
   "fmt": {
     "useTabs": false,

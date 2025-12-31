@@ -1,1 +1,1 @@
-::: cognite.pygen.legacy.utils.mock_generator
+::: cognite.pygen._legacy.utils.mock_generator
