@@ -5,9 +5,9 @@ from collections.abc import Callable
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.legacy._core.models.data_classes import EdgeDataClass, NodeDataClass
-from cognite.pygen.legacy._core.models.fields import Field
-from cognite.pygen.legacy.config import PygenConfig
+from cognite.pygen._legacy._core.models.data_classes import EdgeDataClass, NodeDataClass
+from cognite.pygen._legacy._core.models.fields import Field
+from cognite.pygen._legacy.config import PygenConfig
 from tests.test_python.legacy.utils import to_data_class_by_view_id
 
 

@@ -9,8 +9,8 @@ from typing import (
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.query import NodeOrEdgeResultSetExpression
 
-from cognite.pygen.legacy._query.executor import QueryExecutor
-from cognite.pygen.legacy._query.step import QueryBuildStep
+from cognite.pygen._legacy._query.executor import QueryExecutor
+from cognite.pygen._legacy._query.step import QueryBuildStep
 
 if sys.version_info >= (3, 11):
     from typing import Self

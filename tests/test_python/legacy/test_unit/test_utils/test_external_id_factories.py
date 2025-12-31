@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import pytest
 from wind_turbine.data_classes import DomainModelWrite, RotorWrite, WindTurbineWrite
 
-from cognite.pygen.legacy.utils.external_id_factories import (
+from cognite.pygen._legacy.utils.external_id_factories import (
     ExternalIdFactory,
     domain_name,
     incremental_id,

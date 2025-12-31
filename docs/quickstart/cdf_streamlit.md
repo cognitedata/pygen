@@ -30,21 +30,24 @@ The following is a minimal example of a Streamlit app that uses `pygen` to gener
 ```python
 import streamlit as st
 from cognite.client import CogniteClient
-from cognite.pygen.legacy import generate_sdk_notebook
+from cognite.pygen._legacy import generate_sdk_notebook
+
 st.title("An example app in CDF with Pygen")
 
 client = CogniteClient()
 
+
 @st.cache_data
 def get_client():
-  return generate_sdk_notebook(
-    ("IntegrationTestsImmutable", "ScenarioInstance", "1"), client
-  )
+    return generate_sdk_notebook(
+        ("IntegrationTestsImmutable", "ScenarioInstance", "1"), client
+    )
+
 
 @st.cache_data
 def get_scenario_instances():
-  client = get_client()
-  return client.scenario_instance.list().to_pandas()
+    client = get_client()
+    return client.scenario_instance.list().to_pandas()
 
 
 st.dataframe(get_scenario_instances())
@@ -56,7 +59,7 @@ The first thing we do is to import the `CogniteClient` and `generate_sdk_noteboo
 
 ```python
 from cognite.client import CogniteClient
-from cognite.pygen.legacy import generate_sdk_notebook
+from cognite.pygen._legacy import generate_sdk_notebook
 ```
 
 Then, we create a Streamlit app and a `CogniteClient` instance.

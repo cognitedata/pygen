@@ -2,7 +2,7 @@ import pytest
 from cognite.client import data_modeling as dm
 from omni import data_classes as omni_classes
 
-from cognite.pygen.legacy.utils.text import to_pascal, to_snake
+from cognite.pygen._legacy.utils.text import to_pascal, to_snake
 from tests.test_python.legacy.constants import CORE_SDK, OMNI_MULTI_SDK, OMNI_SDK, OMNI_SUB_SDK, WIND_TURBINE
 from tests.test_python.legacy.omni_constants import OmniClasses
 

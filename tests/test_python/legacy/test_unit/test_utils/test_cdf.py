@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.legacy.utils.cdf import _find_first_node_type, _reduce_model, _unpack_filter
+from cognite.pygen._legacy.utils.cdf import _find_first_node_type, _reduce_model, _unpack_filter
 from tests.test_python.legacy.constants import CORE_SDK
 
 

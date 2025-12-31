@@ -8,11 +8,11 @@ from typing import Literal, overload
 from cognite.client.data_classes import data_modeling as dm
 from cognite.client.data_classes.data_modeling.views import ViewProperty
 
-from cognite.pygen.legacy import config as pygen_config
-from cognite.pygen.legacy._constants import COGNITE_FILE, COGNITE_TIMESERIES
-from cognite.pygen.legacy.config.reserved_words import is_reserved_word
-from cognite.pygen.legacy.utils.cdf import _find_first_node_type
-from cognite.pygen.legacy.utils.text import create_name, to_pascal, to_words
+from cognite.pygen._legacy import config as pygen_config
+from cognite.pygen._legacy._constants import COGNITE_FILE, COGNITE_TIMESERIES
+from cognite.pygen._legacy.config.reserved_words import is_reserved_word
+from cognite.pygen._legacy.utils.cdf import _find_first_node_type
+from cognite.pygen._legacy.utils.text import create_name, to_pascal, to_words
 
 from .fields import (
     BaseConnectionField,

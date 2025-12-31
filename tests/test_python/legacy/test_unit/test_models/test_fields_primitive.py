@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 import pytest
 
-from cognite.pygen.legacy._core.models.fields import Field
+from cognite.pygen._legacy._core.models.fields import Field
 
 
 class TestConnections:

@@ -16,8 +16,8 @@ from cognite.client.data_classes.data_modeling.ids import DataModelId
 from cognite.client.exceptions import CogniteAPIError
 
 from cognite.pygen import generate_sdk_notebook
-from cognite.pygen.legacy.demo._constants import DEFAULT_DATA_SET, DEFAULT_SPACE
-from cognite.pygen.legacy.utils.cdf import CSVLoader
+from cognite.pygen._legacy.demo._constants import DEFAULT_DATA_SET, DEFAULT_SPACE
+from cognite.pygen._legacy.utils.cdf import CSVLoader
 
 _DATA_FOLDER = pathlib.Path(__file__).parent / "solar_apm_data"
 

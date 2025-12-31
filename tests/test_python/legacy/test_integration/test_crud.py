@@ -11,7 +11,7 @@ from omni import data_classes as odc
 from omni._api._core import SequenceNotStr
 from omni.data_classes import DomainModelWrite, ResourcesWriteResult
 
-from cognite.pygen.legacy.utils.mock_generator import MockGenerator, _connected_views
+from cognite.pygen._legacy.utils.mock_generator import MockGenerator, _connected_views
 from tests.test_python.legacy.constants import OMNI_SDK
 from tests.test_python.legacy.omni_constants import OmniClasses
 

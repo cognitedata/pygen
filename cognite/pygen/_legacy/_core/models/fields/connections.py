@@ -16,8 +16,8 @@ from cognite.client.data_classes.data_modeling.views import (
     SingleReverseDirectRelation,
 )
 
-from cognite.pygen.legacy._constants import is_readonly_property
-from cognite.pygen.legacy._warnings import (
+from cognite.pygen._legacy._constants import is_readonly_property
+from cognite.pygen._legacy._warnings import (
     MissingReverseDirectRelationTargetWarning,
     PygenWarning,
     UnknownConnectionTargetWarning,
@@ -27,7 +27,7 @@ from .base import Field
 from .primitive import ContainerProperty
 
 if TYPE_CHECKING:
-    from cognite.pygen.legacy._core.models.data_classes import EdgeDataClass, NodeDataClass
+    from cognite.pygen._legacy._core.models.data_classes import EdgeDataClass, NodeDataClass
 
 
 @total_ordering

@@ -1,7 +1,7 @@
 import difflib
 
-from cognite.pygen.legacy._core.generators import SDKGenerator
-from cognite.pygen.legacy._generator import CodeFormatter
+from cognite.pygen._legacy._core.generators import SDKGenerator
+from cognite.pygen._legacy._generator import CodeFormatter
 from tests.test_python.legacy.constants import OMNI_MULTI_SDK, OMNI_SUB_SDK, OmniMultiFiles, OmniSubFiles
 
 

@@ -1,13 +1,13 @@
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.legacy._core.generators import MultiAPIGenerator
-from cognite.pygen.legacy._core.models import EdgeDataClass, NodeDataClass
-from cognite.pygen.legacy._warnings import (
+from cognite.pygen._legacy._core.generators import MultiAPIGenerator
+from cognite.pygen._legacy._core.models import EdgeDataClass, NodeDataClass
+from cognite.pygen._legacy._warnings import (
     NameCollisionDataClassNameWarning,
     NameCollisionFileNameWarning,
 )
-from cognite.pygen.legacy.config import PygenConfig
+from cognite.pygen._legacy.config import PygenConfig
 from tests.test_python.legacy.omni_constants import OMNI_SPACE
 from tests.test_python.legacy.utils import to_data_class_by_view_id
 

@@ -8,8 +8,8 @@ from cognite.client.data_classes.data_modeling import InstanceSort
 from omni import OmniClient
 from omni import data_classes as dc
 
-from cognite.pygen.legacy._query.constants import SelectedProperties
-from cognite.pygen.legacy._query.interface import Page, QueryExecutor
+from cognite.pygen._legacy._query.constants import SelectedProperties
+from cognite.pygen._legacy._query.interface import Page, QueryExecutor
 
 
 def test_query_reverse_direct_relation(cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:

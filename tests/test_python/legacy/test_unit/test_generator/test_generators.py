@@ -1,6 +1,6 @@
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.legacy._core.generators import MultiAPIGenerator, to_unique_parents_by_view_id
+from cognite.pygen._legacy._core.generators import MultiAPIGenerator, to_unique_parents_by_view_id
 
 
 def test_to_parents_by_view_id_omni(omni_multi_api_generator: MultiAPIGenerator) -> None:

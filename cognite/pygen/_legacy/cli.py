@@ -7,7 +7,7 @@ from cognite.client.exceptions import CogniteAPIError
 
 from cognite import pygen
 from cognite.pygen import generate_sdk
-from cognite.pygen.legacy._settings import PygenSettings, load_settings
+from cognite.pygen._legacy._settings import PygenSettings, load_settings
 
 try:
     import typer

@@ -3,16 +3,16 @@ from __future__ import annotations
 import pytest
 from cognite.client import data_modeling as dm
 
-from cognite.pygen.legacy._core.generators import MultiAPIGenerator
-from cognite.pygen.legacy._core.models import (
+from cognite.pygen._legacy._core.generators import MultiAPIGenerator
+from cognite.pygen._legacy._core.models import (
     FilterImplementation,
     FilterMethod,
     FilterParameter,
 )
-from cognite.pygen.legacy._warnings import (
+from cognite.pygen._legacy._warnings import (
     NameCollisionParameterWarning,
 )
-from cognite.pygen.legacy.config import PygenConfig
+from cognite.pygen._legacy.config import PygenConfig
 from tests.test_python.legacy.omni_constants import OMNI_SPACE
 
 

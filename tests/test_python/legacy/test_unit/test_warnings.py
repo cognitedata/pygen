@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 from cognite.client.data_classes.data_modeling import ViewId
 
-from cognite.pygen.legacy._warnings import PydanticNamespaceCollisionWarning, print_warnings
+from cognite.pygen._legacy._warnings import PydanticNamespaceCollisionWarning, print_warnings
 
 
 class TestPygenWarnings:

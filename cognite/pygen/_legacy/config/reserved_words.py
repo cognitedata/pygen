@@ -7,7 +7,7 @@ from typing import Literal
 from cognite.client import data_modeling as dm
 from pydantic import BaseModel
 
-from cognite.pygen.legacy._warnings import NameCollisionWarning
+from cognite.pygen._legacy._warnings import NameCollisionWarning
 
 PYTHON_BUILTIN_NAMES = {name for name in vars(builtins) if not name.startswith("_")}
 FIELD_NAMES = (

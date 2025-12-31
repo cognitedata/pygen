@@ -4,7 +4,7 @@ import re
 
 import inflect
 
-from cognite.pygen.legacy.config import Case, Naming, Number
+from cognite.pygen._legacy.config import Case, Naming, Number
 
 
 def create_name(raw_name: str, naming: Naming, python_variable: bool = True) -> str:

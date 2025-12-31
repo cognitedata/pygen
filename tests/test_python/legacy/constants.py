@@ -7,9 +7,9 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling import DataModelId
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
-DATA_MODELS = REPO_ROOT / "tests" / "test_python" / "legacy" / "data" / "models"
-DATA_WRITE_DIR = REPO_ROOT / "tests" / "test_python" / "legacy" / "data" / "write"
-JSON_DIR = REPO_ROOT / "tests" / "test_python" / "legacy" / "data" / "json"
+DATA_MODELS = REPO_ROOT / "tests" / "test_python" / "_legacy" / "data" / "models"
+DATA_WRITE_DIR = REPO_ROOT / "tests" / "test_python" / "_legacy" / "data" / "write"
+JSON_DIR = REPO_ROOT / "tests" / "test_python" / "_legacy" / "data" / "json"
 EXAMPLES_DIR = REPO_ROOT / "examples"
 
 

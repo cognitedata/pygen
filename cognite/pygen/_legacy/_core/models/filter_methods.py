@@ -8,9 +8,9 @@ from dataclasses import dataclass
 
 from cognite.client.data_classes import data_modeling as dm
 
-from cognite.pygen.legacy import config as pygen_config
-from cognite.pygen.legacy.config.reserved_words import is_reserved_word
-from cognite.pygen.legacy.utils.helper import _get_literal_str
+from cognite.pygen._legacy import config as pygen_config
+from cognite.pygen._legacy.config.reserved_words import is_reserved_word
+from cognite.pygen._legacy.utils.helper import _get_literal_str
 
 from .fields import (
     BaseConnectionField,

@@ -19,15 +19,15 @@ from cognite.client.data_classes.data_modeling.ids import DataModelId
 from cognite.client.exceptions import CogniteAPIError
 from pydantic_core import SchemaError
 
+from cognite.pygen._legacy._constants import is_pyodide
+from cognite.pygen._legacy._core.generators import SDKGenerator
+from cognite.pygen._legacy._settings import _load_pyproject_toml
+from cognite.pygen._legacy._warnings import InvalidCodeGenerated, print_warnings
+from cognite.pygen._legacy.config import PygenConfig
+from cognite.pygen._legacy.exceptions import DataModelNotFound
+from cognite.pygen._legacy.utils.cdf import _reduce_model
+from cognite.pygen._legacy.utils.text import to_pascal, to_snake
 from cognite.pygen._version import __version__
-from cognite.pygen.legacy._constants import is_pyodide
-from cognite.pygen.legacy._core.generators import SDKGenerator
-from cognite.pygen.legacy._settings import _load_pyproject_toml
-from cognite.pygen.legacy._warnings import InvalidCodeGenerated, print_warnings
-from cognite.pygen.legacy.config import PygenConfig
-from cognite.pygen.legacy.exceptions import DataModelNotFound
-from cognite.pygen.legacy.utils.cdf import _reduce_model
-from cognite.pygen.legacy.utils.text import to_pascal, to_snake
 
 DataModel = DataModelIdentifier | dm.DataModel[dm.View]
 

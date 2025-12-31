@@ -23,8 +23,7 @@ from cognite.client.data_classes.data_modeling.data_types import Enum
 from jinja2 import Environment, PackageLoader, select_autoescape
 from pydantic.version import VERSION as PYDANTIC_VERSION
 
-from cognite.pygen._version import __version__
-from cognite.pygen.legacy._core.models import (
+from cognite.pygen._legacy._core.models import (
     CDFExternalField,
     DataClass,
     EdgeDataClass,
@@ -32,16 +31,17 @@ from cognite.pygen.legacy._core.models import (
     MultiAPIClass,
     NodeDataClass,
 )
-from cognite.pygen.legacy._core.models.api_classes import (
+from cognite.pygen._legacy._core.models.api_classes import (
     APIClass,
     EdgeAPIClass,
     NodeAPIClass,
     QueryAPIClass,
     TimeSeriesAPIClass,
 )
-from cognite.pygen.legacy._query.extract_code import get_file_content
-from cognite.pygen.legacy._warnings import PydanticNamespaceCollisionWarning
-from cognite.pygen.legacy.config import PygenConfig
+from cognite.pygen._legacy._query.extract_code import get_file_content
+from cognite.pygen._legacy._warnings import PydanticNamespaceCollisionWarning
+from cognite.pygen._legacy.config import PygenConfig
+from cognite.pygen._version import __version__
 
 from . import validation
 from .models import fields
@@ -224,7 +224,7 @@ class MultiAPIGenerator:
         config: PygenConfig = PygenConfig(),
     ):
         self.env = Environment(
-            loader=PackageLoader("cognite.pygen.legacy._core", "templates"),
+            loader=PackageLoader("cognite.pygen._legacy._core", "templates"),
             autoescape=select_autoescape(),
             trim_blocks=True,
             lstrip_blocks=True,
@@ -550,7 +550,7 @@ class MultiAPIGenerator:
         for file_name in ["builder", "constants", "processing", "step", "executor"]:
             file_content = get_file_content(f"{file_name}.py")
             output[f"{file_name}.py"] = file_content.replace(
-                "cognite.pygen.legacy._query", f"{self.top_level_package}.data_classes._core.query"
+                "cognite.pygen._legacy._query", f"{self.top_level_package}.data_classes._core.query"
             )
         return output
 
@@ -770,7 +770,7 @@ class APIGenerator:
         base_name: str | None = None,
     ):
         self._env = Environment(
-            loader=PackageLoader("cognite.pygen.legacy._core", "templates"),
+            loader=PackageLoader("cognite.pygen._legacy._core", "templates"),
             autoescape=select_autoescape(),
             trim_blocks=True,
             lstrip_blocks=True,
