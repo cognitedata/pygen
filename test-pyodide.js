@@ -41,7 +41,9 @@ server.listen(PORT, () => {
 
     const packages = JSON.parse(process.env.PACKAGES);
     for (const pkg of packages) {
+      console.log(`Trying to install ${pkg}`);
       await micropip.install(pkg);
+      console.log(`Installed ${pkg} successfully`);
     }
     await pyodide.runPythonAsync("from cognite.pygen import generate_sdk");
 
