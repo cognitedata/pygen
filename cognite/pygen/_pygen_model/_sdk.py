@@ -8,5 +8,10 @@ class DataClassFile(CodeModel):
     write: DataClass | None = None
 
 
+class APIClassFile(CodeModel):
+    filename: str
+
+
 class PygenSDKModel(CodeModel):
     data_classes: list[DataClassFile]
+    api_classes: list[APIClassFile]

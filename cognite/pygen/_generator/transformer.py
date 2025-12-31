@@ -1,12 +1,12 @@
 """Transforms a data model into the PygenModel used for code generation."""
 
-from cognite.pygen._client.models import DataModelResponse
+from cognite.pygen._client.models import DataModelResponseWithViews
 from cognite.pygen._pygen_model import PygenSDKModel
 
 from .config import PygenSDKConfig
 
 
-def to_pygen_model(data_model: DataModelResponse, sdk_config: PygenSDKConfig) -> PygenSDKModel:
+def to_pygen_model(data_model: DataModelResponseWithViews, sdk_config: PygenSDKConfig | None = None) -> PygenSDKModel:
     """Transforms a DataModelResponse into a PygenSDKModel for code generation.
 
     Args:
