@@ -1,4 +1,4 @@
-from cognite.pygen._code_model import DataClass, ReadDataClass
+from cognite.pygen._pygen_model import DataClass, ReadDataClass
 
 from .generator import Generator
 
@@ -13,7 +13,6 @@ class PythonGenerator(Generator):
     )
     instance_type: Literal["{write.instance_type}"] = Field("{write.instance_type}", alias="instanceType")
     {self.create_fields(write)}
-
 '''
 
     def create_class(self, read: ReadDataClass) -> str:
