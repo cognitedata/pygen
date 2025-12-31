@@ -6,6 +6,7 @@ from pydantic_core.core_schema import FieldSerializationInfo
 
 from ._references import DataModelReference, ViewReference
 from ._resource import APIResource, ResponseResource
+from ._view import ViewResponse
 
 
 class DataModel(APIResource[DataModelReference], ABC):
@@ -20,7 +21,6 @@ class DataModel(APIResource[DataModelReference], ABC):
     external_id: str
     version: str
     description: str | None = None
-    views: list[ViewReference] | None = None
 
     def as_reference(self) -> DataModelReference:
         return DataModelReference(
@@ -28,6 +28,10 @@ class DataModel(APIResource[DataModelReference], ABC):
             external_id=self.external_id,
             version=self.version,
         )
+
+
+class DataModelRequest(DataModel):
+    views: list[ViewReference] | None = None
 
     @field_serializer("views", mode="plain")
     @classmethod
@@ -39,10 +43,27 @@ class DataModel(APIResource[DataModelReference], ABC):
         return [{**view.model_dump(**vars(info)), "type": "view"} for view in views]
 
 
-class DataModelRequest(DataModel): ...
-
-
 class DataModelResponse(DataModel, ResponseResource[DataModelReference, DataModelRequest]):
+    views: list[ViewReference] | None = None
+    created_time: int
+    last_updated_time: int
+    is_global: bool
+
+    def as_request(self) -> DataModelRequest:
+        return DataModelRequest.model_validate(self.model_dump(by_alias=True))
+
+    @field_serializer("views", mode="plain")
+    @classmethod
+    def serialize_views(
+        cls, views: list[ViewReference] | None, info: FieldSerializationInfo
+    ) -> list[dict[str, Any]] | None:
+        if views is None:
+            return None
+        return [{**view.model_dump(**vars(info)), "type": "view"} for view in views]
+
+
+class DataModelResponseWithViews(DataModel, ResponseResource[DataModelReference, DataModelRequest]):
+    views: list[ViewResponse] | None = None
     created_time: int
     last_updated_time: int
     is_global: bool
