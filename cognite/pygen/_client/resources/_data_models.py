@@ -4,9 +4,16 @@ This module provides the DataModelsAPI class for managing CDF data models.
 """
 
 from collections.abc import Sequence
+from typing import Literal, overload
 
-from cognite.pygen._client.models import DataModelReference, DataModelRequest, DataModelResponse
-from cognite.pygen._python.instance_api.http_client import HTTPClient, SuccessResponse
+from cognite.pygen._client.models import (
+    DataModelReference,
+    DataModelRequest,
+    DataModelResponse,
+    DataModelResponseWithViews,
+)
+from cognite.pygen._python.instance_api.http_client import HTTPClient, RequestMessage, SuccessResponse
+from cognite.pygen._utils.collection import chunker_sequence
 
 from ._base import BaseResourceAPI, Page, ReferenceResponseItems, ResourceLimits
 
@@ -46,11 +53,25 @@ class DataModelsAPI(BaseResourceAPI[DataModelReference, DataModelRequest, DataMo
         """
         return self._create(items)
 
+    @overload
+    def retrieve(
+        self,
+        references: Sequence[DataModelReference],
+        inline_views: Literal[False] = False,
+    ) -> list[DataModelResponse]: ...
+
+    @overload
+    def retrieve(
+        self,
+        references: Sequence[DataModelReference],
+        inline_views: Literal[True],
+    ) -> list[DataModelResponseWithViews]: ...
+
     def retrieve(
         self,
         references: Sequence[DataModelReference],
         inline_views: bool = False,
-    ) -> list[DataModelResponse]:
+    ) -> list[DataModelResponse] | list[DataModelResponseWithViews]:
         """Retrieve specific data models by their references.
 
         Args:
@@ -60,7 +81,28 @@ class DataModelsAPI(BaseResourceAPI[DataModelReference, DataModelRequest, DataMo
         Returns:
             A list of data model objects. Data models that don't exist are not included.
         """
-        return self._retrieve(references, params={"inlineViews": inline_views})
+        if inline_views is False:
+            return self._retrieve(references)
+        else:
+            return self._retrieve_with_views(references)
+
+    def _retrieve_with_views(self, references: Sequence[DataModelReference]) -> list[DataModelResponseWithViews]:
+        if not references:
+            return []
+        all_items: list[DataModelResponseWithViews] = []
+        for chunk in chunker_sequence(references, self._limits.retrieve):
+            request = RequestMessage(
+                endpoint_url=f"{self._make_url()}/byids",
+                method="POST",
+                body_content={"items": self._serialize_reference(chunk)},  # type: ignore[dict-item]
+                parameters={"inlineViews": True},
+            )
+            result = self._http_client.request_with_retries(request)
+            response = result.get_success_or_raise()
+            items = Page[DataModelResponseWithViews].model_validate_json(response.body).items
+            all_items.extend(items)
+
+        return all_items
 
     def delete(self, references: Sequence[DataModelReference]) -> list[DataModelReference]:
         """Delete data models by their references.
