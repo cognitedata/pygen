@@ -365,7 +365,7 @@ Phase 5 implements the generators that produce SDK code from PygenModel. The gen
 
 **Key Tasks**:
 - Complete Generator base class
-- PythonGenerator with Jinja2 templates
+- PythonGenerator with f-string based templates
 - TypeScriptGenerator with templates
 - Implement `generate_sdk()` function
 - Generated code extends generic Instance API classes

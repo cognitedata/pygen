@@ -5,7 +5,41 @@
 
 ---
 
-## Latest Update: Phases 4-10 Replanning (December 31, 2025)
+## Latest Update: Jinja2 Replaced with F-Strings (December 31, 2025)
+
+### Templating Decision Change
+
+**OLD**: Jinja2 template-based code generation  
+**NEW**: Python f-string based code generation
+
+### Rationale
+
+1. **Simplicity**: Native Python syntax, no extra templating language to learn
+2. **Fewer Dependencies**: Removes Jinja2 as a dependency
+3. **Better IDE Support**: Full syntax highlighting, type checking, refactoring
+4. **Easier Debugging**: Standard Python debugging, stack traces
+5. **Maintainability**: Templates are just Python functions, easier to refactor
+
+### Files Updated
+
+- `plan/architecture.md` - Updated template references and ADR-008
+- `plan/technical-specifications.md` - Updated template structure and generator code
+- `plan/implementation-roadmap.md` - Updated Phase 4 template references
+- `plan/decisions-and-tradeoffs.md` - Updated ADR-005 from Jinja2 to f-strings
+- `plan/project-overview.md` - Updated technology stack
+- `plan/quick-reference.md` - Updated technology stack and template example
+- `plan/UPDATES.md` - This update
+
+### Impact on Implementation
+
+- Generator classes will use Python functions with f-strings instead of Jinja2 templates
+- Template files will be `.py` (Python modules) instead of `.jinja` files
+- Template logic uses Python constructs (loops, conditionals) directly
+- No changes to PygenModel or other architectural components
+
+---
+
+## Previous Update: Phases 4-10 Replanning (December 31, 2025)
 
 ### Architecture Changes
 
@@ -643,7 +677,7 @@ V1 and V2 development in parallel:
 
 ✅ Python 3.10+ minimum version  
 ✅ Pydantic v2 for data models  
-✅ Jinja2 for templates  
+✅ Python f-strings for templates (replaced Jinja2)  
 ✅ >90% test coverage goal  
 ✅ Multi-language support via IR  
 ✅ httpx as HTTP client (now wrapped)  

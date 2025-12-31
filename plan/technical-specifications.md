@@ -1082,27 +1082,25 @@ class PythonGenerator(BaseGenerator):
     def format_code(self, code: str) -> str:
         """Format using ruff"""
     
-    def _setup_template_env(self) -> jinja2.Environment:
-        """Setup Jinja2 environment"""
+    def _render_template(self, template_name: str, **kwargs) -> str:
+        """Render template using f-strings"""
 ```
 
 ### 6.3 Template Structure
 
-**Note**: Templates generate code that extends generic InstanceAPI/InstanceClient classes.
+**Note**: Templates use Python f-strings and generate code that extends generic InstanceAPI/InstanceClient classes.
 
 ```
 templates/python/
-├── __init__.py.jinja
-├── data_class.py.jinja
-├── api_class.py.jinja
-├── filter_class.py.jinja
-├── query_class.py.jinja
-├── macros/
-│   ├── docstring.jinja
-│   ├── type_hints.jinja
-│   └── imports.jinja
-└── custom/
-    └── # User can override with custom templates
+├── __init__.py           # Package init template
+├── data_class.py         # Data class template
+├── api_class.py          # API class template
+├── filter_class.py       # Filter class template
+├── query_class.py        # Query class template
+└── helpers/              # Shared helper functions
+    ├── docstring.py      # Docstring generation
+    ├── type_hints.py     # Type hint generation
+    └── imports.py        # Import generation
 ```
 
 ---

@@ -530,7 +530,7 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 **Approach**: This phase combines model definition with code generation in an iterative manner. The PygenModel and generators are tightly coupled - the model exists to serve generation, and generation requirements inform the model design. Building them together allows for:
 - Faster feedback loops between model design and generation output
-- Discovery of missing model attributes when implementing templates
+- Discovery of missing model attributes when implementing f-string templates
 - Validation that the model structure actually works for code generation
 - Reduced rework compared to finishing the model before starting generation
 
@@ -553,17 +553,17 @@ cognite/pygen/
 │   ├── transformer.py     # CDF ViewResponse → PygenModel
 │   ├── python.py          # PythonGenerator
 │   ├── typescript.py      # TypeScriptGenerator
-│   └── templates/         # Jinja2 templates
+│   └── templates/         # f-string based templates
 │       ├── python/
-│       │   ├── data_class.py.jinja
-│       │   ├── api_class.py.jinja
-│       │   ├── client.py.jinja
-│       │   └── __init__.py.jinja
+│       │   ├── data_class.py
+│       │   ├── api_class.py
+│       │   ├── client.py
+│       │   └── __init__.py
 │       └── typescript/
-│           ├── data_class.ts.jinja
-│           ├── api_class.ts.jinja
-│           ├── client.ts.jinja
-│           └── index.ts.jinja
+│           ├── data_class.ts
+│           ├── api_class.ts
+│           ├── client.ts
+│           └── index.ts
 ```
 
 ### Iteration Strategy
@@ -579,12 +579,12 @@ The work is organized into vertical slices, each delivering end-to-end functiona
 2. **Iteration 2: Complete Python Generation**
    - Extend PygenModel for all field types and connections
    - Full transformer with validation
-   - Complete Python templates
+   - Complete Python f-string templates
    - Generated code matches Phase 2 example patterns
 
 3. **Iteration 3: TypeScript Generation**
    - Reuse PygenModel (language-agnostic where possible)
-   - TypeScript generator and templates
+   - TypeScript generator and f-string templates
    - Generated code matches Phase 3 example patterns
 
 4. **Iteration 4: Polish & Integration**
@@ -667,11 +667,11 @@ The work is organized into vertical slices, each delivering end-to-end functiona
 
 7. **Generator Infrastructure**
    - Complete `Generator` base class in `generator.py`
-   - Template system setup using Jinja2
+   - Template system using Python f-strings (no Jinja2)
    - File writing utilities returning `dict[Path, str]`
    - Code formatting integration:
      - ruff for Python
-     - prettier/deno fmt for TypeScript
+     - deno fmt for TypeScript
 
 8. **Python Generator**
    - Implement `PythonGenerator` in `python.py`

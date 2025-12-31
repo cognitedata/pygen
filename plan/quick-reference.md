@@ -71,7 +71,7 @@
 | Pydantic v2 | 5-17x faster, excellent validation |
 | PygenModel | Internal representation for multi-language generation |
 | Lazy by default | Solves scalability issues |
-| Template-based (Jinja2) | Readable, maintainable, customizable |
+| F-string templates | Simple, native Python, no extra dependencies |
 | Python 3.10+ | Modern features, type hints |
 | Typer for CLI | Modern, type-safe CLI |
 | >90% coverage | Professional-grade quality |
@@ -84,7 +84,7 @@
 - Python 3.10+
 - httpx (HTTP client)
 - Pydantic v2 (data models)
-- Jinja2 (templates)
+- Python f-strings (templates, no Jinja2)
 - FastAPI (API service)
 - typer (CLI)
 
@@ -142,7 +142,7 @@ cognite/pygen/
 │   ├── transformer.py  # CDF → PygenModel
 │   ├── python.py       # PythonGenerator
 │   ├── typescript.py   # TypeScriptGenerator
-│   └── templates/      # Jinja2 templates
+│   └── templates/      # f-string based templates
 ├── _legacy/            # V1 code (delete after v2.0.0)
 ├── _pygen_model/       # Internal model (Phase 4) ⏳
 │   ├── _model.py       # CodeModel base
@@ -340,12 +340,16 @@ CDF Data Model → PygenModel → Python SDK
                       └─→ Future: C#, PySpark SDKs
 ```
 
-### Template-Based Generation
+### F-String-Based Generation
 ```python
-# template.py.jinja
-class {{ class_name }}:
-    def __init__(self, {% for prop in properties %}{{ prop.name }}: {{ prop.type }}{% endfor %}):
+# template function
+def generate_class(class_name: str, properties: list[Property]) -> str:
+    props = ", ".join(f"{p.name}: {p.type}" for p in properties)
+    return f'''
+class {class_name}:
+    def __init__(self, {props}):
         ...
+'''
 
 # Generated code
 class MyModel:

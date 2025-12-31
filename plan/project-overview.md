@@ -164,8 +164,8 @@ Migration guide, complete documentation, release, delete legacy/
 **Why**: Catches issues early, enables graceful degradation
 **Impact**: Better error messages, partial generation possible
 
-### 7. Template-based generation
-**Why**: Readable, maintainable, customizable
+### 7. F-string-based generation
+**Why**: Simple, native Python, no extra dependencies, debuggable
 **Impact**: Easy to add new languages and modify output
 
 ### 8. API Service for on-demand generation
@@ -236,7 +236,7 @@ See [implementation-roadmap.md](./implementation-roadmap.md) for detailed risk m
 - **Python**: 3.10+ (modern type hints, pattern matching)
 - **httpx**: HTTP client (async/sync, HTTP/2)
 - **Pydantic v2**: Data validation and serialization
-- **Jinja2**: Template engine for code generation
+- **Python f-strings**: Template engine for code generation (no Jinja2)
 - **FastAPI**: API service framework (for Goal 5)
 - **typer**: CLI framework
 

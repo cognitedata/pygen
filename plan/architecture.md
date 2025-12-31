@@ -54,7 +54,7 @@ This document outlines the proposed architecture for the Pygen rewrite. The arch
 │  │  - Transformer: CDF ViewResponse → PygenModel       │   │
 │  │  - PythonGenerator: PygenModel → Python code        │   │
 │  │  - TypeScriptGenerator: PygenModel → TS code        │   │
-│  │  - Template-based (Jinja2) with formatting          │   │
+│  │  - Template-based (f-strings) with formatting       │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                                                               │
 └─────────────────────────────────────────────────────────────┘
@@ -312,8 +312,8 @@ Formatted SDK files
 
 **Key Features**:
 - Generates code that extends generic InstanceAPI/InstanceClient
-- Template-based generation using Jinja2
-- Post-processing (ruff for Python, prettier/deno fmt for TypeScript)
+- Template-based generation using Python f-strings
+- Post-processing with formatters (ruff for Python, deno fmt for TypeScript)
 - Generates data classes extending Instance/InstanceWrite
 - Generates API classes extending InstanceAPI
 - Generates client classes extending InstanceClient
@@ -329,16 +329,16 @@ cognite/pygen/_generator/
 ├── python.py            # PythonGenerator
 ├── typescript.py        # TypeScriptGenerator
 └── templates/
-    ├── python/
-    │   ├── data_class.py.jinja     # Extends Instance/InstanceWrite
-    │   ├── api_class.py.jinja      # Extends InstanceAPI
-    │   ├── client.py.jinja         # Extends InstanceClient
-    │   └── __init__.py.jinja
-    └── typescript/
-        ├── data_class.ts.jinja
-        ├── api_class.ts.jinja
-        ├── client.ts.jinja
-        └── index.ts.jinja
+    ├── python/                     # Python f-string templates
+    │   ├── data_class.py           # Extends Instance/InstanceWrite
+    │   ├── api_class.py            # Extends InstanceAPI
+    │   ├── client.py               # Extends InstanceClient
+    │   └── __init__.py
+    └── typescript/                 # TypeScript f-string templates
+        ├── data_class.ts
+        ├── api_class.ts
+        ├── client.ts
+        └── index.ts
 ```
 
 **Generator Pattern**:
@@ -525,12 +525,12 @@ Phase 3: Build Generic TypeScript API
 - Better error messages for users
 - Enables partial generation for incomplete models
 
-### 8. Why template-based generation?
-- Easy to customize
-- Language-specific conventions
-- Maintainable
-- Community can contribute templates
-- Clear separation of logic and output
+### 8. Why f-string-based generation (instead of Jinja2)?
+- Simpler implementation with fewer dependencies
+- More readable and debuggable code
+- Native Python syntax without learning another templating language
+- Easier to maintain and modify
+- Better IDE support (syntax highlighting, type checking)
 - Can generate code that extends generic classes
 
 ## Performance Considerations
@@ -559,7 +559,7 @@ Phase 3: Build Generic TypeScript API
 ### Adding a New Language
 1. Create language-specific generator in `pygen/generation/{language}/`
 2. Implement `BaseGenerator` interface
-3. Create Jinja2 templates
+3. Create f-string based template functions
 4. Add formatter integration
 5. Add tests
 
@@ -577,10 +577,10 @@ Phase 3: Build Generic TypeScript API
 3. Update filtering logic
 4. Add tests for edge cases
 
-### Custom Templates
-1. Users can provide custom template directory
-2. Templates override defaults
-3. Full access to IR objects in templates
+### Custom Generation Logic
+1. Users can extend generator classes
+2. Override template functions for custom output
+3. Full access to PygenModel objects in generators
 
 ### API Service Endpoints (Goal 5)
 1. `/generate` - Generate SDK from specification
@@ -646,7 +646,7 @@ cognite/pygen/
 │   ├── transformer.py                 # CDF → PygenModel
 │   ├── python.py                      # PythonGenerator
 │   ├── typescript.py                  # TypeScriptGenerator
-│   └── templates/                     # Jinja2 templates (SHIPPED)
+│   └── templates/                     # f-string templates (SHIPPED)
 │       ├── python/
 │       └── typescript/
 ├── _legacy/                           # v1 code (delete after v2.0.0)
@@ -733,7 +733,8 @@ include = ["cognite.pygen*"]
     "example/**/*",
 ]
 "cognite.pygen._generator" = [
-    "templates/**/*.jinja",
+    "templates/**/*.py",
+    "templates/**/*.ts",
 ]
 
 [tool.setuptools.exclude-package-data]
