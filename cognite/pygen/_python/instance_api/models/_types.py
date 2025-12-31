@@ -7,7 +7,7 @@ from cognite.pygen._python.instance_api._utils import datetime_to_ms, ms_to_date
 
 DateTimeMS = Annotated[
     datetime,
-    BeforeValidator(ms_to_datetime, json_schema_input_type=int),
+    BeforeValidator(ms_to_datetime),
     PlainSerializer(datetime_to_ms, return_type=int, when_used="always"),
 ]
 DateTime = Annotated[
