@@ -15,7 +15,7 @@ def to_pygen_model(
     Args:
         data_model (DataModelResponse): The data model to transform.
         output_format (OutputFormat): The desired output format for the generated code.
-        sdk_config (PygenSDKConfig): The SDK configuration.
+        config (PygenSDKConfig): The SDK configuration.
 
     Returns:
         PygenSDKModel: The transformed PygenSDKModel.
@@ -25,12 +25,15 @@ def to_pygen_model(
     config = config or PygenSDKConfig()
     naming = _create_naming(config.naming, output_format)
 
-    view_data_class_pairs = _create_data_classes(data_model.views, naming, config)
-    api_classes = _create_api_classes(view_data_class_pairs, naming, config)
-    return PygenSDKModel(
-        data_classes=[dc for _, dc in view_data_class_pairs],
-        api_classes=api_classes,
-    )
+    model = PygenSDKModel(data_classes=[], api_classes=[])
+    for view in data_model.views:
+        if view.external_id in config.exclude_views:
+            continue
+        data_class = _create_data_class(view, naming, config)
+        api_class = _create_api_class(data_class, view, naming, config)
+        model.data_classes.append(data_class)
+        model.api_classes.append(api_class)
+    return model
 
 
 def _create_naming(config: NamingConfig, output_format: OutputFormat) -> NamingConfig:
@@ -42,18 +45,29 @@ def _create_naming(config: NamingConfig, output_format: OutputFormat) -> NamingC
     Returns:
         Naming strategy object.
     """
-    raise NotImplementedError()
+    language = _get_naming_config(output_format)
+    return NamingConfig(
+        class_name=language.class_name if config.class_name == "language_default" else config.class_name,
+        field_name=language.field_name if config.field_name == "language_default" else config.field_name,
+    )
 
 
-def _create_data_classes(
-    views: list[ViewResponse], naming: NamingConfig, config: PygenSDKConfig
-) -> list[tuple[ViewResponse, DataClassFile]]:
-    raise NotImplementedError()
+def _get_naming_config(output_format: OutputFormat) -> NamingConfig:
+    if output_format == "python":
+        return NamingConfig(class_name="PascalCase", field_name="snake_case")
+    elif output_format == "typescript":
+        return NamingConfig(class_name="PascalCase", field_name="camelCase")
+    raise NotImplementedError(f"Naming config for output format {output_format} is not implemented.")
 
 
-def _create_api_classes(
-    data_classes: list[tuple[ViewResponse, DataClassFile]],
+def _create_data_class(view: ViewResponse, naming: NamingConfig, config: PygenSDKConfig) -> DataClassFile:
+    raise NotImplementedError
+
+
+def _create_api_class(
+    data_class: DataClassFile,
+    view: ViewResponse,
     naming: NamingConfig,
     config: PygenSDKConfig,
-) -> list[APIClassFile]:
+) -> APIClassFile:
     raise NotImplementedError()
