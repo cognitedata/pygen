@@ -753,20 +753,20 @@ class InstanceAPI<TWrite extends InstanceWrite, TRead extends Instance, TList> {
 
 ### 4.1 Validator
 
-**Purpose**: Validate CDF data models before IR creation, handle incomplete models gracefully.
+**Purpose**: Validate CDF data models before PygenModel creation, handle incomplete models gracefully.
 
 **Interface**:
 
 ```python
 class DataModelValidator:
     """
-    Validates CDF data models before IR creation.
+    Validates CDF data models before PygenModel creation.
     
     Detects issues like:
     - Missing reverse relations
     - Invalid type references
     - Circular dependencies
-    - Naming conflicts
+    - Naming conflicts with reserved words
     """
     
     def validate(
@@ -846,256 +846,189 @@ Common validation rules include:
 
 ---
 
-## 5. Intermediate Representation (IR) (Phase 4)
+## 5. PygenModel - Internal Model for Code Generation (Phase 4)
 
-**Note**: IR is designed after Phases 2-3 to generate code matching proven patterns.
+**Note**: PygenModel is designed after Phases 2-3 to generate code matching proven patterns.
 
-### 5.1 Type System
+**Location**: `cognite/pygen/_pygen_model/`
+
+### 5.1 Base Classes
 
 ```python
-class IRPrimitiveType(str, Enum):
-    """Primitive types in IR"""
-    STRING = "string"
-    INT = "int"
-    FLOAT = "float"
-    BOOLEAN = "boolean"
-    DATETIME = "datetime"
-    DATE = "date"
-    JSON = "json"
-    BYTES = "bytes"
+from pydantic import BaseModel, ConfigDict
 
-
-@dataclass(frozen=True)
-class IRType:
-    """Base class for all IR types"""
-    nullable: bool = False
-
-
-@dataclass(frozen=True)
-class IRPrimitive(IRType):
-    """Primitive type"""
-    type: IRPrimitiveType
-
-
-@dataclass(frozen=True)
-class IRList(IRType):
-    """List type"""
-    element_type: IRType
-
-
-@dataclass(frozen=True)
-class IRReference(IRType):
-    """Reference to another class"""
-    target: str  # Fully qualified class name
-
-
-@dataclass(frozen=True)
-class IREnum(IRType):
-    """Enum type"""
-    name: str
-    values: list[str]
+class CodeModel(BaseModel):
+    """Base class for code models used in code generation."""
+    model_config = ConfigDict()
 ```
 
-### 5.2 IR Models
+### 5.2 Field Representation
 
 ```python
-@dataclass
-class IRProperty:
-    """Represents a property in IR"""
+class Field(CodeModel):
+    """Represents a property in a data class"""
     
-    name: str
-    type: IRType
-    description: str | None = None
-    required: bool = True
-    default: Any | None = None
-    
-    # Metadata
-    original_name: str | None = None  # Original name from API
-    read_only: bool = False
-    write_only: bool = False
+    cdf_prop_id: str                 # Original CDF property identifier
+    name: str                        # Language-appropriate property name
+    type_hint: str                   # Language-specific type hint string
+    filter_name: str | None = None   # Filter field name (if applicable)
+    description: str | None = None   # Property description from CDF
+```
 
+### 5.3 Connection Representation
 
-@dataclass
-class IRRelationship:
-    """Represents a relationship between classes"""
+```python
+class Connection(CodeModel):
+    """Represents a relationship/connection between classes"""
     
-    name: str
-    target: str  # Target class name
+    name: str                        # Connection field name
+    target_view: ViewReference       # Target view reference
     cardinality: Literal["one", "many"]
+    connection_type: Literal["direct_relation", "edge", "reverse_direct_relation"]
     description: str | None = None
-    reverse_name: str | None = None  # Name of reverse relationship
-    required: bool = False
-
-
-@dataclass
-class IRMethod:
-    """Represents a method to be generated"""
-    
-    name: str
-    parameters: list[IRProperty]
-    return_type: IRType | None
-    description: str | None = None
-    
-    # Method type
-    is_query: bool = False
-    is_mutation: bool = False
-    is_class_method: bool = False
-    is_static_method: bool = False
-
-
-@dataclass
-class IRClass:
-    """Represents a class/view in IR"""
-    
-    name: str
-    properties: list[IRProperty]
-    relationships: list[IRRelationship]
-    methods: list[IRMethod]
-    parent: str | None = None  # Parent class name
-    description: str | None = None
-    
-    # Metadata
-    space: str
-    external_id: str
-    version: str
-    is_abstract: bool = False
-
-
-@dataclass
-class IRModule:
-    """Represents a module (collection of classes)"""
-    
-    name: str
-    classes: list[IRClass]
-    enums: list[IREnum]
-    imports: list[str]
-    description: str | None = None
-
-
-@dataclass
-class IRModel:
-    """Top-level IR model"""
-    
-    name: str
-    modules: list[IRModule]
-    metadata: dict[str, Any] = field(default_factory=dict)
 ```
 
-### 5.3 Parser (CDF → IR)
+### 5.4 DataClass Models
 
 ```python
-class IRParser:
-    """Parse validated CDF models to language-agnostic IR"""
+class DataClass(CodeModel):
+    """Represents a view as a data class"""
     
-    def parse_data_model(self, data_model: DataModel, validation_result: ValidationResult) -> IRModel:
+    view_id: ViewReference           # Source view reference
+    name: str                        # Generated class name
+    fields: list[Field]              # Property fields
+    connections: list[Connection]    # Relationship connections
+    instance_type: Literal["node", "edge"]
+    display_name: str                # Human-readable name
+    description: str                 # Class description
+
+
+class ReadDataClass(DataClass):
+    """Read-side data class with reference to write class"""
+    
+    write_class_name: str | None = None
+
+
+class WriteDataClass(DataClass):
+    """Write-side data class (if needed for different logic)"""
+    pass
+```
+
+### 5.5 PygenModel (Top-Level)
+
+```python
+class PygenModel(CodeModel):
+    """Complete data model representation for code generation"""
+    
+    space: str                       # Data model space
+    external_id: str                 # Data model external ID
+    version: str                     # Data model version
+    data_classes: list[DataClass]    # One per view in the data model
+    client_name: str                 # Name for generated client class
+    default_instance_space: str      # Default space for instances
+```
+
+### 5.6 Transformer (CDF → PygenModel)
+
+**Location**: `cognite/pygen/_generator/transformer.py`
+
+```python
+class Transformer:
+    """Transform validated CDF models to PygenModel"""
+    
+    def transform(
+        self,
+        data_model: DataModelResponse,
+        views: list[ViewResponse],
+        config: PygenSDKConfig,
+    ) -> PygenModel:
         """
-        Parse a DataModel to IR.
+        Transform a CDF DataModel with Views to PygenModel.
         
         Args:
-            data_model: DataModel from API
+            data_model: DataModel from CDF API
+            views: List of ViewResponses from CDF API
+            config: Generation configuration
             
         Returns:
-            IRModel representation
-            
-        Raises:
-            ParseError: If model cannot be parsed
+            PygenModel ready for code generation
         """
     
-    def parse_view(self, view: View) -> IRClass:
-        """Parse a View to IRClass"""
+    def _transform_view(self, view: ViewResponse, config: PygenSDKConfig) -> DataClass:
+        """Transform a View to DataClass"""
     
-    def parse_property(
+    def _transform_property(
         self,
-        name: str,
+        prop_id: str,
         prop: PropertyDefinition,
-    ) -> IRProperty:
-        """Parse a property definition"""
+        config: PygenSDKConfig,
+    ) -> Field:
+        """Transform a property to Field"""
     
-    def _map_type(self, cdf_type: PropertyType | ViewReference) -> IRType:
-        """Map CDF type to IR type"""
-```
-
-### 5.4 Transformer (IR → Language-Specific IR)
-
-```python
-class IRTransformer:
-    """Transform IR to language-specific IR (Python or TypeScript)"""
-    
-    def flatten_inheritance(self, model: IRModel) -> IRModel:
-        """Flatten inheritance hierarchies"""
-    
-    def resolve_relationships(self, model: IRModel) -> IRModel:
-        """Resolve all relationship references"""
-    
-    def apply_naming_conventions(self, model: IRModel, conventions: dict) -> IRModel:
-        """Apply language-specific naming conventions"""
+    def _apply_naming_conventions(self, name: str, convention: NamingConvention) -> str:
+        """Apply naming convention (snake_case, camelCase, PascalCase)"""
 ```
 
 ---
 
 ## 6. Code Generation (Phase 5)
 
-**Purpose**: Generate code from IR that extends the generic InstanceAPI/InstanceClient classes.
+**Purpose**: Generate code from PygenModel that extends the generic InstanceAPI/InstanceClient classes.
+
+**Location**: `cognite/pygen/_generator/`
 
 ### 6.1 Generator Interface
 
 ```python
-class BaseGenerator(ABC):
+from abc import ABC
+from pathlib import Path
+from typing import ClassVar
+
+class Generator(ABC):
     """Abstract base class for language generators"""
     
-    @abstractmethod
-    def generate(
-        self,
-        model: IRModel,
-        output_dir: Path,
-        config: GeneratorConfig | None = None,
-    ) -> GenerationResult:
+    format: ClassVar[str]  # "python" or "typescript"
+    
+    def generate(self, pygen_model: PygenModel) -> dict[Path, str]:
         """
-        Generate code from IR model.
+        Generate SDK code from PygenModel.
         
         Args:
-            model: IR model to generate from
-            output_dir: Directory to write generated files
-            config: Generator configuration
+            pygen_model: PygenModel to generate from
             
         Returns:
-            Generation result with statistics
+            Dictionary mapping file paths to file contents
         """
-    
-    @abstractmethod
-    def generate_class(self, ir_class: IRClass) -> str:
-        """Generate code for a single class"""
-    
-    @abstractmethod
-    def generate_module(self, ir_module: IRModule) -> str:
-        """Generate code for a module"""
-    
-    @abstractmethod
-    def format_code(self, code: str) -> str:
-        """Format generated code"""
-    
-    @abstractmethod
-    def get_file_extension(self) -> str:
-        """Get file extension for this language"""
+        raise NotImplementedError()
+```
+
+### 6.2 SDK Configuration
+
+```python
+from pydantic import BaseModel, Field
+from collections.abc import Set
+from typing import Literal, TypeAlias
+
+NamingConvention: TypeAlias = Literal["camelCase", "PascalCase", "snake_case", "language_default"]
 
 
-@dataclass
-class GeneratorConfig:
-    """Configuration for code generation"""
+class NamingConfig(BaseModel):
+    class_name: NamingConvention = "language_default"
+    field_name: NamingConvention = "language_default"
+
+
+class PygenSDKConfig(BaseModel):
+    """Configuration settings for the Pygen SDK generator."""
     
-    # Naming conventions
-    class_name_format: Literal["PascalCase", "snake_case", "camelCase"] = "PascalCase"
-    method_name_format: Literal["snake_case", "camelCase"] = "snake_case"
-    property_name_format: Literal["snake_case", "camelCase"] = "snake_case"
-    
-    # Code style
-    line_length: int = 100
-    indent: str = "    "  # 4 spaces
-    
-    # Features
-    generate_docstrings: bool = True
-    generate_type_hints: bool = True
-    generate_examples: bool = False
+    top_level_package: str              # Package name for generated SDK
+    client_name: str                    # Name for the client class
+    default_instance_space: str         # Default space for instances
+    output_directory: str               # Where to write files
+    overwrite: bool                     # Whether to overwrite existing files
+    format_code: bool                   # Whether to run formatters
+    exclude_views: Set[str]             # Views to exclude from generation
+    exclude_spaces: Set[str]            # Spaces to exclude
+    naming: NamingConfig = Field(default_factory=NamingConfig)
     
     # Output
     single_file: bool = False
@@ -1195,7 +1128,7 @@ class GenerateRequest(BaseModel):
     space: str
     external_id: str
     version: str
-    language: Literal["python", "_typescript", "csharp", "pyspark"] = "python"
+    language: Literal["python", "typescript"] = "python"
     output_format: Literal["zip", "tarball", "code"] = "zip"
     cdf_url: str
     cdf_credentials: dict[str, str]  # Encrypted/secured
@@ -1338,9 +1271,7 @@ app = typer.Typer(
 
 class Language(str, Enum):
     python = "python"
-    typescript = "_typescript"
-    csharp = "csharp"
-    pyspark = "pyspark"
+    typescript = "typescript"
 
 @app.command()
 def generate(

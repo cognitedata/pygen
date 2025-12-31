@@ -28,17 +28,17 @@
 
 | Phase | Name | Duration | Status | Key Deliverable |
 |-------|------|----------|--------|-----------------|
-| 0 | Foundation | 1 week | ✅ Complete | Project reorganized, v1 in legacy/ |
-| 1 | Pygen Client | 3-4 weeks | ✅ Complete | httpx-based CDF client with HTTPClient |
-| 2 | Generic Instance API (Python) | 3-4 weeks | ✅ Complete | InstanceClient, InstanceAPI, Example SDK |
-| 3 | Generic Instance API (TypeScript) | 4-5 weeks | ✅ Complete | TypeScript equivalent of Phase 2 |
-| 4 | Intermediate Representation (IR) | 3-4 weeks | ⏳ Pending | Validation + Language-agnostic IR |
-| 5 | Code Generation from IR | 4-6 weeks | ⏳ Pending | Python & TypeScript SDK generation |
-| 6 | Feature Parity & Advanced | 4-6 weeks | ⏳ Pending | Match original Pygen |
-| 7 | Query Builder & Optimizer | 2-3 weeks | ⏳ Pending | Query builder/optimizer |
-| 8 | API Service | 2-3 weeks | ⏳ Pending | On-demand SDK generation |
-| 9 | Production | 2-3 weeks | ⏳ Pending | Hardening, optimization |
-| 10 | Release | 2-3 weeks | ⏳ Pending | Migration guide, docs |
+| 0 | Foundation | 1 week | ✅ Complete | Project reorganized, v1 in _legacy/ |
+| 1 | Pygen Client | ~2 days | ✅ Complete | httpx-based CDF client with HTTPClient |
+| 2 | Generic Instance API (Python) | ~5 days | ✅ Complete | InstanceClient, InstanceAPI, Example SDK |
+| 3 | Generic Instance API (TypeScript) | ~2 days | ✅ Complete | TypeScript equivalent of Phase 2 |
+| 4 | PygenModel | 2-3 weeks | ⏳ Pending | Internal model for code generation |
+| 5 | Code Generation from PygenModel | 3-4 weeks | ⏳ Pending | Python & TypeScript SDK generation |
+| 6 | CLI, Feature Parity & Advanced | 3-4 weeks | ⏳ Pending | CLI + match original Pygen |
+| 7 | Query Builder & Advanced Queries | 2-3 weeks | ⏳ Pending | Query builder (parallel with P6) |
+| 8 | API Service | 2-3 weeks | ⏳ Optional | On-demand SDK generation |
+| 9 | Production Hardening | 2-3 weeks | ⏳ Pending | Hardening, optimization |
+| 10 | Migration & Documentation | 2-3 weeks | ⏳ Pending | Migration guide, docs, release |
 
 ---
 
@@ -46,16 +46,15 @@
 
 ```
 ┌─────────────────────────────────────┐
-│  1. Pygen Client                    │  ← HTTPClient wrapper + QueryBuilder
-│     (httpx + Pydantic)              │     Replace cognite-sdk
+│  1. Pygen Client (_client/)         │  ← HTTPClient, Auth, Resource APIs
 ├─────────────────────────────────────┤
-│  2. Validation Layer                │  ← Validate before IR creation
+│  2. Python SDK (_python/)           │  ← Generic InstanceAPI/InstanceClient
 ├─────────────────────────────────────┤
-│  3. Intermediate Representation     │  ← Language-agnostic
+│  3. TypeScript SDK (_typescript/)   │  ← Generic InstanceAPI/InstanceClient
 ├─────────────────────────────────────┤
-│  4. Code Generation (Jinja2)        │  ← Multi-language
+│  4. PygenModel (_pygen_model/)      │  ← Internal model for generation
 ├─────────────────────────────────────┤
-│  5. Generated Runtime Support       │  ← Client-based lazy evaluation
+│  5. Generator (_generator/)         │  ← Transformer + Code generation
 └─────────────────────────────────────┘
 ```
 
@@ -70,9 +69,9 @@
 | Client-based design | Follows v1 patterns, clear separation |
 | httpx over requests | Async/sync, HTTP/2, better performance |
 | Pydantic v2 | 5-17x faster, excellent validation |
-| IR layer | Enables multi-language support |
+| PygenModel | Internal representation for multi-language generation |
 | Lazy by default | Solves scalability issues |
-| Template-based | Readable, maintainable, customizable |
+| Template-based (Jinja2) | Readable, maintainable, customizable |
 | Python 3.10+ | Modern features, type hints |
 | Typer for CLI | Modern, type-safe CLI |
 | >90% coverage | Professional-grade quality |
@@ -130,38 +129,33 @@
 
 ```
 cognite/pygen/
-├── legacy/             # V1 code (delete after v2.0.0)
-│   └── ...
-├── client/             # Pygen Client (Phase 1)
-│   ├── http.py         # HTTPClient wrapper
-│   ├── query.py        # Query builder
-│   ├── core.py
-│   ├── auth.py
-│   ├── models/
-│   └── resources/
-├── validation/         # Validation Layer (Phase 2)
-│   ├── validator.py
-│   ├── rules.py
-│   └── issues.py
-├── ir/                 # Intermediate Representation (Phase 2)
-│   ├── models.py
-│   ├── types.py
-│   ├── parser.py
-│   └── transformer.py
-├── generation/         # Code Generation (Phase 3+)
-│   ├── base.py
-│   ├── python/
-│   ├── typescript/
-│   └── ...
-├── runtime/            # Generated Runtime (Phase 4)
-│   ├── base.py
-│   ├── lazy.py
-│   └── query.py
-├── api/                # API Service (Phase 7)
-│   ├── app.py
-│   ├── endpoints.py
-│   └── models.py
-└── cli.py              # CLI Interface (typer)
+├── _client/            # Pygen Client (Phase 1) ✅
+│   ├── auth/           # Authentication handlers
+│   ├── http_client/    # HTTPClient wrapper
+│   ├── models/         # Pydantic models for CDF API
+│   └── resources/      # Resource APIs
+├── _example_datamodel/ # Example data model for patterns
+├── _generator/         # Code generation (Phases 4-5) ⏳
+│   ├── config.py       # PygenSDKConfig
+│   ├── gen_functions.py # generate_sdk()
+│   ├── generator.py    # Generator base class
+│   ├── transformer.py  # CDF → PygenModel
+│   ├── python.py       # PythonGenerator
+│   ├── typescript.py   # TypeScriptGenerator
+│   └── templates/      # Jinja2 templates
+├── _legacy/            # V1 code (delete after v2.0.0)
+├── _pygen_model/       # Internal model (Phase 4) ⏳
+│   ├── _model.py       # CodeModel base
+│   ├── _data_class.py  # DataClass, ReadDataClass
+│   └── _field.py       # Field representation
+├── _python/            # Python SDK (Phase 2) ✅
+│   ├── instance_api/   # Generic InstanceAPI, InstanceClient
+│   └── example/        # Example SDK
+├── _typescript/        # TypeScript SDK (Phase 3) ✅
+│   ├── instance_api/   # Generic InstanceAPI, InstanceClient
+│   └── example/        # Example SDK
+├── _utils/             # Utility functions
+└── cli.py              # CLI Interface (Phase 6)
 ```
 
 ---
@@ -300,13 +294,13 @@ pygen generate --config pygen.yaml
 |-----------|-------------|--------|--------|
 | **M0** | Phase 0 complete (Foundation) | Week 1 | ✅ Complete |
 | **M1** | Phase 1 complete (Full client) | Week 2 | ✅ Complete |
-| **M1.5** | Phase 2 Tasks 1-3.b complete (InstanceClient, InstanceAPI) | Week 3 | ✅ Complete |
-| **M2** | Phase 2 complete (Example SDK) | Month 1 | ✅ Complete |
-| **M2.1** | Phase 3 Tasks 0-3 complete (TypeScript dev environment, HTTPClient, Auth, Instance Models) | Month 1 | ✅ Complete |
-| **M2.5** | Phase 3 complete (TypeScript Generic Instance API & Example SDK) | Month 1 | ✅ Complete |
-| **M3** | Phase 5 complete (Can generate Python & TypeScript) | Month 4 | ⏳ Pending |
-| **M4** | Phase 6 complete (Feature parity) | Month 6 | ⏳ Pending |
-| **M5** | Phase 10 complete (v2.0.0) | Month 9 | ⏳ Pending |
+| **M2** | Phase 2 complete (Python Generic API + Example SDK) | Month 1 | ✅ Complete |
+| **M2.5** | Phase 3 complete (TypeScript Generic API + Example SDK) | Month 1 | ✅ Complete |
+| **M3** | Phase 4 complete (PygenModel) | Month 2 | ⏳ Pending |
+| **M4** | Phase 5 complete (Can generate Python & TypeScript) | Month 3 | ⏳ Pending |
+| **M5** | Phase 6 complete (CLI + Feature parity) | Month 4 | ⏳ Pending |
+| **M6** | Phase 9 complete (Production ready, beta) | Month 5 | ⏳ Pending |
+| **M7** | Phase 10 complete (v2.0.0 release) | Month 6 | ⏳ Pending |
 
 ---
 
@@ -338,13 +332,12 @@ for item in api.list():  # ✅ Yields one at a time
     process(item)
 ```
 
-### Intermediate Representation
+### PygenModel
 ```
-CDF Data Model → IR → Python SDK
-                 ↓
-                 └─→ TypeScript SDK
-                 └─→ C# SDK
-                 └─→ PySpark SDK
+CDF Data Model → PygenModel → Python SDK
+                      ↓
+                      └─→ TypeScript SDK
+                      └─→ Future: C#, PySpark SDKs
 ```
 
 ### Template-Based Generation
@@ -489,17 +482,17 @@ A: Modern type hints, pattern matching, performance.
   - ✅ Task 10: Example Data Classes
   - ✅ Task 11: Example API Classes
 
-**Current Phase**: Ready for Phase 4 - Intermediate Representation (IR) for Multi-Language Support
+**Current Phase**: Ready for Phase 4 - PygenModel
 
 **Next Steps**:
-1. Begin Phase 4: Validation Layer (Foundation for IR)
-2. Implement language-agnostic IR type system
-3. Build parser from CDF models to IR
-4. Create transformer for language-specific IR adaptations
+1. Begin Phase 4: Validation layer for data models
+2. Complete Field, Connection, DataClass models in `_pygen_model/`
+3. Build transformer from CDF ViewResponse to PygenModel
+4. Test with example data model to validate patterns
 
 ---
 
-**Document Version**: 1.6
-**Last Updated**: December 29, 2025
+**Document Version**: 1.7
+**Last Updated**: December 31, 2025
 **For Details**: See full planning documents in `plan/` folder
 

@@ -16,29 +16,58 @@ This document outlines the phased implementation approach for the Pygen rewrite.
 ## Phase Overview
 
 ```
-Phase 0: Foundation & Setup (1 week)
+Phase 0: Foundation & Setup (1 week) ✅ COMPLETE
     ↓
-Phase 1: Pygen Client Core (3-4 weeks)
+Phase 1: Pygen Client Core (3-4 weeks) ✅ COMPLETE
     ↓
-Phase 2: Generic Instance API & Example SDK - Python (3-4 weeks)
+Phase 2: Generic Instance API & Example SDK - Python (3-4 weeks) ✅ COMPLETE
     ↓
-Phase 3: Generic Instance API & Example SDK - TypeScript (4-5 weeks)
+Phase 3: Generic Instance API & Example SDK - TypeScript (4-5 weeks) ✅ COMPLETE
     ↓
-Phase 4: Intermediate Representation (IR) for Multi-Language (3-4 weeks)
+Phase 4: PygenModel - Internal Model for Code Generation (2-3 weeks) ⏳ PENDING
     ↓
-Phase 5: Code Generation from IR (Python & TypeScript) (4-6 weeks)
+Phase 5: Code Generation from PygenModel (3-4 weeks) ⏳ PENDING
     ↓
-Phase 6: Feature Parity & Advanced Features (4-6 weeks)
+Phase 6: CLI, Feature Parity & Advanced Features (3-4 weeks) ⏳ PENDING
     ↓
-Phase 7: Query Builder & Optimizer (2-3 weeks)
+Phase 7: Query Builder & Advanced Queries (2-3 weeks) ⏳ PENDING [Can parallel with Phase 6]
     ↓
-Phase 8: API Service (2-3 weeks)
+Phase 8: API Service (2-3 weeks) ⏳ OPTIONAL
     ↓
-Phase 9: Production Hardening (2-3 weeks)
+Phase 9: Production Hardening (2-3 weeks) ⏳ PENDING
     ↓
-Phase 10: Migration & Documentation (2-3 weeks)
+Phase 10: Migration & Documentation (2-3 weeks) ⏳ PENDING
 
-Total Estimated Time: 29-43 weeks
+Completed: Phases 0-3 (~2 weeks actual)
+Remaining: Phases 4-10 (~14-21 weeks estimated)
+Total Estimated Time: ~16-23 weeks
+```
+
+## Current Module Structure
+
+```
+cognite/pygen/
+├── _client/              # PygenClient (Phase 1) ✅
+├── _example_datamodel/   # Example data model for SDK patterns
+├── _generator/           # Code generation (Phases 4-5) ⏳
+│   ├── config.py         # PygenSDKConfig
+│   ├── gen_functions.py  # generate_sdk(), generate_sdk_notebook()
+│   ├── generator.py      # Generator base class
+│   ├── transformer.py    # CDF → PygenModel
+│   ├── python.py         # PythonGenerator
+│   └── typescript.py     # TypeScriptGenerator
+├── _legacy/              # v1 code (delete after v2.0.0)
+├── _pygen_model/         # Internal model for generation (Phase 4) ⏳
+│   ├── _model.py         # CodeModel base
+│   ├── _data_class.py    # DataClass, ReadDataClass
+│   └── _field.py         # Field representation
+├── _python/              # Python SDK (Phase 2) ✅
+│   ├── instance_api/     # Generic InstanceAPI, InstanceClient
+│   └── example/          # Example SDK extending generic classes
+├── _typescript/          # TypeScript SDK (Phase 3) ✅
+│   ├── instance_api/     # Generic InstanceAPI, InstanceClient
+│   └── example/          # Example SDK extending generic classes
+└── _utils/               # Utility functions
 ```
 
 ## Phase 0: Foundation & Setup
@@ -495,473 +524,620 @@ All tasks, deliverables, and success criteria have been met. The project is read
 
 ---
 
-## Phase 4: Intermediate Representation (IR) for Multi-Language Support
+## Phase 4: PygenModel - Internal Model for Code Generation
 
-**Goal**: Create a language-agnostic intermediate representation that can support code generation for both Python and TypeScript.
+**Goal**: Create the PygenModel, an internal representation of CDF data models that serves as the basis for code generation in both Python and TypeScript.
 
-**Duration**: 3-4 weeks
+**Duration**: 2-3 weeks
+
+**Note**: The structure is already stipulated in `cognite/pygen/_pygen_model/`. This phase implements the model definitions and the transformer that converts CDF ViewResponses into PygenModel.
+
+### Module Structure
+
+```
+cognite/pygen/
+├── _pygen_model/        # Internal model for code generation
+│   ├── __init__.py
+│   ├── _model.py        # CodeModel base class
+│   ├── _data_class.py   # DataClass, ReadDataClass
+│   ├── _field.py        # Field representation
+│   ├── _connection.py   # Connection/relationship representation
+│   └── _pygen_model.py  # Top-level PygenModel
+├── _generator/          # Code generation logic
+│   ├── transformer.py   # CDF ViewResponse → PygenModel
+│   └── ...
+```
 
 ### Tasks
 
-1. **Validation Layer (Foundation for IR)**
-   - Implement validation rules for data models before IR creation
+1. **Validation Layer (Foundation for PygenModel)**
+   - Implement validation rules for data models before PygenModel creation
    - Check data model for:
      - Existence of reverse direct relation targets
      - `source` is defined for direct relations
      - No name conflicts with language reserved words (Python, TypeScript)
    - Generate warnings for any issues found
-   - Graceful degradation decisions
+   - Graceful degradation decisions (skip problematic views/properties)
    - Clear, user-friendly error messages
+   - Located in `cognite/pygen/_generator/transformer.py` or dedicated validation module
 
-2. **Type System (Language-Agnostic)**
-   - Define IRType hierarchy based on CDF property types:
-     - Primitive types: text → string, int → integer, float, boolean, datetime, date, json
+2. **Field Types and Mappings**
+   - Implement `Field` class with type mappings for CDF property types:
+     - Primitive types: text, int32, int64, float32, float64, boolean, timestamp, date, json, object
      - CDF reference types: timeseries, file, sequence references
      - Container types: list types with cardinality
-     - Connection types: direct relations, edges, reverse direct relations
-     - Enum types with literal values
-   - Type modifiers: nullable, required, default values
-   - Each IRType has methods to generate language-specific type hints:
-     - `as_python_type()` → Python type hint
-     - `as_typescript_type()` → TypeScript type
-     - `as_read_type_hint(lang)` → Read operation type
-     - `as_write_type_hint(lang)` → Write operation type
+     - Direct relations (single and list)
+   - Fields include:
+     - `cdf_prop_id`: The CDF property identifier
+     - `name`: The language-appropriate property name
+     - `type_hint`: The language-specific type hint string
+     - `filter_name`: The filter field name (if applicable)
+     - `description`: Property description
 
-3. **IR Models**
-   - **IRProperty**: Represents a property in a class
-     - Fields: name, type, description, nullable, default, metadata
-     - Methods: `as_python_property()`, `as_typescript_property()`
-   - **IRConnection**: Represents a relationship/connection
-     - Fields: name, connection_type, target_class, cardinality, direction
-     - Methods: `as_python_connection()`, `as_typescript_connection()`
-   - **IRClass**: Represents a view as a class
-     - Fields: name, properties, connections, parent, description, metadata
-     - Methods: `as_python_class()`, `as_typescript_class()`
-   - **IRAPIClass**: Represents an API class for a view
-     - Fields: name, data_class, methods (retrieve, list, iterate, etc.)
-   - **IRModule**: Represents a module/file grouping
-   - **IRModel**: Top-level representation of entire data model
+3. **Connection Representation**
+   - Create `Connection` class for relationships:
+     - Direct relations (single and list)
+     - Edge connections
+     - Reverse direct relations
+   - Include:
+     - Target view reference
+     - Cardinality (one/many)
+     - Direction (outward/inward for edges)
+     - Connection type discriminator
 
-4. **Parser (CDF → IR)**
-   - Parse CDF ViewResponse to IRClass
-   - Parse properties to IRProperty
-   - Parse connections to IRConnection
+4. **DataClass Models**
+   - Implement `DataClass` base class representing a view:
+     - `view_id`: ViewReference to the source view
+     - `name`: Generated class name
+     - `fields`: List of Field objects
+     - `instance_type`: "node" or "edge"
+     - `display_name`: Human-readable name
+     - `description`: View description
+   - Implement `ReadDataClass` extending DataClass:
+     - `write_class_name`: Reference to the corresponding Write class
+   - Implement `WriteDataClass` if needed for write-specific logic
+
+5. **PygenModel (Top-Level)**
+   - Create `PygenModel` class containing:
+     - Data model metadata (space, external_id, version)
+     - List of DataClass objects (one per view)
+     - Client class name
+     - Default instance space
+   - Serves as input to generators
+
+6. **Transformer (CDF → PygenModel)**
+   - Located in `cognite/pygen/_generator/transformer.py`
+   - Parse CDF DataModelResponse with ViewResponses to PygenModel
+   - Apply naming conventions:
+     - Python: snake_case for fields, PascalCase for classes
+     - TypeScript: camelCase for fields, PascalCase for classes
+   - Handle language-specific reserved words
    - Resolve view references and relationships
    - Handle inheritance (implements)
-   - Build complete IRModel from DataModelResponse
-
-5. **Transformer (IR → Language-Specific IR)**
-   - Apply language-specific naming conventions
-     - Python: snake_case for variables, PascalCase for classes
-     - TypeScript: camelCase for variables, PascalCase for classes
-   - Handle language-specific reserved words
-   - Flatten inheritance if needed
-   - Resolve all dependencies
-   - Organize into language-appropriate module structure
 
 ### Deliverables
-- ✅ Complete validation layer
-- ✅ Language-agnostic IR type system
-- ✅ Complete IR model definitions
-- ✅ Parser from CDF models to IR
-- ✅ Transformer for language-specific adaptations
-- ✅ Comprehensive test suite
-- ✅ Documentation of IR structure
+- ⏳ Complete Field, Connection, DataClass models
+- ⏳ PygenModel top-level representation
+- ⏳ Validation layer with clear error messages
+- ⏳ Transformer from CDF models to PygenModel
+- ⏳ Comprehensive test suite
+- ⏳ Documentation of PygenModel structure
 
 ### Success Criteria
-- Can parse complex CDF data models to IR
-- Can transform IR to Python-specific IR
-- Can transform IR to TypeScript-specific IR
-- IR is truly language-agnostic
-- Validation catches common issues
+- Can parse complex CDF data models to PygenModel
+- Validation catches common issues with clear messages
+- PygenModel contains all information needed for code generation
+- Naming conventions correctly applied for both languages
 - All tests pass with >90% coverage
-- Well-documented IR structure
+- Well-documented model structure
+
+### Status
+**⏳ NOT STARTED**
 
 ### Dependencies
-- Phase 1 complete (need CDF API models)
+- Phase 1 complete (need CDF API models: ViewResponse, DataModelResponse)
 - Phase 2 complete (understand Python patterns)
 - Phase 3 complete (understand TypeScript patterns)
 
 ---
 
-## Phase 5: Code Generation from IR (Python & TypeScript)
+## Phase 5: Code Generation from PygenModel (Python & TypeScript)
 
-**Goal**: Use the IR to generate example SDKs for both Python and TypeScript from view and container definitions.
+**Goal**: Use the PygenModel to generate SDKs for both Python and TypeScript that extend the generic Instance API classes from Phases 2-3.
 
-**Duration**: 4-6 weeks
+**Duration**: 3-4 weeks
+
+**Note**: The generator structure is stipulated in `cognite/pygen/_generator/`. This phase implements the generators and templates.
+
+### Module Structure
+
+```
+cognite/pygen/
+├── _generator/
+│   ├── __init__.py
+│   ├── config.py          # PygenSDKConfig (done)
+│   ├── gen_functions.py   # generate_sdk(), generate_sdk_notebook() (done, not implemented)
+│   ├── generator.py       # Generator base class (done)
+│   ├── transformer.py     # CDF → PygenModel (Phase 4)
+│   ├── python.py          # PythonGenerator
+│   ├── typescript.py      # TypeScriptGenerator
+│   └── templates/         # Jinja2 templates
+│       ├── python/
+│       │   ├── data_class.py.jinja
+│       │   ├── api_class.py.jinja
+│       │   ├── client.py.jinja
+│       │   └── __init__.py.jinja
+│       └── typescript/
+│           ├── data_class.ts.jinja
+│           ├── api_class.ts.jinja
+│           ├── client.ts.jinja
+│           └── index.ts.jinja
+├── _python/               # Generic Python SDK (target for generated code)
+│   ├── instance_api/      # InstanceAPI, InstanceClient base classes
+│   └── example/           # Example SDK extending generic classes
+├── _typescript/           # Generic TypeScript SDK (target for generated code)
+│   ├── instance_api/      # InstanceAPI, InstanceClient base classes
+│   └── example/           # Example SDK extending generic classes
+```
 
 ### Tasks
 
 1. **Generator Infrastructure**
-   - BaseGenerator abstract class for language generators
-   - Template system setup (Jinja2 for Python, TypeScript template system)
-   - File writing utilities
-   - Code formatting integration (ruff for Python, prettier for TypeScript)
+   - Complete `Generator` base class in `generator.py`
+   - Template system setup using Jinja2
+   - File writing utilities returning `dict[Path, str]`
+   - Code formatting integration:
+     - ruff for Python
+     - prettier/deno fmt for TypeScript
 
-2. **Python Generator (IR-Based)**
-   - PythonGenerator implementation using IR
-   - Templates for data classes:
-     - Instance subclass template
-     - InstanceWrite subclass template
-     - InstanceList subclass template
+2. **Python Generator**
+   - Implement `PythonGenerator` in `python.py`
+   - Templates for data classes (extending `_python.instance_api`):
+     - `Instance` subclass template (read class)
+     - `InstanceWrite` subclass template (write class)
+     - `InstanceList` subclass template (list class)
+     - Filter container class template
    - Templates for API classes:
-     - InstanceAPI subclass template
-     - Type-safe retrieve/list/iterate methods
+     - `InstanceAPI` subclass template
+     - Type-safe retrieve/list/iterate methods with unpacked filter parameters
    - Templates for client:
-     - InstanceClient subclass with API composition
+     - `InstanceClient` subclass with API composition
    - Package structure generation (`__init__.py`, imports, etc.)
-   - Post-processing with ruff format/check
-   - Mypy type checking validation
+   - Post-processing with ruff format
+   - Generated code imports from `cognite.pygen._python.instance_api`
 
-3. **TypeScript Generator (IR-Based)**
-   - TypeScriptGenerator implementation using IR
-   - Templates for data classes:
-     - Instance interface/class template
-     - InstanceWrite interface template
-     - InstanceList class template
+3. **TypeScript Generator**
+   - Implement `TypeScriptGenerator` in `typescript.py`
+   - Templates for data classes (extending `_typescript/instance_api`):
+     - `Instance` class template (read class)
+     - `InstanceWrite` interface template
+     - `InstanceList` class template
+     - Filter container class template
    - Templates for API classes:
-     - InstanceAPI subclass template
-     - Type-safe retrieve/list/iterate methods
+     - `InstanceAPI` subclass template
+     - Type-safe retrieve/list/iterate methods with unpacked parameters
    - Templates for client:
-     - InstanceClient subclass with API composition
+     - `InstanceClient` subclass with API composition
    - Package structure generation (index.ts, exports, etc.)
-   - Post-processing with prettier
-   - TypeScript compilation validation
+   - Post-processing with prettier/deno fmt
+   - Generated code imports from generic instance_api module
 
-4. **Generation Pipeline**
-   - Fetch data model from CDF → Parse to IR → Transform IR → Generate code
-   - Support for both Python and TypeScript targets
-   - Configuration system for generation options
-   - CLI integration for generation commands
-   - Progress reporting and logging
+4. **Complete `generate_sdk()` Function**
+   - Implement the function in `gen_functions.py`:
+     1. Use PygenClient to fetch DataModel with views
+     2. Run validation on data model
+     3. Transform to PygenModel
+     4. Select generator based on `output_format` parameter
+     5. Generate code files
+     6. Apply formatting
+     7. Return `dict[Path, str]` with file contents
+   - Optionally write files to disk based on config
 
-5. **Generated Code Quality**
-   - Comprehensive docstrings/JSDoc comments
-   - Type hints throughout (Python type hints, TypeScript types)
-   - Proper error handling
+5. **Configuration System**
+   - `PygenSDKConfig` already defined in `config.py`
+   - Includes:
+     - `top_level_package`: Package name for generated SDK
+     - `client_name`: Name for the client class
+     - `default_instance_space`: Default space for instances
+     - `output_directory`: Where to write files
+     - `overwrite`: Whether to overwrite existing files
+     - `format_code`: Whether to run formatters
+     - `exclude_views`: Set of view names to exclude
+     - `exclude_spaces`: Set of spaces to exclude
+     - `naming`: Naming convention configuration
+
+6. **Generated Code Quality**
+   - Comprehensive docstrings/JSDoc comments from view descriptions
+   - Complete type hints (Python) and types (TypeScript)
+   - Generated code follows same patterns as hand-written examples
    - Clean, readable code structure
-   - Follow language best practices (PEP8, TypeScript style guide)
 
 ### Deliverables
-- ✅ Working Python generator from IR
-- ✅ Working TypeScript generator from IR
-- ✅ Complete generation pipeline
-- ✅ Generated Python SDK matches Phase 2 patterns
-- ✅ Generated TypeScript SDK matches Phase 3 patterns
-- ✅ CLI for generation
-- ✅ Configuration system
-- ✅ Comprehensive test suite
+- ⏳ Working Python generator from PygenModel
+- ⏳ Working TypeScript generator from PygenModel
+- ⏳ Complete `generate_sdk()` implementation
+- ⏳ Generated Python SDK matches Phase 2 example patterns
+- ⏳ Generated TypeScript SDK matches Phase 3 example patterns
+- ⏳ Configuration system working
+- ⏳ Comprehensive test suite
 
 ### Success Criteria
 - Can generate Python SDK from any CDF data model
 - Can generate TypeScript SDK from any CDF data model
 - Generated code passes linting and type checking
 - Generated code is functionally equivalent to hand-written examples
-- Generated code is clean and maintainable
+- Generated code correctly extends generic Instance API classes
 - All tests pass with >90% coverage
-- Documentation is complete
+
+### Status
+**⏳ NOT STARTED**
 
 ### Dependencies
-- Phase 4 complete (need IR)
+- Phase 4 complete (need PygenModel and transformer)
 
 ---
 
-## Phase 6: Feature Parity & Advanced Features
+## Phase 6: CLI, Feature Parity & Advanced Features
 
-**Goal**: Match all features of original Pygen and add advanced capabilities.
+**Goal**: Implement CLI, match all features of original Pygen, and add advanced capabilities.
 
-**Duration**: 4-6 weeks
+**Duration**: 3-4 weeks
 
 ### Tasks
 
-1. **Advanced Query Features**
-   - Complex filters with nested conditions
-   - Aggregations
-   - Joins across views
-   - Full-text search
-   - Query builder for type-safe query construction
+1. **CLI Implementation**
+   - Implement typer-based CLI in `cognite/pygen/cli.py`
+   - Commands:
+     - `pygen generate` - Generate SDK from data model
+     - `pygen validate` - Validate data model without generating
+     - `pygen version` - Show version info
+   - Options:
+     - `--space`, `--external-id`, `--version` for data model reference
+     - `--output-format` for Python/TypeScript
+     - `--output-directory` for output location
+     - `--config` for configuration file
+   - Environment variable support for authentication
+   - Progress indicators and clear output
 
-2. **Advanced Generation Features**
-   - Custom naming conventions configuration
-   - Include/exclude specific views
-   - Custom template support for both Python and TypeScript
-   - Configuration file support (pygen.yaml)
-   - CLI improvements with better UX
+2. **Configuration File Support**
+   - Support `pygen.yaml` or `pygen.toml` configuration files
+   - All `PygenSDKConfig` options available in config file
+   - CLI options override config file
+   - Document configuration options
 
-3. **Edge Cases**
-   - Self-referential relationships
-   - Circular dependencies
-   - Deep inheritance hierarchies
-   - Large schemas (100+ views)
-   - Reserved word handling for both languages
+3. **Complete `generate_sdk_notebook()` Function**
+   - Implement in-memory SDK generation for Jupyter notebooks
+   - Execute generated code to create client class
+   - Return instantiated client ready for use
+   - Support for interactive development workflows
 
-4. **Comprehensive Type Coverage**
-   - All CDF property types supported (text, int, float, bool, datetime, date, json, etc.)
-   - All CDF reference types (timeseries, file, sequence)
-   - All connection types (direct relations, edges, reverse relations)
-   - Enum types with proper validation
+4. **Edge Cases & Complex Models**
+   - Self-referential relationships (view references itself)
+   - Circular dependencies between views
+   - Deep inheritance hierarchies (multiple `implements`)
+   - Large schemas (100+ views) - performance optimization
+   - Reserved word handling for both Python and TypeScript
+   - Views without any properties
+
+5. **Comprehensive Type Coverage**
+   - All CDF property types: text, int32, int64, float32, float64, boolean, timestamp, date, json, object
+   - All CDF reference types: timeseries, file, sequence
+   - All connection types: direct relations, edges, reverse direct relations
    - List/array types with proper cardinality
+   - Nullable vs required fields
 
-5. **Developer Experience**
-   - Better error messages with actionable suggestions
-   - Validation feedback during generation
+6. **Developer Experience**
+   - Clear error messages with actionable suggestions
+   - Validation warnings for problematic but valid models
    - Progress indicators for long-running operations
-   - Debug mode with verbose output
-   - Dry-run mode to preview generation
+   - `--verbose` flag for debug output
+   - `--dry-run` flag to preview without writing files
 
 ### Deliverables
-- ✅ All original Pygen features implemented
-- ✅ Edge cases handled gracefully
-- ✅ Better UX than original Pygen
-- ✅ Advanced features working
-- ✅ Comprehensive test suite
+- ⏳ Complete CLI implementation
+- ⏳ Configuration file support
+- ⏳ `generate_sdk_notebook()` working
+- ⏳ All edge cases handled
+- ⏳ Full type coverage
+- ⏳ Improved developer experience
+- ⏳ Comprehensive test suite
 
 ### Success Criteria
+- CLI works for common use cases
 - Can generate SDK for any data model that original Pygen supported
+- Edge cases handled gracefully with clear messages
 - Performance is equal or better than v1
-- Developer experience is significantly improved
 - All tests pass with >90% coverage
-- No known critical bugs
+
+### Status
+**⏳ NOT STARTED**
 
 ### Dependencies
 - Phase 5 complete (need working generation pipeline)
 
 ---
 
-## Phase 7: Query Builder & Optimizer
+## Phase 7: Query Builder & Advanced Queries
 
-**Goal**: Build a comprehensive query builder and optimizer for complex CDF queries.
+**Goal**: Build a comprehensive query builder for complex CDF queries and implement advanced query features.
 
 **Duration**: 2-3 weeks
+
+**Note**: This phase can be started in parallel with Phase 6 as it primarily extends the generic Instance API.
 
 ### Tasks
 
 1. **Query Builder Foundation**
-   - Implement fluent query builder API
-   - Support for filter composition
-   - Support for nested filters and logical operators
-   - Type-safe filter building
+   - Implement fluent query builder API in `cognite/pygen/_utils/query_builder.py`
+   - Support for filter composition with type hints
+   - Support for nested filters and logical operators (and, or, not)
+   - Type-safe filter building with proper IDE support
+   - Integration with existing filter data structures from `_python/instance_api/filters.py`
 
-2. **Query Optimization**
-   - Query optimization logic for efficient CDF queries
-   - Automatic query simplification
-   - Cost-based optimization hints
-   - Query plan analysis
+2. **Advanced Query Features**
+   - Complex filter combinations
+   - Relationship traversal queries (following direct relations)
+   - Aggregation query helpers (count, sum, avg, min, max by property)
+   - Sorting with multiple fields
+   - Pagination helpers for large result sets
 
-3. **Common Query Patterns**
-   - Support for common query patterns from v1
-   - Relationship traversal queries
-   - Aggregation query helpers
-   - Pagination and sorting helpers
+3. **Query Optimization (Optional)**
+   - Query simplification (combine redundant filters)
+   - Ordering optimization for common patterns
+   - Logging/debugging of generated queries
+   - Note: Full optimization may be deferred to post-v2.0
 
-4. **Integration**
-   - Integrate query builder with PygenClient
-   - Update generated API classes to use query builder
-   - Add query builder helpers to InstanceAPI base classes
+4. **Integration with Generated SDKs**
+   - Query builder available on generated API classes
+   - Optional fluent interface: `client.my_view.query().filter(...).sort(...).list()`
+   - Alternative to unpacked filter parameters for complex queries
+   - Works with both Python and TypeScript SDKs
 
 5. **Testing**
    - Unit tests for query builder
-   - Unit tests for query optimizer
-   - Integration tests with PygenClient
-   - Performance benchmarks vs manual queries
+   - Integration tests with InstanceAPI
+   - Test complex query scenarios
+   - Performance benchmarks for large queries
    - Test coverage >90%
 
 ### Deliverables
-- ✅ Complete query builder implementation
-- ✅ Query optimization working
-- ✅ Integration with client and generated code
-- ✅ Comprehensive test suite
-- ✅ Documentation and examples
+- ⏳ Query builder implementation
+- ⏳ Advanced query features working
+- ⏳ Integration with generated SDKs
+- ⏳ Comprehensive test suite
+- ⏳ Documentation and examples
 
 ### Success Criteria
 - Can build complex queries programmatically
-- Query optimization improves performance
 - Type-safe query building works
+- Query builder integrates seamlessly with generated SDKs
 - All tests pass with >90% coverage
 - Better DX than v1 query building
 
+### Status
+**⏳ NOT STARTED**
+
 ### Dependencies
-- Phase 1 complete (need PygenClient)
 - Phase 2 complete (need InstanceAPI patterns)
+- Phase 5 complete (need generation working for integration)
 
 ---
 
-## Phase 8: API Service
+## Phase 8: API Service (Optional)
 
-**Goal**: Build Pygen backend service for generating SDKs on demand via API.
+**Goal**: Build Pygen backend service for generating SDKs on demand via HTTP API.
 
 **Duration**: 2-3 weeks
+
+**Note**: This phase is optional for v2.0 release. It can be implemented post-release if there's demand for a hosted generation service.
 
 ### Tasks
 
 1. **API Service Framework**
-   - Choose framework (FastAPI recommended)
-   - Set up service structure
-   - API endpoint design
-   - Request/response models
+   - Use FastAPI for the service
+   - Service structure in `cognite/pygen/_api/` (not shipped with package)
+   - Pydantic models for request/response
+   - OpenAPI documentation auto-generated
 
 2. **Core Endpoints**
-   - POST `/generate` - Generate SDK from specification
-   - POST `/validate` - Validate data model
-   - GET `/health` - Service health check
-   - GET `/version` - Pygen version info
+   - `POST /generate` - Generate SDK from data model specification
+     - Input: data model reference + configuration
+     - Output: ZIP file or JSON with file contents
+   - `POST /validate` - Validate data model without generating
+     - Input: data model reference
+     - Output: validation results and warnings
+   - `GET /health` - Service health check
+   - `GET /version` - Pygen version info
 
-3. **Generation Service**
-   - Async generation support
-   - Job queue for long-running generations
-   - Result caching (optional)
-   - Rate limiting
+3. **Generation Service Logic**
+   - Reuse `generate_sdk()` from `gen_functions.py`
+   - Support for both Python and TypeScript output
+   - Configurable options via request body
+   - Streaming response for large SDKs
 
 4. **Output Formats**
-   - ZIP file of source files
-   - Tarball/package format
-   - Direct code response (for small SDKs)
-   - Support multiple languages
+   - ZIP file of source files (default)
+   - JSON with file contents (for programmatic use)
+   - Both Python and TypeScript support
 
-5. **Security & Auth**
-   - API authentication
-   - Input validation
-   - Rate limiting
-   - Resource limits
+5. **Security & Operational Concerns**
+   - API authentication (API keys or OAuth2)
+   - Input validation and sanitization
+   - Rate limiting per client
+   - Resource limits (max views, timeout)
+   - Request logging and monitoring
 
 6. **Testing**
-   - API endpoint tests
-   - Integration tests
-   - Load tests
+   - API endpoint tests with pytest + httpx
+   - Integration tests with actual generation
+   - Load tests for concurrent requests
    - Test coverage >90%
 
 ### Deliverables
-- ✅ Working API service
-- ✅ All endpoints functional
-- ✅ Documentation (OpenAPI/Swagger)
-- ✅ Deployment guide
+- ⏳ Working API service
+- ⏳ All endpoints functional
+- ⏳ OpenAPI documentation
+- ⏳ Docker deployment configuration
+- ⏳ Deployment guide
 
 ### Success Criteria
-- Can generate SDK via API
-- Service is stable under load
+- Can generate SDK via HTTP API
+- Service handles concurrent requests
 - All tests pass with >90% coverage
 - API documentation complete
 - Deployment is straightforward
 
+### Status
+**⏳ NOT STARTED** (Optional for v2.0)
+
 ### Dependencies
-- Phase 5 complete (need working generators for both Python and TypeScript)
+- Phase 5 complete (need working generators)
 
 ---
 
 ## Phase 9: Production Hardening
 
-**Goal**: Prepare for production use.
+**Goal**: Prepare Pygen v2 for production use with optimizations and comprehensive testing.
 
 **Duration**: 2-3 weeks
 
 ### Tasks
 
 1. **Performance Optimization**
-   - Profile and optimize hot paths
-   - Reduce memory footprint
-   - Improve generation speed
-   - Optimize runtime queries
+   - Profile code generation hot paths
+   - Optimize large data model handling (100+ views)
+   - Reduce memory footprint during generation
+   - Benchmark against v1 for comparison
+   - Ensure generated SDK runtime performance is optimal
 
 2. **Error Handling & Resilience**
-   - Comprehensive error handling
-   - Retry strategies
-   - Timeout handling
-   - Graceful degradation
+   - Review all error paths for clarity
+   - Ensure all CDF API errors are properly mapped
+   - Add retry logic for transient failures
+   - Timeout handling for long operations
+   - Graceful handling of partial failures
 
-3. **Logging & Monitoring**
-   - Structured logging
-   - Performance metrics
-   - Error tracking
-   - Usage analytics (opt-in)
+3. **Logging & Debugging**
+   - Structured logging throughout
+   - `--verbose` mode for debugging
+   - Clear progress indicators for CLI
+   - Error context in exception messages
 
 4. **Security Review**
-   - Credential handling review
-   - Input validation review
-   - Dependency audit
-   - Security best practices
+   - Credential handling review (no secrets in generated code)
+   - Input validation for all user inputs
+   - Dependency audit with safety/pip-audit
+   - No arbitrary code execution from user input
 
-5. **Production Readiness**
-   - Deployment guide
-   - Configuration guide
-   - Troubleshooting guide
-   - Runbook for common issues
+5. **End-to-End Testing**
+   - E2E tests with real CDF data models
+   - Test generated SDKs actually work
+   - Test with various data model configurations
+   - Cross-language consistency tests (Python and TypeScript)
+
+6. **Beta Testing**
+   - Release beta version for early adopters
+   - Collect feedback and issues
+   - Fix critical bugs
+   - Iterate on UX based on feedback
 
 ### Deliverables
-- ✅ Production-ready code
-- ✅ Security audit complete
-- ✅ Performance optimized
-- ✅ Monitoring in place
+- ⏳ Production-ready code
+- ⏳ Performance benchmarks documented
+- ⏳ Security audit complete
+- ⏳ E2E test suite
+- ⏳ Beta release
 
 ### Success Criteria
-- Passes all load tests
+- Performance equal or better than v1
 - No critical security issues
-- Performance meets SLAs
+- E2E tests pass with real data models
+- Beta users can successfully use v2
 - All documentation complete
-- Ready for beta release
+
+### Status
+**⏳ NOT STARTED**
 
 ### Dependencies
-- Phase 8 complete
+- Phase 6 complete (need full feature set)
 
 ---
 
 ## Phase 10: Migration & Documentation
 
-**Goal**: Enable users to migrate from old to new Pygen.
+**Goal**: Enable users to migrate from v1 to v2 Pygen and complete all documentation.
 
 **Duration**: 2-3 weeks
 
 ### Tasks
 
 1. **Migration Guide**
-   - Breaking changes document
-   - Step-by-step migration guide
-   - Code examples for common patterns
-   - Troubleshooting section
+   - Breaking changes document with clear explanations
+   - Step-by-step migration guide from v1 to v2
+   - Code examples for common patterns:
+     - Basic SDK generation
+     - Configuration changes
+     - Runtime usage differences
+   - Troubleshooting section for common issues
+   - FAQ for migration questions
 
-2. **Migration Tools**
-   - Automated migration script (if feasible)
-   - Compatibility shims (if needed)
-   - Validation tool for generated code
+2. **Migration Tools (If Feasible)**
+   - Script to update v1 configuration to v2 format
+   - Comparison tool showing differences in generated code
+   - Validation that v2 SDK covers same functionality as v1
 
 3. **Comprehensive Documentation**
-   - User guide (quickstart to advanced)
-   - API reference (complete)
-   - Architecture documentation
-   - Contributing guide
-   - Examples and tutorials
-   - FAQ
+   - **User Guide**:
+     - Quickstart (5 minutes to first SDK)
+     - Configuration options
+     - CLI usage
+     - Programmatic usage
+     - TypeScript SDK guide
+   - **API Reference** (auto-generated from docstrings)
+   - **Architecture documentation** (for contributors)
+   - **Contributing guide**
+   - **Examples and tutorials**
 
 4. **Examples & Tutorials**
-   - Update existing examples
-   - Create new examples for new features
-   - Video tutorials (optional)
-   - Interactive notebooks
+   - Basic SDK generation example
+   - Python SDK usage example
+   - TypeScript SDK usage example
+   - Jupyter notebook tutorial
+   - Complex data model example
+   - Custom configuration example
 
 5. **Release Preparation**
-   - Changelog
-   - Release notes
-   - Version strategy
-   - Deprecation plan for old version
+   - Complete CHANGELOG with all changes from v1
+   - Release notes highlighting key improvements
+   - PyPI package preparation
+   - npm package preparation (for TypeScript runtime)
+   - Deprecation plan for v1 (6 months security fixes, 12 months EOL)
 
 ### Deliverables
-- ✅ Complete migration guide
-- ✅ Full documentation
-- ✅ Examples updated
-- ✅ Ready for release
+- ⏳ Complete migration guide
+- ⏳ Full user documentation
+- ⏳ API reference documentation
+- ⏳ Examples and tutorials
+- ⏳ Release artifacts ready
 
 ### Success Criteria
-- Users can migrate with clear guidance
-- All features documented
-- Examples cover common use cases
-- Release artifacts ready
+- Users can migrate from v1 with clear guidance
+- All features documented with examples
+- Documentation is clear and complete
+- Release artifacts ready for PyPI/npm
+- v2.0.0 released
+
+### Status
+**⏳ NOT STARTED**
 
 ### Dependencies
 - Phase 9 complete
 
 ### Post-Release
-- Delete legacy/ folder after v2.0.0 is stable
+- Delete `cognite/pygen/_legacy/` folder after v2.0.0 is stable
 - Archive v1 documentation
 - Sunset v1 support per deprecation plan
+- Monitor issues and release patch versions as needed
 
 ---
 

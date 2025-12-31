@@ -1,6 +1,6 @@
 # Pygen Rewrite - Progress Tracking
 
-**Last Updated**: December 29, 2025
+**Last Updated**: December 31, 2025
 
 This document tracks the actual progress of the Pygen rewrite implementation.
 
@@ -14,11 +14,11 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 | Phase 1: Pygen Client Core | ✅ Complete | Dec 21, 2025 | Dec 22, 2025 | ~2 days |
 | Phase 2: Generic Instance API & Example SDK (Python) | ✅ Complete | Dec 22, 2025 | Dec 27, 2025 | ~5 days |
 | Phase 3: Generic Instance API & Example SDK (TypeScript) | ✅ Complete | Dec 28, 2025 | Dec 29, 2025 | ~2 days |
-| Phase 4: Intermediate Representation (IR) | ⏳ Not Started | - | - | 3-4 weeks (planned) |
-| Phase 5: Code Generation from IR | ⏳ Not Started | - | - | 4-6 weeks (planned) |
-| Phase 6: Feature Parity & Advanced Features | ⏳ Not Started | - | - | 4-6 weeks (planned) |
-| Phase 7: Query Builder & Optimizer | ⏳ Not Started | - | - | 2-3 weeks (planned) |
-| Phase 8: API Service | ⏳ Not Started | - | - | 2-3 weeks (planned) |
+| Phase 4: PygenModel - Internal Model | ⏳ Not Started | - | - | 2-3 weeks (planned) |
+| Phase 5: Code Generation from PygenModel | ⏳ Not Started | - | - | 3-4 weeks (planned) |
+| Phase 6: CLI, Feature Parity & Advanced | ⏳ Not Started | - | - | 3-4 weeks (planned) |
+| Phase 7: Query Builder & Advanced Queries | ⏳ Not Started | - | - | 2-3 weeks (planned) |
+| Phase 8: API Service | ⏳ Not Started (Optional) | - | - | 2-3 weeks (planned) |
 | Phase 9: Production Hardening | ⏳ Not Started | - | - | 2-3 weeks (planned) |
 | Phase 10: Migration & Documentation | ⏳ Not Started | - | - | 2-3 weeks (planned) |
 
@@ -339,7 +339,112 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 
 ## Future Phases
 
-Details for Phases 4-10 will be updated as they are started and completed.
+### Phase 4: PygenModel - Internal Model for Code Generation
+
+**Status**: ⏳ Not Started  
+**Planned Duration**: 2-3 weeks
+
+Phase 4 creates the PygenModel, an internal representation of CDF data models that serves as the basis for code generation. The structure is already stipulated in `cognite/pygen/_pygen_model/`.
+
+**Key Tasks**:
+- Validation layer for data models
+- Complete Field types and mappings
+- Connection representation for relationships
+- DataClass, ReadDataClass, WriteDataClass models
+- PygenModel top-level representation
+- Transformer from CDF ViewResponse to PygenModel
+
+---
+
+### Phase 5: Code Generation from PygenModel
+
+**Status**: ⏳ Not Started  
+**Planned Duration**: 3-4 weeks
+
+Phase 5 implements the generators that produce SDK code from PygenModel. The generator structure is stipulated in `cognite/pygen/_generator/`.
+
+**Key Tasks**:
+- Complete Generator base class
+- PythonGenerator with Jinja2 templates
+- TypeScriptGenerator with templates
+- Implement `generate_sdk()` function
+- Generated code extends generic Instance API classes
+
+---
+
+### Phase 6: CLI, Feature Parity & Advanced Features
+
+**Status**: ⏳ Not Started  
+**Planned Duration**: 3-4 weeks
+
+Phase 6 implements the CLI and achieves feature parity with v1 Pygen.
+
+**Key Tasks**:
+- typer-based CLI implementation
+- Configuration file support (pygen.yaml)
+- `generate_sdk_notebook()` for Jupyter
+- Edge cases and complex models
+- Comprehensive type coverage
+- Developer experience improvements
+
+---
+
+### Phase 7: Query Builder & Advanced Queries
+
+**Status**: ⏳ Not Started  
+**Planned Duration**: 2-3 weeks
+
+Phase 7 builds a comprehensive query builder for complex CDF queries. Can be done in parallel with Phase 6.
+
+**Key Tasks**:
+- Fluent query builder API
+- Advanced query features
+- Integration with generated SDKs
+
+---
+
+### Phase 8: API Service (Optional)
+
+**Status**: ⏳ Not Started (Optional for v2.0)  
+**Planned Duration**: 2-3 weeks
+
+Phase 8 builds an optional HTTP API service for on-demand SDK generation.
+
+**Key Tasks**:
+- FastAPI-based service
+- Generate and validate endpoints
+- Security and authentication
+
+---
+
+### Phase 9: Production Hardening
+
+**Status**: ⏳ Not Started  
+**Planned Duration**: 2-3 weeks
+
+Phase 9 prepares Pygen v2 for production with optimizations and comprehensive testing.
+
+**Key Tasks**:
+- Performance optimization
+- Error handling review
+- Security audit
+- E2E testing
+- Beta release
+
+---
+
+### Phase 10: Migration & Documentation
+
+**Status**: ⏳ Not Started  
+**Planned Duration**: 2-3 weeks
+
+Phase 10 completes documentation and enables migration from v1.
+
+**Key Tasks**:
+- Migration guide from v1 to v2
+- Complete user documentation
+- Examples and tutorials
+- Release v2.0.0
 
 ---
 
@@ -363,9 +468,9 @@ Details for Phases 4-10 will be updated as they are started and completed.
 ## Overall Progress
 
 **Phases Complete**: 4 / 10 (40%)  
-**Current Phase**: Phase 4 - Intermediate Representation (IR) (Not Started)  
+**Current Phase**: Phase 4 - PygenModel (Not Started)  
 **Next Phase Start**: Pending  
-**Estimated Time Remaining**: 20-33 weeks  
+**Estimated Time Remaining**: 14-21 weeks  
 
 ---
 
@@ -557,10 +662,11 @@ Details for Phases 4-10 will be updated as they are started and completed.
 
 ### Next Steps
 
-1. Begin **Phase 4: Intermediate Representation (IR) for Multi-Language Support**
-2. Implement validation layer for data models
-3. Create language-agnostic IR type system
-4. Build parser from CDF models to IR
+1. Begin **Phase 4: PygenModel - Internal Model for Code Generation**
+2. Implement validation layer for data models before PygenModel creation
+3. Complete Field, Connection, and DataClass models in `_pygen_model/`
+4. Build transformer from CDF ViewResponse to PygenModel in `_generator/transformer.py`
+5. Test with example data model to validate patterns
 
 ---
 
