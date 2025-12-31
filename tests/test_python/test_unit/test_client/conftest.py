@@ -135,3 +135,12 @@ def example_data_model_resource() -> dict[str, Any]:
             {"space": "my_space", "externalId": "my_view", "version": "v1", "type": "view"},
         ],
     }
+
+
+@pytest.fixture(scope="session")
+def example_data_model_with_views_resource(
+    example_data_model_resource: dict[str, Any], example_view_resource: dict[str, Any]
+) -> dict[str, Any]:
+    copy = example_data_model_resource.copy()
+    copy["views"] = [example_view_resource]
+    return copy
