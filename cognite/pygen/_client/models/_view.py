@@ -114,3 +114,10 @@ class ViewResponse(View, ResponseResource[ViewReference, ViewRequest]):
 
         dumped["properties"] = properties
         return ViewRequest.model_validate(dumped)
+
+    @field_serializer("mapped_containers", mode="plain")
+    @classmethod
+    def serialize_mapped_containers(
+        cls, mapped_containers: list[ContainerReference], info: FieldSerializationInfo
+    ) -> list[dict[str, Any]]:
+        return [container.model_dump(**vars(info)) | {"type": "container"} for container in mapped_containers]
