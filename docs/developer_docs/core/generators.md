@@ -1,1 +1,1 @@
-::: cognite.pygen.legacy._core.generators
+::: cognite.pygen._legacy._core.generators

@@ -1,16 +1,16 @@
 
-::: cognite.pygen.legacy.config.NamingConfig
+::: cognite.pygen._legacy.config.NamingConfig
 
-::: cognite.pygen.legacy.config.FieldNaming
+::: cognite.pygen._legacy.config.FieldNaming
 
-::: cognite.pygen.legacy.config.DataClassNaming
+::: cognite.pygen._legacy.config.DataClassNaming
 
-::: cognite.pygen.legacy.config.APIClassNaming
+::: cognite.pygen._legacy.config.APIClassNaming
 
-::: cognite.pygen.legacy.config.MultiAPIClassNaming
+::: cognite.pygen._legacy.config.MultiAPIClassNaming
 
-::: cognite.pygen.legacy.config.Naming
+::: cognite.pygen._legacy.config.Naming
 
-::: cognite.pygen.legacy.config.Case
+::: cognite.pygen._legacy.config.Case
 
-::: cognite.pygen.legacy.config.Number
+::: cognite.pygen._legacy.config.Number
