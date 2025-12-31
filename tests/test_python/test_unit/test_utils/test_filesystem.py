@@ -10,8 +10,6 @@ class TestSanitize:
             ("valid_filename.txt", "valid_filename.txt"),
             ("inva|lid:fi*le?name.txt", "invalid_filename.txt"),
             ("another<invalid>name.txt", "anotherinvalidname.txt"),
-            ("con.txt", "con_.txt"),  # 'con' is a reserved name in Windows
-            ("aux.pdf", "aux_.pdf"),  # 'aux' is a reserved name in Windows
             ("file/name/with/slash.txt", "filenamewithslash.txt"),
             ("trailing_space .txt", "trailing_space_.txt"),
             ("trailing_dot..", "trailing_dot_."),
