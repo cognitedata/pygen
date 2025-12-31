@@ -115,20 +115,20 @@ Build generic InstanceClient and InstanceAPI base classes, create hand-written e
 ### Phase 3: Generic Instance API & Example SDK - TypeScript (3-4 weeks)
 Build TypeScript equivalent of Python generic API with example SDK
 
-### Phase 4: Intermediate Representation (IR) (3-4 weeks)
-Create language-agnostic IR that can generate code for both Python and TypeScript
+### Phase 4: PygenModel - Internal Model (2-3 weeks)
+Create PygenModel, the internal representation for code generation in both Python and TypeScript
 
-### Phase 5: Code Generation from IR (4-6 weeks)
-Generate SDKs that match Phases 2-3 patterns from IR for both Python and TypeScript
+### Phase 5: Code Generation from PygenModel (3-4 weeks)
+Generate SDKs that match Phases 2-3 patterns from PygenModel for both Python and TypeScript
 
-### Phase 6: Feature Parity & Advanced Features (4-6 weeks)
-Match all features of original Pygen, handle edge cases
+### Phase 6: CLI, Feature Parity & Advanced Features (3-4 weeks)
+Implement CLI, match all features of original Pygen, handle edge cases
 
-### Phase 7: Query Builder & Optimizer (2-3 weeks)
-Build comprehensive query builder for complex CDF queries
+### Phase 7: Query Builder & Advanced Queries (2-3 weeks)
+Build comprehensive query builder for complex CDF queries (can parallel with Phase 6)
 
-### Phase 8: API Service (2-3 weeks)
-Build Pygen backend service for on-demand generation
+### Phase 8: API Service (2-3 weeks) [Optional]
+Build Pygen backend service for on-demand generation (optional for v2.0)
 
 ### Phase 9: Production Hardening (2-3 weeks)
 Performance optimization, security, stability
@@ -156,16 +156,16 @@ Migration guide, complete documentation, release, delete legacy/
 **Why**: 5-17x faster, excellent validation, type safety
 **Impact**: Better performance and developer experience
 
-### 5. Implement Intermediate Representation after patterns proven
+### 5. Implement PygenModel after patterns proven
 **Why**: Enables multi-language support once patterns validated
-**Impact**: More confident IR design, easier to implement
+**Impact**: More confident model design, easier to implement
 
-### 6. Validation before IR
+### 6. Validation before PygenModel
 **Why**: Catches issues early, enables graceful degradation
 **Impact**: Better error messages, partial generation possible
 
-### 7. Template-based generation
-**Why**: Readable, maintainable, customizable
+### 7. F-string-based generation
+**Why**: Simple, native Python, no extra dependencies, debuggable
 **Impact**: Easy to add new languages and modify output
 
 ### 8. API Service for on-demand generation
@@ -236,7 +236,7 @@ See [implementation-roadmap.md](./implementation-roadmap.md) for detailed risk m
 - **Python**: 3.10+ (modern type hints, pattern matching)
 - **httpx**: HTTP client (async/sync, HTTP/2)
 - **Pydantic v2**: Data validation and serialization
-- **Jinja2**: Template engine for code generation
+- **Python f-strings**: Template engine for code generation (no Jinja2)
 - **FastAPI**: API service framework (for Goal 5)
 - **typer**: CLI framework
 
@@ -300,25 +300,21 @@ This project includes comprehensive planning documentation:
 ## Project Timeline
 
 ```
-Month 1-2: Foundation & Client
-├─ Week 1:     Phase 0 (Reorganize to legacy/)
-├─ Week 2-5:   Phase 1 (Pygen Client Core)
-└─ Week 6-9:   Phase 2 (Generic Instance API - Python)
+✅ COMPLETED (Dec 2025):
+├─ Phase 0: Foundation & Setup (~1 week)
+├─ Phase 1: Pygen Client Core (~2 days)
+├─ Phase 2: Generic Instance API - Python (~5 days)
+└─ Phase 3: Generic Instance API - TypeScript (~2 days)
 
-Month 3-4: TypeScript & IR
-├─ Week 10-13: Phase 3 (Generic Instance API - TypeScript)
-└─ Week 14-17: Phase 4 (Intermediate Representation)
-
-Month 5-6: Generation & Feature Parity
-├─ Week 18-23: Phase 5 (Code Generation from IR)
-└─ Week 24-29: Phase 6 (Feature Parity & Advanced Features)
-
-Month 7-10: Polish & Release
-├─ Week 30-32: Phase 7 (Query Builder & Optimizer)
-├─ Week 33-35: Phase 8 (API Service)
-├─ Week 36-38: Phase 9 (Production Hardening)
-├─ Week 39-41: Phase 10 (Migration & Docs)
-└─ Week 42:    Release v2.0.0, delete legacy/
+⏳ REMAINING (~14-21 weeks):
+├─ Phase 4: PygenModel (2-3 weeks)
+├─ Phase 5: Code Generation from PygenModel (3-4 weeks)
+├─ Phase 6: CLI, Feature Parity & Advanced (3-4 weeks) ┐
+├─ Phase 7: Query Builder & Advanced Queries (2-3 weeks)┘ [can parallel]
+├─ Phase 8: API Service (2-3 weeks) [optional]
+├─ Phase 9: Production Hardening (2-3 weeks)
+├─ Phase 10: Migration & Documentation (2-3 weeks)
+└─ Release v2.0.0, delete _legacy/
 ```
 
 ---
@@ -364,11 +360,11 @@ Each phase must meet quality criteria before proceeding:
 - **Email**: Formal updates to stakeholders
 
 ### Milestones
-1. **M1**: Phase 1 complete (Working client with HTTPClient)
-2. **M2**: Phase 2 complete (Generic Python API working)
-3. **M3**: Phase 3 complete (Generic TypeScript API working)
-4. **M4**: Phase 5 complete (Can generate SDKs from IR)
-5. **M5**: Phase 6 complete (Feature parity achieved)
+1. **M1**: Phase 1 complete (Working client with HTTPClient) ✅
+2. **M2**: Phase 2 complete (Generic Python API working) ✅
+3. **M3**: Phase 3 complete (Generic TypeScript API working) ✅
+4. **M4**: Phase 5 complete (Can generate SDKs from PygenModel)
+5. **M5**: Phase 6 complete (CLI and feature parity achieved)
 6. **M6**: Phase 9 complete (Production ready, beta release)
 7. **M7**: Phase 10 complete (v2.0.0 release)
 
@@ -431,13 +427,15 @@ Phase 0 → Phase 1 → Phase 2 (Python Generic API)
                           ↓
                     Phase 3 (TypeScript Generic API)
                           ↓
-                    Phase 4 (IR based on Phases 2-3)
+                    Phase 4 (PygenModel)
                           ↓
-                    Phase 5 (Generation from IR)
+                    Phase 5 (Generation from PygenModel)
                           ↓
-                    Phase 6 (Feature Parity)
+                    Phase 6 (CLI, Feature Parity) ←→ Phase 7 (Query Builder) [parallel]
                           ↓
-                    Phase 7 (Query Builder) → Phase 8 (API Service) → Phase 9 (Hardening) → Phase 10 (Docs)
+                    Phase 8 (API Service) [optional]
+                          ↓
+                    Phase 9 (Hardening) → Phase 10 (Docs)
 ```
 
 ---
@@ -550,7 +548,7 @@ This project sets the foundation for Pygen's future and enables exciting possibi
 
 ---
 
-**Document Version**: 1.4
-**Last Updated**: December 29, 2025
-**Status**: Phase 3 Complete ✅ - Ready for Phase 4
+**Document Version**: 1.5
+**Last Updated**: December 31, 2025
+**Status**: Phase 3 Complete ✅ - Ready for Phase 4 (PygenModel)
 

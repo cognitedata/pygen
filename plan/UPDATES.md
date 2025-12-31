@@ -1,17 +1,128 @@
 # Plan Updates Summary
 
-**Date**: December 29, 2025  
-**Status**: Phase 3 Complete ✅ - Ready for Phase 4
+**Date**: December 31, 2025  
+**Status**: Phase 3 Complete ✅ - Ready for Phase 4 (PygenModel)
 
 ---
 
-## Latest Update: Phase 3 Complete (December 29, 2025)
+## Latest Update: Jinja2 Replaced with F-Strings (December 31, 2025)
 
-### Completed Work
+### Templating Decision Change
+
+**OLD**: Jinja2 template-based code generation  
+**NEW**: Python f-string based code generation
+
+### Rationale
+
+1. **Simplicity**: Native Python syntax, no extra templating language to learn
+2. **Fewer Dependencies**: Removes Jinja2 as a dependency
+3. **Better IDE Support**: Full syntax highlighting, type checking, refactoring
+4. **Easier Debugging**: Standard Python debugging, stack traces
+5. **Maintainability**: Templates are just Python functions, easier to refactor
+
+### Files Updated
+
+- `plan/architecture.md` - Updated template references and ADR-008
+- `plan/technical-specifications.md` - Updated template structure and generator code
+- `plan/implementation-roadmap.md` - Updated Phase 4 template references
+- `plan/decisions-and-tradeoffs.md` - Updated ADR-005 from Jinja2 to f-strings
+- `plan/project-overview.md` - Updated technology stack
+- `plan/quick-reference.md` - Updated technology stack and template example
+- `plan/UPDATES.md` - This update
+
+### Impact on Implementation
+
+- Generator classes will use Python functions with f-strings instead of Jinja2 templates
+- Template files will be `.py` (Python modules) instead of `.jinja` files
+- Template logic uses Python constructs (loops, conditionals) directly
+- No changes to PygenModel or other architectural components
+
+---
+
+## Previous Update: Phases 4-10 Replanning (December 31, 2025)
+
+### Architecture Changes
+
+The project structure has been finalized with the following changes from the original plan:
+
+1. **Renamed "Intermediate Representation (IR)" to "PygenModel"**
+   - Located in `cognite/pygen/_pygen_model/`
+   - Internal model used as the basis for code generation
+   - Includes: `Field`, `Connection`, `DataClass`, `ReadDataClass`, `PygenModel`
+
+2. **Removed `_generation` module and moved content up one level**
+   - Generator code now in `cognite/pygen/_generator/`
+   - Python SDK now in `cognite/pygen/_python/`
+   - TypeScript SDK now in `cognite/pygen/_typescript/`
+
+3. **New Module Structure**:
+   ```
+   cognite/pygen/
+   ├── _client/              # PygenClient (Phase 1) ✅
+   ├── _example_datamodel/   # Example data model for SDK patterns
+   ├── _generator/           # Code generation (Phases 4-5)
+   │   ├── config.py         # PygenSDKConfig
+   │   ├── gen_functions.py  # generate_sdk(), generate_sdk_notebook()
+   │   ├── generator.py      # Generator base class
+   │   ├── transformer.py    # CDF → PygenModel
+   │   ├── python.py         # PythonGenerator
+   │   └── typescript.py     # TypeScriptGenerator
+   ├── _legacy/              # v1 code (delete after v2.0.0)
+   ├── _pygen_model/         # Internal model for generation (Phase 4)
+   │   ├── _model.py         # CodeModel base
+   │   ├── _data_class.py    # DataClass, ReadDataClass
+   │   └── _field.py         # Field representation
+   ├── _python/              # Python SDK (Phase 2) ✅
+   │   ├── instance_api/     # Generic InstanceAPI, InstanceClient
+   │   └── example/          # Example SDK
+   ├── _typescript/          # TypeScript SDK (Phase 3) ✅
+   │   ├── instance_api/     # Generic InstanceAPI, InstanceClient
+   │   └── example/          # Example SDK
+   └── _utils/               # Utility functions
+   ```
+
+### Updated Phase Descriptions
+
+| Phase | Old Name | New Name | Duration |
+|-------|----------|----------|----------|
+| 4 | Intermediate Representation (IR) | PygenModel - Internal Model | 2-3 weeks |
+| 5 | Code Generation from IR | Code Generation from PygenModel | 3-4 weeks |
+| 6 | Feature Parity & Advanced Features | CLI, Feature Parity & Advanced | 3-4 weeks |
+| 7 | Query Builder & Optimizer | Query Builder & Advanced Queries | 2-3 weeks |
+| 8 | API Service | API Service (Optional) | 2-3 weeks |
+| 9 | Production Hardening | Production Hardening | 2-3 weeks |
+| 10 | Migration & Documentation | Migration & Documentation | 2-3 weeks |
+
+### Key Changes to Phases
+
+- **Phase 4**: Now focuses on `PygenModel` instead of language-agnostic IR. The model is simpler and more directly tied to code generation.
+- **Phase 5**: Generators now produce code from `PygenModel`, not IR. The `generate_sdk()` function is already stipulated.
+- **Phase 6**: CLI implementation explicitly added to this phase.
+- **Phase 7**: Can now be done in parallel with Phase 6.
+- **Phase 8**: Marked as optional for v2.0 release.
+
+### Estimated Timeline Update
+
+- **Completed**: Phases 0-3 (~2 weeks actual, much faster than planned)
+- **Remaining**: Phases 4-10 (~14-21 weeks estimated)
+- **Total**: ~16-23 weeks (down from 29-43 weeks)
+
+### Files Updated
+
+- `plan/implementation-roadmap.md` - Complete rewrite of Phases 4-10
+- `plan/PROGRESS.md` - Updated phase descriptions and next steps
+- `plan/architecture.md` - Updated module structure and diagrams
+- `plan/project-overview.md` - Updated phase descriptions and timeline
+- `plan/quick-reference.md` - Updated roadmap table and project structure
+- `plan/technical-specifications.md` - Updated IR section to PygenModel
+
+---
+
+## Previous Update: Phase 3 Complete (December 29, 2025)
 
 **Phase 3: Generic Instance API & Example SDK (TypeScript)** ✅
 
-Phase 3 has been completed in record time (~2 days vs planned 4-5 weeks), delivering:
+Phase 3 was completed in record time (~2 days vs planned 4-5 weeks), delivering:
 
 #### All 12 Tasks Complete ✅
 
@@ -81,11 +192,11 @@ Phase 3 has been completed in record time (~2 days vs planned 4-5 weeks), delive
 
 ### Next Steps
 
-- Begin **Phase 4: Intermediate Representation (IR) for Multi-Language Support**
+- Begin **Phase 4: PygenModel - Internal Model for Code Generation**
   - Implement validation layer for data models
-  - Create language-agnostic IR type system
-  - Build parser from CDF models to IR
-  - Create transformer for language-specific adaptations
+  - Complete Field, Connection, and DataClass models in `_pygen_model/`
+  - Build transformer from CDF ViewResponse to PygenModel
+  - Test with example data model to validate patterns
 
 ---
 
@@ -566,7 +677,7 @@ V1 and V2 development in parallel:
 
 ✅ Python 3.10+ minimum version  
 ✅ Pydantic v2 for data models  
-✅ Jinja2 for templates  
+✅ Python f-strings for templates (replaced Jinja2)  
 ✅ >90% test coverage goal  
 ✅ Multi-language support via IR  
 ✅ httpx as HTTP client (now wrapped)  

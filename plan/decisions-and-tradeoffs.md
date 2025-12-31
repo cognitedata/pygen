@@ -156,42 +156,46 @@ Implement lazy evaluation by default with explicit eager loading.
 
 ---
 
-### ADR-005: Template-based code generation
+### ADR-005: F-string-based code generation
 
-**Status**: Accepted
+**Status**: Accepted (Updated from Jinja2)
 
 **Context**:
 We need to generate code in multiple languages. Options include:
 1. String concatenation
 2. AST building
-3. Template-based
-4. DSL
+3. Template-based (Jinja2)
+4. F-string based generation
+5. DSL
 
 **Decision**:
-Use Jinja2 template-based code generation.
+Use Python f-string based code generation (instead of Jinja2).
 
 **Rationale**:
-1. **Readability**: Templates look like target code
-2. **Maintainability**: Easy to modify generated code structure
-3. **Customization**: Users can provide custom templates
-4. **Proven**: Industry-standard approach
-5. **Flexibility**: Can generate any text format
-6. **Community**: Many developers familiar with Jinja2
+1. **Simplicity**: Native Python syntax, no extra templating language
+2. **Readability**: Templates look like target code with clear Python interpolation
+3. **Maintainability**: Easy to modify, refactor, and debug
+4. **IDE Support**: Full syntax highlighting, type checking, and refactoring
+5. **No Dependencies**: Removes Jinja2 dependency for simpler package
+6. **Flexibility**: Python functions for complex logic, not template macros
+7. **Debuggability**: Standard Python debugging, stack traces, etc.
 
 **Alternatives Considered**:
+- **Jinja2**: More complex, additional dependency, harder to debug
 - **String concatenation**: Unmaintainable, error-prone
 - **AST building**: Too complex, language-specific
 - **Code generation frameworks**: Overkill, limited flexibility
 - **DSL**: Too much upfront investment
 
 **Tradeoffs**:
-- **Pro**: Easy to understand and modify
-- **Pro**: Good balance of power and simplicity
-- **Con**: Templates can become complex
-- **Con**: Limited static analysis
+- **Pro**: Simpler implementation with native Python
+- **Pro**: Better IDE support and debugging
+- **Pro**: One less dependency to manage
+- **Con**: Less separation between template and logic (mitigated by good code organization)
+- **Con**: No template inheritance (use Python inheritance/composition instead)
 
 **Implementation Impact**:
-- Medium complexity
+- Low to Medium complexity
 - Affects: Generation engine
 - Migration: Internal only
 
@@ -553,8 +557,8 @@ Things we explicitly decided NOT to do:
 ### AD-006: Support code generation to Java
 **Reason**: Low demand, significant effort, focus on requested languages
 
-### AD-007: Build custom template engine
-**Reason**: Jinja2 is excellent, no need to reinvent
+### AD-007: Use Jinja2 for templating
+**Reason**: F-strings are sufficient, simpler, and remove a dependency
 
 ### AD-008: Support inline code generation
 **Reason**: File-based is cleaner, easier to version control
