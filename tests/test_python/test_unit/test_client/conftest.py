@@ -95,7 +95,7 @@ def example_view_resource() -> dict[str, Any]:
                 "type": {
                     "type": "direct",
                     "container": {"space": "my_space", "externalId": "my_container"},
-                    "source": {"space": "my_space", "externalId": "target_view", "version": "v1"},
+                    "source": {"space": "my_space", "externalId": "target_view", "version": "v1", "type": "view"},
                 },
                 "nullable": True,
                 "immutable": False,

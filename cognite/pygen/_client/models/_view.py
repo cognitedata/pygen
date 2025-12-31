@@ -138,7 +138,5 @@ class ViewResponse(View, ResponseResource[ViewReference, ViewRequest]):
                 # We manually include the source as this is excluded by default. The reason why this is excluded
                 # is that the DirectNodeRelation is used for both request and response, and in the request the source
                 # does not exist on the DirectNodeRelation, but on the Property object.
-                output[prop_id]["type"]["source"] = (
-                    prop.type.source.model_dump(**vars(info)) if prop.type.source else None
-                )
+                output[prop_id]["type"]["source"] = prop.type.source.model_dump(**vars(info)) | {"type": "view"}
         return output
