@@ -45,7 +45,7 @@ server.listen(PORT, () => {
       await micropip.install(pkg);
       console.log(`Installed ${pkg} successfully`);
     }
-    console.log(`Installed ${packages.length} packages. Now trying to import pygen module.`);
+    console.log(`INSTALLED ${packages.length} PACKAGES. Now trying to import pygen module.`);
     const result = await pyodide.runPythonAsync(`
 import sys
 import traceback
