@@ -10,6 +10,7 @@ from cognite.pygen._client.models import (
     DataModelReference,
     DataModelRequest,
     DataModelResponse,
+    DataModelResponseWithViews,
     DataType,
     Index,
     IndexDefinition,
@@ -159,6 +160,7 @@ class TestViewResponse:
         assert isinstance(ref, ViewReference)
         assert str(ref) == "my_space:my_view(version=v1)"
         assert isinstance(view_response.as_request(), ViewRequest)
+        assert view_response.model_dump(by_alias=True, exclude_unset=True) == example_view_resource
 
     def test_view_response_with_none_implements(self) -> None:
         """Test that view response with None implements serializes correctly."""
@@ -318,6 +320,17 @@ class TestDataModel:
         assert str(ref) == "my_space:my_data_model(version=v1)"
         assert isinstance(data_model_response.as_request(), DataModelRequest)
         assert data_model_response.model_dump(by_alias=True) == example_data_model_resource
+
+    def test_data_model_response_with_views(self, example_data_model_with_views_resource: dict[str, Any]) -> None:
+        """Test that data model response with views serializes correctly."""
+        data_model_response = DataModelResponseWithViews.model_validate(example_data_model_with_views_resource)
+        ref = data_model_response.as_reference()
+        assert isinstance(ref, DataModelReference)
+        assert str(ref) == "my_space:my_data_model(version=v1)"
+        assert isinstance(data_model_response.as_request(), DataModelRequest)
+        assert (
+            data_model_response.model_dump(by_alias=True, exclude_unset=True) == example_data_model_with_views_resource
+        )
 
     def test_data_model_response_with_none_views(self) -> None:
         """Test that data model response with None views serializes correctly."""

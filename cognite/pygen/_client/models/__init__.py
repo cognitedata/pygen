@@ -11,7 +11,7 @@ from ._container import (
     ContainerRequest,
     ContainerResponse,
 )
-from ._data_model import DataModelRequest, DataModelResponse
+from ._data_model import DataModelRequest, DataModelResponse, DataModelResponseWithViews
 from ._data_types import (
     BooleanProperty,
     DataType,
@@ -156,6 +156,7 @@ __all__ = [
     "ViewRequest",
     "ViewRequestProperty",
     "ViewRequestPropertyAdapter",
+    "DataModelResponseWithViews",
     "ViewResponse",
     "ViewResponseProperty",
     "T_APIResource",

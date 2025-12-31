@@ -191,18 +191,18 @@ class TestDataModelsAPI:
         self,
         pygen_client: PygenClient,
         respx_mock: respx.MockRouter,
-        example_data_model_resource: dict[str, Any],
+        example_data_model_with_views_resource: dict[str, Any],
     ) -> None:
         client = pygen_client
         config = client.config
-        response_model = {**example_data_model_resource, "views": []}
+        response_model = example_data_model_with_views_resource
         route = respx_mock.post(config.create_api_url("/models/datamodels/byids")).respond(
             json={"items": [response_model]}
         )
         ref = DataModelReference(
-            space=example_data_model_resource["space"],
-            external_id=example_data_model_resource["externalId"],
-            version=example_data_model_resource["version"],
+            space=example_data_model_with_views_resource["space"],
+            external_id=example_data_model_with_views_resource["externalId"],
+            version=example_data_model_with_views_resource["version"],
         )
         models = pygen_client.data_models.retrieve([ref], inline_views=True)
         assert len(models) == 1
