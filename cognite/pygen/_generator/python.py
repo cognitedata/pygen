@@ -1,9 +1,7 @@
 from cognite.pygen._pygen_model import DataClass, ReadDataClass
 
-from .generator import Generator
 
-
-class PythonGenerator(Generator):
+class PythonGenerator:
     def create_write_class(self, write: DataClass) -> str:
         return f'''class {write.name}(InstanceWrite):
     """Write class for {write.display_name} instances."""
