@@ -13,6 +13,7 @@ from cognite.pygen._client.models import (
     Int32Property,
     Int64Property,
     JSONProperty,
+    ListablePropertyTypeDefinition,
     SequenceCDFExternalIdReference,
     TextProperty,
     TimeseriesCDFExternalIdReference,
@@ -100,9 +101,7 @@ class PythonDataTypeConverter(DataTypeConverter):
         type_class = type(data_type)
         base_type = _PYTHON_PRIMITIVE_TYPES.get(type_class, "Any")
 
-        is_list = getattr(data_type, "list", False) or False
-
-        if is_list:
+        if isinstance(data_type, ListablePropertyTypeDefinition) and data_type.list:
             type_hint = f"list[{base_type}]"
         else:
             type_hint = base_type
@@ -118,10 +117,7 @@ class PythonDataTypeConverter(DataTypeConverter):
             return None
 
         data_type = prop.type
-        is_list = getattr(data_type, "list", False) or False
-
-        # List properties do not have filters
-        if is_list:
+        if isinstance(data_type, ListablePropertyTypeDefinition) and data_type.list:
             return None
 
         type_class = type(data_type)
@@ -171,9 +167,7 @@ class TypeScriptDataTypeConverter(DataTypeConverter):
         type_class = type(data_type)
         base_type = _TYPESCRIPT_PRIMITIVE_TYPES.get(type_class, "unknown")
 
-        is_list = getattr(data_type, "list", False) or False
-
-        if is_list:
+        if isinstance(data_type, ListablePropertyTypeDefinition) and data_type.list:
             type_hint = f"readonly {base_type}[]"
         else:
             type_hint = base_type
@@ -188,15 +182,11 @@ class TypeScriptDataTypeConverter(DataTypeConverter):
         if not isinstance(prop, ViewCorePropertyResponse):
             return None
 
-        data_type = prop.type
-        is_list = getattr(data_type, "list", False) or False
-
         # List properties do not have filters
-        if is_list:
+        if isinstance(prop.type, ListablePropertyTypeDefinition) and prop.type.list:
             return None
 
-        type_class = type(data_type)
-        return _TYPESCRIPT_FILTER_NAMES.get(type_class)
+        return _TYPESCRIPT_FILTER_NAMES.get(type(prop.type))
 
 
 def get_converter_by_format(format: OutputFormat, context: Literal["read", "write"]) -> DataTypeConverter:
