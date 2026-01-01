@@ -94,20 +94,34 @@ class PythonDataClassGenerator:
         """Generate the filter class for the data class."""
         filter_class = self.data_class.filter
         read = self.data_class.read
+
+        attributes, names = self._create_filter_attributes()
+        attribute_str = f"\n{' '*8}".join(attributes)
+        attribute_list = f"\n{' '*16}".join(names)
         return f"""class {filter_class.name}(FilterContainer):
     def __init__(self, operator: Literal["and", "or"] = "and") -> None:
         view_id = {read.name}._view_id
-        self.property_one = TextFilter(view_id, "prop1", operator)
-        self.property_two = IntegerFilter(view_id, "prop2", operator)
+        {attribute_str}
         super().__init__(
             data_type_filters=[
-                self.property_one,
-                self.property_two,
+                {attribute_list}
             ],
             operator=operator,
             instance_type="{read.instance_type}",
         )
 """
+
+    def _create_filter_attributes(self) -> tuple[list[str], list[str]]:
+        """Create filter attributes for the filter class."""
+        attributes: list[str] = []
+        names: list[str] = []
+        read = self.data_class.read
+        for field in read.fields:
+            if not field.filter_name:
+                continue
+            attributes.append(f'self.{field.name} = {field.filter_name}(view_id, "{field.cdf_prop_id}", operator)')
+            names.append(f"self.{field.name},")
+        return attributes, names
 
     def _generate_field_line(self, field: Field, is_write: bool = False) -> str:
         """Generate a single field definition line."""
