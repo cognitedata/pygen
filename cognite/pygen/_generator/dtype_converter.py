@@ -2,7 +2,24 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import ClassVar, Literal
 
-from cognite.pygen._client.models import ViewResponseProperty
+from cognite.pygen._client.models import (
+    BooleanProperty,
+    DateProperty,
+    DirectNodeRelation,
+    EnumProperty,
+    FileCDFExternalIdReference,
+    Float32Property,
+    Float64Property,
+    Int32Property,
+    Int64Property,
+    JSONProperty,
+    SequenceCDFExternalIdReference,
+    TextProperty,
+    TimeseriesCDFExternalIdReference,
+    TimestampProperty,
+    ViewCorePropertyResponse,
+    ViewResponseProperty,
+)
 
 from ._types import OutputFormat
 
@@ -40,24 +57,146 @@ class DataTypeConverter(ABC):
         raise NotImplementedError()
 
 
+# Python type mappings for core property types
+_PYTHON_PRIMITIVE_TYPES: dict[type, str] = {
+    TextProperty: "str",
+    BooleanProperty: "bool",
+    Int32Property: "int",
+    Int64Property: "int",
+    Float32Property: "float",
+    Float64Property: "float",
+    DateProperty: "Date",
+    TimestampProperty: "int",
+    JSONProperty: "dict",
+    TimeseriesCDFExternalIdReference: "str",
+    FileCDFExternalIdReference: "str",
+    SequenceCDFExternalIdReference: "str",
+    EnumProperty: "str",
+    DirectNodeRelation: "InstanceId",
+}
+
+# Python filter name mappings
+_PYTHON_FILTER_NAMES: dict[type, str] = {
+    TextProperty: "TextFilter",
+    BooleanProperty: "BooleanFilter",
+    Int32Property: "IntegerFilter",
+    Int64Property: "IntegerFilter",
+    Float32Property: "FloatFilter",
+    Float64Property: "FloatFilter",
+    DateProperty: "DateFilter",
+    TimestampProperty: "DateTimeFilter",
+    DirectNodeRelation: "DirectRelationFilter",
+}
+
+
 class PythonDataTypeConverter(DataTypeConverter):
     output_format = "python"
 
     def create_type_hint(self, prop: ViewResponseProperty) -> str:
-        raise NotImplementedError()
+        if not isinstance(prop, ViewCorePropertyResponse):
+            return "Any"
+
+        data_type = prop.type
+        type_class = type(data_type)
+        base_type = _PYTHON_PRIMITIVE_TYPES.get(type_class, "Any")
+
+        is_list = getattr(data_type, "list", False) or False
+
+        if is_list:
+            type_hint = f"list[{base_type}]"
+        else:
+            type_hint = base_type
+
+        nullable = prop.nullable if prop.nullable is not None else False
+        if nullable:
+            type_hint = f"{type_hint} | None"
+
+        return type_hint
 
     def get_filter_name(self, prop: ViewResponseProperty) -> str | None:
-        raise NotImplementedError()
+        if not isinstance(prop, ViewCorePropertyResponse):
+            return None
+
+        data_type = prop.type
+        is_list = getattr(data_type, "list", False) or False
+
+        # List properties do not have filters
+        if is_list:
+            return None
+
+        type_class = type(data_type)
+        return _PYTHON_FILTER_NAMES.get(type_class)
+
+
+# TypeScript type mappings for core property types
+_TYPESCRIPT_PRIMITIVE_TYPES: dict[type, str] = {
+    TextProperty: "string",
+    BooleanProperty: "boolean",
+    Int32Property: "number",
+    Int64Property: "number",
+    Float32Property: "number",
+    Float64Property: "number",
+    DateProperty: "Date",
+    TimestampProperty: "Date",
+    JSONProperty: "object",
+    TimeseriesCDFExternalIdReference: "string",
+    FileCDFExternalIdReference: "string",
+    SequenceCDFExternalIdReference: "string",
+    EnumProperty: "string",
+    DirectNodeRelation: "InstanceId",
+}
+
+# TypeScript filter name mappings
+_TYPESCRIPT_FILTER_NAMES: dict[type, str] = {
+    TextProperty: "TextFilter",
+    BooleanProperty: "BooleanFilter",
+    Int32Property: "IntegerFilter",
+    Int64Property: "IntegerFilter",
+    Float32Property: "FloatFilter",
+    Float64Property: "FloatFilter",
+    DateProperty: "DateFilter",
+    TimestampProperty: "DateTimeFilter",
+    DirectNodeRelation: "DirectRelationFilter",
+}
 
 
 class TypeScriptDataTypeConverter(DataTypeConverter):
     output_format = "typescript"
 
     def create_type_hint(self, prop: ViewResponseProperty) -> str:
-        raise NotImplementedError()
+        if not isinstance(prop, ViewCorePropertyResponse):
+            return "unknown"
+
+        data_type = prop.type
+        type_class = type(data_type)
+        base_type = _TYPESCRIPT_PRIMITIVE_TYPES.get(type_class, "unknown")
+
+        is_list = getattr(data_type, "list", False) or False
+
+        if is_list:
+            type_hint = f"readonly {base_type}[]"
+        else:
+            type_hint = base_type
+
+        nullable = prop.nullable if prop.nullable is not None else False
+        if nullable:
+            type_hint = f"{type_hint} | undefined"
+
+        return type_hint
 
     def get_filter_name(self, prop: ViewResponseProperty) -> str | None:
-        raise NotImplementedError()
+        if not isinstance(prop, ViewCorePropertyResponse):
+            return None
+
+        data_type = prop.type
+        is_list = getattr(data_type, "list", False) or False
+
+        # List properties do not have filters
+        if is_list:
+            return None
+
+        type_class = type(data_type)
+        return _TYPESCRIPT_FILTER_NAMES.get(type_class)
 
 
 def get_converter_by_format(format: OutputFormat, context: Literal["read", "write"]) -> DataTypeConverter:

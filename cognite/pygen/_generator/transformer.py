@@ -150,4 +150,6 @@ def _create_api_class(
     naming: StrictNamingConfig,
     config: PygenSDKConfig,
 ) -> APIClassFile:
-    raise NotImplementedError()
+    return APIClassFile(
+        filename=sanitize(f"_{view.external_id}_api.py"),
+    )
