@@ -586,74 +586,35 @@ The following has been implemented as scaffolding:
 - ✅ `test_gen_functions.py` - Tests with xfail for full generation
 - ✅ `conftest.py` - Fixtures for example data model responses
 
+### MVP Scope
+
+The MVP focuses on generating SDKs for the **ExampleDataModel** located in `cognite/pygen/_example_datamodel/`. This includes 3 views:
+- **ProductNode**: Node view with various property types (text, float, int, bool, date, datetime)
+- **CategoryNode**: Node view with basic properties
+- **RelatesTo**: Edge view with properties
+
+**MVP Limitations** (to be addressed in future iterations):
+- No connection/relationship support (direct relations, edges, reverse relations)
+- No validation layer
+- No code formatting integration
+- Core properties only (text, int, float, bool, date, timestamp, json)
+
+**File Structure**: Unlike the hand-written examples (all classes in one file), generated SDKs will have **separate files** for each data class and API class.
+
 ### Remaining Tasks
 
-#### Task 4.1: Extend PygenModel for Connections ⏳
-
-Add support for relationships beyond core properties:
-
-1. **Create `Connection` class** in `_pygen_model/_connection.py`:
-     - Direct relations (single and list)
-     - Edge connections
-     - Reverse direct relations
-   - Include: target view reference, cardinality, direction, connection type
-
-2. **Update `DataClass` models**:
-   - Add `connections: list[Connection]` field
-   - Add connection-related metadata needed for API generation
-
-3. **Update `DataClassFile` and `APIClassFile`**:
-   - Include connection information for template generation
-
-#### Task 4.2: Extend Transformer for Connections ⏳
-
-Update `transformer.py` to handle all property types:
-
-1. **Handle connection properties**:
-   - `MultiEdgeProperty` → Edge connections
-   - `SingleReverseDirectRelation` → Reverse relations
-   - `MultiReverseDirectRelation` → Reverse relations (list)
-   - Direct relations with `source` view reference
-
-2. **Add view reference resolution**:
-   - Map connection targets to their corresponding DataClass
-   - Handle self-referential views
-   - Handle views from different spaces
-
-3. **Handle inheritance** (`implements`):
-   - Merge fields from parent views
-   - Resolve property overrides
-
-#### Task 4.3: Add Validation Layer ⏳
-
-Create validation in `_generator/validation.py`:
-
-1. **Pre-generation validation**:
-   - Check reverse direct relation targets exist
-   - Verify `source` is defined for direct relations
-   - Detect name conflicts with reserved words
-
-2. **Warning generation**:
-   - Unsupported property types (graceful skip)
-   - Circular dependency detection
-   - Missing view references
-
-3. **Integrate validation** into `generate_sdk()` flow
-
-#### Task 4.4: Complete Python Data Class Templates ⏳
+#### Task 4.1: Complete Python Data Class Templates ⏳
 
 Implement in `python.py` `PythonDataClassGenerator`:
 
 1. **`create_import_statements()`**:
    - Import from `cognite.pygen._python.instance_api`
-   - Import connection target classes
-   - Handle type-only imports for forward references
+   - Import required types (Date, InstanceId, JsonValue, etc.)
 
 2. **`generate_read_class()`**:
    - Extend `Instance` base class
    - Generate all field definitions with type hints
    - Generate `_view_id` class attribute
-   - Handle connection properties
 
 3. **`generate_write_class()`**:
    - Extend `InstanceWrite` base class
@@ -668,7 +629,11 @@ Implement in `python.py` `PythonDataClassGenerator`:
    - Extend `FilterContainer` base class
    - Generate filter fields with DataTypeFilter types
 
-#### Task 4.5: Complete Python API Class Templates ⏳
+**Target Output**: One `.py` file per view containing read, write, list, and filter classes.
+
+Reference: `cognite/pygen/_python/example/_data_class.py`
+
+#### Task 4.2: Complete Python API Class Templates ⏳
 
 Implement `create_api_class_code()` in `PythonGenerator`:
 
@@ -679,13 +644,17 @@ Implement `create_api_class_code()` in `PythonGenerator`:
 
 2. **Type-safe method signatures**:
    - Generate filter parameters from FilterClass fields
-   - Include sorting, pagination, unit conversion parameters
+   - Include sorting, pagination parameters
 
 3. **Import statements**:
-   - Import data classes and filter classes
+   - Import data classes and filter classes from data_classes module
    - Import base classes from instance_api
 
-#### Task 4.6: Complete Python Client & Package Templates ⏳
+**Target Output**: One `_<view_name>_api.py` file per view.
+
+Reference: `cognite/pygen/_python/example/_api.py`
+
+#### Task 4.3: Complete Python Client & Package Templates ⏳
 
 1. **Client class template**:
    - Extend `InstanceClient` base class
@@ -701,12 +670,31 @@ Implement `create_api_class_code()` in `PythonGenerator`:
    - Return empty dict when `pygen_as_dependency=True`
    - Copy instance_api module when `pygen_as_dependency=False`
 
-#### Task 4.7: Complete TypeScript Data Class Templates ⏳
+**Target Output**:
+```
+<sdk_name>/
+├── __init__.py
+├── _client.py
+├── data_classes/
+│   ├── __init__.py
+│   ├── product_node.py
+│   ├── category_node.py
+│   └── relates_to.py
+└── _api/
+    ├── __init__.py
+    ├── _product_node_api.py
+    ├── _category_node_api.py
+    └── _relates_to_api.py
+```
+
+Reference: `cognite/pygen/_python/example/_client.py`
+
+#### Task 4.4: Complete TypeScript Data Class Templates ⏳
 
 Implement in `typescript.py`:
 
 1. **Data class templates**:
-   - `Instance` class (read)
+   - `Instance` interface/class (read)
    - `InstanceWrite` interface
    - `InstanceList` class
    - Filter container class
@@ -716,7 +704,11 @@ Implement in `typescript.py`:
    - Use `| undefined` for nullable types
    - Use interfaces where appropriate
 
-#### Task 4.8: Complete TypeScript API & Client Templates ⏳
+**Target Output**: One `.ts` file per view containing read, write, list, and filter classes.
+
+Reference: `cognite/pygen/_typescript/example/dataClasses.ts`
+
+#### Task 4.5: Complete TypeScript API & Client Templates ⏳
 
 1. **API class template**:
    - Extend `InstanceAPI` base class
@@ -728,86 +720,65 @@ Implement in `typescript.py`:
 
 3. **Package structure**:
    - Generate `index.ts` with exports
-   - Handle Deno-compatible imports
 
 4. **Implement `add_instance_api()`**:
    - Copy TypeScript instance_api module
 
-#### Task 4.9: Code Formatting Integration ⏳
+**Target Output**:
+```
+<sdk_name>/
+├── index.ts
+├── client.ts
+├── dataClasses/
+│   ├── productNode.ts
+│   ├── categoryNode.ts
+│   └── relatesTo.ts
+└── api/
+    ├── productNodeApi.ts
+    ├── categoryNodeApi.ts
+    └── relatesToApi.ts
+```
 
-1. **Python formatting**:
-   - Integrate ruff format post-generation
-   - Handle formatting errors gracefully
+Reference: `cognite/pygen/_typescript/example/api.ts`, `cognite/pygen/_typescript/example/client.ts`
 
-2. **TypeScript formatting**:
-   - Integrate deno fmt post-generation
-   - Fallback if deno not available
-
-3. **Add `format_code` config option handling**
-
-#### Task 4.10: Testing & Validation ⏳
-
-1. **Unit tests for each template**:
-   - Test individual template methods
-   - Test with various property types and combinations
-
-2. **Integration tests**:
-   - Generate SDK from example data model
-   - Compare generated output to hand-written examples in Phase 2/3
-   - Verify generated code compiles/type-checks
-
-3. **Edge case tests**:
-   - Self-referential views
-   - Views without properties
-   - Reserved word handling
-   - Large models (performance)
-
-### Deliverables
+### Deliverables (MVP)
 - ✅ Basic Field, DataClass models (PygenModel) - SCAFFOLDED
 - ✅ PygenSDKModel top-level representation - SCAFFOLDED  
 - ✅ Configuration system (PygenSDKConfig) - COMPLETE
 - ✅ Data type converters (Python/TypeScript) - COMPLETE
 - ✅ Basic transformer (core properties) - SCAFFOLDED
-- ⏳ Connection class for relationships
-- ⏳ Extended transformer for all property types
-- ⏳ Validation layer with clear error messages
 - ⏳ Working Python generator (data classes, API classes, client)
 - ⏳ Working TypeScript generator (data classes, API classes, client)
-- ⏳ Package structure generation
-- ⏳ Code formatting integration
-- ⏳ Generated Python SDK matches Phase 2 example patterns
-- ⏳ Generated TypeScript SDK matches Phase 3 example patterns
-- ⏳ Comprehensive test suite
+- ⏳ Package structure generation (separate files per view)
+- ⏳ Generated Python SDK for ExampleDataModel
+- ⏳ Generated TypeScript SDK for ExampleDataModel
 
-### Success Criteria
-- Can parse complex CDF data models to PygenModel
-- Validation catches common issues with clear messages
-- PygenModel contains all information needed for code generation
+### MVP Success Criteria
+- Can generate Python SDK from ExampleDataModel
+- Can generate TypeScript SDK from ExampleDataModel  
 - Naming conventions correctly applied for both languages
-- Can generate Python SDK from any CDF data model
-- Can generate TypeScript SDK from any CDF data model
-- Generated code passes linting and type checking
-- Generated code is functionally equivalent to hand-written examples
 - Generated code correctly extends generic Instance API classes
-- All tests pass with >90% coverage
-- Well-documented model structure
+- Generated code structure: separate files per data class and API class
+- Generated code handles core property types (text, int, float, bool, date, timestamp, json)
+
+### Deferred to Post-MVP
+- Connection/relationship support (direct relations, edges, reverse relations)
+- Validation layer with error messages
+- Code formatting integration (ruff, deno fmt)
+- Comprehensive test suite
+- Complex data model support
 
 ### Status
-**⏳ IN PROGRESS** - Scaffolding complete
+**⏳ IN PROGRESS** - Scaffolding complete, MVP scope defined
 
 - ✅ Task 4.0: Scaffolding - Complete
-- ⏳ Task 4.1: Extend PygenModel for Connections - Not started
-- ⏳ Task 4.2: Extend Transformer for Connections - Not started
-- ⏳ Task 4.3: Add Validation Layer - Not started
-- ⏳ Task 4.4: Complete Python Data Class Templates - Not started
-- ⏳ Task 4.5: Complete Python API Class Templates - Not started
-- ⏳ Task 4.6: Complete Python Client & Package Templates - Not started
-- ⏳ Task 4.7: Complete TypeScript Data Class Templates - Not started
-- ⏳ Task 4.8: Complete TypeScript API & Client Templates - Not started
-- ⏳ Task 4.9: Code Formatting Integration - Not started
-- ⏳ Task 4.10: Testing & Validation - Partially started (xfail tests exist)
+- ⏳ Task 4.1: Complete Python Data Class Templates - Not started
+- ⏳ Task 4.2: Complete Python API Class Templates - Not started
+- ⏳ Task 4.3: Complete Python Client & Package Templates - Not started
+- ⏳ Task 4.4: Complete TypeScript Data Class Templates - Not started
+- ⏳ Task 4.5: Complete TypeScript API & Client Templates - Not started
 
-**Progress**: 1/11 tasks complete (~9%)
+**Progress**: 1/6 tasks complete (~17%)
 
 ### Dependencies
 - Phase 1 complete (need CDF API models: ViewResponse, DataModelResponse) ✅

@@ -372,22 +372,24 @@ Phase 4 combines PygenModel creation and code generation. The scaffolding has be
 - ✅ `test_gen_functions.py` - Tests with xfail for full generation
 - ✅ `conftest.py` - Fixtures for example data model responses
 
+### MVP Scope
+
+Generate SDKs for the **ExampleDataModel** (`cognite/pygen/_example_datamodel/`) with:
+- 3 views: ProductNode, CategoryNode, RelatesTo
+- Core properties only (no connections/relationships)
+- Separate files per data class and API class
+
 ### Remaining Tasks
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 4.1 | Extend PygenModel for Connections | ⏳ Not Started |
-| 4.2 | Extend Transformer for Connections | ⏳ Not Started |
-| 4.3 | Add Validation Layer | ⏳ Not Started |
-| 4.4 | Complete Python Data Class Templates | ⏳ Not Started |
-| 4.5 | Complete Python API Class Templates | ⏳ Not Started |
-| 4.6 | Complete Python Client & Package Templates | ⏳ Not Started |
-| 4.7 | Complete TypeScript Data Class Templates | ⏳ Not Started |
-| 4.8 | Complete TypeScript API & Client Templates | ⏳ Not Started |
-| 4.9 | Code Formatting Integration | ⏳ Not Started |
-| 4.10 | Testing & Validation | ⏳ Partially (xfail tests exist) |
+| 4.1 | Complete Python Data Class Templates | ⏳ Not Started |
+| 4.2 | Complete Python API Class Templates | ⏳ Not Started |
+| 4.3 | Complete Python Client & Package Templates | ⏳ Not Started |
+| 4.4 | Complete TypeScript Data Class Templates | ⏳ Not Started |
+| 4.5 | Complete TypeScript API & Client Templates | ⏳ Not Started |
 
-**Progress**: 1/11 tasks complete (~9%)
+**Progress**: 1/6 tasks complete (~17%)
 
 See `plan/implementation-roadmap.md` Phase 4 for detailed task breakdown.
 
@@ -685,12 +687,12 @@ Phase 9 completes documentation and enables migration from v1.
 
 ### Next Steps
 
-1. Continue **Phase 4: PygenModel & Code Generation** (scaffolding complete)
-2. **Task 4.1**: Extend PygenModel for Connections - add Connection class for relationships
-3. **Task 4.2**: Extend Transformer for Connections - handle edge and reverse relation properties
-4. **Task 4.3**: Add Validation Layer - pre-generation validation with clear error messages
-5. **Task 4.4**: Complete Python Data Class Templates - implement f-string templates
-6. Test generated output against example SDK from Phase 2
+1. Continue **Phase 4: PygenModel & Code Generation** (MVP scope)
+2. **Task 4.1**: Complete Python Data Class Templates - implement f-string templates for read, write, list, filter classes
+3. **Task 4.2**: Complete Python API Class Templates - generate type-safe API methods
+4. **Task 4.3**: Complete Python Client & Package Templates - generate package structure with separate files
+5. **Task 4.4-4.5**: Complete TypeScript Templates - data classes, API, client
+6. Test generated output against ExampleDataModel (`cognite/pygen/_example_datamodel/`)
 
 ---
 
