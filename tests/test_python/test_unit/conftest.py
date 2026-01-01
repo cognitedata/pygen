@@ -9,6 +9,6 @@ class MockCredentials(Credentials):
         return "Authorization", "Bearer dummy_token"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def pygen_client_config() -> PygenClientConfig:
     return PygenClientConfig("https://example.com", "test_project", MockCredentials())

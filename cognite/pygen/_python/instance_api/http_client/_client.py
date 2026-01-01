@@ -1,7 +1,7 @@
 import random
 import sys
 import time
-from collections.abc import MutableMapping, Set
+from collections.abc import MutableMapping
 from typing import Literal
 
 import httpx
@@ -31,30 +31,15 @@ class HTTPClient:
 
     Args:
         config (PygenClientConfig): Configuration for the Toolkit client.
-        pool_connections (int): The number of connection pools to cache. Default is 10.
-        pool_maxsize (int): The maximum number of connections to save in the pool. Default
-            is 20.
-        max_retries (int): The maximum number of retries for a request. Default is 10.
-        retry_status_codes (frozenset[int]): HTTP status codes that should trigger a retry.
-            Default is {408, 429, 502, 503, 504}.
-
     """
 
-    def __init__(
-        self,
-        config: PygenClientConfig,
-        max_retries: int = 10,
-        pool_connections: int = 10,
-        pool_maxsize: int = 20,
-        retry_status_codes: Set[int] = frozenset({408, 429, 502, 503, 504}),
-        max_retry_backoff: int = 60,
-    ):
+    def __init__(self, config: PygenClientConfig):
         self.config = config
-        self._max_retries = max_retries
-        self._pool_connections = pool_connections
-        self._pool_maxsize = pool_maxsize
-        self._retry_status_codes = retry_status_codes
-        self._max_retry_backoff = max_retry_backoff
+        self._max_retries = config.max_retries
+        self._pool_connections = config.pool_connections
+        self._pool_maxsize = config.pool_maxsize
+        self._retry_status_codes = config.retry_status_codes
+        self._max_retry_backoff = config.max_retry_backoff
 
         # Thread-safe session for connection pooling
         self.session = self._create_thread_safe_session()
@@ -95,7 +80,7 @@ class HTTPClient:
             headers["Content-Length"] = str(content_length)
         headers["accept"] = accept
         headers["x-cdp-sdk"] = f"CognitePygen:{get_current_pygen_version()}"
-        headers["x-cdp-app"] = self.config.client_name
+        headers["x-cdp-app"] = self.config.client_name or f"CognitePygen:{get_current_pygen_version()}"
         headers["cdf-version"] = api_version or self.config.api_subversion
         if not disable_gzip and content_length is None:
             headers["Content-Encoding"] = "gzip"

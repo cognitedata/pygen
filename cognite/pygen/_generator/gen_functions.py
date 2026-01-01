@@ -4,6 +4,7 @@ from typing import Any
 from cognite.pygen._client import PygenClient
 from cognite.pygen._client.models import DataModelReference, DataModelResponseWithViews
 from cognite.pygen._python.instance_api.config import PygenClientConfig
+from cognite.pygen._version import __version__
 
 from ._types import OutputFormat
 from .config import PygenSDKConfig
@@ -72,6 +73,8 @@ def _retrieve_data_model(
         DataModelResponseWithViews: The retrieved data model.
     """
     config = config or PygenClientConfig.default()
+    # This call is considered the `pygen` GenerateSDK application
+    config.client_name = f"CognitePygen:{__version__}:GenerateSDK"
     with PygenClient(config=config) as client:
         data_models = client.data_models.retrieve(
             [DataModelReference(space=space, external_id=external_id, version=version)], inline_views=True

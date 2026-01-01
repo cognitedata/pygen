@@ -33,19 +33,14 @@ class PygenClient:
         containers: API for managing containers.
     """
 
-    def __init__(
-        self,
-        config: PygenClientConfig,
-        max_retries: int = 10,
-    ) -> None:
+    def __init__(self, config: PygenClientConfig) -> None:
         """Initialize the Pygen client.
 
         Args:
             config: Configuration for the client including URL, project, and credentials.
-            max_retries: Maximum number of retries for failed requests. Default is 10.
         """
         self.config = config
-        self._http_client = HTTPClient(config, max_retries=max_retries)
+        self._http_client = HTTPClient(config)
 
         # Initialize resource APIs as attributes (not properties)
         self.spaces = SpacesAPI(self._http_client)

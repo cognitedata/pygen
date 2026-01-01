@@ -24,7 +24,8 @@ def http_client(pygen_client_config: PygenClientConfig) -> Iterator[HTTPClient]:
 
 @pytest.fixture
 def http_client_one_retry(pygen_client_config: PygenClientConfig) -> Iterator[HTTPClient]:
-    with HTTPClient(pygen_client_config, max_retries=1) as client:
+    pygen_client_config.max_retries = 1
+    with HTTPClient(pygen_client_config) as client:
         yield client
 
 
@@ -116,7 +117,8 @@ class TestHTTPClient:
         assert "RequestException after 1 attempts (read error): Simulated read timeout" == response.error
 
     def test_zero_retries(self, pygen_client_config: PygenClientConfig, respx_mock: respx.MockRouter) -> None:
-        client = HTTPClient(pygen_client_config, max_retries=0)
+        pygen_client_config.max_retries = 0
+        client = HTTPClient(pygen_client_config)
         respx_mock.get("https://example.com/api/resource").respond(
             json={"error": {"message": "service unavailable", "code": 503}}, status_code=503
         )

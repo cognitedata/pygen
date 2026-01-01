@@ -1,8 +1,8 @@
 import sys
+from collections.abc import Set
 from dataclasses import dataclass
 
 from cognite.pygen._python.instance_api.auth.credentials import Credentials
-from cognite.pygen._version import __version__
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -15,7 +15,16 @@ class PygenClientConfig:
     cdf_url: str
     project: str
     credentials: Credentials
-    client_name: str = f"CognitePygen:{__version__}:GenerateSDK"
+    client_name: str | None = None
+    max_retries: int = 10
+    #  The number of connection pools to cache. Default is 10.
+    pool_connections: int = 10
+    # The maximum number of connections to save in the pool. Default is 20.
+    pool_maxsize: int = 20
+    # HTTP status codes that should trigger a retry.
+    retry_status_codes: Set[int] = frozenset({408, 429, 502, 503, 504})
+    # The maximum backoff time in seconds between retries. Default is 60 seconds.
+    max_retry_backoff: int = 60
 
     api_subversion: str = "20230101"
     timeout: float = 30.0
