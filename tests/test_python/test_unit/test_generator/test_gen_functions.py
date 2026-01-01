@@ -6,7 +6,9 @@ import pytest
 from cognite.pygen._example_datamodel import EXTERNAL_ID, SPACE, VERSION
 from cognite.pygen._generator.config import PygenSDKConfig
 from cognite.pygen._generator.gen_functions import generate_sdk
+from cognite.pygen._python.instance_api.config import PygenClientConfig
 from tests.test_python.constants import EXAMPLES
+from tests.test_python.test_unit.conftest import MockCredentials
 from tests.test_python.test_unit.test_generator.conftest import create_example_data_model_response
 from tests.test_python.utils import monkeypatch_pygen_client
 
@@ -34,13 +36,23 @@ def actual_python_sdk_example_model() -> dict[Path, str]:
             top_level_package=SDK_NAME_PYTHON,
             client_name="ExamplePygenClient",
         )
+        client_config = PygenClientConfig(
+            cdf_url="https://example.cognitedata.com",
+            project="pygen",
+            credentials=MockCredentials(),
+        )
         sdk_files = generate_sdk(
-            space=SPACE, external_id=EXTERNAL_ID, version=VERSION, sdk_config=sdk_config, output_format="python"
+            space=SPACE,
+            external_id=EXTERNAL_ID,
+            version=VERSION,
+            sdk_config=sdk_config,
+            client_config=client_config,
+            output_format="python",
         )
     return sdk_files
 
 
-@pytest.mark.parametrize("file_path", load_example_model(SDK_NAME_PYTHON).keys())
+@pytest.mark.parametrize("file_path", load_example_model(SDK_NAME_PYTHON).keys(), ids=lambda p: p.as_posix())
 def test_generate_python_sdk_example_model(file_path: Path, actual_python_sdk_example_model: dict[Path, str]) -> None:
     expected_filepath = EXAMPLES / file_path
     if not expected_filepath.exists():

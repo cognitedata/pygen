@@ -1,7 +1,13 @@
+import sys
 from dataclasses import dataclass
 
 from cognite.pygen._python.instance_api.auth.credentials import Credentials
 from cognite.pygen._version import __version__
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 @dataclass
@@ -49,3 +55,8 @@ class PygenClientConfig:
         if not endpoint.startswith("/"):
             endpoint = f"/{endpoint}"
         return f"{self.base_api_url}{endpoint}"
+
+    @classmethod
+    def default(cls) -> Self:
+        # Creates the config from the default (environment, repo root)
+        raise NotImplementedError()
