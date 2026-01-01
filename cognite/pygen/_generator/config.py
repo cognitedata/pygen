@@ -1,14 +1,13 @@
 from collections.abc import Set
-from typing import Literal, TypeAlias
 
 from pydantic import BaseModel, Field
 
-NamingConvention: TypeAlias = Literal["camelCase", "PascalCase", "snake_case", "language_default"]
+from ._types import UserCasing
 
 
 class NamingConfig(BaseModel):
-    class_name: NamingConvention = "language_default"
-    field_name: NamingConvention = "language_default"
+    class_name: UserCasing = "language_default"
+    field_name: UserCasing = "language_default"
 
 
 class PygenSDKConfig(BaseModel):
@@ -22,6 +21,7 @@ class PygenSDKConfig(BaseModel):
     output_directory: str = "."
     overwrite: bool = False
     format_code: bool = True
+    pygen_as_dependency: bool = True
     exclude_views: Set[str] = Field(default_factory=set)
     exclude_spaces: Set[str] = Field(default_factory=set)
     naming: NamingConfig = Field(default_factory=NamingConfig)

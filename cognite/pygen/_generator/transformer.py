@@ -1,6 +1,6 @@
 """Transforms a data model into the PygenModel used for code generation."""
 
-from typing import Literal, TypeAlias, cast
+from typing import Literal, cast
 
 from pydantic import BaseModel
 from pydantic.alias_generators import to_camel, to_pascal, to_snake
@@ -23,11 +23,9 @@ from cognite.pygen._pygen_model import (
 )
 from cognite.pygen._utils.filesystem import sanitize
 
-from ._types import OutputFormat
+from ._types import Casing, OutputFormat
 from .config import NamingConfig, PygenSDKConfig
 from .dtype_converter import DataTypeConverter, get_converter_by_format
-
-Casing: TypeAlias = Literal["camelCase", "PascalCase", "snake_case"]
 
 
 class StrictNamingConfig(BaseModel):
