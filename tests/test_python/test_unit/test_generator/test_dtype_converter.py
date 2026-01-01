@@ -18,10 +18,13 @@ from cognite.pygen._client.models import (
 )
 from cognite.pygen._generator._types import OutputFormat
 from cognite.pygen._generator.dtype_converter import (
+    _PYTHON_FILTER_NAMES,
     PythonDataTypeConverter,
     TypeScriptDataTypeConverter,
     get_converter_by_format,
 )
+from cognite.pygen._python.instance_api.models.dtype_filters import DataTypeFilter
+from tests.test_python.utils import get_concrete_subclasses
 
 _DEFAULT_ARGS: Mapping[str, Any] = {
     "container": ContainerReference(space="default_space", external_id="default_container"),
@@ -88,6 +91,11 @@ class TestPythonDataTypeConverter:
     def test_get_filter_name(self, prop: ViewResponseProperty, expected: str) -> None:
         converter = PythonDataTypeConverter("read")
         assert converter.get_filter_name(prop) == expected
+
+    def test_filter_name_mapping_complete(self) -> None:
+        existing_filter_name = {cls_.__name__ for cls_ in get_concrete_subclasses(DataTypeFilter)}
+        target_filter_names = set(_PYTHON_FILTER_NAMES.values())
+        assert existing_filter_name == target_filter_names
 
 
 class TestTypeScriptDataTypeConverter:
