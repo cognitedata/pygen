@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import pytest
 
 from cognite.pygen._client.models import DataModelResponseWithViews
@@ -15,9 +17,9 @@ from cognite.pygen._example_datamodel import (
 )
 
 
-@pytest.fixture(scope="module")
-def example_data_model_response() -> DataModelResponseWithViews:
-    """Provides an example DataModelResponseWithViews for testing."""
+@lru_cache(maxsize=1)
+def create_example_data_model_response() -> DataModelResponseWithViews:
+    """Creates an example DataModelResponseWithViews for testing."""
     model = example_data_model.model_dump(by_alias=True)
     views = [
         category_view.model_dump(by_alias=True),
@@ -48,6 +50,12 @@ def example_data_model_response() -> DataModelResponseWithViews:
             elif prop.get("connectionType") in ("single_reverse_direct_relation", "multi_reverse_direct_relation"):
                 prop["targetsList"] = True
     return DataModelResponseWithViews.model_validate({**model, "views": views})
+
+
+@pytest.fixture(scope="module")
+def example_data_model_response() -> DataModelResponseWithViews:
+    """Provides an example DataModelResponseWithViews for testing."""
+    return create_example_data_model_response()
 
 
 def test_example_data_model(example_data_model_response: DataModelResponseWithViews) -> None:
