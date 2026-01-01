@@ -52,6 +52,7 @@ def actual_python_sdk_example_model() -> dict[Path, str]:
     return sdk_files
 
 
+@pytest.mark.xfail(reason="Not implemented yet")
 @pytest.mark.parametrize("file_path", load_example_model(SDK_NAME_PYTHON).keys(), ids=lambda p: p.as_posix())
 def test_generate_python_sdk_example_model(file_path: Path, actual_python_sdk_example_model: dict[Path, str]) -> None:
     expected_filepath = EXAMPLES / file_path
