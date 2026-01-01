@@ -145,12 +145,15 @@ def _create_data_class(view: ViewResponse, naming: StrictNamingConfig, output_fo
 
 
 def _to_casing(name: str, casing: Casing) -> str:
+    # First convert to snake_case as an intermediate step to handle
+    # mixed case input (e.g., "CategoryNode" or "categoryName")
+    snake = to_snake(name)
     if casing == "camelCase":
-        return to_camel(name)
+        return to_camel(snake)
     elif casing == "PascalCase":
-        return to_pascal(name)
+        return to_pascal(snake)
     elif casing == "snake_case":
-        return to_snake(name)
+        return snake
     else:
         raise NotImplementedError(f"Unsupported casing: {casing}")
 
