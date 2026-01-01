@@ -11,7 +11,16 @@ from cognite.pygen._client.models import (
     ViewResponse,
     ViewResponseProperty,
 )
-from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field, PygenSDKModel, ReadDataClass
+from cognite.pygen._pygen_model import (
+    APIClassFile,
+    DataClass,
+    DataClassFile,
+    Field,
+    FilterClass,
+    ListDataClass,
+    PygenSDKModel,
+    ReadDataClass,
+)
 from cognite.pygen._utils.filesystem import sanitize
 
 from ._types import OutputFormat
@@ -49,7 +58,7 @@ def to_pygen_model(
         if view.external_id in config.exclude_views:
             continue
         data_class = _create_data_class(view, naming, output_format)
-        api_class = _create_api_class(data_class, view, naming, config)
+        api_class = _create_api_class(data_class, view, naming)
         model.data_classes.append(data_class)
         model.api_classes.append(api_class)
     return model
@@ -116,7 +125,21 @@ def _create_data_class(view: ViewResponse, naming: StrictNamingConfig, output_fo
         write_class_name=write.name if write else None,
     )
 
-    return DataClassFile(filename=sanitize(f"{view.external_id}.py"), read=read, write=write)
+    read_list = ListDataClass(
+        view_id=view.as_reference(),
+        name=_to_casing(f"{view.external_id}List", naming.class_name),
+        read_class_name=read.name,
+    )
+
+    filter_class = FilterClass(
+        name=_to_casing(f"{view.external_id}Filter", naming.class_name),
+        view_id=view.as_reference(),
+        instance_type=used_for,
+    )
+
+    return DataClassFile(
+        filename=sanitize(f"{view.external_id}.py"), read=read, write=write, read_list=read_list, filter=filter_class
+    )
 
 
 def _to_casing(name: str, casing: Casing) -> str:
@@ -144,12 +167,12 @@ def _create_field(
     )
 
 
-def _create_api_class(
-    data_class: DataClassFile,
-    view: ViewResponse,
-    naming: StrictNamingConfig,
-    config: PygenSDKConfig,
-) -> APIClassFile:
+def _create_api_class(data_class: DataClassFile, view: ViewResponse, naming: StrictNamingConfig) -> APIClassFile:
     return APIClassFile(
         filename=sanitize(f"_{view.external_id}_api.py"),
+        name=_to_casing(f"{view.external_id}API", naming.class_name),
+        client_attribute_name=_to_casing(f"{view.external_id}", naming.field_name),
+        read_class_name=data_class.read.name,
+        read_list_class_name=data_class.read_list.name,
+        filter_class=data_class.filter,
     )

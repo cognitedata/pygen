@@ -17,3 +17,15 @@ class DataClass(CodeModel):
 
 class ReadDataClass(DataClass):
     write_class_name: str | None = None
+
+
+class ListDataClass(CodeModel):
+    view_id: ViewReference
+    name: str
+    read_class_name: str
+
+
+class FilterClass(CodeModel):
+    name: str
+    view_id: ViewReference
+    instance_type: Literal["node", "edge"]
