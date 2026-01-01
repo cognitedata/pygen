@@ -7,7 +7,7 @@ def repo_root() -> Path:
     # Raise an error if not in a git repository
     try:
         result = subprocess.run("git rev-parse --show-toplevel".split(), stdout=subprocess.PIPE)
-    except Exception as e:
+    except FileNotFoundError as e:
         raise RuntimeError("Git is not installed or not found in PATH") from e
     output = result.stdout.decode().strip()
     if not output:

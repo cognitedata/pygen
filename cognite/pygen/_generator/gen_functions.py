@@ -37,12 +37,12 @@ def generate_sdk(
     sdk_config: PygenSDKConfig | None = None,
     output_format: OutputFormat = "python",
 ) -> dict[Path, str]:
-    """Generates an SDK for the specified View in Cognite Data Fusion.
+    """Generates an SDK for the specified Data Model in Cognite Data Fusion.
 
     Args:
-        space (str): The space of the View.
-        external_id (str): The external ID of the View.
-        version (str | None): The version of the View. If None, the latest version is used.
+        space (str): The space of the data model.
+        external_id (str): The external ID of the data model.
+        version (str): The version of the data model.
         client_config (PygenClientConfig | None): Configuration for the client generation. If None,
             default configuration is used.
         sdk_config (PygenSDKConfig | None): Configuration for the SDK generation.
@@ -69,7 +69,7 @@ def _retrieve_data_model(
         version (str | None): The version of the View. If None, the latest version is used.
 
     Returns:
-        DataModelReference: The retrieved data model.
+        DataModelResponseWithViews: The retrieved data model.
     """
     config = config or PygenClientConfig.default()
     with PygenClient(config=config) as client:
