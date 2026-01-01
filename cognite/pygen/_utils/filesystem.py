@@ -7,7 +7,9 @@ def sanitize(name: str) -> str:
     result = re.sub(r"[: ]", "_", result)
     result = re.sub("_+", "_", result)
 
-    if result.endswith("."):
-        result = result.rstrip(".") + "_."
+    original_len = len(result)
+    result = result.rstrip(".")
+    if len(result) != original_len:
+        result += "_" * (original_len - len(result))
 
     return result

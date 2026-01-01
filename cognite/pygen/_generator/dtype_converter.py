@@ -53,7 +53,6 @@ class DataTypeConverter(ABC):
             prop (ViewResponseProperty): The property to get the filter name for.
         Returns:
             str | None: The filter name, or None if not applicable.
-        raise NotImplementedError()
         """
         raise NotImplementedError()
 
@@ -68,7 +67,7 @@ _PYTHON_PRIMITIVE_TYPES: dict[type, str] = {
     Float64Property: "float",
     DateProperty: "Date",
     TimestampProperty: "int",
-    JSONProperty: "dict",
+    JSONProperty: "JsonValue",
     TimeseriesCDFExternalIdReference: "str",
     FileCDFExternalIdReference: "str",
     SequenceCDFExternalIdReference: "str",
@@ -99,7 +98,9 @@ class PythonDataTypeConverter(DataTypeConverter):
 
         data_type = prop.type
         type_class = type(data_type)
-        base_type = _PYTHON_PRIMITIVE_TYPES.get(type_class, "Any")
+        if type_class not in _PYTHON_PRIMITIVE_TYPES:
+            raise NotImplementedError(f"Unsupported property type: {type_class.__name__}")
+        base_type = _PYTHON_PRIMITIVE_TYPES[type_class]
 
         if isinstance(data_type, ListablePropertyTypeDefinition) and data_type.list:
             type_hint = f"list[{base_type}]"

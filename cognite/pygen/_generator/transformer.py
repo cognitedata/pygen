@@ -58,7 +58,7 @@ def to_pygen_model(
         if view.external_id in config.exclude_views:
             continue
         data_class = _create_data_class(view, naming, output_format)
-        api_class = _create_api_class(data_class, view, naming)
+        api_class = _create_api_class(data_class, view, naming, output_format)
         model.data_classes.append(data_class)
         model.api_classes.append(api_class)
     return model
@@ -138,7 +138,11 @@ def _create_data_class(view: ViewResponse, naming: StrictNamingConfig, output_fo
     )
 
     return DataClassFile(
-        filename=sanitize(f"{view.external_id}.py"), read=read, write=write, read_list=read_list, filter=filter_class
+        filename=sanitize(f"{view.external_id}.{_file_suffix(output_format)}"),
+        read=read,
+        write=write,
+        read_list=read_list,
+        filter=filter_class,
     )
 
 
@@ -150,7 +154,16 @@ def _to_casing(name: str, casing: Casing) -> str:
     elif casing == "snake_case":
         return to_snake(name)
     else:
-        raise ValueError(f"Unsupported casing: {casing}")
+        raise NotImplementedError(f"Unsupported casing: {casing}")
+
+
+def _file_suffix(output_format: OutputFormat) -> str:
+    if output_format == "python":
+        return "py"
+    elif output_format == "typescript":
+        return "ts"
+    else:
+        raise NotImplementedError(f"Unsupported output format: {output_format}")
 
 
 def _create_field(
@@ -167,9 +180,11 @@ def _create_field(
     )
 
 
-def _create_api_class(data_class: DataClassFile, view: ViewResponse, naming: StrictNamingConfig) -> APIClassFile:
+def _create_api_class(
+    data_class: DataClassFile, view: ViewResponse, naming: StrictNamingConfig, output_format: OutputFormat
+) -> APIClassFile:
     return APIClassFile(
-        filename=sanitize(f"_{view.external_id}_api.py"),
+        filename=sanitize(f"_{view.external_id}_api.{_file_suffix(output_format)}"),
         name=_to_casing(f"{view.external_id}API", naming.class_name),
         client_attribute_name=_to_casing(f"{view.external_id}", naming.field_name),
         read_class_name=data_class.read.name,

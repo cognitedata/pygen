@@ -12,7 +12,8 @@ class TestSanitize:
             ("another<invalid>name.txt", "anotherinvalidname.txt"),
             ("file/name/with/slash.txt", "filenamewithslash.txt"),
             ("trailing_space .txt", "trailing_space_.txt"),
-            ("trailing_dot..", "trailing_dot_."),
+            ("trailing_dot..", "trailing_dot__"),
+            ("test.py.", "test.py_"),
         ],
     )
     def test_sanitize_filename(self, input_str: str, expected_output: str):
