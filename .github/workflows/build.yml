@@ -11,7 +11,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v7
         with:
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -51,7 +51,7 @@ jobs:
           # Skipping  3.11 as we assume it is covered by 3.10 and 3.12
           - "3.12"
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v7
         with:
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v7
         with:
@@ -100,7 +100,7 @@ jobs:
   build_and_test_streamlit_pyodide:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v7
@@ -127,7 +127,7 @@ jobs:
   build_and_test_jupyter_pyodide:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v7
         with:
@@ -153,7 +153,7 @@ jobs:
     name: Validate PR description
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v7
