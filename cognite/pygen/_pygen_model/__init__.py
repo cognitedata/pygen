@@ -1,5 +1,4 @@
-from ._data_class import DataClass, FilterClass, ListDataClass
-from ._field import Field
+from ._data_class import DataClass, Field, FilterClass, ListDataClass
 from ._sdk import APIClassFile, DataClassFile, PygenSDKModel
 
 __all__ = [

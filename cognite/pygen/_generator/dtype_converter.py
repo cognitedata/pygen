@@ -34,6 +34,17 @@ class DataTypeConverter(ABC):
         self.context = context
 
     @abstractmethod
+    def get_dtype(self, prop: ViewResponseProperty) -> str:
+        """Gets the data type for the given property.
+
+        Args:
+            prop (ViewResponseProperty): The property to get the data type for.
+        Returns:
+            str: The data type as a string.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     def create_type_hint(self, prop: ViewResponseProperty) -> str:
         """Creates a type hint for the given property.
 
@@ -77,7 +88,7 @@ _PYTHON_PRIMITIVE_TYPES: dict[type, str] = {
     Float32Property: "float",
     Float64Property: "float",
     DateProperty: "Date",
-    TimestampProperty: "int",
+    TimestampProperty: "Datetime",
     JSONProperty: "JsonValue",
     TimeseriesCDFExternalIdReference: "str",
     FileCDFExternalIdReference: "str",
@@ -103,17 +114,20 @@ _PYTHON_FILTER_NAMES: dict[type, str] = {
 class PythonDataTypeConverter(DataTypeConverter):
     output_format = "python"
 
-    def create_type_hint(self, prop: ViewResponseProperty) -> str:
+    def get_dtype(self, prop: ViewResponseProperty) -> str:
         if not isinstance(prop, ViewCorePropertyResponse):
             return "Any"
 
-        data_type = prop.type
-        type_class = type(data_type)
+        type_class = type(prop.type)
         if type_class not in _PYTHON_PRIMITIVE_TYPES:
             raise NotImplementedError(f"Unsupported property type: {type_class.__name__}")
-        base_type = _PYTHON_PRIMITIVE_TYPES[type_class]
+        return _PYTHON_PRIMITIVE_TYPES[type_class]
 
-        if isinstance(data_type, ListablePropertyTypeDefinition) and data_type.list:
+    def create_type_hint(self, prop: ViewResponseProperty) -> str:
+        if not isinstance(prop, ViewCorePropertyResponse):
+            return "Any"
+        base_type = self.get_dtype(prop)
+        if isinstance(prop.type, ListablePropertyTypeDefinition) and prop.type.list:
             type_hint = f"list[{base_type}]"
         else:
             type_hint = base_type
@@ -180,15 +194,19 @@ _TYPESCRIPT_FILTER_NAMES: dict[type, str] = {
 class TypeScriptDataTypeConverter(DataTypeConverter):
     output_format = "typescript"
 
-    def create_type_hint(self, prop: ViewResponseProperty) -> str:
+    def get_dtype(self, prop: ViewResponseProperty) -> str:
         if not isinstance(prop, ViewCorePropertyResponse):
             return "unknown"
 
-        data_type = prop.type
-        type_class = type(data_type)
-        base_type = _TYPESCRIPT_PRIMITIVE_TYPES.get(type_class, "unknown")
+        type_class = type(prop.type)
+        return _TYPESCRIPT_PRIMITIVE_TYPES.get(type_class, "unknown")
 
-        if isinstance(data_type, ListablePropertyTypeDefinition) and data_type.list:
+    def create_type_hint(self, prop: ViewResponseProperty) -> str:
+        if not isinstance(prop, ViewCorePropertyResponse):
+            return "unknown"
+        base_type = self.get_dtype(prop)
+
+        if isinstance(prop.type, ListablePropertyTypeDefinition) and prop.type.list:
             type_hint = f"readonly {base_type}[]"
         else:
             type_hint = base_type

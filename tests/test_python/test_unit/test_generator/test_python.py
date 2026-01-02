@@ -25,6 +25,7 @@ def data_class_file() -> DataClassFile:
                     filter_name="TextFilter",
                     description="The first property.",
                     default_value="None",
+                    dtype="str",
                 ),
                 Field(
                     cdf_prop_id="prop2",
@@ -32,6 +33,7 @@ def data_class_file() -> DataClassFile:
                     type_hint="int",
                     filter_name="IntegerFilter",
                     description="The second property.",
+                    dtype="int",
                 ),
             ],
             display_name="Example View",
@@ -53,6 +55,7 @@ def data_class_file() -> DataClassFile:
                     filter_name=None,
                     description="The first property.",
                     default_value="None",
+                    dtype="str",
                 ),
                 Field(
                     cdf_prop_id="prop2",
@@ -60,6 +63,7 @@ def data_class_file() -> DataClassFile:
                     type_hint="int",
                     filter_name=None,
                     description="The second property.",
+                    dtype="int",
                 ),
             ],
             display_name="Example View",
@@ -67,6 +71,22 @@ def data_class_file() -> DataClassFile:
         ),
     )
 
+
+EXPECTED_IMPORT_STATEMENTS = """from typing import ClassVar, Literal
+
+from pydantic import Field
+
+from cognite.pygen._python.instance_api.models._references import ViewReference
+from cognite.pygen._python.instance_api.models.dtype_filters import (
+    FilterContainer,
+    IntegerFilter,
+    TextFilter,
+)
+from cognite.pygen._python.instance_api.models.instance import (
+    Instance,
+    InstanceList,
+    InstanceWrite,
+)"""
 
 EXPECTED_WRITE_CLASS_CODE = '''class ExampleViewWrite(InstanceWrite):
     """Write class for Example View instances."""
@@ -120,6 +140,10 @@ def data_class_generator(data_class_file: DataClassFile) -> PythonDataClassGener
 
 
 class TestPythonDataClassGenerator:
+    def test_create_import_statements(self, data_class_generator: PythonDataClassGenerator) -> None:
+        import_statements = data_class_generator.create_import_statements()
+        assert import_statements.strip() == EXPECTED_IMPORT_STATEMENTS.strip()
+
     def test_generate_write_class(self, data_class_generator: PythonDataClassGenerator) -> None:
         write_class_code = data_class_generator.generate_write_class()
         assert write_class_code.strip() == EXPECTED_WRITE_CLASS_CODE.strip()

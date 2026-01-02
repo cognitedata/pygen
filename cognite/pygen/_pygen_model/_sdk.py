@@ -1,8 +1,9 @@
+from collections.abc import Iterable
 from typing import Literal
 
 from cognite.pygen._client.models import ViewReference
 
-from ._data_class import DataClass, FilterClass, ListDataClass
+from ._data_class import DataClass, Field, FilterClass, ListDataClass
 from ._model import CodeModel
 
 
@@ -14,6 +15,11 @@ class DataClassFile(CodeModel):
     read_list: ListDataClass
     filter: FilterClass
     write: DataClass | None = None
+
+    def list_fields(self, dtype: str | None = None) -> Iterable[Field]:
+        yield from self.read.list_fields(dtype)
+        if self.write:
+            yield from self.write.list_fields(dtype)
 
 
 class APIClassFile(CodeModel):

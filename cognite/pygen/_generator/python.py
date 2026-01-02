@@ -11,7 +11,7 @@ class PythonGenerator(Generator):
     def create_data_class_code(self, data_class: DataClassFile) -> str:
         generator = PythonDataClassGenerator(data_class)
         parts: list[str] = [
-            generator.create_import_statements(data_class),
+            generator.create_import_statements(),
         ]
         if data_class.write:
             parts.append(generator.generate_write_class())
@@ -22,7 +22,7 @@ class PythonGenerator(Generator):
                 generator.generate_filter_class(),
             ]
         )
-        return "\n\n\n".join(parts)
+        return "\n\n".join(parts)
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
         raise NotImplementedError()
@@ -51,12 +51,50 @@ _FILTER_IMPORTS: set[str] = {
 
 
 class PythonDataClassGenerator:
-    def __init__(self, data_class: DataClassFile) -> None:
+    def __init__(self, data_class: DataClassFile, top_level: str = "cognite.pygen._python") -> None:
         self.data_class = data_class
+        self.top_level = top_level
 
-    def create_import_statements(self, data_class: DataClassFile) -> str:
+    def create_import_statements(self) -> str:
         """Generate import statements for the data class file."""
-        raise NotImplementedError()
+        import_statements: list[str] = [
+            "from typing import ClassVar, Literal",
+            "",
+        ]
+        if any(
+            field.default_value is not None or field.cdf_prop_id != field.name
+            for field in self.data_class.list_fields()
+        ):
+            # Any field has a default value or alias, need to import Field from pydantic
+            import_statements.append("from pydantic import Field")
+            import_statements.append("")
+        has_direct_relation = any(self.data_class.list_fields(dtype="InstanceId"))
+        if has_direct_relation:
+            import_statements.append(
+                f"from {self.top_level}.instance_api.models._references import InstanceId, ViewReference"
+            )
+        else:
+            import_statements.append(f"from {self.top_level}.instance_api.models._references import ViewReference")
+        filter_imports: set[str] = {"    FilterContainer,"}
+        for field in self.data_class.read.fields:
+            if field.filter_name:
+                filter_imports.add(f"    {field.filter_name},")
+        import_statements.extend(
+            [
+                f"from {self.top_level}.instance_api.models.dtype_filters import (",
+                *sorted(filter_imports),
+                ")",
+            ]
+        )
+        import_statements.append(f"from {self.top_level}.instance_api.models.instance import (")
+        import_statements.append("    Instance,")
+        if has_direct_relation:
+            import_statements.append("    InstanceId,")
+        import_statements.append("    InstanceList,")
+        if self.data_class.write:
+            import_statements.append("    InstanceWrite,")
+        import_statements.append(")")
+        return "\n".join(import_statements)
 
     def generate_read_class(self) -> str:
         """Generate the read class for the data class."""
