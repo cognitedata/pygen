@@ -74,6 +74,21 @@ def data_class_file() -> DataClassFile:
     )
 
 
+EXPECTED_READ_CLASS_CODE = '''class ExampleView(Instance):
+    """Read class for Example View instances."""
+
+    _view_id: ClassVar[ViewReference] = ViewReference(
+        space="example_space", external_id="example_view", version="v1"
+    )
+    instance_type: Literal["node"] = Field("node", alias="instanceType")
+    property_one: str | None = Field(default=None, alias="prop1")
+    property_two: int = Field(alias="prop2")
+
+    def as_write(self) -> ExampleViewWrite:
+        """Convert to write representation."""
+        return ExampleViewWrite.model_validate(self.model_dump(by_alias=True))
+'''
+
 EXPECTED_FILTER_CLASS_CODE = """class ExampleViewFilter(FilterContainer):
     def __init__(self, operator: Literal["and", "or"] = "and") -> None:
         view_id = ExampleView._view_id
@@ -90,8 +105,16 @@ EXPECTED_FILTER_CLASS_CODE = """class ExampleViewFilter(FilterContainer):
 """
 
 
+@pytest.fixture(scope="session")
+def data_class_generator(data_class_file: DataClassFile) -> PythonDataClassGenerator:
+    return PythonDataClassGenerator(data_class_file)
+
+
 class TestPythonDataClassGenerator:
-    def test_generate_filter_class(self, data_class_file: DataClassFile) -> None:
-        generator = PythonDataClassGenerator(data_class_file)
-        filter_class_code = generator.generate_filter_class()
+    def test_generate_read_class(self, data_class_generator: PythonDataClassGenerator) -> None:
+        read_class_code = data_class_generator.generate_read_class()
+        assert read_class_code.strip() == EXPECTED_READ_CLASS_CODE.strip()
+
+    def test_generate_filter_class(self, data_class_generator: PythonDataClassGenerator) -> None:
+        filter_class_code = data_class_generator.generate_filter_class()
         assert filter_class_code.strip() == EXPECTED_FILTER_CLASS_CODE.strip()

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field
+from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile
 
 from .generator import Generator
 
@@ -61,19 +61,24 @@ class PythonDataClassGenerator:
     def generate_read_class(self) -> str:
         """Generate the read class for the data class."""
         read = self.data_class.read
+        write_method = ""
+        if self.data_class.write:
+            write = self.data_class.write
+            write_method = f'''
+    def as_write(self) -> {write.name}:
+        """Convert to write representation."""
+        return {write.name}.model_validate(self.model_dump(by_alias=True))'''
+
         return f'''class {read.name}(Instance):
-            """Read class for {read.display_name} instances."""
+    """Read class for {read.display_name} instances."""
 
-            _view_id: ClassVar[ViewReference] = ViewReference(
-                space="{read.view_id.space}", external_id="{read.view_id.external_id}", version="{read.view_id.version}"
-            )
-            instance_type: Literal["{read.instance_type}"] = Field("{read.instance_type}", alias="instanceType")
-            {self.create_fields(read)}
-
-            def as_write(self) -> {read.write_class_name}:
-                """Convert to write representation."""
-                return {read.write_class_name}.model_validate(self.model_dump(by_alias=True))
-        '''
+    _view_id: ClassVar[ViewReference] = ViewReference(
+        space="{read.view_id.space}", external_id="{read.view_id.external_id}", version="{read.view_id.version}"
+    )
+    instance_type: Literal["{read.instance_type}"] = Field("{read.instance_type}", alias="instanceType")
+    {self.create_fields(read)}
+{write_method}
+'''
 
     def generate_write_class(self) -> str:
         raise NotImplementedError()
@@ -83,6 +88,8 @@ class PythonDataClassGenerator:
         field_lines = []
         for field in data_class.fields:
             field_line = f"{field.name}: {field.type_hint}"
+            if field.cdf_prop_id != field.name:
+                field_line += f' = Field(alias="{field.cdf_prop_id}")'
             field_lines.append(field_line)
         return "\n    ".join(field_lines)
 
@@ -122,31 +129,3 @@ class PythonDataClassGenerator:
             attributes.append(f'self.{field.name} = {field.filter_name}(view_id, "{field.cdf_prop_id}", operator)')
             names.append(f"self.{field.name},")
         return attributes, names
-
-    def _generate_field_line(self, field: Field, is_write: bool = False) -> str:
-        """Generate a single field definition line."""
-        name = field.name
-        type_hint = field.type_hint
-        needs_alias = name != field.cdf_prop_id
-
-        # For write classes, allow tuple input for InstanceId
-        if is_write and "InstanceId" in type_hint:
-            # Replace InstanceId with InstanceId | tuple[str, str] for write
-            if "InstanceId | None" in type_hint:
-                type_hint = "InstanceId | tuple[str, str] | None"
-            elif "InstanceId" in type_hint:
-                type_hint = "InstanceId | tuple[str, str]"
-
-        # Check if nullable (has | None)
-        is_nullable = "| None" in type_hint
-
-        if needs_alias:
-            if is_nullable:
-                return f'    {name}: {type_hint} = Field(None, alias="{field.cdf_prop_id}")'
-            else:
-                return f'    {name}: {type_hint} = Field(alias="{field.cdf_prop_id}")'
-        else:
-            if is_nullable:
-                return f"    {name}: {type_hint} = None"
-            else:
-                return f"    {name}: {type_hint}"
