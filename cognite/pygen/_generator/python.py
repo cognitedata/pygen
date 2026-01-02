@@ -31,25 +31,6 @@ class PythonGenerator(Generator):
         raise NotImplementedError()
 
 
-# Types that require imports from instance_api.models._types
-_TYPE_IMPORTS: dict[str, str] = {
-    "Date": "cognite.pygen._python.instance_api.models._types",
-    "DateTime": "cognite.pygen._python.instance_api.models._types",
-    "JsonValue": "cognite.pygen._python.instance_api.models._types",
-}
-
-# Filter types that require imports from dtype_filters
-_FILTER_IMPORTS: set[str] = {
-    "TextFilter",
-    "FloatFilter",
-    "IntegerFilter",
-    "BooleanFilter",
-    "DateFilter",
-    "DateTimeFilter",
-    "DirectRelationFilter",
-}
-
-
 class PythonDataClassGenerator:
     def __init__(self, data_class: DataClassFile, top_level: str = "cognite.pygen._python") -> None:
         self.data_class = data_class
@@ -75,6 +56,9 @@ class PythonDataClassGenerator:
             )
         else:
             import_statements.append(f"from {self.top_level}.instance_api.models._references import ViewReference")
+        if time_fields := set(field.dtype for field in self.data_class.list_fields(dtype={"DateTime", "Date"})):
+            import_statements.append(f"from {self.top_level}.instance_api.models._types import {sorted(time_fields)}")
+
         filter_imports: set[str] = {"    FilterContainer,"}
         for field in self.data_class.read.fields:
             if field.filter_name:

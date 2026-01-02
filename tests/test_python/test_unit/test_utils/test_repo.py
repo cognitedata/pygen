@@ -15,7 +15,7 @@ class TestRepoRoot:
 
     def test_repo_root_git_not_found(self) -> None:
         with (
-            patch("subprocess.run", side_effect=Exception("git not found")),
+            patch("subprocess.run", side_effect=FileNotFoundError("git not found")),
             pytest.raises(RuntimeError, match="Git is not installed or not found in PATH"),
         ):
             _ = repo_root()

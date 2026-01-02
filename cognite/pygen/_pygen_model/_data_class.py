@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Set
 
 from ._model import CodeModel
 
@@ -19,8 +19,14 @@ class DataClass(CodeModel):
     description: str
     fields: list[Field]
 
-    def list_fields(self, dtype: str | None = None) -> Iterable[Field]:
-        return (field for field in self.fields if field.dtype == dtype or dtype is None)
+    def list_fields(self, dtype: str | Set[str] | None = None) -> Iterable[Field]:
+        iterable = (field for field in self.fields)
+        if dtype is None:
+            yield from iterable
+        elif isinstance(dtype, str):
+            yield from (field for field in iterable if field.dtype == dtype)
+        else:
+            yield from (field for field in iterable if field.dtype in dtype)
 
 
 class ListDataClass(CodeModel):

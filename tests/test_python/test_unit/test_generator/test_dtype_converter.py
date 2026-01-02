@@ -69,7 +69,7 @@ class TestPythonDataTypeConverter:
             (ViewCorePropertyResponse(type=Float32Property(list=True), nullable=False, **_DEFAULT_ARGS), "list[float]"),
             (
                 ViewCorePropertyResponse(type=TimestampProperty(list=True), nullable=True, **_DEFAULT_ARGS),
-                "list[int] | None",
+                "list[Datetime] | None",
             ),
             (MultiEdgeProperty(**_DEFAULT_EDGE_ARGS), "Any"),
         ],
