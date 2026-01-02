@@ -114,7 +114,12 @@ class PythonDataClassGenerator:
 
     def generate_read_list_class(self) -> str:
         """Generate the list class for the data class."""
-        raise NotImplementedError()
+        read = self.data_class.read
+        list_cls = self.data_class.read_list
+        return f'''class {list_cls.name}(InstanceList[{read.name}]):
+    """List of {read.display_name} instances."""
+    _INSTANCE: ClassVar[type[{read.name}]] = {read.name}
+'''
 
     def generate_filter_class(self) -> str:
         """Generate the filter class for the data class."""

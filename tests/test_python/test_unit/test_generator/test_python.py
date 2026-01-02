@@ -93,6 +93,11 @@ EXPECTED_READ_CLASS_CODE = '''class ExampleView(Instance):
         return ExampleViewWrite.model_validate(self.model_dump(by_alias=True))
 '''
 
+EXPECTED_READ_LIST_CLASS_CODE = '''class ExampleViewList(InstanceList[ExampleView]):
+    """List of Example View instances."""
+    _INSTANCE: ClassVar[type[ExampleView]] = ExampleView
+'''
+
 EXPECTED_FILTER_CLASS_CODE = """class ExampleViewFilter(FilterContainer):
     def __init__(self, operator: Literal["and", "or"] = "and") -> None:
         view_id = ExampleView._view_id
@@ -122,6 +127,10 @@ class TestPythonDataClassGenerator:
     def test_generate_read_class(self, data_class_generator: PythonDataClassGenerator) -> None:
         read_class_code = data_class_generator.generate_read_class()
         assert read_class_code.strip() == EXPECTED_READ_CLASS_CODE.strip()
+
+    def test_generate_read_list_class(self, data_class_generator: PythonDataClassGenerator) -> None:
+        read_list_class_code = data_class_generator.generate_read_list_class()
+        assert read_list_class_code.strip() == EXPECTED_READ_LIST_CLASS_CODE.strip()
 
     def test_generate_filter_class(self, data_class_generator: PythonDataClassGenerator) -> None:
         filter_class_code = data_class_generator.generate_filter_class()
