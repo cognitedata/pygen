@@ -2,20 +2,20 @@ import pytest
 
 from cognite.pygen._client.models import ViewReference
 from cognite.pygen._generator.python import PythonDataClassGenerator
-from cognite.pygen._pygen_model import DataClass, DataClassFile, Field, FilterClass, ListDataClass, ReadDataClass
+from cognite.pygen._pygen_model import DataClass, DataClassFile, Field, FilterClass, ListDataClass
 
 
 @pytest.fixture(scope="session")
 def data_class_file() -> DataClassFile:
-    view_id = ViewReference(
-        space="example_space",
-        external_id="example_view",
-        version="v1",
-    )
     return DataClassFile(
         filename="example.py",
-        read=ReadDataClass(
-            view_id=view_id,
+        view_id=ViewReference(
+            space="example_space",
+            external_id="example_view",
+            version="v1",
+        ),
+        instance_type="node",
+        read=DataClass(
             name="ExampleView",
             fields=[
                 Field(
@@ -33,23 +33,16 @@ def data_class_file() -> DataClassFile:
                     description="The second property.",
                 ),
             ],
-            instance_type="node",
             display_name="Example View",
             description="An example view for testing.",
-            write_class_name="ExampleViewWrite",
         ),
         read_list=ListDataClass(
-            view_id=view_id,
             name="ExampleViewList",
-            read_class_name="ExampleView",
         ),
         filter=FilterClass(
             name="ExampleViewFilter",
-            view_id=view_id,
-            instance_type="node",
         ),
         write=DataClass(
-            view_id=view_id,
             name="ExampleViewWrite",
             fields=[
                 Field(
@@ -67,7 +60,6 @@ def data_class_file() -> DataClassFile:
                     description="The second property.",
                 ),
             ],
-            instance_type="node",
             display_name="Example View Write",
             description="An example write view for testing.",
         ),

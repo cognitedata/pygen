@@ -61,6 +61,8 @@ class PythonDataClassGenerator:
     def generate_read_class(self) -> str:
         """Generate the read class for the data class."""
         read = self.data_class.read
+        view_id = self.data_class.view_id
+        instance_type = self.data_class.instance_type
         write_method = ""
         if self.data_class.write:
             write = self.data_class.write
@@ -73,9 +75,9 @@ class PythonDataClassGenerator:
     """Read class for {read.display_name} instances."""
 
     _view_id: ClassVar[ViewReference] = ViewReference(
-        space="{read.view_id.space}", external_id="{read.view_id.external_id}", version="{read.view_id.version}"
+        space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
     )
-    instance_type: Literal["{read.instance_type}"] = Field("{read.instance_type}", alias="instanceType")
+    instance_type: Literal["{instance_type}"] = Field("{instance_type}", alias="instanceType")
     {self.create_fields(read)}
 {write_method}
 '''
@@ -101,6 +103,7 @@ class PythonDataClassGenerator:
         """Generate the filter class for the data class."""
         filter_class = self.data_class.filter
         read = self.data_class.read
+        instance_type = self.data_class.instance_type
 
         attributes, names = self._create_filter_attributes()
         attribute_str = f"\n{' '*8}".join(attributes)
@@ -114,7 +117,7 @@ class PythonDataClassGenerator:
                 {attribute_list}
             ],
             operator=operator,
-            instance_type="{read.instance_type}",
+            instance_type="{instance_type}",
         )
 """
 

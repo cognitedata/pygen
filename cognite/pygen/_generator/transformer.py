@@ -19,7 +19,6 @@ from cognite.pygen._pygen_model import (
     FilterClass,
     ListDataClass,
     PygenSDKModel,
-    ReadDataClass,
 )
 from cognite.pygen._utils.filesystem import sanitize
 
@@ -96,47 +95,40 @@ def _create_data_class(view: ViewResponse, naming: StrictNamingConfig, output_fo
     if view.writable:
         write_converter = get_converter_by_format(output_format, context="write")
         write = DataClass(
-            view_id=view.as_reference(),
             name=_to_casing(f"{view.external_id}Write", naming.class_name),
             fields=[
                 field_
                 for prop_id, prop in view.properties.items()
                 if (field_ := _create_field(prop_id, prop, naming, write_converter))
             ],
-            instance_type=used_for,
             display_name=view.name or view.external_id,
             description=view.description or "",
         )
 
     read_converter = get_converter_by_format(output_format, context="read")
-    read = ReadDataClass(
-        view_id=view.as_reference(),
+    read = DataClass(
         name=_to_casing(view.external_id, naming.class_name),
         fields=[
             field_
             for prop_id, prop in view.properties.items()
             if (field_ := _create_field(prop_id, prop, naming, read_converter))
         ],
-        instance_type=used_for,
         display_name=view.name or view.external_id,
         description=view.description or "",
-        write_class_name=write.name if write else None,
     )
 
     read_list = ListDataClass(
-        view_id=view.as_reference(),
         name=_to_casing(f"{view.external_id}List", naming.class_name),
-        read_class_name=read.name,
     )
 
     filter_class = FilterClass(
         name=_to_casing(f"{view.external_id}Filter", naming.class_name),
-        view_id=view.as_reference(),
-        instance_type=used_for,
     )
 
     return DataClassFile(
         filename=sanitize(f"{view.external_id}.{_file_suffix(output_format)}"),
+        instance_type=used_for,
+        view_id=view.as_reference(),
         read=read,
         write=write,
         read_list=read_list,
@@ -188,7 +180,4 @@ def _create_api_class(
         filename=sanitize(f"_{view.external_id}_api.{_file_suffix(output_format)}"),
         name=_to_casing(f"{view.external_id}API", naming.class_name),
         client_attribute_name=_to_casing(f"{view.external_id}", naming.field_name),
-        read_class_name=data_class.read.name,
-        read_list_class_name=data_class.read_list.name,
-        filter_class=data_class.filter,
     )
