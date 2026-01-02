@@ -83,7 +83,19 @@ class PythonDataClassGenerator:
 '''
 
     def generate_write_class(self) -> str:
-        raise NotImplementedError()
+        write = self.data_class.write
+        if not write:
+            raise ValueError("No write class defined for this data class file.")
+        view_id = self.data_class.view_id
+        instance_type = self.data_class.instance_type
+        return f'''class {write.name}(InstanceWrite):
+    """Write class for {write.display_name} instances."""
+    _view_id: ClassVar[ViewReference] = ViewReference(
+        space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
+    )
+    instance_type: Literal["{instance_type}"] = Field("{instance_type}", alias="instanceType")
+    {self.create_fields(write)}
+'''
 
     @staticmethod
     def create_fields(data_class: DataClass) -> str:

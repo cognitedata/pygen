@@ -62,11 +62,21 @@ def data_class_file() -> DataClassFile:
                     description="The second property.",
                 ),
             ],
-            display_name="Example View Write",
+            display_name="Example View",
             description="An example write view for testing.",
         ),
     )
 
+
+EXPECTED_WRITE_CLASS_CODE = '''class ExampleViewWrite(InstanceWrite):
+    """Write class for Example View instances."""
+    _view_id: ClassVar[ViewReference] = ViewReference(
+        space="example_space", external_id="example_view", version="v1"
+    )
+    instance_type: Literal["node"] = Field("node", alias="instanceType")
+    property_one: str | None = Field(default=None, alias="prop1")
+    property_two: int = Field(alias="prop2")
+'''
 
 EXPECTED_READ_CLASS_CODE = '''class ExampleView(Instance):
     """Read class for Example View instances."""
@@ -105,6 +115,10 @@ def data_class_generator(data_class_file: DataClassFile) -> PythonDataClassGener
 
 
 class TestPythonDataClassGenerator:
+    def test_generate_write_class(self, data_class_generator: PythonDataClassGenerator) -> None:
+        write_class_code = data_class_generator.generate_write_class()
+        assert write_class_code.strip() == EXPECTED_WRITE_CLASS_CODE.strip()
+
     def test_generate_read_class(self, data_class_generator: PythonDataClassGenerator) -> None:
         read_class_code = data_class_generator.generate_read_class()
         assert read_class_code.strip() == EXPECTED_READ_CLASS_CODE.strip()
