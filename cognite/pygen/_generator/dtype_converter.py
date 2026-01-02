@@ -46,6 +46,17 @@ class DataTypeConverter(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    def get_default_value(self, prop: ViewResponseProperty) -> str | None:
+        """Gets the default value for the given property, if any.
+
+        Args:
+            prop (ViewResponseProperty): The property to get the default value for.
+        Returns:
+            str | None: The default value as a string, or None if not applicable.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     def get_filter_name(self, prop: ViewResponseProperty) -> str | None:
         """Gets the filter name for the given property.
 
@@ -124,6 +135,15 @@ class PythonDataTypeConverter(DataTypeConverter):
         type_class = type(data_type)
         return _PYTHON_FILTER_NAMES.get(type_class)
 
+    def get_default_value(self, prop: ViewResponseProperty) -> str | None:
+        if not isinstance(prop, ViewCorePropertyResponse):
+            return None
+        if prop.nullable:
+            return "None"
+        elif prop.default_value is not None:
+            return f'"{prop.default_value}"' if isinstance(prop.default_value, str) else str(prop.default_value)
+        return None
+
 
 # TypeScript type mappings for core property types
 _TYPESCRIPT_PRIMITIVE_TYPES: dict[type, str] = {
@@ -188,6 +208,15 @@ class TypeScriptDataTypeConverter(DataTypeConverter):
             return None
 
         return _TYPESCRIPT_FILTER_NAMES.get(type(prop.type))
+
+    def get_default_value(self, prop: ViewResponseProperty) -> str | None:
+        if not isinstance(prop, ViewCorePropertyResponse):
+            return None
+        if prop.nullable:
+            return "undefined"
+        elif prop.default_value is not None:
+            return f'"{prop.default_value}"' if isinstance(prop.default_value, str) else str(prop.default_value)
+        return None
 
 
 def get_converter_by_format(format: OutputFormat, context: Literal["read", "write"]) -> DataTypeConverter:

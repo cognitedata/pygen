@@ -170,6 +170,7 @@ def _create_field(
         type_hint=converter.create_type_hint(prop),
         filter_name=converter.get_filter_name(prop),
         description=prop.description or "",
+        default_value=converter.get_default_value(prop),
     )
 
 

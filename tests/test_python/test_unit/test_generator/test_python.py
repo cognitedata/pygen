@@ -24,6 +24,7 @@ def data_class_file() -> DataClassFile:
                     type_hint="str | None",
                     filter_name="TextFilter",
                     description="The first property.",
+                    default_value="None",
                 ),
                 Field(
                     cdf_prop_id="prop2",
@@ -51,6 +52,7 @@ def data_class_file() -> DataClassFile:
                     type_hint="str | None",
                     filter_name=None,
                     description="The first property.",
+                    default_value="None",
                 ),
                 Field(
                     cdf_prop_id="prop2",

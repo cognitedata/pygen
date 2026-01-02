@@ -90,8 +90,13 @@ class PythonDataClassGenerator:
         field_lines = []
         for field in data_class.fields:
             field_line = f"{field.name}: {field.type_hint}"
+            args: list[str] = []
+            if field.default_value is not None:
+                args.append(f"default={field.default_value}")
             if field.cdf_prop_id != field.name:
-                field_line += f' = Field(alias="{field.cdf_prop_id}")'
+                args.append(f'alias="{field.cdf_prop_id}"')
+            if args:
+                field_line += f' = Field({", ".join(args)})'
             field_lines.append(field_line)
         return "\n    ".join(field_lines)
 
