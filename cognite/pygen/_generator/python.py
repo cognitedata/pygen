@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field
+from cognite.pygen._generator.config import PygenSDKConfig
+from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field, PygenSDKModel
 
 from .generator import Generator
 
@@ -10,7 +11,7 @@ class PythonGenerator(Generator):
     format = "python"
 
     def create_data_class_code(self, data_class: DataClassFile) -> str:
-        generator = PythonDataClassGenerator(data_class)
+        generator = PythonDataClassGenerator(data_class, top_level=self._get_top_level())
         parts: list[str] = [
             generator.create_import_statements(),
         ]
@@ -26,7 +27,7 @@ class PythonGenerator(Generator):
         return "\n\n".join(parts)
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
-        generator = PythonAPIGenerator(api_class)
+        generator = PythonAPIGenerator(api_class, top_level=self._get_top_level())
         parts: list[str] = [
             generator.create_import_statements(),
             generator.create_api_class_with_init(),
@@ -38,8 +39,34 @@ class PythonGenerator(Generator):
         ]
         return "\n\n".join(parts)
 
+    def create_data_class_init_code(self, model: PygenSDKModel) -> str:
+        """Generate the data_classes/__init__.py file."""
+        generator = PythonPackageGenerator(model, self.config)
+        return generator.create_data_class_init()
+
+    def create_api_init_code(self, model: PygenSDKModel) -> str:
+        """Generate the _api/__init__.py file."""
+        generator = PythonPackageGenerator(model, self.config)
+        return generator.create_api_init()
+
+    def create_client_code(self, model: PygenSDKModel) -> str:
+        """Generate the client file."""
+        generator = PythonPackageGenerator(model, self.config)
+        return generator.create_client()
+
+    def create_package_init_code(self, model: PygenSDKModel) -> str:
+        """Generate the top-level __init__.py file."""
+        generator = PythonPackageGenerator(model, self.config)
+        return generator.create_package_init()
+
     def add_instance_api(self) -> dict[Path, str]:
         raise NotImplementedError()
+
+    def _get_top_level(self) -> str:
+        """Get the top-level import path for the instance_api module."""
+        if self.config.pygen_as_dependency:
+            return "cognite.pygen._python"
+        return f"{self.config.top_level_package}"
 
 
 class PythonDataClassGenerator:
@@ -554,3 +581,192 @@ class {api_name}(InstanceAPI[{read_name}, {list_name}]):
             sort = PropertySort(property=prop_ref, direction=sort_direction)
 
         return self._list(limit=limit, filter=filter_.as_filter(), sort=sort)'''
+
+
+class PythonPackageGenerator:
+    """Generator for Python package structure files (__init__.py, _client.py)."""
+
+    def __init__(self, model: PygenSDKModel, config: PygenSDKConfig) -> None:
+        self.model = model
+        self.config = config
+
+    def _get_top_level(self) -> str:
+        """Get the top-level import path for the instance_api module."""
+        if self.config.pygen_as_dependency:
+            return "cognite.pygen._python"
+        return f"{self.config.top_level_package}"
+
+    def create_data_class_init(self) -> str:
+        """Generate the data_classes/__init__.py file.
+
+        Exports all data classes (read, write, list, filter) from each view.
+        """
+        lines: list[str] = [
+            '"""Data classes for the generated SDK.',
+            "",
+            "This module exports all data classes including read, write, list, and filter classes.",
+            '"""',
+            "",
+        ]
+
+        # Collect all exports
+        all_exports: list[str] = []
+
+        for data_class_file in self.model.data_classes:
+            # Module name is filename without .py extension
+            module_name = data_class_file.filename.replace(".py", "")
+
+            # Build list of classes to import from this module
+            classes: list[str] = [
+                data_class_file.read.name,
+                data_class_file.read_list.name,
+                data_class_file.filter.name,
+            ]
+            if data_class_file.write:
+                classes.insert(0, data_class_file.write.name)
+
+            all_exports.extend(classes)
+
+            # Generate import statement
+            classes_str = ",\n    ".join(classes)
+            lines.append(f"from .{module_name} import (")
+            lines.append(f"    {classes_str},")
+            lines.append(")")
+
+        # Generate __all__
+        lines.append("")
+        lines.append("__all__ = [")
+        for export in all_exports:
+            lines.append(f'    "{export}",')
+        lines.append("]")
+
+        return "\n".join(lines)
+
+    def create_api_init(self) -> str:
+        """Generate the _api/__init__.py file.
+
+        Exports all API classes.
+        """
+        lines: list[str] = [
+            '"""API classes for the generated SDK.',
+            "",
+            "This module exports all view-specific API classes.",
+            '"""',
+            "",
+        ]
+
+        # Collect all API class names
+        api_class_names: list[str] = []
+
+        for api_class in self.model.api_classes:
+            # Module name is filename without .py extension
+            module_name = api_class.filename.replace(".py", "")
+            api_class_names.append(api_class.name)
+            lines.append(f"from .{module_name} import {api_class.name}")
+
+        # Generate __all__
+        lines.append("")
+        lines.append("__all__ = [")
+        for name in api_class_names:
+            lines.append(f'    "{name}",')
+        lines.append("]")
+
+        return "\n".join(lines)
+
+    def create_client(self) -> str:
+        """Generate the _client.py file.
+
+        Creates the client class that composes all API classes.
+        """
+        top_level = self._get_top_level()
+        client_name = self.config.client_name
+
+        # Build import statements
+        lines: list[str] = [
+            '"""Client for the generated SDK.',
+            "",
+            f"This module contains the {client_name} that composes view-specific APIs.",
+            '"""',
+            "",
+            f"from {top_level}.instance_api._client import InstanceClient",
+            f"from {top_level}.instance_api.config import PygenClientConfig",
+            "",
+        ]
+
+        # Import API classes
+        api_class_imports = ", ".join(api.name for api in self.model.api_classes)
+        lines.append(f"from ._api import {api_class_imports}")
+        lines.append("")
+        lines.append("")
+
+        # Build client class
+        lines.append(f"class {client_name}(InstanceClient):")
+
+        # Docstring
+        lines.append('    """Generated client for interacting with the data model.')
+        lines.append("")
+        lines.append("    This client provides access to the following views:")
+        for api_class in self.model.api_classes:
+            lines.append(f"    - {api_class.client_attribute_name}: {api_class.name}")
+        lines.append('    """')
+        lines.append("")
+
+        # __init__ method
+        lines.append("    def __init__(self, config: PygenClientConfig) -> None:")
+        lines.append('        """Initialize the client.')
+        lines.append("")
+        lines.append("        Args:")
+        lines.append("            config: Configuration for the client including URL, project, and credentials.")
+        lines.append('        """')
+        lines.append("        super().__init__(config)")
+        lines.append("")
+        lines.append("        # Initialize view-specific APIs")
+
+        for api_class in self.model.api_classes:
+            lines.append(f"        self.{api_class.client_attribute_name} = {api_class.name}(self._http_client)")
+
+        return "\n".join(lines)
+
+    def create_package_init(self) -> str:
+        """Generate the top-level __init__.py file.
+
+        Exports the client class and key data classes for convenient access.
+        """
+        client_name = self.config.client_name
+
+        lines: list[str] = [
+            '"""Generated SDK package.',
+            "",
+            f"This package provides the {client_name} for interacting with the data model.",
+            '"""',
+            "",
+            f"from ._client import {client_name}",
+            "from .data_classes import (",
+        ]
+
+        # Export all data classes
+        for data_class_file in self.model.data_classes:
+            if data_class_file.write:
+                lines.append(f"    {data_class_file.write.name},")
+            lines.append(f"    {data_class_file.read.name},")
+            lines.append(f"    {data_class_file.read_list.name},")
+            lines.append(f"    {data_class_file.filter.name},")
+
+        lines.append(")")
+        lines.append("")
+
+        # Build __all__
+        all_exports: list[str] = [client_name]
+        for data_class_file in self.model.data_classes:
+            if data_class_file.write:
+                all_exports.append(data_class_file.write.name)
+            all_exports.append(data_class_file.read.name)
+            all_exports.append(data_class_file.read_list.name)
+            all_exports.append(data_class_file.filter.name)
+
+        lines.append("__all__ = [")
+        for export in all_exports:
+            lines.append(f'    "{export}",')
+        lines.append("]")
+
+        return "\n".join(lines)

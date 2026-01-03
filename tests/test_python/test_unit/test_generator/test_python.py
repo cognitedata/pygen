@@ -1,8 +1,17 @@
 import pytest
 
 from cognite.pygen._client.models import ViewReference
-from cognite.pygen._generator.python import PythonAPIGenerator, PythonDataClassGenerator
-from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field, FilterClass, ListDataClass
+from cognite.pygen._generator.config import PygenSDKConfig
+from cognite.pygen._generator.python import PythonAPIGenerator, PythonDataClassGenerator, PythonPackageGenerator
+from cognite.pygen._pygen_model import (
+    APIClassFile,
+    DataClass,
+    DataClassFile,
+    Field,
+    FilterClass,
+    ListDataClass,
+    PygenSDKModel,
+)
 
 
 @pytest.fixture(scope="session")
@@ -432,3 +441,125 @@ class TestPythonAPIGenerator:
     def test_create_list_method(self, api_class_generator: PythonAPIGenerator) -> None:
         list_method = api_class_generator.create_list_method()
         assert list_method.strip() == EXPECTED_LIST_METHOD.strip()
+
+
+# ============================================================================
+# Package Generator Tests
+# ============================================================================
+
+
+@pytest.fixture(scope="session")
+def pygen_sdk_model(data_class_file: DataClassFile, api_class_file: APIClassFile) -> PygenSDKModel:
+    """Create a PygenSDKModel with a single view for testing."""
+    return PygenSDKModel(
+        data_classes=[data_class_file],
+        api_classes=[api_class_file],
+    )
+
+
+@pytest.fixture(scope="session")
+def package_generator(pygen_sdk_model: PygenSDKModel) -> PythonPackageGenerator:
+    config = PygenSDKConfig(
+        top_level_package="my_sdk",
+        client_name="MyClient",
+    )
+    return PythonPackageGenerator(pygen_sdk_model, config)
+
+
+EXPECTED_DATA_CLASS_INIT = '''"""Data classes for the generated SDK.
+
+This module exports all data classes including read, write, list, and filter classes.
+"""
+
+from .example import (
+    ExampleViewWrite,
+    ExampleView,
+    ExampleViewList,
+    ExampleViewFilter,
+)
+
+__all__ = [
+    "ExampleViewWrite",
+    "ExampleView",
+    "ExampleViewList",
+    "ExampleViewFilter",
+]'''
+
+EXPECTED_API_INIT = '''"""API classes for the generated SDK.
+
+This module exports all view-specific API classes.
+"""
+
+from ._example_view_api import ExampleViewAPI
+
+__all__ = [
+    "ExampleViewAPI",
+]'''
+
+EXPECTED_CLIENT_CODE = '''"""Client for the generated SDK.
+
+This module contains the MyClient that composes view-specific APIs.
+"""
+
+from cognite.pygen._python.instance_api._client import InstanceClient
+from cognite.pygen._python.instance_api.config import PygenClientConfig
+
+from ._api import ExampleViewAPI
+
+
+class MyClient(InstanceClient):
+    """Generated client for interacting with the data model.
+
+    This client provides access to the following views:
+    - example_view: ExampleViewAPI
+    """
+
+    def __init__(self, config: PygenClientConfig) -> None:
+        """Initialize the client.
+
+        Args:
+            config: Configuration for the client including URL, project, and credentials.
+        """
+        super().__init__(config)
+
+        # Initialize view-specific APIs
+        self.example_view = ExampleViewAPI(self._http_client)'''
+
+EXPECTED_PACKAGE_INIT = '''"""Generated SDK package.
+
+This package provides the MyClient for interacting with the data model.
+"""
+
+from ._client import MyClient
+from .data_classes import (
+    ExampleViewWrite,
+    ExampleView,
+    ExampleViewList,
+    ExampleViewFilter,
+)
+
+__all__ = [
+    "MyClient",
+    "ExampleViewWrite",
+    "ExampleView",
+    "ExampleViewList",
+    "ExampleViewFilter",
+]'''
+
+
+class TestPythonPackageGenerator:
+    def test_create_data_class_init(self, package_generator: PythonPackageGenerator) -> None:
+        data_class_init = package_generator.create_data_class_init()
+        assert data_class_init.strip() == EXPECTED_DATA_CLASS_INIT.strip()
+
+    def test_create_api_init(self, package_generator: PythonPackageGenerator) -> None:
+        api_init = package_generator.create_api_init()
+        assert api_init.strip() == EXPECTED_API_INIT.strip()
+
+    def test_create_client(self, package_generator: PythonPackageGenerator) -> None:
+        client_code = package_generator.create_client()
+        assert client_code.strip() == EXPECTED_CLIENT_CODE.strip()
+
+    def test_create_package_init(self, package_generator: PythonPackageGenerator) -> None:
+        package_init = package_generator.create_package_init()
+        assert package_init.strip() == EXPECTED_PACKAGE_INIT.strip()
