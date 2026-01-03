@@ -679,18 +679,19 @@ class PythonPackageGenerator:
         """
         # Import API classes (sorted)
         api_classes_sorted = sorted(self.model.api_classes, key=lambda x: x.name)
-        api_class_imports = ", ".join(api.name for api in api_classes_sorted)
-
-        # Build view list for docstring
-        view_list = "\n".join(
-            f"    - {api_class.client_attribute_name}: {api_class.name}" for api_class in api_classes_sorted
-        )
-
-        # Build API initializations
-        api_inits = "\n".join(
-            f"        self.{api_class.client_attribute_name} = {api_class.name}(self._http_client)"
-            for api_class in api_classes_sorted
-        )
+        if api_classes_sorted:
+            api_class_imports = f"from ._api import {', '.join(api.name for api in api_classes_sorted)}"
+            view_list = "\n".join(
+                f"    - {api_class.client_attribute_name}: {api_class.name}" for api_class in api_classes_sorted
+            )
+            api_inits = "\n".join(
+                f"        self.{api_class.client_attribute_name} = {api_class.name}(self._http_client)"
+                for api_class in api_classes_sorted
+            )
+        else:
+            api_class_imports = ""
+            view_list = "    This client does not provide access to any views."
+            api_inits = "        pass"
 
         return f'''"""Client for the generated SDK.
 
@@ -700,7 +701,7 @@ This module contains the {self.client_name} that composes view-specific APIs.
 from {self.top_level}.instance_api._client import InstanceClient
 from {self.top_level}.instance_api.config import PygenClientConfig
 
-from ._api import {api_class_imports}
+{api_class_imports}
 
 
 class {self.client_name}(InstanceClient):
