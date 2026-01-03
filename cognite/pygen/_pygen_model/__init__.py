@@ -1,11 +1,9 @@
-from ._data_class import DataClass, FilterClass, ListDataClass, ReadDataClass
-from ._field import Field
+from ._data_class import DataClass, Field, FilterClass, ListDataClass
 from ._sdk import APIClassFile, DataClassFile, PygenSDKModel
 
 __all__ = [
     "Field",
     "DataClass",
-    "ReadDataClass",
     "PygenSDKModel",
     "DataClassFile",
     "APIClassFile",

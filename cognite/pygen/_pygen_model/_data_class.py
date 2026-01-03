@@ -1,31 +1,37 @@
-from typing import Literal
+from collections.abc import Iterable, Set
 
-from cognite.pygen._client.models import ViewReference
-
-from ._field import Field
 from ._model import CodeModel
 
 
-class DataClass(CodeModel):
-    view_id: ViewReference
+class Field(CodeModel):
+    cdf_prop_id: str
     name: str
-    fields: list[Field]
-    instance_type: Literal["node", "edge"]
+    dtype: str
+    type_hint: str
+    default_value: str | None = None
+    filter_name: str | None = None
+    description: str | None = None
+
+
+class DataClass(CodeModel):
+    name: str
     display_name: str
     description: str
+    fields: list[Field]
 
-
-class ReadDataClass(DataClass):
-    write_class_name: str | None = None
+    def list_fields(self, dtype: str | Set[str] | None = None) -> Iterable[Field]:
+        iterable = (field for field in self.fields)
+        if dtype is None:
+            yield from iterable
+        elif isinstance(dtype, str):
+            yield from (field for field in iterable if field.dtype == dtype)
+        else:
+            yield from (field for field in iterable if field.dtype in dtype)
 
 
 class ListDataClass(CodeModel):
-    view_id: ViewReference
     name: str
-    read_class_name: str
 
 
 class FilterClass(CodeModel):
     name: str
-    view_id: ViewReference
-    instance_type: Literal["node", "edge"]

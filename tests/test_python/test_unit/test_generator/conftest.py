@@ -15,6 +15,8 @@ from cognite.pygen._example_datamodel import (
     relates_to_container,
     relates_to_view,
 )
+from cognite.pygen._generator.transformer import to_pygen_model
+from cognite.pygen._pygen_model import PygenSDKModel
 
 
 @lru_cache(maxsize=1)
@@ -56,6 +58,11 @@ def create_example_data_model_response() -> DataModelResponseWithViews:
 def example_data_model_response() -> DataModelResponseWithViews:
     """Provides an example DataModelResponseWithViews for testing."""
     return create_example_data_model_response()
+
+
+@pytest.fixture(scope="module")
+def example_python_pygen_sdk_model(example_data_model_response: DataModelResponseWithViews) -> PygenSDKModel:
+    return to_pygen_model(example_data_model_response, "python")
 
 
 def test_example_data_model(example_data_model_response: DataModelResponseWithViews) -> None:
