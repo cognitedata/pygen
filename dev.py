@@ -1,5 +1,6 @@
 """This is a small CLI used for Pygen development."""
 
+import subprocess
 import time
 from collections import defaultdict
 from datetime import datetime
@@ -188,6 +189,24 @@ def overwrite_index():
     copy = _remove_top_lines(readme, 2)
     new_index = "\n".join(index.split("\n")[:1] + copy.split("\n"))
     index_path.write_text(new_index)
+
+
+@app.command("count", help="Count the number of code lines in v2 of Pygen")
+def count_lines() -> None:
+    typer.echo("Counting lines of code in cognite/pygen...")
+    command = (
+        r"find {root} -path '*/{exclude}' -prune -o -type f "
+        r"\( -name '*.py' -o -name '*.ts' -o -name '*.js' -o -name '*.sql' \) -print | xargs wc -l"
+    )
+    subprocess.run(
+        command.format(root="cognite", exclude="_legacy").split(),
+        shell=True,
+    )
+    typer.echo("Counting lines of code in tests")
+    subprocess.run(
+        command.format(root="tests", exclude="test_legacy").split(),
+        shell=True,
+    )
 
 
 def _remove_top_lines(text: str, lines: int) -> str:

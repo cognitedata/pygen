@@ -433,11 +433,9 @@ class {api_name}(InstanceAPI[{read_name}, {list_name}]):
         filter_name = self.data_class.filter.name
         calls: list[str] = [f'filter_ = {filter_name}("and")']
 
-        # Group consecutive filter calls on the same field for chaining
         for param in self.filter_params:
             calls.append(param.filter_call)
 
-        # Add common filter calls
         calls.extend(
             [
                 "filter_.external_id.prefix(external_id_prefix)",
