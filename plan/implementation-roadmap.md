@@ -666,9 +666,8 @@ Reference: `cognite/pygen/_python/example/_api.py`
    - Generate `data_classes/__init__.py`
    - Generate `_api/__init__.py`
 
-3. **Implement `add_instance_api()`**:
-   - Return empty dict when `pygen_as_dependency=True`
-   - Copy instance_api module when `pygen_as_dependency=False`
+Note wait with implementing `add_instance_api()` until after Task 4.5. For now assume that 
+`pygen_as_dependency=True`.
 
 **Target Output**:
 ```
