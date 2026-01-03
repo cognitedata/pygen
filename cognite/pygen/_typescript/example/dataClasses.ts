@@ -18,14 +18,14 @@ import type {
 import { InstanceList } from "../instance_api/types/instance.ts";
 import type { InstanceId, NodeReference, ViewReference } from "../instance_api/types/references.ts";
 import {
-  BooleanFilter,
-  DateFilter,
-  DateTimeFilter,
-  DirectRelationFilter,
-  FilterContainer,
-  FloatFilter,
-  IntegerFilter,
-  TextFilter,
+    BooleanFilter, DataTypeFilter,
+    DateFilter,
+    DateTimeFilter,
+    DirectRelationFilter,
+    FilterContainer,
+    FloatFilter,
+    IntegerFilter,
+    TextFilter,
 } from "../instance_api/types/dtypeFilters.ts";
 
 // ============================================================================
@@ -336,7 +336,7 @@ export class CategoryNodeFilter extends FilterContainer {
    * @param operator - How to combine filters ("and" or "or"). Defaults to "and"
    */
   constructor(operator: "and" | "or" = "and") {
-    const dataTypeFilters: TextFilter[] = [];
+    const dataTypeFilters: DataTypeFilter[] = [];
 
     super(dataTypeFilters, operator, "node");
 
@@ -449,7 +449,7 @@ export class RelatesToFilter extends FilterContainer {
    * @param operator - How to combine filters ("and" or "or"). Defaults to "and"
    */
   constructor(operator: "and" | "or" = "and") {
-    const dataTypeFilters: (TextFilter | FloatFilter | DateTimeFilter)[] = [];
+    const dataTypeFilters: DataTypeFilter[] = [];
 
     super(dataTypeFilters, operator, "edge");
 
