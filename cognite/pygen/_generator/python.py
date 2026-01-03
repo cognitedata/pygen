@@ -25,7 +25,17 @@ class PythonGenerator(Generator):
         return "\n\n".join(parts)
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
-        raise NotImplementedError()
+        generator = PythonAPIGenerator(api_class)
+        parts: list[str] = [
+            generator.create_import_statements(),
+            generator.create_api_class_with_init(),
+            generator.create_retrieve_method(),
+            generator.create_aggregate_method(),
+            generator.create_search_method(),
+            generator.create_iterate_method(),
+            generator.create_list_method(),
+        ]
+        return "\n\n".join(parts)
 
     def add_instance_api(self) -> dict[Path, str]:
         raise NotImplementedError()
