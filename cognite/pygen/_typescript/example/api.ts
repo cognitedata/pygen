@@ -311,7 +311,10 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
   } = {}): Promise<ProductNodeList> {
     const filter = this._buildFilter(options);
     const sort: PropertySort | undefined = options.sortBy !== undefined
-      ? { property: createPropertyRef(PRODUCT_NODE_VIEW, options.sortBy), direction: options.sortDirection }
+      ? {
+        property: createPropertyRef(PRODUCT_NODE_VIEW, options.sortBy),
+        direction: options.sortDirection,
+      }
       : undefined;
 
     const result = await this._list({
@@ -506,7 +509,10 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
   } = {}): Promise<CategoryNodeList> {
     const filter = this._buildFilter(options);
     const sort: PropertySort | undefined = options.sortBy !== undefined
-      ? { property: createPropertyRef(CATEGORY_NODE_VIEW, options.sortBy), direction: options.sortDirection }
+      ? {
+        property: createPropertyRef(CATEGORY_NODE_VIEW, options.sortBy),
+        direction: options.sortDirection,
+      }
       : undefined;
 
     const result = await this._list({
@@ -722,7 +728,10 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
   } = {}): Promise<RelatesToList> {
     const filter = this._buildFilter(options);
     const sort: PropertySort | undefined = options.sortBy !== undefined
-      ? { property: createPropertyRef(RELATES_TO_VIEW, options.sortBy), direction: options.sortDirection }
+      ? {
+        property: createPropertyRef(RELATES_TO_VIEW, options.sortBy),
+        direction: options.sortDirection,
+      }
       : undefined;
 
     const result = await this._list({
