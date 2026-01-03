@@ -218,9 +218,28 @@ def count_lines() -> None:
             return sum(int(line.strip().split()[0]) for line in lines if line.strip())
         return 0
 
+    def get_markdown_line_count(root: str) -> int:
+        md_command = f"find {root} -type f -name '*.md' -print | xargs wc -l"
+        result = subprocess.run(
+            md_command,
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        lines = result.stdout.strip().split("\n")
+        if not lines or not lines[0]:
+            return 0
+        last_line = lines[-1].strip()
+        if "total" in last_line:
+            return int(last_line.split()[0])
+        elif lines:
+            return sum(int(line.strip().split()[0]) for line in lines if line.strip())
+        return 0
+
     cognite_count = get_line_count("cognite", "_legacy")
     tests_count = get_line_count("tests", "test_legacy")
     total_count = cognite_count + tests_count
+    plan_count = get_markdown_line_count("plan")
 
     typer.echo(f"{'Location':<20} {'Count':>10}")
     typer.echo("-" * 31)
@@ -228,6 +247,8 @@ def count_lines() -> None:
     typer.echo(f"{'tests':<20} {tests_count:>10,}")
     typer.echo("-" * 31)
     typer.echo(f"{'Total':<20} {total_count:>10,}")
+    typer.echo("")
+    typer.echo(f"{'plan (markdown)':<20} {plan_count:>10,}")
 
 
 def _remove_top_lines(text: str, lines: int) -> str:
