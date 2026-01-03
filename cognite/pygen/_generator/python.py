@@ -57,7 +57,9 @@ class PythonDataClassGenerator:
         else:
             import_statements.append(f"from {self.top_level}.instance_api.models._references import ViewReference")
         if time_fields := set(field.dtype for field in self.data_class.list_fields(dtype={"DateTime", "Date"})):
-            import_statements.append(f"from {self.top_level}.instance_api.models._types import {sorted(time_fields)}")
+            import_statements.append(
+                f"from {self.top_level}.instance_api.models._types import {','.join(sorted(time_fields))}"
+            )
 
         filter_imports: set[str] = {"    FilterContainer,"}
         for field in self.data_class.read.fields:

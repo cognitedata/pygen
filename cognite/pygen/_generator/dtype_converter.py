@@ -88,7 +88,7 @@ _PYTHON_PRIMITIVE_TYPES: dict[type, str] = {
     Float32Property: "float",
     Float64Property: "float",
     DateProperty: "Date",
-    TimestampProperty: "Datetime",
+    TimestampProperty: "DateTime",
     JSONProperty: "JsonValue",
     TimeseriesCDFExternalIdReference: "str",
     FileCDFExternalIdReference: "str",
