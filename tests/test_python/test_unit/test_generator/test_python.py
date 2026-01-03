@@ -188,6 +188,7 @@ from cognite.pygen._python.instance_api._api import InstanceAPI
 from cognite.pygen._python.instance_api.http_client import HTTPClient
 from cognite.pygen._python.instance_api.models import (
     Aggregation,
+    InstanceId,
     PropertySort,
     ViewReference,
 )
@@ -221,20 +222,20 @@ EXPECTED_RETRIEVE_METHOD = '''
     @overload
     def retrieve(
         self,
-        id: str | tuple[str, str],
+        id: str | InstanceId | tuple[str, str],
         space: str | None = None,
     ) -> ExampleView | None: ...
 
     @overload
     def retrieve(
         self,
-        id: list[str | tuple[str, str]],
+        id: list[str | InstanceId | tuple[str, str]],
         space: str | None = None,
     ) -> ExampleViewList: ...
 
     def retrieve(
         self,
-        id: str | tuple[str, str] | list[str | tuple[str, str]],
+        id: str | InstanceId | tuple[str, str] | list[str | InstanceId | tuple[str, str]],
         space: str | None = None,
     ) -> ExampleView | ExampleViewList | None:
         """Retrieve ExampleView instances by ID.

@@ -286,24 +286,12 @@ class PythonAPIGenerator:
                 self._filter_params.extend(_create_filter_params(field))
         return self._filter_params
 
-    def _needs_date_import(self) -> bool:
-        """Check if we need to import date from datetime."""
-        return any("date |" in p.type_hint or "date | None" == p.type_hint for p in self.filter_params)
-
-    def _needs_datetime_import(self) -> bool:
-        """Check if we need to import datetime from datetime."""
-        return any("datetime |" in p.type_hint or "datetime | None" == p.type_hint for p in self.filter_params)
-
     def create_import_statements(self) -> str:
         """Generate import statements for the API class file."""
         lines: list[str] = ["from collections.abc import Sequence"]
-        # Collect datetime imports
-        datetime_imports: list[str] = []
-        if self._needs_date_import():
-            datetime_imports.append("date")
-        if self._needs_datetime_import():
-            datetime_imports.append("datetime")
-        if datetime_imports:
+        if datetime_imports := {
+            field.dtype.lower() for field in self.data_class.list_fields(dtype={"DateTime", "Date"})
+        }:
             lines.append(f"from datetime import {', '.join(sorted(datetime_imports))}")
         lines.extend(
             [
@@ -313,11 +301,8 @@ class PythonAPIGenerator:
                 f"from {self.top_level}.instance_api.http_client import HTTPClient",
                 f"from {self.top_level}.instance_api.models import (",
                 "    Aggregation,",
-            ]
-        )
-        lines.extend(
-            [
-                "    InstanceId," "    PropertySort,",
+                "    InstanceId,",
+                "    PropertySort,",
                 "    ViewReference,",
                 ")",
                 f"from {self.top_level}.instance_api.models.responses import (",
@@ -327,16 +312,12 @@ class PythonAPIGenerator:
                 "",
             ]
         )
-
-        # Import data classes
         read_name = self.data_class.read.name
         filter_name = self.data_class.filter.name
         list_name = self.data_class.read_list.name
-        lines.append("from ._data_class import (")
-        lines.append(f"    {read_name},")
-        lines.append(f"    {filter_name},")
-        lines.append(f"    {list_name},")
-        lines.append(")")
+        lines.extend(
+            ["from ._data_class import (", f"    {read_name},", f"    {filter_name},", f"    {list_name},", ")"]
+        )
 
         return "\n".join(lines)
 
