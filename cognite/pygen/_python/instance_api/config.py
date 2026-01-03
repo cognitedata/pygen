@@ -50,6 +50,7 @@ class PygenClientConfig(BaseModel):
             str: The base API URL.
 
         Examples:
+            >>> from cognite.pygen._python.instance_api.auth import TokenCredentials
             >>> config = PygenClientConfig(
             ...     cdf_url="https://bluefield.cognitedata.com",
             ...     project="my_project",
@@ -70,6 +71,7 @@ class PygenClientConfig(BaseModel):
             str: The full API URL.
 
         Examples:
+            >>> from cognite.pygen._python.instance_api.auth import TokenCredentials
             >>> config = PygenClientConfig(
             ...     cdf_url="https://bluefield.cognitedata.com",
             ...     project="my_project",
