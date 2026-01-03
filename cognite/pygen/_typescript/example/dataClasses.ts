@@ -216,34 +216,23 @@ export class ProductNodeFilter extends FilterContainer {
    * @param operator - How to combine filters ("and" or "or"). Defaults to "and"
    */
   constructor(operator: "and" | "or" = "and") {
-    const dataTypeFilters: (
-      | TextFilter
-      | FloatFilter
-      | IntegerFilter
-      | BooleanFilter
-      | DateFilter
-      | DirectRelationFilter
-    )[] = [];
+    const name = new TextFilter(PRODUCT_NODE_VIEW, "name", operator);
+    const description = new TextFilter(PRODUCT_NODE_VIEW, "description", operator);
+    const price = new FloatFilter(PRODUCT_NODE_VIEW, "price", operator);
+    const quantity = new IntegerFilter(PRODUCT_NODE_VIEW, "quantity", operator);
+    const active = new BooleanFilter(PRODUCT_NODE_VIEW, "active", operator);
+    const createdDate = new DateFilter(PRODUCT_NODE_VIEW, "createdDate", operator);
+    const category = new DirectRelationFilter(PRODUCT_NODE_VIEW, "category", operator);
 
-    super(dataTypeFilters, operator, "node");
+    super([name, description, price, quantity, active, createdDate, category], operator, "node");
 
-    this.name = new TextFilter(PRODUCT_NODE_VIEW, "name", operator);
-    this.description = new TextFilter(PRODUCT_NODE_VIEW, "description", operator);
-    this.price = new FloatFilter(PRODUCT_NODE_VIEW, "price", operator);
-    this.quantity = new IntegerFilter(PRODUCT_NODE_VIEW, "quantity", operator);
-    this.active = new BooleanFilter(PRODUCT_NODE_VIEW, "active", operator);
-    this.createdDate = new DateFilter(PRODUCT_NODE_VIEW, "createdDate", operator);
-    this.category = new DirectRelationFilter(PRODUCT_NODE_VIEW, "category", operator);
-
-    dataTypeFilters.push(
-      this.name,
-      this.description,
-      this.price,
-      this.quantity,
-      this.active,
-      this.createdDate,
-      this.category,
-    );
+    this.name = name;
+    this.description = description;
+    this.price = price;
+    this.quantity = quantity;
+    this.active = active;
+    this.createdDate = createdDate;
+    this.category = category;
   }
 }
 
