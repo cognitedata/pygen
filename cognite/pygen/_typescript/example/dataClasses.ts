@@ -18,7 +18,7 @@ import type {
 import { InstanceList } from "../instance_api/types/instance.ts";
 import type { InstanceId, NodeReference, ViewReference } from "../instance_api/types/references.ts";
 import {
-    BooleanFilter, DataTypeFilter,
+    BooleanFilter,
     DateFilter,
     DateTimeFilter,
     DirectRelationFilter,
@@ -336,13 +336,11 @@ export class CategoryNodeFilter extends FilterContainer {
    * @param operator - How to combine filters ("and" or "or"). Defaults to "and"
    */
   constructor(operator: "and" | "or" = "and") {
-    const dataTypeFilters: DataTypeFilter[] = [];
+    const categoryName = new TextFilter(CATEGORY_NODE_VIEW, "categoryName", operator);
 
-    super(dataTypeFilters, operator, "node");
+    super([categoryName], operator, "node");
 
-    this.categoryName = new TextFilter(CATEGORY_NODE_VIEW, "categoryName", operator);
-
-    dataTypeFilters.push(this.categoryName);
+    this.categoryName = categoryName;
   }
 }
 
@@ -449,14 +447,14 @@ export class RelatesToFilter extends FilterContainer {
    * @param operator - How to combine filters ("and" or "or"). Defaults to "and"
    */
   constructor(operator: "and" | "or" = "and") {
-    const dataTypeFilters: DataTypeFilter[] = [];
+    const relationType = new TextFilter(RELATES_TO_VIEW, "relationType", operator);
+    const strength = new FloatFilter(RELATES_TO_VIEW, "strength", operator);
+    const createdAt = new DateTimeFilter(RELATES_TO_VIEW, "createdAt", operator);
 
-    super(dataTypeFilters, operator, "edge");
+    super([relationType, strength, createdAt], operator, "edge");
 
-    this.relationType = new TextFilter(RELATES_TO_VIEW, "relationType", operator);
-    this.strength = new FloatFilter(RELATES_TO_VIEW, "strength", operator);
-    this.createdAt = new DateTimeFilter(RELATES_TO_VIEW, "createdAt", operator);
-
-    dataTypeFilters.push(this.relationType, this.strength, this.createdAt);
+    this.relationType = relationType;
+    this.strength = strength;
+    this.createdAt = createdAt;
   }
 }
