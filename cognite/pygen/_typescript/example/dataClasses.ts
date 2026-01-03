@@ -77,29 +77,29 @@ export interface ProductNodeWrite extends NodeInstanceWrite {
 
   // Required properties
   /** The name of the product */
-  readonly name: string;
+  name: string;
   /** The price of the product */
-  readonly price: number;
+  price: number;
   /** The quantity in stock */
-  readonly quantity: number;
+  quantity: number;
   /** When the product was created (as Date) */
-  readonly createdDate: Date;
+  createdDate: Date;
 
   // Optional properties
   /** Optional description of the product */
-  readonly description?: string;
+  description?: string;
   /** Optional list of tags */
-  readonly tags?: readonly string[];
+  tags?: readonly string[];
   /** Optional historical prices */
-  readonly prices?: readonly number[];
+  prices?: readonly number[];
   /** Optional historical quantities */
-  readonly quantities?: readonly number[];
+  quantities?: readonly number[];
   /** Whether the product is active */
-  readonly active?: boolean;
+  active?: boolean;
   /** When the product was last updated */
-  readonly updatedTimestamp?: Date;
+  updatedTimestamp?: Date;
   /** Reference to the category */
-  readonly category?: InstanceId | readonly [string, string];
+  category?: InstanceId | readonly [string, string];
 }
 
 /**
@@ -257,7 +257,7 @@ export class ProductNodeFilter extends FilterContainer {
 export interface CategoryNodeWrite extends NodeInstanceWrite {
   readonly instanceType: "node";
   /** The name of the category */
-  readonly categoryName: string;
+  categoryName: string;
 }
 
 /**
@@ -355,14 +355,14 @@ export class CategoryNodeFilter extends FilterContainer {
  */
 export interface RelatesToWrite extends EdgeInstanceWrite {
   readonly instanceType: "edge";
-  readonly startNode: NodeReference;
-  readonly endNode: NodeReference;
+  startNode: NodeReference;
+  endNode: NodeReference;
   /** The type of relation */
-  readonly relationType: string;
+  relationType: string;
   /** The strength of the relation */
-  readonly strength?: number;
+  strength?: number;
   /** When the relation was created */
-  readonly createdAt: Date;
+  createdAt: Date;
 }
 
 /**
