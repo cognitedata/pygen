@@ -734,7 +734,5 @@ This package provides the {self.client_name} for interacting with the data model
 
 from ._client import {self.client_name}
 
-__all__ = [
-    "{self.client_name}",
-]
+__all__ = ["{self.client_name}"]
 '''

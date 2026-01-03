@@ -467,17 +467,17 @@ This module exports all data classes including read, write, list, and filter cla
 """
 
 from .example import (
-    ExampleViewWrite,
     ExampleView,
-    ExampleViewList,
     ExampleViewFilter,
+    ExampleViewList,
+    ExampleViewWrite,
 )
 
 __all__ = [
-    "ExampleViewWrite",
     "ExampleView",
-    "ExampleViewList",
     "ExampleViewFilter",
+    "ExampleViewList",
+    "ExampleViewWrite",
 ]'''
 
 EXPECTED_API_INIT = '''"""API classes for the generated SDK.
@@ -527,7 +527,8 @@ This package provides the MyClient for interacting with the data model.
 
 from ._client import MyClient
 
-__all__ = ["MyClient"]'''
+__all__ = ["MyClient"]
+'''
 
 
 class TestPythonPackageGenerator:
