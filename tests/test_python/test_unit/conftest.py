@@ -1,6 +1,6 @@
 import pytest
 
-from cognite.pygen._python.instance_api.auth.credentials import Credentials
+from cognite.pygen._python.instance_api.auth import Credentials
 from cognite.pygen._python.instance_api.config import PygenClientConfig
 
 

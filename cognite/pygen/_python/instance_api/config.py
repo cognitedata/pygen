@@ -3,7 +3,7 @@ from collections.abc import Set
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from cognite.pygen._python.instance_api.auth.credentials import Credentials
+from cognite.pygen._python.instance_api.auth import Credentials
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -44,7 +44,11 @@ class PygenClientConfig(BaseModel):
             str: The base API URL.
 
         Examples:
-            >>> config = PygenClientConfig("https://bluefield.cognitedata.com", "my_project", ...)
+            >>> config = PygenClientConfig(
+            ...     cdf_url="https://bluefield.cognitedata.com",
+            ...     project="my_project",
+            ...     credentials=TokenCredentials(token="my_token"),
+            ... )
             >>> config.base_api_url
             'https://bluefield.cognitedata.com/api/v1/projects/my_project'
         """
@@ -63,7 +67,7 @@ class PygenClientConfig(BaseModel):
             >>> config = PygenClientConfig(
             ...     cdf_url="https://bluefield.cognitedata.com",
             ...     project="my_project",
-            ...     credentials=...,
+            ...     credentials=TokenCredentials(token="my_token"),
             ... )
             >>> config.create_api_url("/models/instances")
             'https://bluefield.cognitedata.com/api/v1/projects/my_project/models/instances'

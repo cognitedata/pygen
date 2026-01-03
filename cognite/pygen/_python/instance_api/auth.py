@@ -1,13 +1,32 @@
-"""OAuth2 authentication support."""
+"""Base credentials interface for authentication."""
 
 from datetime import datetime, timedelta
 from threading import Lock
+from typing import Protocol, runtime_checkable
 
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from cognite.pygen._python.instance_api.auth.credentials import Credentials
 from cognite.pygen._python.instance_api.exceptions import OAuth2Error
+
+
+@runtime_checkable
+class Credentials(Protocol):
+    """
+    Abstract base class for authentication credentials.
+
+    All credential types must inherit from this class and implement
+    the get_headers method to provide authentication headers for HTTP requests.
+    """
+
+    def authorization_header(self) -> tuple[str, str]:
+        """
+        Get the authorization header for HTTP requests.
+
+        Returns:
+            A tuple containing the header name and header value.
+        """
+        raise NotImplementedError()
 
 
 class _TokenResponse(BaseModel):
@@ -136,3 +155,24 @@ class OAuth2ClientCredentials(Credentials):
     def __exit__(self, *args) -> None:
         """Context manager support - closes HTTP client."""
         self.close()
+
+
+class TokenCredentials(Credentials):
+    """
+    Simple token-based authentication.
+
+    Args:
+        token: The static token to use for authentication.
+    """
+
+    def __init__(self, token: str) -> None:
+        self.token = token
+
+    def authorization_header(self) -> tuple[str, str]:
+        """
+        Get authentication headers with the static token.
+
+        Returns:
+            Dictionary containing the Authorization header with Bearer token.
+        """
+        return "Authorization", f"Bearer {self.token}"
