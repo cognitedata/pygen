@@ -1,6 +1,7 @@
+from dataclasses import dataclass
 from pathlib import Path
 
-from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile
+from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field
 
 from .generator import Generator
 
@@ -190,34 +191,387 @@ class PythonDataClassGenerator:
         return attributes, names
 
 
+@dataclass
+class FilterParam:
+    """Represents a filter parameter for an API method."""
+
+    name: str
+    type_hint: str
+    docstring: str
+    filter_call: str  # e.g., "filter_.name.equals_or_in(name)"
+
+
+# Mapping from filter name to parameter generation
+# Returns: list of (param_name_suffix, type_hint, docstring, filter_method_call)
+_FILTER_PARAM_TEMPLATES: dict[str, list[tuple[str, str, str, str]]] = {
+    "TextFilter": [
+        ("", "str | list[str] | None", "Filter by exact {name} or list of values.", ".equals_or_in({param})"),
+        ("_prefix", "str | None", "Filter by {name} prefix.", ".prefix({param})"),
+    ],
+    "IntegerFilter": [
+        ("", "int | None", "Minimum {name} (inclusive).", ".greater_than_or_equals({param})"),
+        ("", "int | None", "Maximum {name} (inclusive).", ".less_than_or_equals({param})"),
+    ],
+    "FloatFilter": [
+        ("", "float | None", "Minimum {name} (inclusive).", ".greater_than_or_equals({param})"),
+        ("", "float | None", "Maximum {name} (inclusive).", ".less_than_or_equals({param})"),
+    ],
+    "BooleanFilter": [
+        ("", "bool | None", "Filter by {name}.", ".equals({param})"),
+    ],
+    "DateFilter": [
+        ("", "date | None", "Minimum {name} (inclusive).", ".greater_than_or_equals({param})"),
+        ("", "date | None", "Maximum {name} (inclusive).", ".less_than_or_equals({param})"),
+    ],
+    "DateTimeFilter": [
+        ("", "datetime | None", "Minimum {name} (inclusive).", ".greater_than_or_equals({param})"),
+        ("", "datetime | None", "Maximum {name} (inclusive).", ".less_than_or_equals({param})"),
+    ],
+    "DirectRelationFilter": [
+        (
+            "",
+            "str | InstanceId | tuple[str, str] | list[str | InstanceId | tuple[str, str]] | None",
+            "Filter by {name} relation.",
+            ".equals_or_in({param})",
+        ),
+    ],
+}
+
+
+def _create_filter_params(field: Field) -> list[FilterParam]:
+    """Create filter parameters for a field based on its filter type."""
+    if not field.filter_name:
+        return []
+
+    templates = _FILTER_PARAM_TEMPLATES.get(field.filter_name, [])
+    params: list[FilterParam] = []
+
+    # Determine if this is a range filter type (uses min_/max_ prefixes)
+    range_filter_types = {"IntegerFilter", "FloatFilter", "DateFilter", "DateTimeFilter"}
+    is_range_filter = field.filter_name in range_filter_types
+
+    for i, (suffix, type_hint, docstring_template, filter_call_template) in enumerate(templates):
+        # For range filters (min/max), use min_/max_ prefix
+        if is_range_filter and len(templates) == 2 and suffix == "":
+            prefix = "min_" if i == 0 else "max_"
+            param_name = f"{prefix}{field.name}"
+        else:
+            param_name = f"{field.name}{suffix}"
+
+        params.append(
+            FilterParam(
+                name=param_name,
+                type_hint=type_hint,
+                docstring=docstring_template.format(name=field.name.replace("_", " ")),
+                filter_call=f"filter_.{field.name}{filter_call_template.format(param=param_name)}",
+            )
+        )
+
+    return params
+
+
 class PythonAPIGenerator:
     def __init__(self, api_class: APIClassFile, top_level: str = "cognite.pygen._python") -> None:
         self.api_class = api_class
+        self.data_class = api_class.data_class
         self.top_level = top_level
+        self._filter_params: list[FilterParam] | None = None
+
+    @property
+    def filter_params(self) -> list[FilterParam]:
+        """Get all filter parameters for the API methods."""
+        if self._filter_params is None:
+            self._filter_params = []
+            for field in self.data_class.read.fields:
+                self._filter_params.extend(_create_filter_params(field))
+        return self._filter_params
+
+    def _needs_date_import(self) -> bool:
+        """Check if we need to import date from datetime."""
+        return any("date |" in p.type_hint or "date | None" == p.type_hint for p in self.filter_params)
+
+    def _needs_datetime_import(self) -> bool:
+        """Check if we need to import datetime from datetime."""
+        return any("datetime |" in p.type_hint or "datetime | None" == p.type_hint for p in self.filter_params)
 
     def create_import_statements(self) -> str:
-        raise NotImplementedError()
+        """Generate import statements for the API class file."""
+        lines: list[str] = ["from collections.abc import Sequence"]
+        # Collect datetime imports
+        datetime_imports: list[str] = []
+        if self._needs_date_import():
+            datetime_imports.append("date")
+        if self._needs_datetime_import():
+            datetime_imports.append("datetime")
+        if datetime_imports:
+            lines.append(f"from datetime import {', '.join(sorted(datetime_imports))}")
+        lines.extend(
+            [
+                "from typing import Literal, overload",
+                "",
+                f"from {self.top_level}.instance_api._api import InstanceAPI",
+                f"from {self.top_level}.instance_api.http_client import HTTPClient",
+                f"from {self.top_level}.instance_api.models import (",
+                "    Aggregation,",
+            ]
+        )
+        lines.extend(
+            [
+                "    InstanceId," "    PropertySort,",
+                "    ViewReference,",
+                ")",
+                f"from {self.top_level}.instance_api.models.responses import (",
+                "    AggregateResponse,",
+                "    Page,",
+                ")",
+                "",
+            ]
+        )
+
+        # Import data classes
+        read_name = self.data_class.read.name
+        filter_name = self.data_class.filter.name
+        list_name = self.data_class.read_list.name
+        lines.append("from ._data_class import (")
+        lines.append(f"    {read_name},")
+        lines.append(f"    {filter_name},")
+        lines.append(f"    {list_name},")
+        lines.append(")")
+
+        return "\n".join(lines)
 
     def create_api_class_with_init(self) -> str:
-        raise NotImplementedError()
+        """Generate the API class definition with __init__ method."""
+        api_name = self.api_class.name
+        read_name = self.data_class.read.name
+        list_name = self.data_class.read_list.name
+        view_id = self.data_class.view_id
+        instance_type = self.data_class.instance_type
+
+        return f'''
+def _create_property_ref(view_ref: ViewReference, property_name: str) -> list[str]:
+    """Create a property reference for filtering."""
+    return [view_ref.space, f"{{view_ref.external_id}}/{{view_ref.version}}", property_name]
+
+
+class {api_name}(InstanceAPI[{read_name}, {list_name}]):
+    """API for {read_name} instances with type-safe filter methods."""
+
+    def __init__(self, http_client: HTTPClient) -> None:
+        view_ref = ViewReference(
+            space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
+        )
+        super().__init__(http_client, view_ref, "{instance_type}", {list_name})'''
 
     def create_retrieve_method(self) -> str:
-        raise NotImplementedError()
+        """Generate the retrieve method with overloads."""
+        read_name = self.data_class.read.name
+        list_name = self.data_class.read_list.name
+        instance_id_type = "str | InstanceId | tuple[str, str]"
+
+        return f'''
+    @overload
+    def retrieve(
+        self,
+        id: {instance_id_type},
+        space: str | None = None,
+    ) -> {read_name} | None: ...
+
+    @overload
+    def retrieve(
+        self,
+        id: list[{instance_id_type}],
+        space: str | None = None,
+    ) -> {list_name}: ...
+
+    def retrieve(
+        self,
+        id: {instance_id_type} | list[{instance_id_type}],
+        space: str | None = None,
+    ) -> {read_name} | {list_name} | None:
+        """Retrieve {read_name} instances by ID.
+
+        Args:
+            id: Instance identifier(s). Can be a string, InstanceId, tuple, or list of these.
+            space: Default space to use when id is a string.
+
+        Returns:
+            For single id: The {read_name} if found, None otherwise.
+            For list of ids: A {list_name} of found instances.
+        """
+        return self._retrieve(id, space)'''
+
+    def _create_filter_arguments(self, include_pagination: bool = False, include_sort: bool = False) -> str:
+        """Create filter argument list for method signatures."""
+        args: list[str] = []
+        for param in self.filter_params:
+            args.append(f"{param.name}: {param.type_hint} = None,")
+
+        # Add common filter params
+        args.extend(
+            [
+                "external_id_prefix: str | None = None,",
+                "space: str | list[str] | None = None,",
+            ]
+        )
+
+        if include_pagination:
+            args.extend(
+                [
+                    "cursor: str | None = None,",
+                    "limit: int = 25,",
+                ]
+            )
+        elif include_sort:
+            args.extend(
+                [
+                    "sort_by: str | None = None,",
+                    'sort_direction: Literal["ascending", "descending"] = "ascending",',
+                    "limit: int | None = 25,",
+                ]
+            )
+
+        return "\n        ".join(args)
+
+    def _create_filter_argument_docstrings(self) -> str:
+        """Create docstring entries for filter arguments."""
+        docs: list[str] = []
+        for param in self.filter_params:
+            docs.append(f"            {param.name}: {param.docstring}")
+
+        docs.extend(
+            [
+                "            external_id_prefix: Filter by external ID prefix.",
+                "            space: Filter by space.",
+            ]
+        )
+        return "\n".join(docs)
+
+    def _create_filter_calls(self) -> str:
+        """Create filter method calls for building the filter."""
+        filter_name = self.data_class.filter.name
+        calls: list[str] = [f'filter_ = {filter_name}("and")']
+
+        # Group consecutive filter calls on the same field for chaining
+        for param in self.filter_params:
+            calls.append(param.filter_call)
+
+        # Add common filter calls
+        calls.extend(
+            [
+                "filter_.external_id.prefix(external_id_prefix)",
+                "filter_.space.equals_or_in(space)",
+            ]
+        )
+        return "\n        ".join(calls)
 
     def create_aggregate_method(self) -> str:
-        raise NotImplementedError()
+        """Generate the aggregate method."""
+        filter_args = self._create_filter_arguments()
+        filter_docs = self._create_filter_argument_docstrings()
+        filter_calls = self._create_filter_calls()
+
+        return f'''
+    def aggregate(
+        self,
+        aggregate: Aggregation | Sequence[Aggregation],
+        group_by: str | Sequence[str] | None = None,
+        {filter_args}
+    ) -> AggregateResponse:
+        """Aggregate instances.
+
+        Args:
+            aggregate: Aggregation(s) to perform.
+            group_by: Property or properties to group by.
+{filter_docs}
+
+        Returns:
+            AggregateResponse with aggregated values.
+        """
+        {filter_calls}
+        return self._aggregate(aggregate=aggregate, group_by=group_by, filter=filter_.as_filter())'''
 
     def create_search_method(self) -> str:
-        raise NotImplementedError()
+        """Generate the search method."""
+        list_name = self.data_class.read_list.name
+        filter_args = self._create_filter_arguments()
+        filter_docs = self._create_filter_argument_docstrings()
+        filter_calls = self._create_filter_calls()
+
+        return f'''
+    def search(
+        self,
+        query: str | None = None,
+        properties: str | Sequence[str] | None = None,
+        {filter_args}
+        limit: int = 25,
+    ) -> {list_name}:
+        """Search instances using full-text search.
+
+        Args:
+            query: The search query string.
+            properties: Properties to search in. If None, searches all text properties.
+{filter_docs}
+            limit: Maximum number of results.
+
+        Returns:
+            A {list_name} with matching instances.
+        """
+        {filter_calls}
+        return self._search(query=query, properties=properties, limit=limit, filter=filter_.as_filter()).items'''
 
     def create_iterate_method(self) -> str:
-        raise NotImplementedError()
+        """Generate the iterate method."""
+        list_name = self.data_class.read_list.name
+        filter_args = self._create_filter_arguments(include_pagination=True)
+        filter_docs = self._create_filter_argument_docstrings()
+        filter_calls = self._create_filter_calls()
+
+        return f'''
+    def iterate(
+        self,
+        {filter_args}
+    ) -> Page[{list_name}]:
+        """Iterate over instances with pagination.
+
+        Args:
+{filter_docs}
+            cursor: Pagination cursor from a previous page.
+            limit: Maximum number of results per page (1-1000).
+
+        Returns:
+            A Page containing items and optional next cursor.
+        """
+        {filter_calls}
+        return self._iterate(cursor=cursor, limit=limit, filter=filter_.as_filter())'''
 
     def create_list_method(self) -> str:
-        raise NotImplementedError()
+        """Generate the list method."""
+        list_name = self.data_class.read_list.name
+        filter_args = self._create_filter_arguments(include_sort=True)
+        filter_docs = self._create_filter_argument_docstrings()
+        filter_calls = self._create_filter_calls()
 
-    def create_filter_arguments(self) -> str:
-        raise NotImplementedError()
+        return f'''
+    def list(
+        self,
+        {filter_args}
+    ) -> {list_name}:
+        """List instances with type-safe filtering.
 
-    def create_filter_argument_docstrings(self) -> str:
-        raise NotImplementedError()
+        Args:
+{filter_docs}
+            sort_by: Property name to sort by.
+            sort_direction: Sort direction.
+            limit: Maximum number of results. None for no limit.
+
+        Returns:
+            A {list_name} of matching instances.
+        """
+        {filter_calls}
+        sort = None
+        if sort_by is not None:
+            prop_ref = _create_property_ref(self._view_ref, sort_by)
+            sort = PropertySort(property=prop_ref, direction=sort_direction)
+
+        return self._list(limit=limit, filter=filter_.as_filter(), sort=sort)'''

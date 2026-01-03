@@ -1,8 +1,8 @@
 import pytest
 
 from cognite.pygen._client.models import ViewReference
-from cognite.pygen._generator.python import PythonDataClassGenerator
-from cognite.pygen._pygen_model import DataClass, DataClassFile, Field, FilterClass, ListDataClass
+from cognite.pygen._generator.python import PythonAPIGenerator, PythonDataClassGenerator
+from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field, FilterClass, ListDataClass
 
 
 @pytest.fixture(scope="session")
@@ -159,3 +159,275 @@ class TestPythonDataClassGenerator:
     def test_generate_filter_class(self, data_class_generator: PythonDataClassGenerator) -> None:
         filter_class_code = data_class_generator.generate_filter_class()
         assert filter_class_code.strip() == EXPECTED_FILTER_CLASS_CODE.strip()
+
+
+# ============================================================================
+# API Class Generator Tests
+# ============================================================================
+
+
+@pytest.fixture(scope="session")
+def api_class_file(data_class_file: DataClassFile) -> APIClassFile:
+    return APIClassFile(
+        filename="_example_view_api.py",
+        name="ExampleViewAPI",
+        client_attribute_name="example_view",
+        data_class=data_class_file,
+    )
+
+
+@pytest.fixture(scope="session")
+def api_class_generator(api_class_file: APIClassFile) -> PythonAPIGenerator:
+    return PythonAPIGenerator(api_class_file)
+
+
+EXPECTED_API_IMPORT_STATEMENTS = """from collections.abc import Sequence
+from typing import Literal, overload
+
+from cognite.pygen._python.instance_api._api import InstanceAPI
+from cognite.pygen._python.instance_api.http_client import HTTPClient
+from cognite.pygen._python.instance_api.models import (
+    Aggregation,
+    PropertySort,
+    ViewReference,
+)
+from cognite.pygen._python.instance_api.models.responses import (
+    AggregateResponse,
+    Page,
+)
+
+from ._data_class import (
+    ExampleView,
+    ExampleViewFilter,
+    ExampleViewList,
+)"""
+
+EXPECTED_API_CLASS_WITH_INIT = '''
+def _create_property_ref(view_ref: ViewReference, property_name: str) -> list[str]:
+    """Create a property reference for filtering."""
+    return [view_ref.space, f"{view_ref.external_id}/{view_ref.version}", property_name]
+
+
+class ExampleViewAPI(InstanceAPI[ExampleView, ExampleViewList]):
+    """API for ExampleView instances with type-safe filter methods."""
+
+    def __init__(self, http_client: HTTPClient) -> None:
+        view_ref = ViewReference(
+            space="example_space", external_id="example_view", version="v1"
+        )
+        super().__init__(http_client, view_ref, "node", ExampleViewList)'''
+
+EXPECTED_RETRIEVE_METHOD = '''
+    @overload
+    def retrieve(
+        self,
+        id: str | tuple[str, str],
+        space: str | None = None,
+    ) -> ExampleView | None: ...
+
+    @overload
+    def retrieve(
+        self,
+        id: list[str | tuple[str, str]],
+        space: str | None = None,
+    ) -> ExampleViewList: ...
+
+    def retrieve(
+        self,
+        id: str | tuple[str, str] | list[str | tuple[str, str]],
+        space: str | None = None,
+    ) -> ExampleView | ExampleViewList | None:
+        """Retrieve ExampleView instances by ID.
+
+        Args:
+            id: Instance identifier(s). Can be a string, InstanceId, tuple, or list of these.
+            space: Default space to use when id is a string.
+
+        Returns:
+            For single id: The ExampleView if found, None otherwise.
+            For list of ids: A ExampleViewList of found instances.
+        """
+        return self._retrieve(id, space)'''
+
+EXPECTED_AGGREGATE_METHOD = '''
+    def aggregate(
+        self,
+        aggregate: Aggregation | Sequence[Aggregation],
+        group_by: str | Sequence[str] | None = None,
+        property_one: str | list[str] | None = None,
+        property_one_prefix: str | None = None,
+        min_property_two: int | None = None,
+        max_property_two: int | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+    ) -> AggregateResponse:
+        """Aggregate instances.
+
+        Args:
+            aggregate: Aggregation(s) to perform.
+            group_by: Property or properties to group by.
+            property_one: Filter by exact property one or list of values.
+            property_one_prefix: Filter by property one prefix.
+            min_property_two: Minimum property two (inclusive).
+            max_property_two: Maximum property two (inclusive).
+            external_id_prefix: Filter by external ID prefix.
+            space: Filter by space.
+
+        Returns:
+            AggregateResponse with aggregated values.
+        """
+        filter_ = ExampleViewFilter("and")
+        filter_.property_one.equals_or_in(property_one)
+        filter_.property_one.prefix(property_one_prefix)
+        filter_.property_two.greater_than_or_equals(min_property_two)
+        filter_.property_two.less_than_or_equals(max_property_two)
+        filter_.external_id.prefix(external_id_prefix)
+        filter_.space.equals_or_in(space)
+        return self._aggregate(aggregate=aggregate, group_by=group_by, filter=filter_.as_filter())'''
+
+EXPECTED_SEARCH_METHOD = '''
+    def search(
+        self,
+        query: str | None = None,
+        properties: str | Sequence[str] | None = None,
+        property_one: str | list[str] | None = None,
+        property_one_prefix: str | None = None,
+        min_property_two: int | None = None,
+        max_property_two: int | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        limit: int = 25,
+    ) -> ExampleViewList:
+        """Search instances using full-text search.
+
+        Args:
+            query: The search query string.
+            properties: Properties to search in. If None, searches all text properties.
+            property_one: Filter by exact property one or list of values.
+            property_one_prefix: Filter by property one prefix.
+            min_property_two: Minimum property two (inclusive).
+            max_property_two: Maximum property two (inclusive).
+            external_id_prefix: Filter by external ID prefix.
+            space: Filter by space.
+            limit: Maximum number of results.
+
+        Returns:
+            A ExampleViewList with matching instances.
+        """
+        filter_ = ExampleViewFilter("and")
+        filter_.property_one.equals_or_in(property_one)
+        filter_.property_one.prefix(property_one_prefix)
+        filter_.property_two.greater_than_or_equals(min_property_two)
+        filter_.property_two.less_than_or_equals(max_property_two)
+        filter_.external_id.prefix(external_id_prefix)
+        filter_.space.equals_or_in(space)
+        return self._search(query=query, properties=properties, limit=limit, filter=filter_.as_filter()).items'''
+
+EXPECTED_ITERATE_METHOD = '''
+    def iterate(
+        self,
+        property_one: str | list[str] | None = None,
+        property_one_prefix: str | None = None,
+        min_property_two: int | None = None,
+        max_property_two: int | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        cursor: str | None = None,
+        limit: int = 25,
+    ) -> Page[ExampleViewList]:
+        """Iterate over instances with pagination.
+
+        Args:
+            property_one: Filter by exact property one or list of values.
+            property_one_prefix: Filter by property one prefix.
+            min_property_two: Minimum property two (inclusive).
+            max_property_two: Maximum property two (inclusive).
+            external_id_prefix: Filter by external ID prefix.
+            space: Filter by space.
+            cursor: Pagination cursor from a previous page.
+            limit: Maximum number of results per page (1-1000).
+
+        Returns:
+            A Page containing items and optional next cursor.
+        """
+        filter_ = ExampleViewFilter("and")
+        filter_.property_one.equals_or_in(property_one)
+        filter_.property_one.prefix(property_one_prefix)
+        filter_.property_two.greater_than_or_equals(min_property_two)
+        filter_.property_two.less_than_or_equals(max_property_two)
+        filter_.external_id.prefix(external_id_prefix)
+        filter_.space.equals_or_in(space)
+        return self._iterate(cursor=cursor, limit=limit, filter=filter_.as_filter())'''
+
+EXPECTED_LIST_METHOD = '''
+    def list(
+        self,
+        property_one: str | list[str] | None = None,
+        property_one_prefix: str | None = None,
+        min_property_two: int | None = None,
+        max_property_two: int | None = None,
+        external_id_prefix: str | None = None,
+        space: str | list[str] | None = None,
+        sort_by: str | None = None,
+        sort_direction: Literal["ascending", "descending"] = "ascending",
+        limit: int | None = 25,
+    ) -> ExampleViewList:
+        """List instances with type-safe filtering.
+
+        Args:
+            property_one: Filter by exact property one or list of values.
+            property_one_prefix: Filter by property one prefix.
+            min_property_two: Minimum property two (inclusive).
+            max_property_two: Maximum property two (inclusive).
+            external_id_prefix: Filter by external ID prefix.
+            space: Filter by space.
+            sort_by: Property name to sort by.
+            sort_direction: Sort direction.
+            limit: Maximum number of results. None for no limit.
+
+        Returns:
+            A ExampleViewList of matching instances.
+        """
+        filter_ = ExampleViewFilter("and")
+        filter_.property_one.equals_or_in(property_one)
+        filter_.property_one.prefix(property_one_prefix)
+        filter_.property_two.greater_than_or_equals(min_property_two)
+        filter_.property_two.less_than_or_equals(max_property_two)
+        filter_.external_id.prefix(external_id_prefix)
+        filter_.space.equals_or_in(space)
+        sort = None
+        if sort_by is not None:
+            prop_ref = _create_property_ref(self._view_ref, sort_by)
+            sort = PropertySort(property=prop_ref, direction=sort_direction)
+
+        return self._list(limit=limit, filter=filter_.as_filter(), sort=sort)'''
+
+
+class TestPythonAPIGenerator:
+    def test_create_import_statements(self, api_class_generator: PythonAPIGenerator) -> None:
+        import_statements = api_class_generator.create_import_statements()
+        assert import_statements.strip() == EXPECTED_API_IMPORT_STATEMENTS.strip()
+
+    def test_create_api_class_with_init(self, api_class_generator: PythonAPIGenerator) -> None:
+        api_class_code = api_class_generator.create_api_class_with_init()
+        assert api_class_code.strip() == EXPECTED_API_CLASS_WITH_INIT.strip()
+
+    def test_create_retrieve_method(self, api_class_generator: PythonAPIGenerator) -> None:
+        retrieve_method = api_class_generator.create_retrieve_method()
+        assert retrieve_method.strip() == EXPECTED_RETRIEVE_METHOD.strip()
+
+    def test_create_aggregate_method(self, api_class_generator: PythonAPIGenerator) -> None:
+        aggregate_method = api_class_generator.create_aggregate_method()
+        assert aggregate_method.strip() == EXPECTED_AGGREGATE_METHOD.strip()
+
+    def test_create_search_method(self, api_class_generator: PythonAPIGenerator) -> None:
+        search_method = api_class_generator.create_search_method()
+        assert search_method.strip() == EXPECTED_SEARCH_METHOD.strip()
+
+    def test_create_iterate_method(self, api_class_generator: PythonAPIGenerator) -> None:
+        iterate_method = api_class_generator.create_iterate_method()
+        assert iterate_method.strip() == EXPECTED_ITERATE_METHOD.strip()
+
+    def test_create_list_method(self, api_class_generator: PythonAPIGenerator) -> None:
+        list_method = api_class_generator.create_list_method()
+        assert list_method.strip() == EXPECTED_LIST_METHOD.strip()
