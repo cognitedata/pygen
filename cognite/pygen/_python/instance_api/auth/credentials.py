@@ -1,8 +1,9 @@
 """Base credentials interface for authentication."""
 
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 
+@runtime_checkable
 class Credentials(Protocol):
     """
     Abstract base class for authentication credentials.
