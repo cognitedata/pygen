@@ -182,4 +182,5 @@ def _create_api_class(
         filename=sanitize(f"_{view.external_id}_api.{_file_suffix(output_format)}"),
         name=_to_casing(f"{view.external_id}API", naming.class_name),
         client_attribute_name=_to_casing(f"{view.external_id}", naming.field_name),
+        data_class=data_class,
     )

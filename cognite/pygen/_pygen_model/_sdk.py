@@ -26,6 +26,7 @@ class APIClassFile(CodeModel):
     filename: str
     name: str
     client_attribute_name: str
+    data_class: DataClassFile
 
 
 class PygenSDKModel(CodeModel):
