@@ -1,9 +1,9 @@
 """Base credentials interface for authentication."""
 
-from abc import ABC, abstractmethod
+from typing import Protocol
 
 
-class Credentials(ABC):
+class Credentials(Protocol):
     """
     Abstract base class for authentication credentials.
 
@@ -11,7 +11,6 @@ class Credentials(ABC):
     the get_headers method to provide authentication headers for HTTP requests.
     """
 
-    @abstractmethod
     def authorization_header(self) -> tuple[str, str]:
         """
         Get the authorization header for HTTP requests.
