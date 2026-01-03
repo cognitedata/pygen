@@ -531,20 +531,8 @@ This package provides the MyClient for interacting with the data model.
 """
 
 from ._client import MyClient
-from .data_classes import (
-    ExampleViewWrite,
-    ExampleView,
-    ExampleViewList,
-    ExampleViewFilter,
-)
 
-__all__ = [
-    "MyClient",
-    "ExampleViewWrite",
-    "ExampleView",
-    "ExampleViewList",
-    "ExampleViewFilter",
-]'''
+__all__ = ["MyClient"]'''
 
 
 class TestPythonPackageGenerator:
