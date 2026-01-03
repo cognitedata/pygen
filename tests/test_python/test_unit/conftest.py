@@ -11,4 +11,4 @@ class MockCredentials(Credentials):
 
 @pytest.fixture()
 def pygen_client_config() -> PygenClientConfig:
-    return PygenClientConfig("https://example.com", "test_project", MockCredentials())
+    return PygenClientConfig(cdf_url="https://example.com", project="test_project", credentials=MockCredentials())

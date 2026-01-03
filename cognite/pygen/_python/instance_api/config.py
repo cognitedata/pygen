@@ -1,6 +1,7 @@
 import sys
 from collections.abc import Set
-from dataclasses import dataclass
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from cognite.pygen._python.instance_api.auth.credentials import Credentials
 
@@ -10,21 +11,24 @@ else:
     from typing_extensions import Self
 
 
-@dataclass
-class PygenClientConfig:
+class PygenClientConfig(BaseModel):
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
+        frozen=False,
+    )
+
     cdf_url: str
     project: str
     credentials: Credentials
     client_name: str | None = None
     max_retries: int = 10
-    #  The number of connection pools to cache. Default is 10.
-    pool_connections: int = 10
-    # The maximum number of connections to save in the pool. Default is 20.
-    pool_maxsize: int = 20
-    # HTTP status codes that should trigger a retry.
-    retry_status_codes: Set[int] = frozenset({408, 429, 502, 503, 504})
-    # The maximum backoff time in seconds between retries. Default is 60 seconds.
-    max_retry_backoff: int = 60
+    pool_connections: int = Field(default=10, description="The number of connection pools to cache.")
+    pool_maxsize: int = Field(default=20, description="The maximum number of connections to save in the pool.")
+    retry_status_codes: Set[int] = Field(
+        default=frozenset({408, 429, 502, 503, 504}), description="HTTP status codes that should trigger a retry."
+    )
+    max_retry_backoff: int = Field(default=60, description="The maximum backoff time in seconds between retries.")
     write_workers: int = 1
     delete_workers: int = 1
     retrieve_workers: int = 1
