@@ -26,7 +26,13 @@ class PygenClientConfig(BaseModel):
     pool_connections: int = Field(default=10, description="The number of connection pools to cache.")
     pool_maxsize: int = Field(default=20, description="The maximum number of connections to save in the pool.")
     retry_status_codes: Set[int] = Field(
-        default=frozenset({408, 429, 502, 503, 504}), description="HTTP status codes that should trigger a retry."
+        # 408 - Request Timeout
+        # 429 - Too Many Requests
+        # 502 - Bad Gateway
+        # 503 - Service Unavailable
+        # 504 - Gateway Timeout
+        default=frozenset({408, 429, 502, 503, 504}),
+        description="HTTP status codes that should trigger a retry.",
     )
     max_retry_backoff: int = Field(default=60, description="The maximum backoff time in seconds between retries.")
     write_workers: int = 1
