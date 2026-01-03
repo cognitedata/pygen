@@ -8,6 +8,7 @@ from ._types import UserCasing
 class NamingConfig(BaseModel):
     class_name: UserCasing = "language_default"
     field_name: UserCasing = "language_default"
+    file_name: UserCasing = "language_default"
 
 
 class PygenSDKConfig(BaseModel):

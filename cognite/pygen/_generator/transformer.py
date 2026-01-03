@@ -30,6 +30,7 @@ from .dtype_converter import DataTypeConverter, get_converter_by_format
 class StrictNamingConfig(BaseModel):
     class_name: Casing
     field_name: Casing
+    file_name: Casing
 
 
 def to_pygen_model(
@@ -74,14 +75,15 @@ def _create_naming(config: NamingConfig, output_format: OutputFormat) -> StrictN
     return StrictNamingConfig(
         class_name=language.class_name if config.class_name == "language_default" else config.class_name,
         field_name=language.field_name if config.field_name == "language_default" else config.field_name,
+        file_name=language.field_name if config.file_name == "language_default" else config.file_name,
     )
 
 
 def _get_naming_config(output_format: OutputFormat) -> StrictNamingConfig:
     if output_format == "python":
-        return StrictNamingConfig(class_name="PascalCase", field_name="snake_case")
+        return StrictNamingConfig(class_name="PascalCase", field_name="snake_case", file_name="snake_case")
     elif output_format == "typescript":
-        return StrictNamingConfig(class_name="PascalCase", field_name="camelCase")
+        return StrictNamingConfig(class_name="PascalCase", field_name="camelCase", file_name="camelCase")
     raise NotImplementedError(f"Naming config for output format {output_format} is not implemented.")
 
 
