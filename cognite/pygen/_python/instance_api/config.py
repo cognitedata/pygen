@@ -25,6 +25,9 @@ class PygenClientConfig:
     retry_status_codes: Set[int] = frozenset({408, 429, 502, 503, 504})
     # The maximum backoff time in seconds between retries. Default is 60 seconds.
     max_retry_backoff: int = 60
+    write_workers: int = 1
+    delete_workers: int = 1
+    retrieve_workers: int = 1
 
     api_subversion: str = "20230101"
     timeout: float = 30.0

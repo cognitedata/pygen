@@ -19,22 +19,13 @@ class ExampleClient(InstanceClient):
     - relates_to: RelatesTo view (edges between nodes)
     """
 
-    def __init__(
-        self,
-        config: PygenClientConfig,
-        write_workers: int = 5,
-        delete_workers: int = 3,
-        retrieve_workers: int = 10,
-    ) -> None:
+    def __init__(self, config: PygenClientConfig) -> None:
         """Initialize the ExampleClient.
 
         Args:
             config: Configuration for the client including URL, project, and credentials.
-            write_workers: Number of concurrent workers for write operations. Default is 5.
-            delete_workers: Number of concurrent workers for delete operations. Default is 3.
-            retrieve_workers: Number of concurrent workers for retrieve operations. Default is 10.
         """
-        super().__init__(config, write_workers, delete_workers, retrieve_workers)
+        super().__init__(config)
 
         # Initialize view-specific APIs
         self.product_node = ProductNodeAPI(self._http_client)

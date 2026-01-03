@@ -35,33 +35,24 @@ class InstanceClient:
     _RETRIEVE_LIMIT = 1000
     _ENDPOINT = "/models/instances"
 
-    def __init__(
-        self,
-        config: PygenClientConfig,
-        write_workers: int = 5,
-        delete_workers: int = 3,
-        retrieve_workers: int = 10,
-    ) -> None:
+    def __init__(self, config: PygenClientConfig) -> None:
         """Initialize the Pygen client.
 
         Args:
             config: Configuration for the client including URL, project, and credentials.
-            write_workers: Number of concurrent workers for write operations. Default is 5.
-            delete_workers: Number of concurrent workers for delete operations. Default is 3.
-            retrieve_workers: Number of concurrent workers for retrieve operations. Default is 10.
         """
         self._config = config
         self._http_client = HTTPClient(config)
 
         # Create thread pool executors for different operations
         self._write_executor = concurrent.futures.ThreadPoolExecutor(
-            max_workers=write_workers, thread_name_prefix="pygen-write"
+            max_workers=config.write_workers, thread_name_prefix="pygen-write"
         )
         self._delete_executor = concurrent.futures.ThreadPoolExecutor(
-            max_workers=delete_workers, thread_name_prefix="pygen-delete"
+            max_workers=config.delete_workers, thread_name_prefix="pygen-delete"
         )
         self._retrieve_executor = concurrent.futures.ThreadPoolExecutor(
-            max_workers=retrieve_workers, thread_name_prefix="pygen-retrieve"
+            max_workers=config.retrieve_workers, thread_name_prefix="pygen-retrieve"
         )
 
     def __enter__(self) -> Self:
