@@ -193,20 +193,41 @@ def overwrite_index():
 
 @app.command("count", help="Count the number of code lines in v2 of Pygen")
 def count_lines() -> None:
-    typer.echo("Counting lines of code in cognite/pygen...")
     command = (
         r"find {root} -path '*/{exclude}' -prune -o -type f "
         r"\( -name '*.py' -o -name '*.ts' -o -name '*.js' -o -name '*.sql' \) -print | xargs wc -l"
     )
-    subprocess.run(
-        command.format(root="cognite", exclude="_legacy").split(),
-        shell=True,
-    )
-    typer.echo("Counting lines of code in tests")
-    subprocess.run(
-        command.format(root="tests", exclude="test_legacy").split(),
-        shell=True,
-    )
+
+    def get_line_count(root: str, exclude: str) -> int:
+        result = subprocess.run(
+            command.format(root=root, exclude=exclude),
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        # The last line of wc -l output contains the total
+        lines = result.stdout.strip().split("\n")
+        if not lines:
+            return 0
+        last_line = lines[-1].strip()
+        # If only one file, there's no "total" line, just the count
+        if "total" in last_line:
+            return int(last_line.split()[0])
+        elif lines:
+            # Sum all individual file counts
+            return sum(int(line.strip().split()[0]) for line in lines if line.strip())
+        return 0
+
+    cognite_count = get_line_count("cognite", "_legacy")
+    tests_count = get_line_count("tests", "test_legacy")
+    total_count = cognite_count + tests_count
+
+    typer.echo(f"{'Location':<20} {'Count':>10}")
+    typer.echo("-" * 31)
+    typer.echo(f"{'cognite/pygen':<20} {cognite_count:>10,}")
+    typer.echo(f"{'tests':<20} {tests_count:>10,}")
+    typer.echo("-" * 31)
+    typer.echo(f"{'Total':<20} {total_count:>10,}")
 
 
 def _remove_top_lines(text: str, lines: int) -> str:
