@@ -178,3 +178,36 @@ class PythonDataClassGenerator:
             attributes.append(f'self.{field.name} = {field.filter_name}(view_id, "{field.cdf_prop_id}", operator)')
             names.append(f"self.{field.name},")
         return attributes, names
+
+
+class PythonAPIGenerator:
+    def __init__(self, api_class: APIClassFile, top_level: str = "cognite.pygen._python") -> None:
+        self.api_class = api_class
+        self.top_level = top_level
+
+    def create_import_statements(self) -> str:
+        raise NotImplementedError()
+
+    def create_api_class_with_init(self) -> str:
+        raise NotImplementedError()
+
+    def create_retrieve_method(self) -> str:
+        raise NotImplementedError()
+
+    def create_aggregate_method(self) -> str:
+        raise NotImplementedError()
+
+    def create_search_method(self) -> str:
+        raise NotImplementedError()
+
+    def create_iterate_method(self) -> str:
+        raise NotImplementedError()
+
+    def create_list_method(self) -> str:
+        raise NotImplementedError()
+
+    def create_filter_arguments(self) -> str:
+        raise NotImplementedError()
+
+    def create_filter_argument_docstrings(self) -> str:
+        raise NotImplementedError()
