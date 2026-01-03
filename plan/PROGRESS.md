@@ -1,6 +1,6 @@
 # Pygen Rewrite - Progress Tracking
 
-**Last Updated**: December 31, 2025
+**Last Updated**: January 3, 2026
 
 This document tracks the actual progress of the Pygen rewrite implementation.
 
@@ -362,8 +362,8 @@ Phase 4 combines PygenModel creation and code generation. The scaffolding has be
 - ✅ `DataTypeConverter` - Abstract base with Python/TypeScript implementations
 - ✅ `to_pygen_model()` - Transforms DataModelResponse to PygenSDKModel (core props only)
 - ✅ `Generator` base class - Abstract with generate() method
-- ✅ `generate_sdk()` - Main function scaffolded
-- ⏳ `PythonGenerator` - Stub with NotImplementedError on template methods
+- ✅ `generate_sdk()` - Main function complete
+- ✅ `PythonGenerator` - Complete with data class, API class, and client templates
 - ⏳ `TypeScriptGenerator` - Stub with NotImplementedError on all methods
 
 **Tests**:
@@ -379,17 +379,39 @@ Generate SDKs for the **ExampleDataModel** (`cognite/pygen/_example_datamodel/`)
 - Core properties only (no connections/relationships)
 - Separate files per data class and API class
 
+### Completed Tasks
+
+#### Task 4.1: Complete Python Data Class Templates ✅ (Completed January 3, 2026)
+- Implemented `PythonDataClassGenerator` in `python.py`
+- `create_import_statements()` - imports from `cognite.pygen._python.instance_api`
+- `generate_read_class()` - extends `Instance` base class with field definitions
+- `generate_write_class()` - extends `InstanceWrite` base class
+- `generate_read_list_class()` - extends `InstanceList` base class
+- `generate_filter_class()` - extends `FilterContainer` base class
+
+#### Task 4.2: Complete Python API Class Templates ✅ (Completed January 3, 2026)
+- Implemented `create_api_class_code()` in `PythonGenerator`
+- API classes extend `InstanceAPI` base class
+- Generated `retrieve()`, `list()`, `iterate()`, `search()`, `aggregate()` methods
+- Type-safe method signatures with unpacked filter parameters
+
+#### Task 4.3: Complete Python Client & Package Templates ✅ (Completed January 3, 2026)
+- Implemented client class template extending `InstanceClient`
+- Generated package structure with separate files per view
+- Generated `__init__.py` with all exports
+- Generated `data_classes/__init__.py` and `_api/__init__.py`
+
 ### Remaining Tasks
 
 | Task | Description | Status |
 |------|-------------|--------|
-| 4.1 | Complete Python Data Class Templates | ⏳ Not Started |
-| 4.2 | Complete Python API Class Templates | ⏳ Not Started |
-| 4.3 | Complete Python Client & Package Templates | ⏳ Not Started |
+| 4.1 | Complete Python Data Class Templates | ✅ Complete |
+| 4.2 | Complete Python API Class Templates | ✅ Complete |
+| 4.3 | Complete Python Client & Package Templates | ✅ Complete |
 | 4.4 | Complete TypeScript Data Class Templates | ⏳ Not Started |
 | 4.5 | Complete TypeScript API & Client Templates | ⏳ Not Started |
 
-**Progress**: 1/6 tasks complete (~17%)
+**Progress**: 4/6 tasks complete (~67%)
 
 See `plan/implementation-roadmap.md` Phase 4 for detailed task breakdown.
 
@@ -688,11 +710,9 @@ Phase 9 completes documentation and enables migration from v1.
 ### Next Steps
 
 1. Continue **Phase 4: PygenModel & Code Generation** (MVP scope)
-2. **Task 4.1**: Complete Python Data Class Templates - implement f-string templates for read, write, list, filter classes
-3. **Task 4.2**: Complete Python API Class Templates - generate type-safe API methods
-4. **Task 4.3**: Complete Python Client & Package Templates - generate package structure with separate files
-5. **Task 4.4-4.5**: Complete TypeScript Templates - data classes, API, client
-6. Test generated output against ExampleDataModel (`cognite/pygen/_example_datamodel/`)
+2. **Task 4.4**: Complete TypeScript Data Class Templates - implement templates for read, write, list, filter classes
+3. **Task 4.5**: Complete TypeScript API & Client Templates - generate API classes, client, and package structure
+4. Test generated TypeScript output against ExampleDataModel (`cognite/pygen/_example_datamodel/`)
 
 ---
 
