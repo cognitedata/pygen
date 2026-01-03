@@ -77,29 +77,29 @@ export interface ProductNodeWrite extends NodeInstanceWrite {
 
   // Required properties
   /** The name of the product */
-  readonly name: string;
+  name: string;
   /** The price of the product */
-  readonly price: number;
+  price: number;
   /** The quantity in stock */
-  readonly quantity: number;
+  quantity: number;
   /** When the product was created (as Date) */
-  readonly createdDate: Date;
+  createdDate: Date;
 
   // Optional properties
   /** Optional description of the product */
-  readonly description?: string;
+  description?: string;
   /** Optional list of tags */
-  readonly tags?: readonly string[];
+  tags?: readonly string[];
   /** Optional historical prices */
-  readonly prices?: readonly number[];
+  prices?: readonly number[];
   /** Optional historical quantities */
-  readonly quantities?: readonly number[];
+  quantities?: readonly number[];
   /** Whether the product is active */
-  readonly active?: boolean;
+  active?: boolean;
   /** When the product was last updated */
-  readonly updatedTimestamp?: Date;
+  updatedTimestamp?: Date;
   /** Reference to the category */
-  readonly category?: InstanceId | readonly [string, string];
+  category?: InstanceId | readonly [string, string];
 }
 
 /**
@@ -216,34 +216,23 @@ export class ProductNodeFilter extends FilterContainer {
    * @param operator - How to combine filters ("and" or "or"). Defaults to "and"
    */
   constructor(operator: "and" | "or" = "and") {
-    const dataTypeFilters: (
-      | TextFilter
-      | FloatFilter
-      | IntegerFilter
-      | BooleanFilter
-      | DateFilter
-      | DirectRelationFilter
-    )[] = [];
+    const name = new TextFilter(PRODUCT_NODE_VIEW, "name", operator);
+    const description = new TextFilter(PRODUCT_NODE_VIEW, "description", operator);
+    const price = new FloatFilter(PRODUCT_NODE_VIEW, "price", operator);
+    const quantity = new IntegerFilter(PRODUCT_NODE_VIEW, "quantity", operator);
+    const active = new BooleanFilter(PRODUCT_NODE_VIEW, "active", operator);
+    const createdDate = new DateFilter(PRODUCT_NODE_VIEW, "createdDate", operator);
+    const category = new DirectRelationFilter(PRODUCT_NODE_VIEW, "category", operator);
 
-    super(dataTypeFilters, operator, "node");
+    super([name, description, price, quantity, active, createdDate, category], operator, "node");
 
-    this.name = new TextFilter(PRODUCT_NODE_VIEW, "name", operator);
-    this.description = new TextFilter(PRODUCT_NODE_VIEW, "description", operator);
-    this.price = new FloatFilter(PRODUCT_NODE_VIEW, "price", operator);
-    this.quantity = new IntegerFilter(PRODUCT_NODE_VIEW, "quantity", operator);
-    this.active = new BooleanFilter(PRODUCT_NODE_VIEW, "active", operator);
-    this.createdDate = new DateFilter(PRODUCT_NODE_VIEW, "createdDate", operator);
-    this.category = new DirectRelationFilter(PRODUCT_NODE_VIEW, "category", operator);
-
-    dataTypeFilters.push(
-      this.name,
-      this.description,
-      this.price,
-      this.quantity,
-      this.active,
-      this.createdDate,
-      this.category,
-    );
+    this.name = name;
+    this.description = description;
+    this.price = price;
+    this.quantity = quantity;
+    this.active = active;
+    this.createdDate = createdDate;
+    this.category = category;
   }
 }
 
@@ -257,7 +246,7 @@ export class ProductNodeFilter extends FilterContainer {
 export interface CategoryNodeWrite extends NodeInstanceWrite {
   readonly instanceType: "node";
   /** The name of the category */
-  readonly categoryName: string;
+  categoryName: string;
 }
 
 /**
@@ -336,13 +325,11 @@ export class CategoryNodeFilter extends FilterContainer {
    * @param operator - How to combine filters ("and" or "or"). Defaults to "and"
    */
   constructor(operator: "and" | "or" = "and") {
-    const dataTypeFilters: TextFilter[] = [];
+    const categoryName = new TextFilter(CATEGORY_NODE_VIEW, "categoryName", operator);
 
-    super(dataTypeFilters, operator, "node");
+    super([categoryName], operator, "node");
 
-    this.categoryName = new TextFilter(CATEGORY_NODE_VIEW, "categoryName", operator);
-
-    dataTypeFilters.push(this.categoryName);
+    this.categoryName = categoryName;
   }
 }
 
@@ -355,14 +342,14 @@ export class CategoryNodeFilter extends FilterContainer {
  */
 export interface RelatesToWrite extends EdgeInstanceWrite {
   readonly instanceType: "edge";
-  readonly startNode: NodeReference;
-  readonly endNode: NodeReference;
+  startNode: NodeReference;
+  endNode: NodeReference;
   /** The type of relation */
-  readonly relationType: string;
+  relationType: string;
   /** The strength of the relation */
-  readonly strength?: number;
+  strength?: number;
   /** When the relation was created */
-  readonly createdAt: Date;
+  createdAt: Date;
 }
 
 /**
@@ -449,14 +436,14 @@ export class RelatesToFilter extends FilterContainer {
    * @param operator - How to combine filters ("and" or "or"). Defaults to "and"
    */
   constructor(operator: "and" | "or" = "and") {
-    const dataTypeFilters: (TextFilter | FloatFilter | DateTimeFilter)[] = [];
+    const relationType = new TextFilter(RELATES_TO_VIEW, "relationType", operator);
+    const strength = new FloatFilter(RELATES_TO_VIEW, "strength", operator);
+    const createdAt = new DateTimeFilter(RELATES_TO_VIEW, "createdAt", operator);
 
-    super(dataTypeFilters, operator, "edge");
+    super([relationType, strength, createdAt], operator, "edge");
 
-    this.relationType = new TextFilter(RELATES_TO_VIEW, "relationType", operator);
-    this.strength = new FloatFilter(RELATES_TO_VIEW, "strength", operator);
-    this.createdAt = new DateTimeFilter(RELATES_TO_VIEW, "createdAt", operator);
-
-    dataTypeFilters.push(this.relationType, this.strength, this.createdAt);
+    this.relationType = relationType;
+    this.strength = strength;
+    this.createdAt = createdAt;
   }
 }

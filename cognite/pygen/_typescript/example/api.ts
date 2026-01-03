@@ -154,23 +154,20 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
       | readonly (string | InstanceId | readonly [string, string])[],
     options: { space?: string } = {},
   ): Promise<ProductNode | ProductNodeList | undefined> {
-    // Determine if single or batch
     const isSingle = !Array.isArray(id) ||
       (id.length === 2 && typeof id[0] === "string" && typeof id[1] === "string");
 
     if (isSingle) {
-      const result = await this._retrieve(
+      return await this._retrieve(
         id as string | InstanceId | readonly [string, string],
         options,
-      );
-      return result as ProductNode | undefined;
-    } else {
-      const result = await this._retrieve(
-        id as readonly (string | InstanceId | readonly [string, string])[],
-        options,
-      );
-      return new ProductNodeList([...(result as InstanceList<ProductNode>)]);
+      ) as ProductNode | undefined;
     }
+    const result = await this._retrieve(
+      id as readonly (string | InstanceId | readonly [string, string])[],
+      options,
+    );
+    return new ProductNodeList([...(result as InstanceList<ProductNode>)]);
   }
 
   /**
@@ -200,19 +197,13 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
     limit?: number;
   } = {}): Promise<Page<ProductNodeList>> {
     const filter = this._buildFilter(options);
-
     const page = await this._iterate({
       cursor: options.cursor,
       limit: options.limit,
       filter: filter.asFilter(),
     });
 
-    return {
-      items: new ProductNodeList([...page.items]),
-      nextCursor: page.nextCursor,
-      typing: page.typing,
-      debug: page.debug,
-    };
+    return { ...page, items: new ProductNodeList([...page.items]) };
   }
 
   /**
@@ -319,14 +310,12 @@ export class ProductNodeAPI extends InstanceAPI<ProductNode> {
     limit?: number;
   } = {}): Promise<ProductNodeList> {
     const filter = this._buildFilter(options);
-
-    let sort: PropertySort | undefined;
-    if (options.sortBy !== undefined) {
-      sort = {
+    const sort: PropertySort | undefined = options.sortBy !== undefined
+      ? {
         property: createPropertyRef(PRODUCT_NODE_VIEW, options.sortBy),
         direction: options.sortDirection,
-      };
-    }
+      }
+      : undefined;
 
     const result = await this._list({
       limit: options.limit,
@@ -411,23 +400,20 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
       | readonly (string | InstanceId | readonly [string, string])[],
     options: { space?: string } = {},
   ): Promise<CategoryNode | CategoryNodeList | undefined> {
-    // Determine if single or batch
     const isSingle = !Array.isArray(id) ||
       (id.length === 2 && typeof id[0] === "string" && typeof id[1] === "string");
 
     if (isSingle) {
-      const result = await this._retrieve(
+      return await this._retrieve(
         id as string | InstanceId | readonly [string, string],
         options,
-      );
-      return result as CategoryNode | undefined;
-    } else {
-      const result = await this._retrieve(
-        id as readonly (string | InstanceId | readonly [string, string])[],
-        options,
-      );
-      return new CategoryNodeList([...(result as InstanceList<CategoryNode>)]);
+      ) as CategoryNode | undefined;
     }
+    const result = await this._retrieve(
+      id as readonly (string | InstanceId | readonly [string, string])[],
+      options,
+    );
+    return new CategoryNodeList([...(result as InstanceList<CategoryNode>)]);
   }
 
   /**
@@ -445,19 +431,13 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
     limit?: number;
   } = {}): Promise<Page<CategoryNodeList>> {
     const filter = this._buildFilter(options);
-
     const page = await this._iterate({
       cursor: options.cursor,
       limit: options.limit,
       filter: filter.asFilter(),
     });
 
-    return {
-      items: new CategoryNodeList([...page.items]),
-      nextCursor: page.nextCursor,
-      typing: page.typing,
-      debug: page.debug,
-    };
+    return { ...page, items: new CategoryNodeList([...page.items]) };
   }
 
   /**
@@ -528,14 +508,12 @@ export class CategoryNodeAPI extends InstanceAPI<CategoryNode> {
     limit?: number;
   } = {}): Promise<CategoryNodeList> {
     const filter = this._buildFilter(options);
-
-    let sort: PropertySort | undefined;
-    if (options.sortBy !== undefined) {
-      sort = {
+    const sort: PropertySort | undefined = options.sortBy !== undefined
+      ? {
         property: createPropertyRef(CATEGORY_NODE_VIEW, options.sortBy),
         direction: options.sortDirection,
-      };
-    }
+      }
+      : undefined;
 
     const result = await this._list({
       limit: options.limit,
@@ -629,23 +607,20 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
       | readonly (string | InstanceId | readonly [string, string])[],
     options: { space?: string } = {},
   ): Promise<RelatesTo | RelatesToList | undefined> {
-    // Determine if single or batch
     const isSingle = !Array.isArray(id) ||
       (id.length === 2 && typeof id[0] === "string" && typeof id[1] === "string");
 
     if (isSingle) {
-      const result = await this._retrieve(
+      return await this._retrieve(
         id as string | InstanceId | readonly [string, string],
         options,
-      );
-      return result as RelatesTo | undefined;
-    } else {
-      const result = await this._retrieve(
-        id as readonly (string | InstanceId | readonly [string, string])[],
-        options,
-      );
-      return new RelatesToList([...(result as InstanceList<RelatesTo>)]);
+      ) as RelatesTo | undefined;
     }
+    const result = await this._retrieve(
+      id as readonly (string | InstanceId | readonly [string, string])[],
+      options,
+    );
+    return new RelatesToList([...(result as InstanceList<RelatesTo>)]);
   }
 
   /**
@@ -666,19 +641,13 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
     limit?: number;
   } = {}): Promise<Page<RelatesToList>> {
     const filter = this._buildFilter(options);
-
     const page = await this._iterate({
       cursor: options.cursor,
       limit: options.limit,
       filter: filter.asFilter(),
     });
 
-    return {
-      items: new RelatesToList([...page.items]),
-      nextCursor: page.nextCursor,
-      typing: page.typing,
-      debug: page.debug,
-    };
+    return { ...page, items: new RelatesToList([...page.items]) };
   }
 
   /**
@@ -758,14 +727,12 @@ export class RelatesToAPI extends InstanceAPI<RelatesTo> {
     limit?: number;
   } = {}): Promise<RelatesToList> {
     const filter = this._buildFilter(options);
-
-    let sort: PropertySort | undefined;
-    if (options.sortBy !== undefined) {
-      sort = {
+    const sort: PropertySort | undefined = options.sortBy !== undefined
+      ? {
         property: createPropertyRef(RELATES_TO_VIEW, options.sortBy),
         direction: options.sortDirection,
-      };
-    }
+      }
+      : undefined;
 
     const result = await this._list({
       limit: options.limit,
