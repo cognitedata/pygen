@@ -1,7 +1,6 @@
 import pytest
 
 from cognite.pygen._client.models import ViewReference
-from cognite.pygen._generator.config import PygenSDKConfig
 from cognite.pygen._generator.python import PythonAPIGenerator, PythonDataClassGenerator, PythonPackageGenerator
 from cognite.pygen._pygen_model import (
     APIClassFile,
@@ -459,11 +458,7 @@ def pygen_sdk_model(data_class_file: DataClassFile, api_class_file: APIClassFile
 
 @pytest.fixture(scope="session")
 def package_generator(pygen_sdk_model: PygenSDKModel) -> PythonPackageGenerator:
-    config = PygenSDKConfig(
-        top_level_package="my_sdk",
-        client_name="MyClient",
-    )
-    return PythonPackageGenerator(pygen_sdk_model, config)
+    return PythonPackageGenerator(pygen_sdk_model, "cognite.pygen._python", "MyClient")
 
 
 EXPECTED_DATA_CLASS_INIT = '''"""Data classes for the generated SDK.

@@ -16,9 +16,10 @@ class Generator(ABC):
     def __init__(self, data_model: DataModelResponseWithViews, config: PygenSDKConfig | None = None) -> None:
         self.data_model = data_model
         self.config = config or PygenSDKConfig()
+        self.model = to_pygen_model(self.data_model, self.format, self.config)
 
     def generate(self) -> dict[Path, str]:
-        model = to_pygen_model(self.data_model, self.format, self.config)
+        model = self.model
         sdk: dict[Path, str] = {}
 
         # Generate data class files
