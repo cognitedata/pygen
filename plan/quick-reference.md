@@ -10,7 +10,7 @@
 
 **Timeline**: 28-42 weeks (7-10 months)
 
-**Status**: Phase 3 Complete ✅ - Ready for Phase 4
+**Status**: Phase 4 In Progress ⏳ - Python Generation Complete (67%)
 
 ---
 
@@ -32,7 +32,7 @@
 | 1 | Pygen Client | ~2 days | ✅ Complete | httpx-based CDF client with HTTPClient |
 | 2 | Generic Instance API (Python) | ~5 days | ✅ Complete | InstanceClient, InstanceAPI, Example SDK |
 | 3 | Generic Instance API (TypeScript) | ~2 days | ✅ Complete | TypeScript equivalent of Phase 2 |
-| 4 | PygenModel | 2-3 weeks | ⏳ Pending | Internal model for code generation |
+| 4 | PygenModel | 2-3 weeks | ⏳ In Progress (67%) | Internal model for code generation |
 | 5 | Code Generation from PygenModel | 3-4 weeks | ⏳ Pending | Python & TypeScript SDK generation |
 | 6 | CLI, Feature Parity & Advanced | 3-4 weeks | ⏳ Pending | CLI + match original Pygen |
 | 7 | Query Builder & Advanced Queries | 2-3 weeks | ⏳ Pending | Query builder (parallel with P6) |
@@ -486,17 +486,22 @@ A: Modern type hints, pattern matching, performance.
   - ✅ Task 10: Example Data Classes
   - ✅ Task 11: Example API Classes
 
-**Current Phase**: Ready for Phase 4 - PygenModel
+**Current Phase**: Phase 4 - PygenModel & Code Generation (67% complete)
+
+**Completed in Phase 4**:
+- ✅ Task 4.0: Scaffolding
+- ✅ Task 4.1: Python Data Class Templates
+- ✅ Task 4.2: Python API Class Templates
+- ✅ Task 4.3: Python Client & Package Templates
 
 **Next Steps**:
-1. Begin Phase 4: Validation layer for data models
-2. Complete Field, Connection, DataClass models in `_pygen_model/`
-3. Build transformer from CDF ViewResponse to PygenModel
-4. Test with example data model to validate patterns
+1. Task 4.4: Complete TypeScript Data Class Templates
+2. Task 4.5: Complete TypeScript API & Client Templates
+3. Test generated TypeScript SDK against ExampleDataModel
 
 ---
 
-**Document Version**: 1.7
-**Last Updated**: December 31, 2025
+**Document Version**: 1.8
+**Last Updated**: January 3, 2026
 **For Details**: See full planning documents in `plan/` folder
 

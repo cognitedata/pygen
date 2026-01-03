@@ -603,7 +603,7 @@ The MVP focuses on generating SDKs for the **ExampleDataModel** located in `cogn
 
 ### Remaining Tasks
 
-#### Task 4.1: Complete Python Data Class Templates ⏳
+#### Task 4.1: Complete Python Data Class Templates ✅
 
 Implement in `python.py` `PythonDataClassGenerator`:
 
@@ -633,7 +633,7 @@ Implement in `python.py` `PythonDataClassGenerator`:
 
 Reference: `cognite/pygen/_python/example/_data_class.py`
 
-#### Task 4.2: Complete Python API Class Templates ⏳
+#### Task 4.2: Complete Python API Class Templates ✅
 
 Implement `create_api_class_code()` in `PythonGenerator`:
 
@@ -654,7 +654,7 @@ Implement `create_api_class_code()` in `PythonGenerator`:
 
 Reference: `cognite/pygen/_python/example/_api.py`
 
-#### Task 4.3: Complete Python Client & Package Templates ⏳
+#### Task 4.3: Complete Python Client & Package Templates ✅
 
 1. **Client class template**:
    - Extend `InstanceClient` base class
@@ -741,15 +741,15 @@ Reference: `cognite/pygen/_typescript/example/dataClasses.ts`
 Reference: `cognite/pygen/_typescript/example/api.ts`, `cognite/pygen/_typescript/example/client.ts`
 
 ### Deliverables (MVP)
-- ✅ Basic Field, DataClass models (PygenModel) - SCAFFOLDED
-- ✅ PygenSDKModel top-level representation - SCAFFOLDED  
+- ✅ Basic Field, DataClass models (PygenModel) - COMPLETE
+- ✅ PygenSDKModel top-level representation - COMPLETE  
 - ✅ Configuration system (PygenSDKConfig) - COMPLETE
 - ✅ Data type converters (Python/TypeScript) - COMPLETE
-- ✅ Basic transformer (core properties) - SCAFFOLDED
-- ⏳ Working Python generator (data classes, API classes, client)
+- ✅ Basic transformer (core properties) - COMPLETE
+- ✅ Working Python generator (data classes, API classes, client) - COMPLETE
 - ⏳ Working TypeScript generator (data classes, API classes, client)
-- ⏳ Package structure generation (separate files per view)
-- ⏳ Generated Python SDK for ExampleDataModel
+- ✅ Package structure generation (separate files per view) - COMPLETE (Python)
+- ✅ Generated Python SDK for ExampleDataModel - COMPLETE
 - ⏳ Generated TypeScript SDK for ExampleDataModel
 
 ### MVP Success Criteria
@@ -768,16 +768,16 @@ Reference: `cognite/pygen/_typescript/example/api.ts`, `cognite/pygen/_typescrip
 - Complex data model support
 
 ### Status
-**⏳ IN PROGRESS** - Scaffolding complete, MVP scope defined
+**⏳ IN PROGRESS** - Python generation complete, TypeScript pending
 
 - ✅ Task 4.0: Scaffolding - Complete
-- ⏳ Task 4.1: Complete Python Data Class Templates - Not started
-- ⏳ Task 4.2: Complete Python API Class Templates - Not started
-- ⏳ Task 4.3: Complete Python Client & Package Templates - Not started
+- ✅ Task 4.1: Complete Python Data Class Templates - Complete
+- ✅ Task 4.2: Complete Python API Class Templates - Complete
+- ✅ Task 4.3: Complete Python Client & Package Templates - Complete
 - ⏳ Task 4.4: Complete TypeScript Data Class Templates - Not started
 - ⏳ Task 4.5: Complete TypeScript API & Client Templates - Not started
 
-**Progress**: 1/6 tasks complete (~17%)
+**Progress**: 4/6 tasks complete (~67%)
 
 ### Dependencies
 - Phase 1 complete (need CDF API models: ViewResponse, DataModelResponse) ✅
