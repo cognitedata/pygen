@@ -18,5 +18,7 @@ Note this task will be done inbetween phases or once all phases are done.
     is not yet finalized.
 3. **Ensure client name is set correctly in PygenClient**
    - This is to ensure appropriate logging and tracking on the server side.
-
+4. **Find a more elegant solution for `_create_filter_params`** in the Python generator.
+   - The current implementation by Claude feels wrong. I suspect there is a more elegant
+     solution.
 
