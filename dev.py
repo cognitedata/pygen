@@ -293,6 +293,9 @@ def generate_v2() -> None:
             output_path.parent.mkdir(parents=True, exist_ok=True)
             output_path.write_text(content, encoding="utf-8", newline="\n")
     typer.echo("v2 SDK generation complete.")
+    sdk_dir = EXAMPLES_V2 / SDK_NAME_PYTHON
+    subprocess.run(f"ruff check {sdk_dir.as_posix()} --fix".split(), shell=True)
+    typer.echo("Formatted generated v2 SDK.")
     return None
 
 
