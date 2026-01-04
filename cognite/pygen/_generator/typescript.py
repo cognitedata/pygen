@@ -55,7 +55,66 @@ class TypeScriptGenerator(Generator):
         return "\n\n".join(parts)
 
     def create_data_class_index(self) -> str:
-        return ""
+        """Generate the data_classes/index.ts file that exports all data classes.
+
+        Exports all data classes including read, write, list, filter classes and
+        view constants from each view module.
+        """
+        lines: list[str] = [
+            "/**",
+            " * Data classes for the generated SDK.",
+            " *",
+            " * This module exports all data classes including read, write, list, and filter classes.",
+            " *",
+            " * @packageDocumentation",
+            " */",
+            "",
+        ]
+
+        # Collect all exports
+        all_exports: list[str] = []
+
+        for data_class_file in self.model.data_classes:
+            # Module name is filename without .ts extension
+            module_name = data_class_file.filename.replace(".ts", "")
+
+            # Build list of exports from this module
+            exports: list[str] = []
+
+            # Add view constant (UPPER_SNAKE_CASE)
+            view_const = self._to_view_const_name(data_class_file.read.name)
+            exports.append(view_const)
+
+            # Add data classes
+            if data_class_file.write:
+                exports.append(data_class_file.write.name)
+            exports.append(data_class_file.read.name)
+
+            # Add asWrite function
+            as_write_func = data_class_file.read.name[0].lower() + data_class_file.read.name[1:] + "AsWrite"
+            exports.append(as_write_func)
+
+            # Add list and filter classes
+            exports.append(data_class_file.read_list.name)
+            exports.append(data_class_file.filter.name)
+
+            all_exports.extend(exports)
+
+            # Generate export statement
+            exports_str = ",\n  ".join(exports)
+            lines.append(f'export {{\n  {exports_str},\n}} from "./{module_name}.ts";')
+
+        return "\n".join(lines)
+
+    @staticmethod
+    def _to_view_const_name(class_name: str) -> str:
+        """Convert PascalCase class name to UPPER_SNAKE_CASE view constant name."""
+        result: list[str] = []
+        for i, char in enumerate(class_name):
+            if char.isupper() and i > 0:
+                result.append("_")
+            result.append(char.upper())
+        return "".join(result) + "_VIEW"
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
         return ""

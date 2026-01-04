@@ -1,13 +1,15 @@
 import pytest
 
 from cognite.pygen._client.models import ViewReference
-from cognite.pygen._generator.typescript import TypeScriptDataClassGenerator
+from cognite.pygen._generator.typescript import TypeScriptDataClassGenerator, TypeScriptGenerator
 from cognite.pygen._pygen_model import (
+    APIClassFile,
     DataClass,
     DataClassFile,
     Field,
     FilterClass,
     ListDataClass,
+    PygenSDKModel,
 )
 
 
@@ -502,3 +504,78 @@ class TestTypeScriptDirectRelationGenerator:
         """Verify that write interface allows tuple format for direct relations."""
         write_interface = ts_direct_relation_generator.generate_write_interface()
         assert write_interface.strip() == EXPECTED_TS_DIRECT_RELATION_WRITE.strip()
+
+
+# ============================================================================
+# TypeScriptGenerator Tests
+# ============================================================================
+
+
+@pytest.fixture(scope="session")
+def ts_pygen_sdk_model(
+    ts_data_class_file: DataClassFile,
+    ts_edge_data_class_file: DataClassFile,
+) -> PygenSDKModel:
+    """Create a PygenSDKModel for testing TypeScriptGenerator."""
+    data_classes = [ts_data_class_file, ts_edge_data_class_file]
+    api_classes = [
+        APIClassFile(
+            filename="exampleViewApi.ts",
+            name="ExampleViewAPI",
+            client_attribute_name="exampleView",
+            data_class=ts_data_class_file,
+        ),
+        APIClassFile(
+            filename="relatesToApi.ts",
+            name="RelatesToAPI",
+            client_attribute_name="relatesTo",
+            data_class=ts_edge_data_class_file,
+        ),
+    ]
+    return PygenSDKModel(data_classes=data_classes, api_classes=api_classes)
+
+
+EXPECTED_TS_DATA_CLASS_INDEX = """/**
+ * Data classes for the generated SDK.
+ *
+ * This module exports all data classes including read, write, list, and filter classes.
+ *
+ * @packageDocumentation
+ */
+
+export {
+  EXAMPLE_VIEW_VIEW,
+  ExampleViewWrite,
+  ExampleView,
+  exampleViewAsWrite,
+  ExampleViewList,
+  ExampleViewFilter,
+} from "./exampleView.ts";
+export {
+  RELATES_TO_VIEW,
+  RelatesToWrite,
+  RelatesTo,
+  relatesToAsWrite,
+  RelatesToList,
+  RelatesToFilter,
+} from "./relatesTo.ts";"""
+
+
+class TestTypeScriptGenerator:
+    def test_create_data_class_index(self, ts_pygen_sdk_model: PygenSDKModel) -> None:
+        """Test that create_data_class_index generates correct exports."""
+        # Create a mock generator with the model
+        # We need to patch the model directly since TypeScriptGenerator requires a DataModelResponse
+        generator = TypeScriptGenerator.__new__(TypeScriptGenerator)
+        generator.model = ts_pygen_sdk_model
+
+        index_code = generator.create_data_class_index()
+        assert index_code.strip() == EXPECTED_TS_DATA_CLASS_INDEX.strip()
+
+    def test_to_view_const_name(self) -> None:
+        """Test conversion of PascalCase to UPPER_SNAKE_CASE view constant name."""
+        assert TypeScriptGenerator._to_view_const_name("ProductNode") == "PRODUCT_NODE_VIEW"
+        assert TypeScriptGenerator._to_view_const_name("CategoryNode") == "CATEGORY_NODE_VIEW"
+        assert TypeScriptGenerator._to_view_const_name("RelatesTo") == "RELATES_TO_VIEW"
+        assert TypeScriptGenerator._to_view_const_name("SimpleView") == "SIMPLE_VIEW_VIEW"
+        assert TypeScriptGenerator._to_view_const_name("ABCView") == "A_B_C_VIEW_VIEW"
