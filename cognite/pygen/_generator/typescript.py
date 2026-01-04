@@ -74,7 +74,7 @@ class TypeScriptGenerator(Generator):
         location = Path(instance_api.__path__[0])
         for file in location.rglob("**/*.ts"):
             relative_path = file.relative_to(location)
-            instance_api_files[relative_path] = str(file)
+            instance_api_files[location.name / relative_path] = str(file)
         return instance_api_files
 
 
