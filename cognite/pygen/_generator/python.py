@@ -24,6 +24,38 @@ class PythonGenerator(Generator):
             return "cognite.pygen._python"
         return f"{self.config.top_level_package}"
 
+    def generate(self) -> dict[Path, str]:
+        model = self.model
+        sdk: dict[Path, str] = {}
+
+        # Generate data class files
+        for data_class in model.data_classes:
+            file_path = Path(f"data_classes/{data_class.filename}")
+            sdk[file_path] = self.create_data_class_code(data_class)
+
+        # Generate data_classes/__init__.py
+        sdk[Path("data_classes/__init__.py")] = self.create_data_class_init_code(model)
+
+        # Generate API class files
+        for api_class in model.api_classes:
+            file_path = Path(f"_api/{api_class.filename}")
+            sdk[file_path] = self.create_api_class_code(api_class)
+
+        # Generate _api/__init__.py
+        sdk[Path("_api/__init__.py")] = self.create_api_init_code(model)
+
+        # Generate client file
+        sdk[Path("_client.py")] = self.create_client_code(model)
+
+        # Generate top-level __init__.py
+        sdk[Path("__init__.py")] = self.create_package_init_code(model)
+
+        # Add instance_api module if not using pygen as dependency
+        if self.format != "python" or not self.config.pygen_as_dependency:
+            sdk.update(self.add_instance_api())
+
+        return sdk
+
     def create_data_class_code(self, data_class: DataClassFile) -> str:
         generator = PythonDataClassGenerator(
             data_class, max_line_length=self.config.max_line_length, instance_api_location=self._instance_api_location
