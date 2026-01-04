@@ -30,4 +30,3 @@ export {
   RelatesToList,
   RelatesToFilter,
 } from "./relatesTo.ts";
-

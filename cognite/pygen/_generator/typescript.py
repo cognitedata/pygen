@@ -1,6 +1,7 @@
+from dataclasses import dataclass
 from pathlib import Path
 
-from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile
+from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field, PygenSDKModel
 from cognite.pygen._typescript import instance_api
 
 from .generator import Generator
@@ -8,6 +9,10 @@ from .generator import Generator
 
 class TypeScriptGenerator(Generator):
     format = "typescript"
+
+    def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(*args, **kwargs)
+        self._package_generator = TypeScriptPackageGenerator(self.model, self.config.client_name)
 
     def generate(self) -> dict[Path, str]:
         model = self.model
@@ -117,16 +122,26 @@ class TypeScriptGenerator(Generator):
         return "".join(result) + "_VIEW"
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
-        return ""
+        """Generate API class code for a single view."""
+        generator = TypeScriptAPIGenerator(api_class)
+        parts = [
+            generator.create_import_statements(),
+            generator.create_helper_function(),
+            generator.create_api_class(),
+        ]
+        return "\n".join(parts)
 
     def create_api_index_code(self) -> str:
-        return ""
+        """Generate the _api/index.ts file."""
+        return self._package_generator.create_api_index()
 
     def create_client_code(self) -> str:
-        return ""
+        """Generate the _client.ts file."""
+        return self._package_generator.create_client()
 
     def create_package_index_code(self) -> str:
-        return ""
+        """Generate the root index.ts file."""
+        return self._package_generator.create_package_index()
 
     def add_instance_api(self) -> dict[Path, str]:
         instance_api_files: dict[Path, str] = {}
@@ -429,3 +444,552 @@ export class {filter_cls.name} extends FilterContainer {{
 {this_assignments}
   }}
 }}"""
+
+
+# ============================================================================
+# Filter Parameter Templates for TypeScript
+# ============================================================================
+
+
+@dataclass
+class TSFilterParam:
+    """Represents a filter parameter for a TypeScript API method."""
+
+    name: str
+    type_hint: str
+    filter_call: str  # e.g., "filter.name.equalsOrIn(options.name ?? null)"
+
+
+# Mapping from filter name to TypeScript parameter generation
+_TS_FILTER_PARAM_TEMPLATES: dict[str, list[tuple[str, str, str]]] = {
+    "TextFilter": [
+        ("", "string | readonly string[]", ".equalsOrIn(options.{param} ?? null)"),
+        ("Prefix", "string", ".prefix(options.{param} ?? null)"),
+    ],
+    "IntegerFilter": [
+        ("", "number", ".greaterThanOrEquals(options.{param} ?? null)"),
+        ("", "number", ".lessThanOrEquals(options.{param} ?? null)"),
+    ],
+    "FloatFilter": [
+        ("", "number", ".greaterThanOrEquals(options.{param} ?? null)"),
+        ("", "number", ".lessThanOrEquals(options.{param} ?? null)"),
+    ],
+    "BooleanFilter": [
+        ("", "boolean", ".equals(options.{param} ?? null)"),
+    ],
+    "DateFilter": [
+        ("", "Date | string", ".greaterThanOrEquals(options.{param} ?? null)"),
+        ("", "Date | string", ".lessThanOrEquals(options.{param} ?? null)"),
+    ],
+    "DateTimeFilter": [
+        ("", "Date | string", ".greaterThanOrEquals(options.{param} ?? null)"),
+        ("", "Date | string", ".lessThanOrEquals(options.{param} ?? null)"),
+    ],
+    "DirectRelationFilter": [
+        (
+            "",
+            (
+                "string | InstanceId | readonly [string, string] | "
+                "readonly (string | InstanceId | readonly [string, string])[]"
+            ),
+            ".equalsOrIn(options.{param} ?? null)",
+        ),
+    ],
+}
+
+
+def _create_ts_filter_params(field: Field) -> list[TSFilterParam]:
+    """Create TypeScript filter parameters for a field based on its filter type."""
+    if not field.filter_name:
+        return []
+
+    templates = _TS_FILTER_PARAM_TEMPLATES.get(field.filter_name, [])
+    params: list[TSFilterParam] = []
+
+    # Determine if this is a range filter type (uses min/max prefixes)
+    range_filter_types = {"IntegerFilter", "FloatFilter", "DateFilter", "DateTimeFilter"}
+    is_range_filter = field.filter_name in range_filter_types
+
+    for i, (suffix, type_hint, filter_call_template) in enumerate(templates):
+        # For range filters (min/max), use min/max prefix (camelCase)
+        if is_range_filter and len(templates) == 2 and suffix == "":
+            prefix = "min" if i == 0 else "max"
+            # Capitalize first letter of field name
+            param_name = f"{prefix}{field.name[0].upper()}{field.name[1:]}"
+        else:
+            param_name = f"{field.name}{suffix}"
+
+        params.append(
+            TSFilterParam(
+                name=param_name,
+                type_hint=type_hint,
+                filter_call=f"filter.{field.name}{filter_call_template.format(param=param_name)}",
+            )
+        )
+
+    return params
+
+
+# ============================================================================
+# TypeScriptAPIGenerator
+# ============================================================================
+
+
+class TypeScriptAPIGenerator:
+    """Generator for TypeScript API class files."""
+
+    def __init__(self, api_class: APIClassFile) -> None:
+        self.api_class = api_class
+        self.data_class = api_class.data_class
+        self._filter_params: list[TSFilterParam] | None = None
+        self._view_const_name = self._create_view_const_name()
+
+    def _create_view_const_name(self) -> str:
+        """Create the view constant name in UPPER_SNAKE_CASE."""
+        name = self.data_class.read.name
+        result: list[str] = []
+        for i, char in enumerate(name):
+            if char.isupper() and i > 0:
+                result.append("_")
+            result.append(char.upper())
+        return "".join(result) + "_VIEW"
+
+    @property
+    def filter_params(self) -> list[TSFilterParam]:
+        """Get all filter parameters for the API methods."""
+        if self._filter_params is None:
+            self._filter_params = []
+            for field in self.data_class.read.fields:
+                self._filter_params.extend(_create_ts_filter_params(field))
+        return self._filter_params
+
+    def create_import_statements(self) -> str:
+        """Generate import statements for the API class file."""
+        read_name = self.data_class.read.name
+        filter_name = self.data_class.filter.name
+        list_name = self.data_class.read_list.name
+        view_const = self._view_const_name
+
+        # Check if we need InstanceId import (for direct relation filters)
+        has_direct_relation = any(field.filter_name == "DirectRelationFilter" for field in self.data_class.read.fields)
+        instance_id_import = ", InstanceId" if has_direct_relation else ""
+
+        return f"""/**
+ * API class for {read_name} instances.
+ *
+ * @packageDocumentation
+ */
+
+import {{ InstanceAPI }} from "../instance_api/api.ts";
+import type {{ PygenClientConfig }} from "../instance_api/auth/index.ts";
+import type {{ ViewReference{instance_id_import} }} from "../instance_api/types/references.ts";
+import type {{ Aggregation, PropertySort, SortDirection }} from "../instance_api/types/query.ts";
+import type {{ AggregateResponse, Page }} from "../instance_api/types/responses.ts";
+import {{ InstanceList }} from "../instance_api/types/instance.ts";
+
+import {{
+  {view_const},
+  {read_name},
+  {filter_name},
+  {list_name},
+}} from "../data_classes/index.ts";"""
+
+    def create_helper_function(self) -> str:
+        """Generate the createPropertyRef helper function."""
+        return """
+/**
+ * Creates a property reference for sorting.
+ *
+ * @param viewRef - The view reference
+ * @param propertyName - The property name
+ * @returns A property path array
+ */
+function createPropertyRef(
+  viewRef: ViewReference,
+  propertyName: string,
+): [string, string, string] {
+  return [viewRef.space, `${viewRef.externalId}/${viewRef.version}`, propertyName];
+}"""
+
+    def _create_filter_options_interface(self, include_pagination: bool = False, include_sort: bool = False) -> str:
+        """Create the filter options interface fields."""
+        lines: list[str] = []
+        for param in self.filter_params:
+            lines.append(f"    {param.name}?: {param.type_hint};")
+
+        # Add common filter params
+        lines.extend(
+            [
+                "    externalIdPrefix?: string;",
+                "    space?: string | readonly string[];",
+            ]
+        )
+
+        if include_pagination:
+            lines.extend(
+                [
+                    "    cursor?: string;",
+                    "    limit?: number;",
+                ]
+            )
+        elif include_sort:
+            lines.extend(
+                [
+                    "    sortBy?: string;",
+                    "    sortDirection?: SortDirection;",
+                    "    limit?: number;",
+                ]
+            )
+
+        return "\n".join(lines)
+
+    def _create_filter_calls(self) -> str:
+        """Create filter method calls for building the filter."""
+        filter_name = self.data_class.filter.name
+        lines: list[str] = [f'    const filter = new {filter_name}("and");']
+
+        for param in self.filter_params:
+            lines.append(f"    {param.filter_call};")
+
+        lines.extend(
+            [
+                "    filter.externalId.prefix(options.externalIdPrefix ?? null);",
+                "    filter.space.equalsOrIn(options.space ?? null);",
+            ]
+        )
+
+        return "\n".join(lines)
+
+    def create_api_class(self) -> str:
+        """Generate the complete API class."""
+        api_name = self.api_class.name
+        read_name = self.data_class.read.name
+        instance_type = self.data_class.instance_type
+        view_const = self._view_const_name
+
+        # Generate all method parts
+        build_filter_method = self._create_build_filter_method()
+        retrieve_method = self._create_retrieve_method()
+        iterate_method = self._create_iterate_method()
+        search_method = self._create_search_method()
+        aggregate_method = self._create_aggregate_method()
+        list_method = self._create_list_method()
+
+        return f"""
+/**
+ * API for {read_name} instances with type-safe filter methods.
+ */
+export class {api_name} extends InstanceAPI<{read_name}> {{
+  /**
+   * Creates a new {api_name}.
+   *
+   * @param config - Client configuration for API access
+   */
+  constructor(config: PygenClientConfig) {{
+    super(config, {view_const}, "{instance_type}");
+  }}
+
+{build_filter_method}
+
+{retrieve_method}
+
+{iterate_method}
+
+{search_method}
+
+{aggregate_method}
+
+{list_method}
+}}"""
+
+    def _create_build_filter_method(self) -> str:
+        """Generate the private _buildFilter method."""
+        filter_name = self.data_class.filter.name
+        filter_options = self._create_filter_options_interface()
+        filter_calls = self._create_filter_calls()
+
+        return f"""  /**
+   * Builds a {filter_name} from the given options.
+   *
+   * @param options - Filter options
+   * @returns A configured {filter_name}
+   */
+  private _buildFilter(options: {{
+{filter_options}
+  }}): {filter_name} {{
+{filter_calls}
+
+    return filter;
+  }}"""
+
+    def _create_retrieve_method(self) -> str:
+        """Generate the retrieve method with overloads."""
+        read_name = self.data_class.read.name
+        list_name = self.data_class.read_list.name
+
+        return f"""  /**
+   * Retrieve {read_name} instances by ID.
+   *
+   * @param id - Instance identifier. Can be a string, InstanceId, tuple, or array
+   * @param options - Additional options
+   * @returns For single id: The {read_name} if found, undefined otherwise.
+   *          For array of ids: A {list_name} of found instances.
+   */
+  async retrieve(
+    id: string | InstanceId | readonly [string, string],
+    options?: {{ space?: string }},
+  ): Promise<{read_name} | undefined>;
+  async retrieve(
+    id: readonly (string | InstanceId | readonly [string, string])[],
+    options?: {{ space?: string }},
+  ): Promise<{list_name}>;
+  async retrieve(
+    id:
+      | string
+      | InstanceId
+      | readonly [string, string]
+      | readonly (string | InstanceId | readonly [string, string])[],
+    options: {{ space?: string }} = {{}},
+  ): Promise<{read_name} | {list_name} | undefined> {{
+    const isSingle = !Array.isArray(id) ||
+      (id.length === 2 && typeof id[0] === "string" && typeof id[1] === "string");
+
+    if (isSingle) {{
+      return await this._retrieve(
+        id as string | InstanceId | readonly [string, string],
+        options,
+      ) as {read_name} | undefined;
+    }}
+    const result = await this._retrieve(
+      id as readonly (string | InstanceId | readonly [string, string])[],
+      options,
+    );
+    return new {list_name}([...(result as InstanceList<{read_name}>)]);
+  }}"""
+
+    def _create_iterate_method(self) -> str:
+        """Generate the iterate method."""
+        list_name = self.data_class.read_list.name
+        filter_options = self._create_filter_options_interface(include_pagination=True)
+
+        return f"""  /**
+   * Iterate over instances with pagination.
+   *
+   * @param options - Filter and pagination options
+   * @returns A Page containing items and optional next cursor.
+   */
+  async iterate(options: {{
+{filter_options}
+  }} = {{}}): Promise<Page<{list_name}>> {{
+    const filter = this._buildFilter(options);
+    const page = await this._iterate({{
+      cursor: options.cursor,
+      limit: options.limit,
+      filter: filter.asFilter(),
+    }});
+
+    return {{ ...page, items: new {list_name}([...page.items]) }};
+  }}"""
+
+    def _create_search_method(self) -> str:
+        """Generate the search method."""
+        list_name = self.data_class.read_list.name
+        filter_options = self._create_filter_options_interface()
+
+        return f"""  /**
+   * Search instances using full-text search.
+   *
+   * @param options - Search and filter options
+   * @returns A {list_name} of matching instances.
+   */
+  async search(options: {{
+    query?: string;
+    properties?: string | readonly string[];
+{filter_options}
+    limit?: number;
+  }} = {{}}): Promise<{list_name}> {{
+    const filter = this._buildFilter(options);
+
+    const result = await this._search({{
+      query: options.query,
+      properties: options.properties,
+      limit: options.limit,
+      filter: filter.asFilter(),
+    }});
+
+    return new {list_name}([...result.items]);
+  }}"""
+
+    def _create_aggregate_method(self) -> str:
+        """Generate the aggregate method."""
+        filter_options = self._create_filter_options_interface()
+
+        return f"""  /**
+   * Aggregate instances.
+   *
+   * @param aggregate - Aggregation(s) to perform.
+   * @param options - Filter and grouping options.
+   * @returns AggregateResponse with aggregated values.
+   */
+  async aggregate(
+    aggregate: Aggregation | readonly Aggregation[],
+    options: {{
+      groupBy?: string | readonly string[];
+{filter_options}
+    }} = {{}},
+  ): Promise<AggregateResponse> {{
+    const filter = this._buildFilter(options);
+
+    return this._aggregate(aggregate, {{
+      groupBy: options.groupBy,
+      filter: filter.asFilter(),
+    }});
+  }}"""
+
+    def _create_list_method(self) -> str:
+        """Generate the list method."""
+        list_name = self.data_class.read_list.name
+        view_const = self._view_const_name
+        filter_options = self._create_filter_options_interface(include_sort=True)
+
+        return f"""  /**
+   * List instances with type-safe filtering.
+   *
+   * @param options - Filter, sort, and pagination options.
+   * @returns A {list_name} of matching instances.
+   */
+  async list(options: {{
+{filter_options}
+  }} = {{}}): Promise<{list_name}> {{
+    const filter = this._buildFilter(options);
+    const sort: PropertySort | undefined = options.sortBy !== undefined
+      ? {{
+        property: createPropertyRef({view_const}, options.sortBy),
+        direction: options.sortDirection,
+      }}
+      : undefined;
+
+    const result = await this._list({{
+      limit: options.limit,
+      filter: filter.asFilter(),
+      sort,
+    }});
+
+    return new {list_name}([...result]);
+  }}"""
+
+
+# ============================================================================
+# TypeScriptPackageGenerator
+# ============================================================================
+
+
+class TypeScriptPackageGenerator:
+    """Generator for TypeScript package structure files (index.ts, _client.ts)."""
+
+    def __init__(self, model: PygenSDKModel, client_name: str) -> None:
+        self.model = model
+        self.client_name = client_name
+
+    def create_api_index(self) -> str:
+        """Generate the _api/index.ts file that exports all API classes."""
+        lines: list[str] = [
+            "/**",
+            " * API classes for the generated SDK.",
+            " *",
+            " * This module exports all view-specific API classes.",
+            " *",
+            " * @packageDocumentation",
+            " */",
+            "",
+        ]
+
+        # Collect and sort API classes by name
+        api_classes_sorted = sorted(self.model.api_classes, key=lambda x: x.name)
+
+        for api_class in api_classes_sorted:
+            # Module name is filename without .ts extension
+            module_name = api_class.filename.replace(".ts", "")
+            lines.append(f'export {{ {api_class.name} }} from "./{module_name}.ts";')
+
+        return "\n".join(lines)
+
+    def create_client(self) -> str:
+        """Generate the _client.ts file with the client class."""
+        # Collect and sort API classes
+        api_classes_sorted = sorted(self.model.api_classes, key=lambda x: x.name)
+
+        # Build imports
+        api_imports = ", ".join(api.name for api in api_classes_sorted)
+
+        # Build property declarations
+        property_declarations = "\n".join(
+            f"  /** API for {api.data_class.read.name} instances */\n"
+            f"  readonly {api.client_attribute_name}: {api.name};"
+            for api in api_classes_sorted
+        )
+
+        # Build constructor initializations
+        api_inits = "\n".join(
+            f"    this.{api.client_attribute_name} = new {api.name}(config);" for api in api_classes_sorted
+        )
+
+        # Build view list for docstring
+        view_list = "\n".join(f" * - {api.client_attribute_name}: {api.name}" for api in api_classes_sorted)
+
+        return f"""/**
+ * Client for the generated SDK.
+ *
+ * This module contains the {self.client_name} that composes view-specific APIs.
+ *
+ * @packageDocumentation
+ */
+
+import type {{ PygenClientConfig }} from "./instance_api/auth/index.ts";
+import {{ InstanceClient }} from "./instance_api/client.ts";
+
+import {{ {api_imports} }} from "./_api/index.ts";
+
+/**
+ * Generated client for interacting with the data model.
+ *
+ * This client provides access to the following views:
+{view_list}
+ */
+export class {self.client_name} extends InstanceClient {{
+{property_declarations}
+
+  /**
+   * Creates a new {self.client_name}.
+   *
+   * @param config - Configuration for the client including URL, project, and credentials.
+   * @param writeWorkers - Number of concurrent workers for write operations. Default is 5.
+   * @param deleteWorkers - Number of concurrent workers for delete operations. Default is 3.
+   * @param retrieveWorkers - Number of concurrent workers for retrieve operations. Default is 10.
+   */
+  constructor(
+    config: PygenClientConfig,
+    writeWorkers = 5,
+    deleteWorkers = 3,
+    retrieveWorkers = 10,
+  ) {{
+    super(config, writeWorkers, deleteWorkers, retrieveWorkers);
+
+    // Initialize view-specific APIs
+{api_inits}
+  }}
+}}"""
+
+    def create_package_index(self) -> str:
+        """Generate the root index.ts file that exports the client and re-exports data classes."""
+        return f"""/**
+ * Generated SDK package.
+ *
+ * This package provides the {self.client_name} for interacting with the data model.
+ *
+ * @packageDocumentation
+ */
+
+export {{ {self.client_name} }} from "./_client.ts";
+export * from "./data_classes/index.ts";
+"""
