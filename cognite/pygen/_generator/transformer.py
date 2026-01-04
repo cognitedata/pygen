@@ -2,14 +2,13 @@
 
 from typing import Literal, cast
 
-from pydantic.alias_generators import to_camel, to_pascal, to_snake
-
 from cognite.pygen._client.models import (
     DataModelResponseWithViews,
     ViewCorePropertyResponse,
     ViewResponse,
     ViewResponseProperty,
 )
+from cognite.pygen._generator.config import to_casing
 from cognite.pygen._pygen_model import (
     APIClassFile,
     DataClass,
@@ -21,7 +20,7 @@ from cognite.pygen._pygen_model import (
 )
 from cognite.pygen._utils.filesystem import sanitize
 
-from ._types import Casing, OutputFormat
+from ._types import OutputFormat
 from .config import InternalPygenSDKConfig, NamingConfig
 from .dtype_converter import DataTypeConverter, get_converter_by_format
 
@@ -63,7 +62,7 @@ def _create_data_class(view: ViewResponse, naming: NamingConfig, output_format: 
     if view.writable:
         write_converter = get_converter_by_format(output_format, context="write")
         write = DataClass(
-            name=_to_casing(f"{view.external_id}Write", naming.class_name),
+            name=to_casing(f"{view.external_id}Write", naming.class_name),
             fields=[
                 field_
                 for prop_id, prop in view.properties.items()
@@ -75,7 +74,7 @@ def _create_data_class(view: ViewResponse, naming: NamingConfig, output_format: 
 
     read_converter = get_converter_by_format(output_format, context="read")
     read = DataClass(
-        name=_to_casing(view.external_id, naming.class_name),
+        name=to_casing(view.external_id, naming.class_name),
         fields=[
             field_
             for prop_id, prop in view.properties.items()
@@ -86,15 +85,15 @@ def _create_data_class(view: ViewResponse, naming: NamingConfig, output_format: 
     )
 
     read_list = ListDataClass(
-        name=_to_casing(f"{view.external_id}List", naming.class_name),
+        name=to_casing(f"{view.external_id}List", naming.class_name),
     )
 
     filter_class = FilterClass(
-        name=_to_casing(f"{view.external_id}Filter", naming.class_name),
+        name=to_casing(f"{view.external_id}Filter", naming.class_name),
     )
 
     return DataClassFile(
-        filename=sanitize(f"{view.external_id}.{_file_suffix(output_format)}"),
+        filename=sanitize(f"{to_casing(view.external_id, naming.file_name)}.{_file_suffix(output_format)}"),
         instance_type=used_for,
         view_id=view.as_reference(),
         read=read,
@@ -102,20 +101,6 @@ def _create_data_class(view: ViewResponse, naming: NamingConfig, output_format: 
         read_list=read_list,
         filter=filter_class,
     )
-
-
-def _to_casing(name: str, casing: Casing) -> str:
-    # First convert to snake_case as an intermediate step to handle
-    # mixed case input (e.g., "CategoryNode" or "categoryName")
-    snake = to_snake(name)
-    if casing == "camelCase":
-        return to_camel(snake)
-    elif casing == "PascalCase":
-        return to_pascal(snake)
-    elif casing == "snake_case":
-        return snake
-    else:
-        raise NotImplementedError(f"Unsupported casing: {casing}")
 
 
 def _file_suffix(output_format: OutputFormat) -> str:
@@ -134,7 +119,7 @@ def _create_field(
         return None
     return Field(
         cdf_prop_id=prop_id,
-        name=_to_casing(prop_id, naming.field_name),
+        name=to_casing(prop_id, naming.field_name),
         type_hint=converter.create_type_hint(prop),
         filter_name=converter.get_filter_name(prop),
         description=prop.description or "",
@@ -147,8 +132,8 @@ def _create_api_class(
     data_class: DataClassFile, view: ViewResponse, naming: NamingConfig, output_format: OutputFormat
 ) -> APIClassFile:
     return APIClassFile(
-        filename=sanitize(f"_{view.external_id}_api.{_file_suffix(output_format)}"),
-        name=_to_casing(f"{view.external_id}API", naming.class_name),
-        client_attribute_name=_to_casing(f"{view.external_id}", naming.field_name),
+        filename=sanitize(f"_{to_casing(view.external_id, naming.file_name)}_api.{_file_suffix(output_format)}"),
+        name=to_casing(f"{view.external_id}API", naming.class_name),
+        client_attribute_name=to_casing(f"{view.external_id}", naming.field_name),
         data_class=data_class,
     )

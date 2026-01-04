@@ -1,6 +1,7 @@
 from collections.abc import Set
 
 from pydantic import BaseModel, Field
+from pydantic.alias_generators import to_camel, to_pascal, to_snake
 
 from ._types import Casing, OutputFormat
 
@@ -50,3 +51,17 @@ def _get_naming_config(output_format: OutputFormat) -> NamingConfig:
     elif output_format == "typescript":
         return NamingConfig(class_name="PascalCase", field_name="camelCase", file_name="camelCase")
     raise NotImplementedError(f"Naming config for output format {output_format} is not implemented.")
+
+
+def to_casing(name: str, casing: Casing) -> str:
+    # First convert to snake_case as an intermediate step to handle
+    # mixed case input (e.g., "CategoryNode" or "categoryName")
+    snake = to_snake(name)
+    if casing == "camelCase":
+        return to_camel(snake)
+    elif casing == "PascalCase":
+        return to_pascal(snake)
+    elif casing == "snake_case":
+        return snake
+    else:
+        raise NotImplementedError(f"Unsupported casing: {casing}")
