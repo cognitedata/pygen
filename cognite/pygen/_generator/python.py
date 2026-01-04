@@ -345,7 +345,7 @@ class PythonAPIGenerator:
         list_name = self.data_class.read_list.name
         lines.extend(
             [
-                f"from {self.top_level}.data_class import (",
+                f"from {self.top_level}.data_classes import (",
                 f"    {read_name},",
                 f"    {filter_name},",
                 f"    {list_name},",

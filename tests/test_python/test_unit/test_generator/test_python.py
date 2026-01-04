@@ -205,7 +205,7 @@ from cognite.pygen._python.instance_api.models.responses import (
     Page,
 )
 
-from example_sdk_python.data_class import (
+from example_sdk_python.data_classes import (
     ExampleView,
     ExampleViewFilter,
     ExampleViewList,
