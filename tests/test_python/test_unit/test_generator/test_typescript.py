@@ -577,13 +577,19 @@ class TestTypeScriptGenerator:
         index_code = generator.create_data_class_index()
         assert index_code.strip() == EXPECTED_TS_DATA_CLASS_INDEX.strip()
 
-    def test_to_view_const_name(self) -> None:
+    @pytest.mark.parametrize(
+        "input_name,expected",
+        [
+            ("ProductNode", "PRODUCT_NODE_VIEW"),
+            ("CategoryNode", "CATEGORY_NODE_VIEW"),
+            ("RelatesTo", "RELATES_TO_VIEW"),
+            ("SimpleView", "SIMPLE_VIEW_VIEW"),
+            ("ABCView", "ABC_VIEW_VIEW"),
+        ],
+    )
+    def test_to_view_const_name(self, input_name: str, expected: str) -> None:
         """Test conversion of PascalCase to UPPER_SNAKE_CASE view constant name."""
-        assert TypeScriptGenerator._to_view_const_name("ProductNode") == "PRODUCT_NODE_VIEW"
-        assert TypeScriptGenerator._to_view_const_name("CategoryNode") == "CATEGORY_NODE_VIEW"
-        assert TypeScriptGenerator._to_view_const_name("RelatesTo") == "RELATES_TO_VIEW"
-        assert TypeScriptGenerator._to_view_const_name("SimpleView") == "SIMPLE_VIEW_VIEW"
-        assert TypeScriptGenerator._to_view_const_name("ABCView") == "A_B_C_VIEW_VIEW"
+        assert TypeScriptGenerator._to_view_const_name(input_name) == expected
 
 
 # ============================================================================
