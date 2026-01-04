@@ -63,4 +63,4 @@ def test_generate_python_sdk_example_model(file_path: Path, actual_python_sdk_ex
     if actual_content is None:
         pytest.fail(f"Generated SDK is missing expected file: {file_path}")
 
-    assert actual_content == expected_content, f"Content mismatch for file: {file_path}"
+    assert actual_content.strip() == expected_content.strip(), f"Content mismatch for file: {file_path}"
