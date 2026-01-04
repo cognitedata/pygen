@@ -291,7 +291,7 @@ def generate_v2() -> None:
         for path, content in sdk_files.items():
             output_path = EXAMPLES_V2 / SDK_NAME_PYTHON / path
             output_path.parent.mkdir(parents=True, exist_ok=True)
-            output_path.write_text(content, encoding="utf-8")
+            output_path.write_text(content, encoding="utf-8", newline="\n")
     typer.echo("v2 SDK generation complete.")
     return None
 
