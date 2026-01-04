@@ -98,9 +98,8 @@ from cognite.pygen._python.instance_api.models.instance import (
 
 EXPECTED_WRITE_CLASS_CODE = '''class ExampleViewWrite(InstanceWrite):
     """Write class for Example View instances."""
-    _view_id: ClassVar[ViewReference] = ViewReference(
-        space="example_space", external_id="example_view", version="v1"
-    )
+
+    _view_id: ClassVar[ViewReference] = ViewReference(space="example_space", external_id="example_view", version="v1")
     instance_type: Literal["node"] = Field("node", alias="instanceType")
     property_one: str | None = Field(default=None, alias="prop1")
     property_two: int = Field(alias="prop2")
@@ -109,9 +108,7 @@ EXPECTED_WRITE_CLASS_CODE = '''class ExampleViewWrite(InstanceWrite):
 EXPECTED_READ_CLASS_CODE = '''class ExampleView(Instance):
     """Read class for Example View instances."""
 
-    _view_id: ClassVar[ViewReference] = ViewReference(
-        space="example_space", external_id="example_view", version="v1"
-    )
+    _view_id: ClassVar[ViewReference] = ViewReference(space="example_space", external_id="example_view", version="v1")
     instance_type: Literal["node"] = Field("node", alias="instanceType")
     property_one: str | None = Field(default=None, alias="prop1")
     property_two: int = Field(alias="prop2")
@@ -123,6 +120,7 @@ EXPECTED_READ_CLASS_CODE = '''class ExampleView(Instance):
 
 EXPECTED_READ_LIST_CLASS_CODE = '''class ExampleViewList(InstanceList[ExampleView]):
     """List of Example View instances."""
+
     _INSTANCE: ClassVar[type[ExampleView]] = ExampleView
 '''
 
@@ -204,7 +202,6 @@ from cognite.pygen._python.instance_api.models.responses import (
     AggregateResponse,
     Page,
 )
-
 from example_sdk_python.data_classes import (
     ExampleView,
     ExampleViewFilter,
@@ -221,9 +218,7 @@ class ExampleViewAPI(InstanceAPI[ExampleView, ExampleViewList]):
     """API for ExampleView instances with type-safe filter methods."""
 
     def __init__(self, http_client: HTTPClient) -> None:
-        view_ref = ViewReference(
-            space="example_space", external_id="example_view", version="v1"
-        )
+        view_ref = ViewReference(space="example_space", external_id="example_view", version="v1")
         super().__init__(http_client, view_ref, "node", ExampleViewList)'''
 
 EXPECTED_RETRIEVE_METHOD = '''
