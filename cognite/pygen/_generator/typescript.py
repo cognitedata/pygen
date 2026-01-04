@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from cognite.pygen._client.models import DataModelResponseWithViews
-from cognite.pygen._generator.config import PygenSDKConfig
 from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, PygenSDKModel
 
 from .generator import Generator
@@ -10,28 +8,19 @@ from .generator import Generator
 class TypeScriptGenerator(Generator):
     format = "typescript"
 
-    def __init__(self, data_model: DataModelResponseWithViews, config: PygenSDKConfig | None = None) -> None:
-        super().__init__(data_model, config)
-        self._data_class_generator_cache: dict[str, TypeScriptDataClassGenerator] = {}
-
-    def _get_data_class_generator(self, data_class: DataClassFile) -> "TypeScriptDataClassGenerator":
-        """Get or create a TypeScriptDataClassGenerator for the given data class file."""
-        if data_class.filename not in self._data_class_generator_cache:
-            self._data_class_generator_cache[data_class.filename] = TypeScriptDataClassGenerator(data_class)
-        return self._data_class_generator_cache[data_class.filename]
-
     def create_data_class_code(self, data_class: DataClassFile) -> str:
-        generator = self._get_data_class_generator(data_class)
+        generator = TypeScriptDataClassGenerator(data_class)
         parts: list[str] = [
             generator.create_import_statements(),
             generator.create_view_reference_constant(),
         ]
         if data_class.write:
             parts.append(generator.generate_write_interface())
+        parts.append(generator.generate_read_interface())
+        if data_class.write:
+            parts.append(generator.generate_as_write_function())
         parts.extend(
             [
-                generator.generate_read_interface(),
-                generator.generate_as_write_function(),
                 generator.generate_list_class(),
                 generator.generate_filter_class(),
             ]
