@@ -15,6 +15,7 @@ from cognite.pygen._example_datamodel import (
     relates_to_container,
     relates_to_view,
 )
+from cognite.pygen._generator.config import PygenSDKConfig, create_internal_config
 from cognite.pygen._generator.transformer import to_pygen_model
 from cognite.pygen._pygen_model import PygenSDKModel
 
@@ -60,9 +61,17 @@ def example_data_model_response() -> DataModelResponseWithViews:
     return create_example_data_model_response()
 
 
+@pytest.fixture()
+def pygen_sdk_config() -> PygenSDKConfig:
+    return PygenSDKConfig(top_level_package=".", client_name="ExampleDataModel")
+
+
 @pytest.fixture(scope="module")
-def example_python_pygen_sdk_model(example_data_model_response: DataModelResponseWithViews) -> PygenSDKModel:
-    return to_pygen_model(example_data_model_response, "python")
+def example_python_pygen_sdk_model(
+    example_data_model_response: DataModelResponseWithViews, pygen_sdk_config: PygenSDKConfig
+) -> PygenSDKModel:
+    config = create_internal_config(pygen_sdk_config, "python")
+    return to_pygen_model(example_data_model_response, "python", config=config)
 
 
 def test_example_data_model(example_data_model_response: DataModelResponseWithViews) -> None:

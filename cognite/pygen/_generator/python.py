@@ -13,17 +13,21 @@ class PythonGenerator(Generator):
 
     def __init__(self, data_model: DataModelResponseWithViews, config: PygenSDKConfig | None = None) -> None:
         super().__init__(data_model, config)
-        self._top_level = self._get_top_level()
-        self._package_generator = PythonPackageGenerator(self.model, self._top_level, self.config.client_name)
+        self._instance_api_location = self._get_instance_api_location()
+        self._package_generator = PythonPackageGenerator(
+            self.model, self._instance_api_location, self.config.client_name
+        )
 
-    def _get_top_level(self) -> str:
+    def _get_instance_api_location(self) -> str:
         """Get the top-level import path for the instance_api module."""
         if self.config.pygen_as_dependency:
             return "cognite.pygen._python"
         return f"{self.config.top_level_package}"
 
     def create_data_class_code(self, data_class: DataClassFile) -> str:
-        generator = PythonDataClassGenerator(data_class, top_level=self._top_level)
+        generator = PythonDataClassGenerator(
+            data_class, max_line_length=self.config.max_line_length, instance_api_location=self._instance_api_location
+        )
         parts: list[str] = [
             generator.create_import_statements(),
         ]
@@ -39,8 +43,13 @@ class PythonGenerator(Generator):
         return "\n\n".join(parts)
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
-        generator = PythonAPIGenerator(api_class, top_level=self._top_level)
-        parts: list[str] = [
+        generator = PythonAPIGenerator(
+            api_class,
+            top_level=self.config.top_level_package,
+            max_line_length=self.config.max_line_length,
+            instance_api_location=self._instance_api_location,
+        )
+        parts = [
             generator.create_import_statements(),
             generator.create_api_class_with_init(),
             generator.create_retrieve_method(),
@@ -49,7 +58,7 @@ class PythonGenerator(Generator):
             generator.create_iterate_method(),
             generator.create_list_method(),
         ]
-        return "\n\n".join(parts)
+        return "\n".join(parts)
 
     def create_data_class_init_code(self, model: PygenSDKModel) -> str:
         """Generate the data_classes/__init__.py file."""
@@ -72,33 +81,30 @@ class PythonGenerator(Generator):
 
 
 class PythonDataClassGenerator:
-    def __init__(self, data_class: DataClassFile, top_level: str = "cognite.pygen._python") -> None:
+    def __init__(
+        self,
+        data_class: DataClassFile,
+        max_line_length: int = 120,
+        instance_api_location: str = "cognite.pygen._python",
+    ) -> None:
         self.data_class = data_class
-        self.top_level = top_level
+        self.max_line_length = max_line_length
+        self.instance_api_location = instance_api_location
 
     def create_import_statements(self) -> str:
         """Generate import statements for the data class file."""
         import_statements: list[str] = [
             "from typing import ClassVar, Literal",
             "",
+            "from pydantic import Field",
+            "",
         ]
-        if any(
-            field.default_value is not None or field.cdf_prop_id != field.name
-            for field in self.data_class.list_fields()
-        ):
-            # Any field has a default value or alias, need to import Field from pydantic
-            import_statements.append("from pydantic import Field")
-            import_statements.append("")
-        has_direct_relation = any(self.data_class.list_fields(dtype="InstanceId"))
-        if has_direct_relation:
-            import_statements.append(
-                f"from {self.top_level}.instance_api.models._references import InstanceId, ViewReference"
-            )
-        else:
-            import_statements.append(f"from {self.top_level}.instance_api.models._references import ViewReference")
+        import_statements.append(
+            f"from {self.instance_api_location}.instance_api.models._references import ViewReference"
+        )
         if time_fields := set(field.dtype for field in self.data_class.list_fields(dtype={"DateTime", "Date"})):
             import_statements.append(
-                f"from {self.top_level}.instance_api.models._types import {','.join(sorted(time_fields))}"
+                f"from {self.instance_api_location}.instance_api.models._types import {', '.join(sorted(time_fields))}"
             )
 
         filter_imports: set[str] = {"    FilterContainer,"}
@@ -107,26 +113,29 @@ class PythonDataClassGenerator:
                 filter_imports.add(f"    {field.filter_name},")
         import_statements.extend(
             [
-                f"from {self.top_level}.instance_api.models.dtype_filters import (",
+                f"from {self.instance_api_location}.instance_api.models.dtype_filters import (",
                 *sorted(filter_imports),
                 ")",
             ]
         )
-        import_statements.append(f"from {self.top_level}.instance_api.models.instance import (")
+        import_statements.append(f"from {self.instance_api_location}.instance_api.models.instance import (")
         import_statements.append("    Instance,")
+        has_direct_relation = any(self.data_class.list_fields(dtype="InstanceId"))
         if has_direct_relation:
             import_statements.append("    InstanceId,")
         import_statements.append("    InstanceList,")
         if self.data_class.write:
             import_statements.append("    InstanceWrite,")
         import_statements.append(")")
+        import_statements.append("")
         return "\n".join(import_statements)
 
     def generate_read_class(self) -> str:
         """Generate the read class for the data class."""
         read = self.data_class.read
-        view_id = self.data_class.view_id
         instance_type = self.data_class.instance_type
+        view_id_str = self._create_view_ref()
+
         write_method = ""
         if self.data_class.write:
             write = self.data_class.write
@@ -138,25 +147,43 @@ class PythonDataClassGenerator:
         return f'''class {read.name}(Instance):
     """Read class for {read.display_name} instances."""
 
-    _view_id: ClassVar[ViewReference] = ViewReference(
-        space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
-    )
+    _view_id: ClassVar[ViewReference] = {view_id_str}
     instance_type: Literal["{instance_type}"] = Field("{instance_type}", alias="instanceType")
     {self.create_fields(read)}
 {write_method}
 '''
 
+    def _create_view_ref(self) -> str:
+        view_id = self.data_class.view_id
+        one_liner = (
+            f'ViewReference(space="{view_id.space}", '
+            f'external_id="{view_id.external_id}", '
+            f'version="{view_id.version}")'
+        )
+        prefix = len("    _view_id: ClassVar[ViewReference] = ")
+        if len(one_liner) + prefix <= self.max_line_length:
+            return one_liner
+        three_liner = f"""ViewReference(
+            space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
+        )"""
+        if len(three_liner.splitlines()[1]) <= self.max_line_length:
+            return three_liner
+        return f"""ViewReference(
+        space="{view_id.space}",
+        external_id="{view_id.external_id}",
+        version="{view_id.version}",
+)"""
+
     def generate_write_class(self) -> str:
         write = self.data_class.write
         if not write:
             raise ValueError("No write class defined for this data class file.")
-        view_id = self.data_class.view_id
         instance_type = self.data_class.instance_type
+        view_id_str = self._create_view_ref()
         return f'''class {write.name}(InstanceWrite):
     """Write class for {write.display_name} instances."""
-    _view_id: ClassVar[ViewReference] = ViewReference(
-        space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
-    )
+
+    _view_id: ClassVar[ViewReference] = {view_id_str}
     instance_type: Literal["{instance_type}"] = Field("{instance_type}", alias="instanceType")
     {self.create_fields(write)}
 '''
@@ -182,6 +209,7 @@ class PythonDataClassGenerator:
         list_cls = self.data_class.read_list
         return f'''class {list_cls.name}(InstanceList[{read.name}]):
     """List of {read.display_name} instances."""
+
     _INSTANCE: ClassVar[type[{read.name}]] = {read.name}
 '''
 
@@ -300,10 +328,18 @@ def _create_filter_params(field: Field) -> list[FilterParam]:
 
 
 class PythonAPIGenerator:
-    def __init__(self, api_class: APIClassFile, top_level: str = "cognite.pygen._python") -> None:
+    def __init__(
+        self,
+        api_class: APIClassFile,
+        top_level: str,
+        max_line_length: int,
+        instance_api_location: str = "cognite.pygen._python",
+    ) -> None:
         self.api_class = api_class
         self.data_class = api_class.data_class
         self.top_level = top_level
+        self.max_line_length = max_line_length
+        self.instance_api_location = instance_api_location
         self._filter_params: list[FilterParam] | None = None
 
     @property
@@ -326,26 +362,31 @@ class PythonAPIGenerator:
             [
                 "from typing import Literal, overload",
                 "",
-                f"from {self.top_level}.instance_api._api import InstanceAPI",
-                f"from {self.top_level}.instance_api.http_client import HTTPClient",
-                f"from {self.top_level}.instance_api.models import (",
+                f"from {self.instance_api_location}.instance_api._api import InstanceAPI",
+                f"from {self.instance_api_location}.instance_api.http_client import HTTPClient",
+                f"from {self.instance_api_location}.instance_api.models import (",
                 "    Aggregation,",
                 "    InstanceId,",
                 "    PropertySort,",
                 "    ViewReference,",
                 ")",
-                f"from {self.top_level}.instance_api.models.responses import (",
+                f"from {self.instance_api_location}.instance_api.models.responses import (",
                 "    AggregateResponse,",
                 "    Page,",
                 ")",
-                "",
             ]
         )
         read_name = self.data_class.read.name
         filter_name = self.data_class.filter.name
         list_name = self.data_class.read_list.name
         lines.extend(
-            ["from ._data_class import (", f"    {read_name},", f"    {filter_name},", f"    {list_name},", ")"]
+            [
+                f"from {self.top_level}.data_classes import (",
+                f"    {read_name},",
+                f"    {filter_name},",
+                f"    {list_name},",
+                ")",
+            ]
         )
 
         return "\n".join(lines)
@@ -355,10 +396,11 @@ class PythonAPIGenerator:
         api_name = self.api_class.name
         read_name = self.data_class.read.name
         list_name = self.data_class.read_list.name
-        view_id = self.data_class.view_id
         instance_type = self.data_class.instance_type
+        view_ref_str = self._create_view_ref()
 
         return f'''
+
 def _create_property_ref(view_ref: ViewReference, property_name: str) -> list[str]:
     """Create a property reference for filtering."""
     return [view_ref.space, f"{{view_ref.external_id}}/{{view_ref.version}}", property_name]
@@ -368,10 +410,29 @@ class {api_name}(InstanceAPI[{read_name}, {list_name}]):
     """API for {read_name} instances with type-safe filter methods."""
 
     def __init__(self, http_client: HTTPClient) -> None:
-        view_ref = ViewReference(
-            space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
-        )
+        view_ref = {view_ref_str}
         super().__init__(http_client, view_ref, "{instance_type}", {list_name})'''
+
+    def _create_view_ref(self) -> str:
+        view_id = self.data_class.view_id
+        one_liner = (
+            f'ViewReference(space="{view_id.space}", '
+            f'external_id="{view_id.external_id}", '
+            f'version="{view_id.version}")'
+        )
+        prefix = len("        view_ref = ")
+        if len(one_liner) + prefix <= self.max_line_length:
+            return one_liner
+        three_liner = f"""ViewReference(
+            space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
+        )"""
+        if len(three_liner.splitlines()[1]) <= self.max_line_length:
+            return three_liner
+        return f"""ViewReference(
+        space="{view_id.space}",
+        external_id="{view_id.external_id}",
+        version="{view_id.version}",
+)"""
 
     def create_retrieve_method(self) -> str:
         """Generate the retrieve method with overloads."""
