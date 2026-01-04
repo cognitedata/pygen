@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile
+from cognite.pygen._typescript import instance_api
 
 from .generator import Generator
 
@@ -69,7 +70,12 @@ class TypeScriptGenerator(Generator):
         return ""
 
     def add_instance_api(self) -> dict[Path, str]:
-        return {}
+        instance_api_files: dict[Path, str] = {}
+        location = Path(instance_api.__path__[0])
+        for file in location.rglob("**/*.ts"):
+            relative_path = file.relative_to(location)
+            instance_api_files[relative_path] = str(file)
+        return instance_api_files
 
 
 class TypeScriptDataClassGenerator:
