@@ -25,7 +25,9 @@ class PythonGenerator(Generator):
         return f"{self.config.top_level_package}"
 
     def create_data_class_code(self, data_class: DataClassFile) -> str:
-        generator = PythonDataClassGenerator(data_class, instance_api_location=self._instance_api_location)
+        generator = PythonDataClassGenerator(
+            data_class, max_line_length=self.config.max_line_length, instance_api_location=self._instance_api_location
+        )
         parts: list[str] = [
             generator.create_import_statements(),
         ]
@@ -42,7 +44,10 @@ class PythonGenerator(Generator):
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
         generator = PythonAPIGenerator(
-            api_class, top_level=self.config.top_level_package, instance_api_location=self._instance_api_location
+            api_class,
+            top_level=self.config.top_level_package,
+            max_line_length=self.config.max_line_length,
+            instance_api_location=self._instance_api_location,
         )
         parts = [
             generator.create_import_statements(),
@@ -76,8 +81,14 @@ class PythonGenerator(Generator):
 
 
 class PythonDataClassGenerator:
-    def __init__(self, data_class: DataClassFile, instance_api_location: str = "cognite.pygen._python") -> None:
+    def __init__(
+        self,
+        data_class: DataClassFile,
+        max_line_length: int = 120,
+        instance_api_location: str = "cognite.pygen._python",
+    ) -> None:
         self.data_class = data_class
+        self.max_line_length = max_line_length
         self.instance_api_location = instance_api_location
 
     def create_import_statements(self) -> str:
@@ -93,7 +104,7 @@ class PythonDataClassGenerator:
         )
         if time_fields := set(field.dtype for field in self.data_class.list_fields(dtype={"DateTime", "Date"})):
             import_statements.append(
-                f"from {self.instance_api_location}.instance_api.models._types import {','.join(sorted(time_fields))}"
+                f"from {self.instance_api_location}.instance_api.models._types import {', '.join(sorted(time_fields))}"
             )
 
         filter_imports: set[str] = {"    FilterContainer,"}
@@ -116,13 +127,15 @@ class PythonDataClassGenerator:
         if self.data_class.write:
             import_statements.append("    InstanceWrite,")
         import_statements.append(")")
+        import_statements.append("")
         return "\n".join(import_statements)
 
     def generate_read_class(self) -> str:
         """Generate the read class for the data class."""
         read = self.data_class.read
-        view_id = self.data_class.view_id
         instance_type = self.data_class.instance_type
+        view_id_str = self._create_view_ref()
+
         write_method = ""
         if self.data_class.write:
             write = self.data_class.write
@@ -134,25 +147,43 @@ class PythonDataClassGenerator:
         return f'''class {read.name}(Instance):
     """Read class for {read.display_name} instances."""
 
-    _view_id: ClassVar[ViewReference] = ViewReference(
-        space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
-    )
+    _view_id: ClassVar[ViewReference] = {view_id_str}
     instance_type: Literal["{instance_type}"] = Field("{instance_type}", alias="instanceType")
     {self.create_fields(read)}
 {write_method}
 '''
 
+    def _create_view_ref(self) -> str:
+        view_id = self.data_class.view_id
+        one_liner = (
+            f'ViewReference(space="{view_id.space}", '
+            f'external_id="{view_id.external_id}", '
+            f'version="{view_id.version}")'
+        )
+        prefix = len("    _view_id: ClassVar[ViewReference] = ")
+        if len(one_liner) + prefix <= self.max_line_length:
+            return one_liner
+        three_liner = f"""ViewReference(
+            space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
+        )"""
+        if len(three_liner.splitlines()[1]) <= self.max_line_length:
+            return three_liner
+        return f"""ViewReference(
+        space="{view_id.space}",
+        external_id="{view_id.external_id}",
+        version="{view_id.version}",
+)"""
+
     def generate_write_class(self) -> str:
         write = self.data_class.write
         if not write:
             raise ValueError("No write class defined for this data class file.")
-        view_id = self.data_class.view_id
         instance_type = self.data_class.instance_type
+        view_id_str = self._create_view_ref()
         return f'''class {write.name}(InstanceWrite):
     """Write class for {write.display_name} instances."""
-    _view_id: ClassVar[ViewReference] = ViewReference(
-        space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
-    )
+
+    _view_id: ClassVar[ViewReference] = {view_id_str}
     instance_type: Literal["{instance_type}"] = Field("{instance_type}", alias="instanceType")
     {self.create_fields(write)}
 '''
@@ -178,6 +209,7 @@ class PythonDataClassGenerator:
         list_cls = self.data_class.read_list
         return f'''class {list_cls.name}(InstanceList[{read.name}]):
     """List of {read.display_name} instances."""
+
     _INSTANCE: ClassVar[type[{read.name}]] = {read.name}
 '''
 
@@ -297,11 +329,16 @@ def _create_filter_params(field: Field) -> list[FilterParam]:
 
 class PythonAPIGenerator:
     def __init__(
-        self, api_class: APIClassFile, top_level: str, instance_api_location: str = "cognite.pygen._python"
+        self,
+        api_class: APIClassFile,
+        top_level: str,
+        max_line_length: int,
+        instance_api_location: str = "cognite.pygen._python",
     ) -> None:
         self.api_class = api_class
         self.data_class = api_class.data_class
         self.top_level = top_level
+        self.max_line_length = max_line_length
         self.instance_api_location = instance_api_location
         self._filter_params: list[FilterParam] | None = None
 
@@ -383,11 +420,19 @@ class {api_name}(InstanceAPI[{read_name}, {list_name}]):
             f'external_id="{view_id.external_id}", '
             f'version="{view_id.version}")'
         )
-        if len(one_liner) <= 120:
+        prefix = len("        view_ref = ")
+        if len(one_liner) + prefix <= self.max_line_length:
             return one_liner
-        return f"""ViewReference(
+        three_liner = f"""ViewReference(
             space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
         )"""
+        if len(three_liner.splitlines()[1]) <= self.max_line_length:
+            return three_liner
+        return f"""ViewReference(
+        space="{view_id.space}",
+        external_id="{view_id.external_id}",
+        version="{view_id.version}",
+)"""
 
     def create_retrieve_method(self) -> str:
         """Generate the retrieve method with overloads."""

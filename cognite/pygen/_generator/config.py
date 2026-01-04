@@ -30,6 +30,7 @@ class PygenSDKConfig(BaseModel):
 
 class InternalPygenSDKConfig(PygenSDKConfig):
     naming: NamingConfig
+    max_line_length: int = 120
 
 
 def create_internal_config(config: PygenSDKConfig, output_format: OutputFormat) -> InternalPygenSDKConfig:

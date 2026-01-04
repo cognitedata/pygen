@@ -144,7 +144,7 @@ EXPECTED_FILTER_CLASS_CODE = """class ExampleViewFilter(FilterContainer):
 
 @pytest.fixture(scope="session")
 def data_class_generator(data_class_file: DataClassFile) -> PythonDataClassGenerator:
-    return PythonDataClassGenerator(data_class_file)
+    return PythonDataClassGenerator(data_class_file, max_line_length=120)
 
 
 class TestPythonDataClassGenerator:
@@ -186,7 +186,7 @@ def api_class_file(data_class_file: DataClassFile) -> APIClassFile:
 
 @pytest.fixture(scope="session")
 def api_class_generator(api_class_file: APIClassFile) -> PythonAPIGenerator:
-    return PythonAPIGenerator(api_class_file, top_level="example_sdk_python")
+    return PythonAPIGenerator(api_class_file, top_level="example_sdk_python", max_line_length=120)
 
 
 EXPECTED_API_IMPORT_STATEMENTS = """from collections.abc import Sequence
