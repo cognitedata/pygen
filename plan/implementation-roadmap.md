@@ -24,7 +24,7 @@ Phase 2: Generic Instance API & Example SDK - Python (3-4 weeks) ✅ COMPLETE
     ↓
 Phase 3: Generic Instance API & Example SDK - TypeScript (4-5 weeks) ✅ COMPLETE
     ↓
-Phase 4: PygenModel & Code Generation (4-6 weeks) ⏳ PENDING
+Phase 4: PygenModel & Code Generation (4-6 weeks) ✅ COMPLETE
     ↓
 Phase 5: CLI, Feature Parity & Advanced Features (3-4 weeks) ⏳ PENDING
     ↓
@@ -688,7 +688,7 @@ Note wait with implementing `add_instance_api()` until after Task 4.5. For now a
 
 Reference: `cognite/pygen/_python/example/_client.py`
 
-#### Task 4.4: Complete TypeScript Data Class Templates ⏳
+#### Task 4.4: Complete TypeScript Data Class Templates ✅
 
 Implement in `typescript.py`:
 
@@ -707,7 +707,7 @@ Implement in `typescript.py`:
 
 Reference: `cognite/pygen/_typescript/example/dataClasses.ts`
 
-#### Task 4.5: Complete TypeScript API & Client Templates ⏳
+#### Task 4.5: Complete TypeScript API & Client Templates ✅
 
 1. **API class template**:
    - Extend `InstanceAPI` base class
@@ -747,10 +747,10 @@ Reference: `cognite/pygen/_typescript/example/api.ts`, `cognite/pygen/_typescrip
 - ✅ Data type converters (Python/TypeScript) - COMPLETE
 - ✅ Basic transformer (core properties) - COMPLETE
 - ✅ Working Python generator (data classes, API classes, client) - COMPLETE
-- ⏳ Working TypeScript generator (data classes, API classes, client)
-- ✅ Package structure generation (separate files per view) - COMPLETE (Python)
+- ✅ Working TypeScript generator (data classes, API classes, client) - COMPLETE
+- ✅ Package structure generation (separate files per view) - COMPLETE
 - ✅ Generated Python SDK for ExampleDataModel - COMPLETE
-- ⏳ Generated TypeScript SDK for ExampleDataModel
+- ✅ Generated TypeScript SDK for ExampleDataModel - COMPLETE
 
 ### MVP Success Criteria
 - Can generate Python SDK from ExampleDataModel
@@ -768,16 +768,16 @@ Reference: `cognite/pygen/_typescript/example/api.ts`, `cognite/pygen/_typescrip
 - Complex data model support
 
 ### Status
-**⏳ IN PROGRESS** - Python generation complete, TypeScript pending
+**✅ PHASE 4 COMPLETE** (January 4, 2026)
 
 - ✅ Task 4.0: Scaffolding - Complete
 - ✅ Task 4.1: Complete Python Data Class Templates - Complete
 - ✅ Task 4.2: Complete Python API Class Templates - Complete
 - ✅ Task 4.3: Complete Python Client & Package Templates - Complete
-- ⏳ Task 4.4: Complete TypeScript Data Class Templates - Not started
-- ⏳ Task 4.5: Complete TypeScript API & Client Templates - Not started
+- ✅ Task 4.4: Complete TypeScript Data Class Templates - Complete (January 4, 2026)
+- ✅ Task 4.5: Complete TypeScript API & Client Templates - Complete (January 4, 2026)
 
-**Progress**: 4/6 tasks complete (~67%)
+**Progress**: 6/6 tasks complete (100%)
 
 ### Dependencies
 - Phase 1 complete (need CDF API models: ViewResponse, DataModelResponse) ✅

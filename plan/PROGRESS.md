@@ -1,6 +1,6 @@
 # Pygen Rewrite - Progress Tracking
 
-**Last Updated**: January 3, 2026
+**Last Updated**: January 4, 2026
 
 This document tracks the actual progress of the Pygen rewrite implementation.
 
@@ -14,7 +14,7 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 | Phase 1: Pygen Client Core | ✅ Complete | Dec 21, 2025 | Dec 22, 2025 | ~2 days |
 | Phase 2: Generic Instance API & Example SDK (Python) | ✅ Complete | Dec 22, 2025 | Dec 27, 2025 | ~5 days |
 | Phase 3: Generic Instance API & Example SDK (TypeScript) | ✅ Complete | Dec 28, 2025 | Dec 29, 2025 | ~2 days |
-| Phase 4: PygenModel & Code Generation | ⏳ In Progress | Dec 31, 2025 | - | 4-6 weeks (planned) |
+| Phase 4: PygenModel & Code Generation | ✅ Complete | Dec 31, 2025 | Jan 4, 2026 | ~5 days |
 | Phase 5: CLI, Feature Parity & Advanced | ⏳ Not Started | - | - | 3-4 weeks (planned) |
 | Phase 6: Query Builder & Advanced Queries | ⏳ Not Started | - | - | 2-3 weeks (planned) |
 | Phase 7: API Service | ⏳ Not Started (Optional) | - | - | 2-3 weeks (planned) |
@@ -336,11 +336,12 @@ This document tracks the actual progress of the Pygen rewrite implementation.
 
 ---
 
-## Phase 4: PygenModel & Code Generation ⏳
+## Phase 4: PygenModel & Code Generation ✅
 
-**Status**: In Progress (Scaffolding Complete)  
+**Status**: Complete  
 **Planned Duration**: 4-6 weeks  
-**Start Date**: December 31, 2025
+**Start Date**: December 31, 2025  
+**Completed**: January 4, 2026
 
 Phase 4 combines PygenModel creation and code generation. The scaffolding has been completed, providing the foundation for the remaining implementation work.
 
@@ -364,7 +365,7 @@ Phase 4 combines PygenModel creation and code generation. The scaffolding has be
 - ✅ `Generator` base class - Abstract with generate() method
 - ✅ `generate_sdk()` - Main function complete
 - ✅ `PythonGenerator` - Complete with data class, API class, and client templates
-- ⏳ `TypeScriptGenerator` - Stub with NotImplementedError on all methods
+- ✅ `TypeScriptGenerator` - Complete with data class, API class, and client templates
 
 **Tests**:
 - ✅ `test_dtype_converter.py` - Good coverage for both converters
@@ -401,19 +402,42 @@ Generate SDKs for the **ExampleDataModel** (`cognite/pygen/_example_datamodel/`)
 - Generated `__init__.py` with all exports
 - Generated `data_classes/__init__.py` and `_api/__init__.py`
 
-### Remaining Tasks
+#### Task 4.4: Complete TypeScript Data Class Templates ✅ (Completed January 4, 2026)
+- Implemented `TypeScriptDataClassGenerator` in `typescript.py`
+- Data class templates for read, write, list, and filter classes
+- Handle TypeScript idioms (readonly arrays, undefined for nullable types, interfaces)
+- One `.ts` file per view
+
+#### Task 4.5: Complete TypeScript API & Client Templates ✅ (Completed January 4, 2026)
+- Implemented API class templates extending `InstanceAPI`
+- Type-safe methods with unpacked filter parameters
+- Client class template extending `InstanceClient`
+- Package structure generation with `index.ts` exports
+
+### All Tasks Complete
 
 | Task | Description | Status |
 |------|-------------|--------|
 | 4.1 | Complete Python Data Class Templates | ✅ Complete |
 | 4.2 | Complete Python API Class Templates | ✅ Complete |
 | 4.3 | Complete Python Client & Package Templates | ✅ Complete |
-| 4.4 | Complete TypeScript Data Class Templates | ⏳ Not Started |
-| 4.5 | Complete TypeScript API & Client Templates | ⏳ Not Started |
+| 4.4 | Complete TypeScript Data Class Templates | ✅ Complete |
+| 4.5 | Complete TypeScript API & Client Templates | ✅ Complete |
 
-**Progress**: 4/6 tasks complete (~67%)
+**Progress**: 6/6 tasks complete (100%)
 
-See `plan/implementation-roadmap.md` Phase 4 for detailed task breakdown.
+### Deliverables ✅
+
+- ✅ Complete generic InstanceModel/Instance/InstanceWrite base classes
+- ✅ PygenSDKModel top-level representation
+- ✅ Configuration system (PygenSDKConfig)
+- ✅ Data type converters (Python/TypeScript)
+- ✅ Basic transformer (core properties)
+- ✅ Working Python generator (data classes, API classes, client)
+- ✅ Working TypeScript generator (data classes, API classes, client)
+- ✅ Package structure generation (separate files per view)
+- ✅ Generated Python SDK for ExampleDataModel
+- ✅ Generated TypeScript SDK for ExampleDataModel
 
 ---
 
@@ -506,7 +530,7 @@ Phase 9 completes documentation and enables migration from v1.
 - ✅ **M2**: Phase 2 Complete - Example SDK demonstrating patterns (Dec 27, 2025)
 - ✅ **M2.1**: Phase 3 Task 0 Complete - TypeScript development environment ready (Dec 28, 2025)
 - ✅ **M2.5**: Phase 3 Complete - TypeScript Generic Instance API & Example SDK (Dec 29, 2025)
-- ⏳ **M3**: Phase 4 Complete - Can generate Python and TypeScript SDKs
+- ✅ **M3**: Phase 4 Complete - Can generate Python and TypeScript SDKs (Jan 4, 2026)
 - ⏳ **M4**: Phase 5 Complete - Feature parity achieved
 - ⏳ **M5**: Phase 9 Complete - v2.0.0 release
 
@@ -514,10 +538,10 @@ Phase 9 completes documentation and enables migration from v1.
 
 ## Overall Progress
 
-**Phases Complete**: 4 / 9 (44%)  
-**Current Phase**: Phase 4 - PygenModel & Code Generation (In Progress - Scaffolding Complete)  
-**Next Phase Start**: Phase 4 implementation underway  
-**Estimated Time Remaining**: 12-18 weeks  
+**Phases Complete**: 5 / 9 (56%)  
+**Current Phase**: Phase 4 Complete - Ready for Phase 5  
+**Next Phase**: Phase 5 - CLI, Feature Parity & Advanced Features  
+**Estimated Time Remaining**: 10-16 weeks  
 
 ---
 
@@ -707,12 +731,23 @@ Phase 9 completes documentation and enables migration from v1.
 - Created `ExampleClient` extending `InstanceClient` composing all APIs
 - Demonstrated unpacked filter parameters for type-safe usage
 
+### Phase 4 Completion Notes
+
+Phase 4 completed faster than estimated (5 days vs 4-6 weeks planned). Key accomplishments:
+
+1. **Python Generator** - Full implementation with data class, API class, and client templates
+2. **TypeScript Generator** - Full implementation matching Python patterns for TypeScript idioms
+3. **Generated SDKs** - Both Python and TypeScript SDKs generated for ExampleDataModel
+4. **Package Structure** - Separate files per view for both languages
+
 ### Next Steps
 
-1. Continue **Phase 4: PygenModel & Code Generation** (MVP scope)
-2. **Task 4.4**: Complete TypeScript Data Class Templates - implement templates for read, write, list, filter classes
-3. **Task 4.5**: Complete TypeScript API & Client Templates - generate API classes, client, and package structure
-4. Test generated TypeScript output against ExampleDataModel (`cognite/pygen/_example_datamodel/`)
+1. Begin **Phase 5: CLI, Feature Parity & Advanced Features**
+2. Implement typer-based CLI for SDK generation
+3. Add configuration file support (pygen.yaml)
+4. Implement `generate_sdk_notebook()` for Jupyter workflows
+5. Handle edge cases and complex models (self-referential, circular dependencies)
+6. Add comprehensive type coverage (all CDF property and reference types)
 
 ---
 
