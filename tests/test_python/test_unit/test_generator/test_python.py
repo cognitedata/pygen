@@ -186,7 +186,7 @@ def api_class_file(data_class_file: DataClassFile) -> APIClassFile:
 
 @pytest.fixture(scope="session")
 def api_class_generator(api_class_file: APIClassFile) -> PythonAPIGenerator:
-    return PythonAPIGenerator(api_class_file)
+    return PythonAPIGenerator(api_class_file, top_level="example_sdk_python")
 
 
 EXPECTED_API_IMPORT_STATEMENTS = """from collections.abc import Sequence
@@ -205,7 +205,7 @@ from cognite.pygen._python.instance_api.models.responses import (
     Page,
 )
 
-from ._data_class import (
+from example_sdk_python.data_class import (
     ExampleView,
     ExampleViewFilter,
     ExampleViewList,

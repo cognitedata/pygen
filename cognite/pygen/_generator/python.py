@@ -13,17 +13,19 @@ class PythonGenerator(Generator):
 
     def __init__(self, data_model: DataModelResponseWithViews, config: PygenSDKConfig | None = None) -> None:
         super().__init__(data_model, config)
-        self._top_level = self._get_top_level()
-        self._package_generator = PythonPackageGenerator(self.model, self._top_level, self.config.client_name)
+        self._instance_api_location = self._get_instance_api_location()
+        self._package_generator = PythonPackageGenerator(
+            self.model, self._instance_api_location, self.config.client_name
+        )
 
-    def _get_top_level(self) -> str:
+    def _get_instance_api_location(self) -> str:
         """Get the top-level import path for the instance_api module."""
         if self.config.pygen_as_dependency:
             return "cognite.pygen._python"
         return f"{self.config.top_level_package}"
 
     def create_data_class_code(self, data_class: DataClassFile) -> str:
-        generator = PythonDataClassGenerator(data_class, top_level=self._top_level)
+        generator = PythonDataClassGenerator(data_class, instance_api_location=self._instance_api_location)
         parts: list[str] = [
             generator.create_import_statements(),
         ]
@@ -39,7 +41,9 @@ class PythonGenerator(Generator):
         return "\n\n".join(parts)
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
-        generator = PythonAPIGenerator(api_class, top_level=self._top_level)
+        generator = PythonAPIGenerator(
+            api_class, top_level=self.config.top_level_package, instance_api_location=self._instance_api_location
+        )
         parts: list[str] = [
             generator.create_import_statements(),
             generator.create_api_class_with_init(),
@@ -72,9 +76,9 @@ class PythonGenerator(Generator):
 
 
 class PythonDataClassGenerator:
-    def __init__(self, data_class: DataClassFile, top_level: str = "cognite.pygen._python") -> None:
+    def __init__(self, data_class: DataClassFile, instance_api_location: str = "cognite.pygen._python") -> None:
         self.data_class = data_class
-        self.top_level = top_level
+        self.instance_api_location = instance_api_location
 
     def create_import_statements(self) -> str:
         """Generate import statements for the data class file."""
@@ -84,10 +88,12 @@ class PythonDataClassGenerator:
             "from pydantic import Field",
             "",
         ]
-        import_statements.append(f"from {self.top_level}.instance_api.models._references import ViewReference")
+        import_statements.append(
+            f"from {self.instance_api_location}.instance_api.models._references import ViewReference"
+        )
         if time_fields := set(field.dtype for field in self.data_class.list_fields(dtype={"DateTime", "Date"})):
             import_statements.append(
-                f"from {self.top_level}.instance_api.models._types import {','.join(sorted(time_fields))}"
+                f"from {self.instance_api_location}.instance_api.models._types import {','.join(sorted(time_fields))}"
             )
 
         filter_imports: set[str] = {"    FilterContainer,"}
@@ -96,12 +102,12 @@ class PythonDataClassGenerator:
                 filter_imports.add(f"    {field.filter_name},")
         import_statements.extend(
             [
-                f"from {self.top_level}.instance_api.models.dtype_filters import (",
+                f"from {self.instance_api_location}.instance_api.models.dtype_filters import (",
                 *sorted(filter_imports),
                 ")",
             ]
         )
-        import_statements.append(f"from {self.top_level}.instance_api.models.instance import (")
+        import_statements.append(f"from {self.instance_api_location}.instance_api.models.instance import (")
         import_statements.append("    Instance,")
         has_direct_relation = any(self.data_class.list_fields(dtype="InstanceId"))
         if has_direct_relation:
@@ -290,10 +296,13 @@ def _create_filter_params(field: Field) -> list[FilterParam]:
 
 
 class PythonAPIGenerator:
-    def __init__(self, api_class: APIClassFile, top_level: str = "cognite.pygen._python") -> None:
+    def __init__(
+        self, api_class: APIClassFile, top_level: str, instance_api_location: str = "cognite.pygen._python"
+    ) -> None:
         self.api_class = api_class
         self.data_class = api_class.data_class
         self.top_level = top_level
+        self.instance_api_location = instance_api_location
         self._filter_params: list[FilterParam] | None = None
 
     @property
@@ -316,15 +325,15 @@ class PythonAPIGenerator:
             [
                 "from typing import Literal, overload",
                 "",
-                f"from {self.top_level}.instance_api._api import InstanceAPI",
-                f"from {self.top_level}.instance_api.http_client import HTTPClient",
-                f"from {self.top_level}.instance_api.models import (",
+                f"from {self.instance_api_location}.instance_api._api import InstanceAPI",
+                f"from {self.instance_api_location}.instance_api.http_client import HTTPClient",
+                f"from {self.instance_api_location}.instance_api.models import (",
                 "    Aggregation,",
                 "    InstanceId,",
                 "    PropertySort,",
                 "    ViewReference,",
                 ")",
-                f"from {self.top_level}.instance_api.models.responses import (",
+                f"from {self.instance_api_location}.instance_api.models.responses import (",
                 "    AggregateResponse,",
                 "    Page,",
                 ")",
@@ -335,7 +344,13 @@ class PythonAPIGenerator:
         filter_name = self.data_class.filter.name
         list_name = self.data_class.read_list.name
         lines.extend(
-            ["from ._data_class import (", f"    {read_name},", f"    {filter_name},", f"    {list_name},", ")"]
+            [
+                f"from {self.top_level}.data_class import (",
+                f"    {read_name},",
+                f"    {filter_name},",
+                f"    {list_name},",
+                ")",
+            ]
         )
 
         return "\n".join(lines)

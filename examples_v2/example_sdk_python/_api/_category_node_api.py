@@ -13,8 +13,7 @@ from cognite.pygen._python.instance_api.models.responses import (
     AggregateResponse,
     Page,
 )
-
-from ._data_class import (
+from example_sdk_python.data_classes import (
     CategoryNode,
     CategoryNodeFilter,
     CategoryNodeList,
