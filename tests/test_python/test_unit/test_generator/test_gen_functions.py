@@ -7,12 +7,10 @@ from cognite.pygen._example_datamodel import EXTERNAL_ID, SPACE, VERSION
 from cognite.pygen._generator.config import PygenSDKConfig
 from cognite.pygen._generator.gen_functions import generate_sdk
 from cognite.pygen._python.instance_api.config import PygenClientConfig
-from tests.test_python.constants import EXAMPLES
+from tests.test_python.constants import EXAMPLES, SDK_NAME_PYTHON
 from tests.test_python.test_unit.conftest import MockCredentials
 from tests.test_python.test_unit.test_generator.conftest import create_example_data_model_response
 from tests.test_python.utils import monkeypatch_pygen_client
-
-SDK_NAME_PYTHON = "example_sdk_python"
 
 
 @lru_cache

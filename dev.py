@@ -15,9 +15,15 @@ import typer
 from cognite.client import data_modeling as dm
 from packaging.version import Version, parse
 
-from cognite.pygen._legacy._generator import SDKGenerator, generate_typed, write_sdk_to_disk
+from cognite.pygen._example_datamodel import EXTERNAL_ID, SPACE, VERSION
+from cognite.pygen._generator.config import PygenSDKConfig
+from cognite.pygen._legacy._generator import SDKGenerator, generate_sdk, generate_typed, write_sdk_to_disk
 from cognite.pygen._legacy.utils import MockGenerator, load_cognite_client_from_toml
+from cognite.pygen._python.instance_api.config import PygenClientConfig
+from tests.test_python.constants import SDK_NAME_PYTHON
 from tests.test_python.test_legacy.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
+from tests.test_python.test_unit.test_generator.conftest import create_example_data_model_response
+from tests.test_python.utils import monkeypatch_pygen_client
 
 app = typer.Typer(
     add_completion=False,
@@ -26,6 +32,12 @@ app = typer.Typer(
     pretty_exceptions_show_locals=False,
     pretty_exceptions_enable=False,
 )
+
+EXAMPLE_MODEL = {
+    "space": SPACE,
+    "external_id": EXTERNAL_ID,
+    "version": VERSION,
+}
 
 VALID_CHANGELOG_HEADERS = {"Added", "Changed", "Removed", "Fixed", "Improved"}
 BUMP_OPTIONS = Literal["major", "minor", "patch", "skip"]
@@ -249,6 +261,32 @@ def count_lines() -> None:
     typer.echo(f"{'Total':<20} {total_count:>10,}")
     typer.echo("")
     typer.echo(f"{'plan (markdown)':<20} {plan_count:>10,}")
+
+
+@app.command("generate-v2", help="Generate v2 of Pygen SDKs (work in progress)")
+def generate_v2() -> None:
+    class MockCredentials:
+        def authorization_header(self) -> tuple[str, str]:
+            return "Authorization", "Bearer mock_token"
+
+    with monkeypatch_pygen_client() as mocked_client:
+        mocked_client.data_models.retrieve.return_value = [create_example_data_model_response()]
+        sdk_config = PygenSDKConfig(
+            top_level_package=SDK_NAME_PYTHON,
+            client_name="ExamplePygenClient",
+        )
+        client_config = PygenClientConfig(
+            cdf_url="https://example.cognitedata.com",
+            project="pygen",
+            credentials=MockCredentials(),
+        )
+        sdk_files = generate_sdk(
+            **EXAMPLE_MODEL,
+            sdk_config=sdk_config,
+            client_config=client_config,
+            output_format="python",
+        )
+    return sdk_files
 
 
 def _remove_top_lines(text: str, lines: int) -> str:
