@@ -22,7 +22,7 @@ from cognite.pygen._legacy._generator import SDKGenerator, generate_typed, write
 from cognite.pygen._legacy.utils import MockGenerator, load_cognite_client_from_toml
 from cognite.pygen._python.instance_api.config import PygenClientConfig
 from tests.test_python.constants import EXAMPLES as EXAMPLES_V2
-from tests.test_python.constants import SDK_NAME_PYTHON
+from tests.test_python.constants import SDK_NAME_PYTHON, SDK_NAME_TYPESCRIPT
 from tests.test_python.test_legacy.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
 from tests.test_python.test_unit.test_generator.conftest import create_example_data_model_response
 from tests.test_python.utils import monkeypatch_pygen_client
@@ -290,6 +290,16 @@ def generate_v2() -> None:
         )
         for path, content in sdk_files.items():
             output_path = EXAMPLES_V2 / SDK_NAME_PYTHON / path
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(content, encoding="utf-8", newline="\n")
+        sdk_files = generate_sdk(
+            **EXAMPLE_MODEL,
+            sdk_config=sdk_config,
+            client_config=client_config,
+            output_format="typescript",
+        )
+        for path, content in sdk_files.items():
+            output_path = EXAMPLES_V2 / SDK_NAME_TYPESCRIPT / path
             output_path.parent.mkdir(parents=True, exist_ok=True)
             output_path.write_text(content, encoding="utf-8", newline="\n")
     typer.echo("v2 SDK generation complete.")
