@@ -44,7 +44,7 @@ class PythonGenerator(Generator):
         generator = PythonAPIGenerator(
             api_class, top_level=self.config.top_level_package, instance_api_location=self._instance_api_location
         )
-        parts: list[str] = [
+        parts = [
             generator.create_import_statements(),
             generator.create_api_class_with_init(),
             generator.create_retrieve_method(),
@@ -53,7 +53,7 @@ class PythonGenerator(Generator):
             generator.create_iterate_method(),
             generator.create_list_method(),
         ]
-        return "\n\n".join(parts)
+        return "\n".join(parts)
 
     def create_data_class_init_code(self, model: PygenSDKModel) -> str:
         """Generate the data_classes/__init__.py file."""
@@ -337,7 +337,6 @@ class PythonAPIGenerator:
                 "    AggregateResponse,",
                 "    Page,",
                 ")",
-                "",
             ]
         )
         read_name = self.data_class.read.name
@@ -360,10 +359,11 @@ class PythonAPIGenerator:
         api_name = self.api_class.name
         read_name = self.data_class.read.name
         list_name = self.data_class.read_list.name
-        view_id = self.data_class.view_id
         instance_type = self.data_class.instance_type
+        view_ref_str = self._create_view_ref()
 
         return f'''
+
 def _create_property_ref(view_ref: ViewReference, property_name: str) -> list[str]:
     """Create a property reference for filtering."""
     return [view_ref.space, f"{{view_ref.external_id}}/{{view_ref.version}}", property_name]
@@ -373,10 +373,21 @@ class {api_name}(InstanceAPI[{read_name}, {list_name}]):
     """API for {read_name} instances with type-safe filter methods."""
 
     def __init__(self, http_client: HTTPClient) -> None:
-        view_ref = ViewReference(
-            space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
-        )
+        view_ref = {view_ref_str}
         super().__init__(http_client, view_ref, "{instance_type}", {list_name})'''
+
+    def _create_view_ref(self) -> str:
+        view_id = self.data_class.view_id
+        one_liner = (
+            f'ViewReference(space="{view_id.space}", '
+            f'external_id="{view_id.external_id}", '
+            f'version="{view_id.version}")'
+        )
+        if len(one_liner) <= 120:
+            return one_liner
+        return f"""ViewReference(
+            space="{view_id.space}", external_id="{view_id.external_id}", version="{view_id.version}"
+        )"""
 
     def create_retrieve_method(self) -> str:
         """Generate the retrieve method with overloads."""
