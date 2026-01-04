@@ -52,12 +52,11 @@ def actual_python_sdk_example_model() -> dict[Path, str]:
     return sdk_files
 
 
-@pytest.mark.xfail(reason="Not implemented yet")
 @pytest.mark.parametrize("file_path", load_example_model(SDK_NAME_PYTHON).keys(), ids=lambda p: p.as_posix())
 def test_generate_python_sdk_example_model(file_path: Path, actual_python_sdk_example_model: dict[Path, str]) -> None:
-    expected_filepath = EXAMPLES / file_path
+    expected_filepath = EXAMPLES / SDK_NAME_PYTHON / file_path
     if not expected_filepath.exists():
-        pytest.fail(f"Expected file {file_path} not found in examples directory.")
+        pytest.fail(f"Expected file {file_path} not found in {EXAMPLES.as_posix()!r} directory.")
     expected_content = expected_filepath.read_text(encoding="utf-8")
 
     actual_content = actual_python_sdk_example_model.get(file_path)
