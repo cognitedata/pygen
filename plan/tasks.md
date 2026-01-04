@@ -20,5 +20,5 @@ Note this task will be done inbetween phases or once all phases are done.
    - This is to ensure appropriate logging and tracking on the server side.
 4. **Find a more elegant solution for `_create_filter_params`** in the Python generator.
    - The current implementation by Claude feels wrong. I suspect there is a more elegant
-     solution.
+     solution. Same for the typescript generator.
 

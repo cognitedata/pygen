@@ -1,17 +1,21 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from pydantic.alias_generators import to_snake
+
+from cognite.pygen._client.models import DataModelResponseWithViews
 from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile, Field, PygenSDKModel
 from cognite.pygen._typescript import instance_api
 
+from .config import PygenSDKConfig
 from .generator import Generator
 
 
 class TypeScriptGenerator(Generator):
     format = "typescript"
 
-    def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        super().__init__(*args, **kwargs)
+    def __init__(self, data_model: DataModelResponseWithViews, config: PygenSDKConfig | None = None) -> None:
+        super().__init__(data_model, config)
         self._package_generator = TypeScriptPackageGenerator(self.model, self.config.client_name)
 
     def generate(self) -> dict[Path, str]:
@@ -114,12 +118,8 @@ class TypeScriptGenerator(Generator):
     @staticmethod
     def _to_view_const_name(class_name: str) -> str:
         """Convert PascalCase class name to UPPER_SNAKE_CASE view constant name."""
-        result: list[str] = []
-        for i, char in enumerate(class_name):
-            if char.isupper() and i > 0:
-                result.append("_")
-            result.append(char.upper())
-        return "".join(result) + "_VIEW"
+        snake_cased = to_snake(class_name).upper()
+        return f"{snake_cased}_VIEW"
 
     def create_api_class_code(self, api_class: APIClassFile) -> str:
         """Generate API class code for a single view."""
@@ -546,13 +546,7 @@ class TypeScriptAPIGenerator:
 
     def _create_view_const_name(self) -> str:
         """Create the view constant name in UPPER_SNAKE_CASE."""
-        name = self.data_class.read.name
-        result: list[str] = []
-        for i, char in enumerate(name):
-            if char.isupper() and i > 0:
-                result.append("_")
-            result.append(char.upper())
-        return "".join(result) + "_VIEW"
+        return TypeScriptGenerator._to_view_const_name(self.data_class.read.name)
 
     @property
     def filter_params(self) -> list[TSFilterParam]:
@@ -629,17 +623,17 @@ function createPropertyRef(
             lines.extend(
                 [
                     "    cursor?: string;",
-                    "    limit?: number;",
                 ]
             )
-        elif include_sort:
+        if include_sort:
             lines.extend(
                 [
                     "    sortBy?: string;",
                     "    sortDirection?: SortDirection;",
-                    "    limit?: number;",
                 ]
             )
+        if include_pagination or include_sort:
+            lines.append("    limit?: number;")
 
         return "\n".join(lines)
 
