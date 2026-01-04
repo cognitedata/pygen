@@ -1,5 +1,7 @@
 from typing import ClassVar, Literal
 
+from pydantic import Field
+
 from cognite.pygen._python.instance_api.models._references import ViewReference
 from cognite.pygen._python.instance_api.models.dtype_filters import (
     FilterContainer,

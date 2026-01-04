@@ -78,14 +78,13 @@ class PythonDataClassGenerator:
 
     def create_import_statements(self) -> str:
         """Generate import statements for the data class file."""
-        import_statements: list[str] = ["from typing import ClassVar, Literal", "", "from pydantic import Field", ""]
-        has_direct_relation = any(self.data_class.list_fields(dtype="InstanceId"))
-        if has_direct_relation:
-            import_statements.append(
-                f"from {self.top_level}.instance_api.models._references import InstanceId, ViewReference"
-            )
-        else:
-            import_statements.append(f"from {self.top_level}.instance_api.models._references import ViewReference")
+        import_statements: list[str] = [
+            "from typing import ClassVar, Literal",
+            "",
+            "from pydantic import Field",
+            "",
+        ]
+        import_statements.append(f"from {self.top_level}.instance_api.models._references import ViewReference")
         if time_fields := set(field.dtype for field in self.data_class.list_fields(dtype={"DateTime", "Date"})):
             import_statements.append(
                 f"from {self.top_level}.instance_api.models._types import {','.join(sorted(time_fields))}"
@@ -104,6 +103,7 @@ class PythonDataClassGenerator:
         )
         import_statements.append(f"from {self.top_level}.instance_api.models.instance import (")
         import_statements.append("    Instance,")
+        has_direct_relation = any(self.data_class.list_fields(dtype="InstanceId"))
         if has_direct_relation:
             import_statements.append("    InstanceId,")
         import_statements.append("    InstanceList,")
