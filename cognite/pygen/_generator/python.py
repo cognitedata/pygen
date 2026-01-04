@@ -50,8 +50,7 @@ class PythonGenerator(Generator):
         # Generate top-level __init__.py
         sdk[Path("__init__.py")] = self.create_package_init_code(model)
 
-        # Add instance_api module if not using pygen as dependency
-        if self.format != "python" or not self.config.pygen_as_dependency:
+        if not self.config.pygen_as_dependency:
             sdk.update(self.add_instance_api())
 
         return sdk

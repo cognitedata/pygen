@@ -1,10 +1,38 @@
-from cognite.pygen._pygen_model import DataClass, DataClassFile
+from pathlib import Path
+
+from cognite.pygen._pygen_model import APIClassFile, DataClass, DataClassFile
 
 from .generator import Generator
 
 
 class TypeScriptGenerator(Generator):
     format = "typescript"
+
+    def generate(self) -> dict[Path, str]:
+        model = self.model
+        sdk: dict[Path, str] = {}
+
+        # Generate data class files
+        for data_class in model.data_classes:
+            file_path = Path(f"data_classes/{data_class.filename}")
+            sdk[file_path] = self.create_data_class_code(data_class)
+
+        sdk[Path("data_classes/index.ts")] = self.create_data_class_index()
+
+        # Generate API class files
+        for api_class in model.api_classes:
+            file_path = Path(f"_api/{api_class.filename}")
+            sdk[file_path] = self.create_api_class_code(api_class)
+
+        sdk[Path("_api/index.ts")] = self.create_api_index_code()
+
+        # Generate client file
+        sdk[Path("_client.ts")] = self.create_client_code()
+
+        sdk[Path("index.ts")] = self.create_package_index_code()
+
+        sdk.update(self.add_instance_api())
+        return sdk
 
     def create_data_class_code(self, data_class: DataClassFile) -> str:
         generator = TypeScriptDataClassGenerator(data_class)
@@ -24,6 +52,24 @@ class TypeScriptGenerator(Generator):
             ]
         )
         return "\n\n".join(parts)
+
+    def create_data_class_index(self) -> str:
+        return ""
+
+    def create_api_class_code(self, api_class: APIClassFile) -> str:
+        return ""
+
+    def create_api_index_code(self) -> str:
+        return ""
+
+    def create_client_code(self) -> str:
+        return ""
+
+    def create_package_index_code(self) -> str:
+        return ""
+
+    def add_instance_api(self) -> dict[Path, str]:
+        return {}
 
 
 class TypeScriptDataClassGenerator:
