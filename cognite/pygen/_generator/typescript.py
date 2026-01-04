@@ -108,7 +108,7 @@ class TypeScriptDataClassGenerator:
             reference_imports.append("InstanceId")
         if not is_node:
             reference_imports.append("NodeReference")
-
+        filter_import_str = ",\n  ".join(sorted(filter_imports))
         return f"""/**
  * Data classes for {self.data_class.read.display_name}.
  *
@@ -121,7 +121,7 @@ import type {{
 import {{ InstanceList }} from "../instance_api/types/instance.ts";
 import type {{ {", ".join(sorted(reference_imports))} }} from "../instance_api/types/references.ts";
 import {{
-  {",\n  ".join(sorted(filter_imports))},
+  {filter_import_str},
 }} from "../instance_api/types/dtypeFilters.ts";"""
 
     def create_view_reference_constant(self) -> str:
