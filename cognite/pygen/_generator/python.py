@@ -78,17 +78,7 @@ class PythonDataClassGenerator:
 
     def create_import_statements(self) -> str:
         """Generate import statements for the data class file."""
-        import_statements: list[str] = [
-            "from typing import ClassVar, Literal",
-            "",
-        ]
-        if any(
-            field.default_value is not None or field.cdf_prop_id != field.name
-            for field in self.data_class.list_fields()
-        ):
-            # Any field has a default value or alias, need to import Field from pydantic
-            import_statements.append("from pydantic import Field")
-            import_statements.append("")
+        import_statements: list[str] = ["from typing import ClassVar, Literal", "", "from pydantic import Field", ""]
         has_direct_relation = any(self.data_class.list_fields(dtype="InstanceId"))
         if has_direct_relation:
             import_statements.append(
