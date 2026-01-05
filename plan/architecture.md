@@ -1,0 +1,952 @@
+# Pygen Rewrite - Architecture Design
+
+## Overview
+
+This document outlines the proposed architecture for the Pygen rewrite. The architecture is designed to address the core problems: performance, lazy evaluation, multi-language support, maintainability, API service support, and upfront validation with graceful degradation.
+
+## Core Architectural Principles
+
+1. **Separation of Concerns**: Clear boundaries between client operations, code generation, and runtime behavior
+2. **Pydantic-First**: All data models built on pydantic for validation, serialization, and performance
+3. **Language-Agnostic Core**: Internal representation that can target multiple output languages
+4. **Lazy by Default**: All data access patterns support lazy evaluation
+5. **Testability**: Design for >90% test coverage from the start
+6. **Extensibility**: Easy to add new languages, features, and API endpoints
+
+## High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Pygen Core System                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │     1. Pygen Client (_client/)                       │   │
+│  │  - HTTPClient wrapper (httpx-based)                 │   │
+│  │  - Authentication (OAuth2, Token)                   │   │
+│  │  - CRUD for Spaces, DataModels, Views, Containers   │   │
+│  │  - Pydantic models for API objects                  │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │     2. Python SDK (_python/)                         │   │
+│  │  - instance_api/: InstanceClient, InstanceAPI       │   │
+│  │  - example/: Example SDK extending generic classes  │   │
+│  │  - Serves as target for generated Python code       │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │     3. TypeScript SDK (_typescript/)                 │   │
+│  │  - instance_api/: InstanceClient, InstanceAPI       │   │
+│  │  - example/: Example SDK extending generic classes  │   │
+│  │  - Serves as target for generated TypeScript code   │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │     4. PygenModel (_pygen_model/)                    │   │
+│  │  - Internal model for code generation               │   │
+│  │  - Field, Connection, DataClass representations     │   │
+│  │  - Validation layer for data models                 │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                  │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │     5. Generator (_generator/)                       │   │
+│  │  - Transformer: CDF ViewResponse → PygenModel       │   │
+│  │  - PythonGenerator: PygenModel → Python code        │   │
+│  │  - TypeScriptGenerator: PygenModel → TS code        │   │
+│  │  - Template-based (f-strings) with formatting       │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Component Details
+
+### 1. Pygen Client (Runtime)
+
+**Purpose**: Replace `cognite-sdk` with a lightweight, purpose-built client for data modeling operations. This
+lightweight client will not be exposed to end users directly but will be used to fetch data models, views,
+containers, and spaces from the CDF API to drive code generation and runtime operations.
+
+**Key Features**:
+- Internal HTTPClient wrapper around `httpx` for modern async/sync support
+- Pydantic models for all API objects (DataModel, View, Container, Space)
+- Connection pooling and rate limiting. Note that read, write and delete will have different concurrency limits.
+- Automatic retry logic with exponential backoff
+- Streaming support for large datasets
+- Query builder/optimizer for simplifying complex API interactions
+- Full type hints for IDE support
+
+**Structure**:
+This is a simplified representation of the client structure, the actual implementation will be more detailed.
+```
+pygen/client/
+├── __init__.py
+├── core.py              # Main PygenClient class
+├── auth/              # Authentication handlers
+├── http_client/       # Internal HTTPClient wrapper (httpx)
+├── query_builder.py     # Query builder/optimizer
+├── models/              # Pydantic models for API objects
+│   ├── __init__.py
+│   ├── data_model.py
+│   ├── view.py
+│   ├── container.py
+│   └── space.py
+├── resources/           # Resource-specific clients
+│   ├── __init__.py
+│   ├── resources.py    # This file contains the common logic for the iterate, list, create, delete, retrieve methods for all resources.
+│   ├── data_models.py
+│   ├── views.py
+│   ├── containers.py
+│   └── spaces.py
+└── exceptions.py        # Custom exceptions
+```
+
+**API Design Example**:
+
+```python
+from cognite.pygen._client import PygenClient
+from cognite.pygen._python.instance_api.config import PygenClientConfig
+from cognite.pygen._client.models import DataModelReference, DataModelRequest
+
+client = PygenClient(config=PygenClientConfig(...))
+
+# CRUD operations with pydantic models, all CRUD methods support Sequence inputs
+data_model = client.data_models.retrieve(
+    [
+        DataModelReference(
+            space="my_space",
+            external_id="my_model",
+            version="v1",
+        )
+    ]
+)
+delete_result = client.data_models.delete(
+    [
+        DataModelReference(
+            space="my_space",
+            external_id="my_model",
+            version="v1",
+        )
+    ]
+)
+create_result = client.data_models.create(
+    [
+        DataModelRequest(
+            space="my_space",
+            external_id="my_model",
+            version="v1",
+
+        )
+    ]
+)
+page = client.data_models.iterate(
+    space="my_space",
+    include_global=True,
+    cursor=None,
+    limit=100,
+)
+print(page.cursor)
+print(page.items)
+
+all_models = client.data_models.list(
+    space="my_space",
+    include_global=True,
+    limit=None,
+)
+
+
+
+
+```
+
+### 2. Generic Instance API (Python)
+
+**Purpose**: Provide generic base classes for instance CRUD operations that can be extended for specific views.
+
+**Key Features**:
+- Generic `InstanceModel`, `Instance`, `InstanceWrite` base classes
+- `InstanceClient` for CRUD operations (upsert, delete)
+- `InstanceAPI` base class for view-specific operations (retrieve, list, iterate, search, aggregate)
+- Support for both node and edge instance types
+- Pagination and lazy iteration
+- Pandas integration for data analysis
+
+**Structure**:
+```
+pygen/_generation/python/_instance_api/
+├── __init__.py
+├── _instance.py         # Base models (Instance, InstanceWrite, InstanceList)
+├── _client.py           # InstanceClient for CRUD
+├── _api.py              # InstanceAPI base class
+└── _utils.py            # Helper utilities
+
+pygen/_generation/python/example/
+├── __init__.py
+├── _data_class.py       # Example data classes extending Instance
+├── _api.py              # Example API classes extending InstanceAPI
+└── _client.py           # Example client extending InstanceClient
+```
+
+**Design Pattern**:
+```python
+# Generic base (in _instance_api/)
+class InstanceAPI(Generic[T_InstanceWrite, T_Instance, T_InstanceList]):
+    def retrieve(self, id: ...) -> T_Instance | T_InstanceList | None: ...
+    def list(self) -> T_InstanceList: ...
+    def iterate(self) -> Page[T_InstanceList]: ...
+
+# View-specific API (generated or hand-written example)
+class PrimitiveNullableAPI(InstanceAPI[PrimitiveNullableWrite, PrimitiveNullable, PrimitiveNullableList]):
+    # Inherits all methods with proper types
+```
+
+### 3. Generic Instance API (TypeScript)
+
+**Purpose**: TypeScript equivalent of the Python generic instance API.
+
+**Key Features**:
+- Generic instance interfaces/classes
+- InstanceClient for CRUD operations
+- InstanceAPI base class for view-specific operations
+- TypeScript generics for type safety
+- Async/await patterns for API calls
+
+**Structure**:
+```
+pygen/_generation/typescript/_instance_api/
+├── index.ts
+├── instance.ts          # Base interfaces/classes
+├── client.ts            # InstanceClient
+└── api.ts               # InstanceAPI base class
+
+pygen/_generation/typescript/example/
+├── index.ts
+├── dataClasses.ts       # Example data classes
+├── api.ts               # Example API classes
+└── client.ts            # Example client
+```
+
+### 4. PygenModel
+
+**Purpose**: Internal representation of CDF data models used as the basis for code generation in Python and TypeScript.
+
+**Key Features**:
+- Validation layer upfront (before PygenModel creation)
+- Field and connection representations
+- DataClass models for each view
+- Transformer: CDF ViewResponse → PygenModel
+
+**Structure**:
+```
+cognite/pygen/_pygen_model/
+├── __init__.py
+├── _model.py            # CodeModel base class
+├── _field.py            # Field representation
+├── _connection.py       # Connection/relationship representation
+├── _data_class.py       # DataClass, ReadDataClass, WriteDataClass
+└── _pygen_model.py      # Top-level PygenModel
+```
+
+**PygenModel Structure**:
+```python
+class CodeModel(BaseModel):
+    """Base class for code models used in code generation."""
+    pass
+
+class Field(CodeModel):
+    """Property representation"""
+    cdf_prop_id: str
+    name: str
+    type_hint: str
+    filter_name: str | None = None
+    description: str | None = None
+
+class Connection(CodeModel):
+    """Connection/relationship representation"""
+    name: str
+    target_view: ViewReference
+    cardinality: Literal["one", "many"]
+    connection_type: Literal["direct_relation", "edge", "reverse_direct_relation"]
+
+class DataClass(CodeModel):
+    """View representation"""
+    view_id: ViewReference
+    name: str
+    fields: list[Field]
+    connections: list[Connection]
+    instance_type: Literal["node", "edge"]
+    display_name: str
+    description: str
+
+class ReadDataClass(DataClass):
+    """Read-side data class with reference to write class"""
+    write_class_name: str | None = None
+
+class PygenModel(CodeModel):
+    """Complete data model representation"""
+    space: str
+    external_id: str
+    version: str
+    data_classes: list[DataClass]
+    client_name: str
+    default_instance_space: str
+```
+
+**Generation Flow**:
+```
+CDF Data Model (DataModelResponse with ViewResponses)
+   ↓ (validation)
+Validated Model (warnings generated for issues)
+   ↓ (transformer)
+PygenModel (internal representation)
+   ↓ (generator)
+Python Code  or  TypeScript Code
+   ↓ (formatter)
+Formatted SDK files
+```
+
+### 5. Code Generator
+
+**Purpose**: Generate SDK code from PygenModel that follows the patterns established in Phases 2-3 (generic API + example SDK).
+
+**Key Features**:
+- Generates code that extends generic InstanceAPI/InstanceClient
+- Template-based generation using Python f-strings
+- Post-processing with formatters (ruff for Python, deno fmt for TypeScript)
+- Generates data classes extending Instance/InstanceWrite
+- Generates API classes extending InstanceAPI
+- Generates client classes extending InstanceClient
+
+**Structure**:
+```
+cognite/pygen/_generator/
+├── __init__.py
+├── config.py            # PygenSDKConfig
+├── gen_functions.py     # generate_sdk(), generate_sdk_notebook()
+├── generator.py         # Generator base class
+├── transformer.py       # CDF ViewResponse → PygenModel
+├── python.py            # PythonGenerator
+├── typescript.py        # TypeScriptGenerator
+└── templates/
+    ├── python/                     # Python f-string templates
+    │   ├── data_class.py           # Extends Instance/InstanceWrite
+    │   ├── api_class.py            # Extends InstanceAPI
+    │   ├── client.py               # Extends InstanceClient
+    │   └── __init__.py
+    └── typescript/                 # TypeScript f-string templates
+        ├── data_class.ts
+        ├── api_class.ts
+        ├── client.ts
+        └── index.ts
+```
+
+**Generator Pattern**:
+```python
+class Generator(ABC):
+    format: ClassVar[str]
+    
+    def generate(self, pygen_model: PygenModel) -> dict[Path, str]:
+        """Generate SDK code from PygenModel"""
+        raise NotImplementedError()
+
+class PythonGenerator(Generator):
+    format = "python"
+    
+    def generate(self, pygen_model: PygenModel) -> dict[Path, str]:
+        """Generate Python SDK from PygenModel"""
+        # For each DataClass in pygen_model:
+        #   - Generate data class extending Instance/InstanceWrite
+        #   - Generate API class extending InstanceAPI[Write, Read, List]
+        #   - Generate filter container class
+        # Generate client class extending InstanceClient
+        ...
+```
+
+**Generated Code Pattern** (matches Phase 2 example):
+```python
+# Generated data class
+class MyView(Instance):
+    _view_id = ViewRef(space="my_space", external_id="MyView", version="1")
+    my_property: str
+    # ... other properties
+
+# Generated API class
+class MyViewAPI(InstanceAPI[MyViewWrite, MyView, MyViewList]):
+    # Inherits retrieve, list, iterate, search, aggregate
+    # Type-safe filter methods with unpacked parameters
+    pass
+
+# Generated client
+class MyClient(InstanceClient):
+    def __init__(self, config: PygenClientConfig):
+        super().__init__(config)
+        self.my_view = MyViewAPI(self._http_client, MyView._view_id, "node")
+```
+
+
+## Data Flow
+
+### Development Flow (Phases 2-3)
+```
+Phase 2: Build Generic Python API
+   ↓
+1. Create InstanceModel, Instance, InstanceWrite base classes
+2. Create InstanceClient for CRUD
+3. Create InstanceAPI base class
+4. Build example SDK manually extending generic classes
+   ↓
+Phase 3: Build Generic TypeScript API
+   ↓
+5. Create equivalent TypeScript interfaces/classes
+6. Create TypeScript InstanceClient and InstanceAPI
+7. Build example TypeScript SDK
+```
+
+### Generation Flow (Phase 5+)
+```
+1. User calls generate_sdk() with data model reference
+   ↓
+2. Pygen Client fetches DataModel with Views from CDF API
+   ↓
+3. Validation Layer validates model
+   - Checks for incomplete models, missing relations
+   - Generates warnings for issues
+   - Filters out problematic views/properties
+   ↓
+4. Transformer converts validated CDF models to PygenModel
+   - Apply naming conventions (Python or TypeScript)
+   - Handle language-specific reserved words
+   - Resolve view references and relationships
+   ↓
+5. Generator creates code from PygenModel
+   - Generates data classes extending Instance/InstanceWrite
+   - Generates API classes extending InstanceAPI
+   - Generates client extending InstanceClient
+   - Generates filter containers
+   ↓
+6. Formatter processes generated code
+   - ruff for Python
+   - prettier/deno fmt for TypeScript
+   ↓
+7. Output returned as dict[Path, str]
+   - Optionally written to disk based on config
+```
+
+### Runtime Flow (Using Generated SDK)
+```
+1. User imports generated SDK
+   ↓
+2. User creates client instance (extends InstanceClient)
+   client = MyGeneratedClient(config)
+   ↓
+3. User accesses view-specific API (extends InstanceAPI)
+   api = client.my_view  # MyViewAPI instance
+   ↓
+4. User calls methods on API
+   items = api.list()  # Returns MyViewList
+   item = api.retrieve(id)  # Returns MyView or None
+   ↓
+5. InstanceAPI uses InstanceClient for CRUD
+   ↓
+6. InstanceClient uses HTTPClient to call CDF API
+   ↓
+7. Data deserialized into view-specific classes (extend Instance)
+   ↓
+8. User processes strongly-typed data
+```
+
+### API Service Flow (New Goal 5)
+```
+1. HTTP request to Pygen API service
+   POST /generate with data model specification
+   ↓
+2. Service validates request
+   ↓
+3. Service runs generation flow (steps 2-6 from Generation Flow)
+   ↓
+4. Service returns generated SDK as:
+   - ZIP file of source files, or
+   - Package tarball, or
+   - Direct code response
+   ↓
+5. Client downloads and uses generated SDK
+```
+
+## Key Design Decisions
+
+### 1. Why httpx over requests?
+- Async/sync support
+- HTTP/2 support
+- Better connection pooling
+- Modern, actively maintained
+- Better performance characteristics
+
+### 2. Why pydantic v2?
+- Performance improvements (rust core)
+- Better validation
+- JSON schema generation
+- Type safety
+- Serialization performance
+
+### 3. Why lazy by default?
+- Scalability with large datasets
+- Reduced memory footprint
+- Better user experience (faster initial response)
+- Explicit eager loading when needed
+
+### 4. Why build generic API before IR?
+- Establishes concrete patterns for generated code
+- Validates design with real examples
+- Provides immediate value (can use generic API directly)
+- Informs IR design based on actual needs
+- Easier to test patterns before codifying in IR
+
+### 5. Why PygenModel layer after generic API?
+- Can learn from concrete implementations (Phases 2-3)
+- Decouples parsing from generation
+- Enables multi-language support once patterns are proven
+- Easier to test each stage
+- Single representation drives both Python and TypeScript generators
+- Clear separation between CDF models and code generation concerns
+
+### 6. Why extend generic classes (not generate from scratch)?
+- Reduces code duplication
+- Centralizes CRUD logic in InstanceClient
+- Easy to add features to all generated SDKs
+- Clear separation: generic operations vs view-specific logic
+- Type safety through generics
+- Easier to maintain and evolve
+
+### 7. Why validation before PygenModel?
+- Catches issues early in the pipeline
+- Allows graceful degradation decisions before PygenModel creation
+- Prevents invalid models from entering PygenModel
+- Better error messages for users
+- Enables partial generation for incomplete models
+
+### 8. Why f-string-based generation (instead of Jinja2)?
+- Simpler implementation with fewer dependencies
+- More readable and debuggable code
+- Native Python syntax without learning another templating language
+- Easier to maintain and modify
+- Better IDE support (syntax highlighting, type checking)
+- Can generate code that extends generic classes
+
+## Performance Considerations
+
+### Client Performance
+- Connection pooling (httpx default)
+- Request batching where possible
+- Streaming for large responses
+- Compression support
+- Efficient pagination
+
+### Generation Performance
+- Parallel generation of independent classes
+- Incremental generation (only changed files)
+- Template caching
+- Efficient IR representation
+
+### Runtime Performance
+- Lazy evaluation reduces initial load
+- Efficient serialization (pydantic v2)
+- Query optimization
+- Result caching where appropriate
+
+## Extensibility Points
+
+### Adding a New Language
+1. Create language-specific generator in `pygen/generation/{language}/`
+2. Implement `BaseGenerator` interface
+3. Create f-string based template functions
+4. Add formatter integration
+5. Add tests
+
+### Adding New API Operations
+1. Add pydantic model in `pygen/client/models/`
+2. Add resource methods in `pygen/client/resources/`
+3. Update validation rules if needed
+4. Update IR if needed
+5. Update generators if new patterns needed
+6. Add tests
+
+### Adding New Validation Rules
+1. Add rule in `pygen/validation/rules.py`
+2. Add warning type if needed
+3. Update filtering logic
+4. Add tests for edge cases
+
+### Custom Generation Logic
+1. Users can extend generator classes
+2. Override template functions for custom output
+3. Full access to PygenModel objects in generators
+
+### API Service Endpoints (Goal 5)
+1. `/generate` - Generate SDK from specification
+2. `/validate` - Validate data model
+3. `/health` - Service health check
+4. `/version` - Pygen version info
+
+## Migration Strategy
+
+### Backward Compatibility
+- Generated code should maintain similar API surface
+- Provide migration guide for breaking changes
+- Version generated code with metadata
+- Support both old and new client side-by-side initially
+
+### Deprecation Path
+1. Release new version with deprecation warnings
+2. Provide migration tools where possible
+3. Document all breaking changes
+4. Support old version for defined period
+5. Clear communication timeline
+
+## Security Considerations
+
+- Secure credential handling
+- No secrets in generated code
+- HTTPS-only by default
+- Rate limiting to prevent abuse
+- Input validation on all API calls
+- Audit logging support
+
+## Monitoring and Observability
+
+- Structured logging throughout
+- Performance metrics collection
+- Error tracking integration
+- Request/response logging (opt-in)
+- Generation analytics
+
+## Package Structure and Shipping
+
+The SDK generator supports multiple languages. Each language has a generic part (Instance API) and templates for generating model-specific code. Tests are run for all languages but are not shipped with the package.
+
+### Directory Structure
+
+```
+cognite/pygen/
+├── __init__.py                        # Public API exports
+├── _version.py                        # Version info
+├── _client/                           # Pygen Client (internal)
+│   ├── __init__.py
+│   ├── auth/                          # Authentication handlers
+│   ├── http_client/                   # HTTPClient wrapper
+│   ├── models/                        # Pydantic models for CDF API
+│   └── resources/                     # Resource APIs (Spaces, Views, etc.)
+├── _example_datamodel/                # Example data model for patterns
+│   └── ...
+├── _generator/                        # Code generation engine
+│   ├── __init__.py
+│   ├── config.py                      # PygenSDKConfig
+│   ├── gen_functions.py               # generate_sdk(), generate_sdk_notebook()
+│   ├── generator.py                   # Generator base class
+│   ├── transformer.py                 # CDF → PygenModel
+│   ├── python.py                      # PythonGenerator
+│   ├── typescript.py                  # TypeScriptGenerator
+│   └── templates/                     # f-string templates (SHIPPED)
+│       ├── python/
+│       └── typescript/
+├── _legacy/                           # v1 code (delete after v2.0.0)
+│   └── ...
+├── _pygen_model/                      # Internal model for code generation
+│   ├── __init__.py
+│   ├── _model.py                      # CodeModel base class
+│   ├── _field.py                      # Field representation
+│   ├── _connection.py                 # Connection representation
+│   ├── _data_class.py                 # DataClass, ReadDataClass
+│   └── _pygen_model.py                # PygenModel top-level
+├── _python/                           # Python SDK (SHIPPED)
+│   ├── instance_api/                  # Generic InstanceClient, InstanceAPI
+│   │   ├── __init__.py
+│   │   ├── _instance.py
+│   │   ├── _client.py
+│   │   ├── _api.py
+│   │   ├── config.py
+│   │   └── filters.py
+│   └── example/                       # Example SDK extending generic classes
+│       └── ...
+├── _typescript/                       # TypeScript SDK (SHIPPED)
+│   ├── instance_api/                  # Generic InstanceClient, InstanceAPI
+│   │   └── ...
+│   └── example/                       # Example SDK extending generic classes
+│       └── ...
+├── _utils/                            # Utility functions
+│   └── ...
+└── cli.py                             # CLI interface (typer)
+
+tests/                                 # NOT SHIPPED - tests only
+├── conftest.py                        # Shared fixtures
+├── tests_client/                      # Pygen Client tests
+│   └── ...
+├── tests_python/                      # Python SDK tests
+│   ├── test_instance_api.py
+│   ├── test_generation.py
+│   └── generated/                     # Temp generated code for testing
+├── tests_typescript/                  # TypeScript SDK tests
+│   ├── __tests__/                     # Vitest/Deno tests
+│   │   ├── instance.test.ts
+│   │   └── client.test.ts
+│   └── generated/                     # Temp generated code for testing
+├── tests_generator/                   # Code generation tests
+│   ├── test_transformer.py
+│   ├── test_pygen_model.py
+│   └── test_generators.py
+└── integration/                       # Cross-language integration tests
+    └── ...
+
+# Root level TypeScript/Deno configuration (shared)
+deno.json                              # Deno configuration
+package.json                           # TypeScript dev dependencies (legacy/optional)
+tsconfig.json                          # TypeScript configuration
+node_modules/                          # Shared dependencies (gitignored)
+```
+
+### What Gets Shipped
+
+The Python package ships:
+- `instance_api/` - Generic runtime code for each language
+- `examples/` - Basic examples showing extension patterns
+- `templates/` - Code generation templates
+
+The package does NOT ship:
+- `tests/` - Test code stays in the repository
+- `generated/` - Temporary generated code for testing
+- Language-specific test files (`__tests__/`, `Tests/`, etc.)
+
+### pyproject.toml Configuration
+
+```toml
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cognite.pygen*"]
+
+[tool.setuptools.package-data]
+"cognite.pygen._python" = [
+    "instance_api/**/*.py",
+    "example/**/*.py",
+]
+"cognite.pygen._typescript" = [
+    "instance_api/**/*",
+    "example/**/*",
+]
+"cognite.pygen._generator" = [
+    "templates/**/*.py",
+    "templates/**/*.ts",
+]
+
+[tool.setuptools.exclude-package-data]
+"*" = [
+    "tests/*",
+    "**/generated/*",
+    "**/__tests__/*",
+    "**/*.test.ts",
+    "**/test_*.py",
+]
+```
+
+## Multi-Language Testing Strategy
+
+All language SDKs are tested, but tests are orchestrated through Python/pytest for consistency.
+
+### Testing Architecture
+
+Each language runs its native test framework independently in CI:
+
+```
+CI Pipeline
+    │
+    ├── Python tests (pytest)
+    │   └── pytest tests/tests_python
+    │
+    ├── TypeScript tests (vitest, from repository root)
+    │   ├── npm install (uses root package.json)
+    │   ├── npm run build (tsc compilation)
+    │   ├── npm run lint (ESLint)
+    │   └── npm test (vitest)
+    │
+    ├── C# tests (dotnet test)
+    │   ├── dotnet restore
+    │   ├── dotnet build
+    │   └── dotnet test
+    │
+    └── Integration tests
+        └── Cross-language consistency checks
+```
+
+### TypeScript Test Examples
+
+TypeScript tests use Vitest and are located in `tests/tests_typescript/__tests__/`:
+
+```typescript
+// tests/tests_typescript/__tests__/instance.test.ts
+import { describe, it, expect } from 'vitest';
+import { Instance, InstanceWrite } from '../../cognite/pygen/_generator/_typescript/instance_api';
+
+describe('Instance', () => {
+  it('should create an instance with required fields', () => {
+    const instance = new Instance({
+      space: 'test_space',
+      externalId: 'test_id',
+    });
+    expect(instance.space).toBe('test_space');
+    expect(instance.externalId).toBe('test_id');
+  });
+
+  it('should convert to write format', () => {
+    const instance = new Instance({
+      space: 'test_space',
+      externalId: 'test_id',
+    });
+    const write = instance.asWrite();
+    expect(write).toBeInstanceOf(InstanceWrite);
+  });
+});
+```
+
+```typescript
+// tests/tests_typescript/__tests__/client.test.ts
+import { describe, it, expect, vi } from 'vitest';
+import { InstanceClient } from '../../cognite/pygen/_generator/_typescript/instance_api';
+
+describe('InstanceClient', () => {
+  it('should upsert instances', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ items: [] }),
+    });
+    
+    const client = new InstanceClient({
+      baseUrl: 'https://api.cognitedata.com',
+      project: 'test',
+      credentials: { token: 'test-token' },
+      fetch: mockFetch,
+    });
+    
+    const result = await client.upsert([]);
+    expect(result).toBeDefined();
+  });
+});
+```
+
+### TypeScript Test Project Structure
+
+All TypeScript configuration files (package.json, tsconfig.json, etc.) are placed at the repository root level to share the same `node_modules` directory. TypeScript tests are placed in `tests/tests_typescript/` following the same pattern as Python tests.
+
+```
+# Root level (shared TypeScript configuration)
+package.json                     # TypeScript dependencies (dev dependencies)
+tsconfig.json                    # TypeScript config
+vitest.config.ts                 # Test runner config
+node_modules/                    # Shared node_modules (gitignored)
+
+# Test files
+tests/tests_typescript/
+├── test_generation.py           # Python wrapper tests
+├── __tests__/                   # TypeScript unit tests
+│   ├── instance.test.ts         # Tests for instance_api
+│   ├── client.test.ts           # Tests for client
+│   └── api.test.ts              # Tests for API classes
+└── generated/                   # .gitignore'd, temp generated code
+```
+
+### Root package.json (TypeScript Configuration)
+
+The root `package.json` contains all TypeScript development dependencies. This allows sharing `node_modules` across all TypeScript code in the project.
+
+```json
+{
+  "name": "@cognite/pygen",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "lint": "eslint . --ext .ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0"
+  }
+}
+```
+
+Note: The `.gitignore` file is shared for both Python and TypeScript, including entries for `node_modules/`, `*.js` build artifacts, and other TypeScript-specific ignores alongside Python ignores.
+
+### CI/CD Configuration
+
+```yaml
+# .github/workflows/test.yml
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/tests_python
+
+  test-typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install      # Uses root package.json
+      - run: npm run build    # Compile TypeScript
+      - run: npm run lint     # Run ESLint
+      - run: npm test         # Run vitest
+
+  test-csharp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0"
+      - run: dotnet restore
+      - run: dotnet build
+      - run: dotnet test
+```
+
+### Test Categories
+
+1. **Unit Tests**: Test individual components in isolation
+   - IR parsing and transformation
+   - Template rendering
+   - Type mappings
+
+2. **Generation Tests**: Test that generated code is valid
+   - Compiles without errors
+   - Passes linting
+   - Has correct structure
+
+3. **Runtime Tests**: Test that generated SDK works correctly
+   - CRUD operations
+   - Serialization/deserialization
+   - Type safety
+
+4. **Integration Tests**: Test cross-language consistency
+   - Same data model generates equivalent SDKs
+   - API behavior is consistent across languages
+
+## Documentation Strategy
+
+- API reference (auto-generated from docstrings)
+- User guides for each feature
+- Architecture documentation (this doc)
+- Contributing guide
+- Examples and tutorials
+- Migration guide

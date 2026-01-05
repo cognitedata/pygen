@@ -1,5 +1,6 @@
 """This is a small CLI used for Pygen development."""
 
+import subprocess
 import time
 from collections import defaultdict
 from datetime import datetime
@@ -14,10 +15,17 @@ import typer
 from cognite.client import data_modeling as dm
 from packaging.version import Version, parse
 
-from cognite.pygen._generator import SDKGenerator, generate_typed, write_sdk_to_disk
-from cognite.pygen.utils import MockGenerator
-from cognite.pygen.utils.cdf import load_cognite_client_from_toml
-from tests.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
+from cognite.pygen._example_datamodel import EXTERNAL_ID, SPACE, VERSION
+from cognite.pygen._generator.config import PygenSDKConfig
+from cognite.pygen._generator.gen_functions import generate_sdk
+from cognite.pygen._legacy._generator import SDKGenerator, generate_typed, write_sdk_to_disk
+from cognite.pygen._legacy.utils import MockGenerator, load_cognite_client_from_toml
+from cognite.pygen._python.instance_api.config import PygenClientConfig
+from tests.test_python.constants import EXAMPLES as EXAMPLES_V2
+from tests.test_python.constants import SDK_NAME_PYTHON, SDK_NAME_TYPESCRIPT
+from tests.test_python.test_legacy.constants import DATA_WRITE_DIR, EXAMPLE_SDKS, EXAMPLES_DIR, REPO_ROOT, ExampleSDK
+from tests.test_python.test_unit.test_generator.conftest import create_example_data_model_response
+from tests.test_python.utils import monkeypatch_pygen_client
 
 app = typer.Typer(
     add_completion=False,
@@ -26,6 +34,12 @@ app = typer.Typer(
     pretty_exceptions_show_locals=False,
     pretty_exceptions_enable=False,
 )
+
+EXAMPLE_MODEL = {
+    "space": SPACE,
+    "external_id": EXTERNAL_ID,
+    "version": VERSION,
+}
 
 VALID_CHANGELOG_HEADERS = {"Added", "Changed", "Removed", "Fixed", "Improved"}
 BUMP_OPTIONS = Literal["major", "minor", "patch", "skip"]
@@ -189,6 +203,111 @@ def overwrite_index():
     copy = _remove_top_lines(readme, 2)
     new_index = "\n".join(index.split("\n")[:1] + copy.split("\n"))
     index_path.write_text(new_index)
+
+
+@app.command("count", help="Count the number of code lines in v2 of Pygen")
+def count_lines() -> None:
+    command = (
+        r"find {root} -path '*/{exclude}' -prune -o -type f "
+        r"\( -name '*.py' -o -name '*.ts' -o -name '*.js' -o -name '*.sql' \) -print | xargs wc -l"
+    )
+
+    def get_line_count(root: str, exclude: str) -> int:
+        result = subprocess.run(
+            command.format(root=root, exclude=exclude),
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        # The last line of wc -l output contains the total
+        lines = result.stdout.strip().split("\n")
+        if not lines:
+            return 0
+        last_line = lines[-1].strip()
+        # If only one file, there's no "total" line, just the count
+        if "total" in last_line:
+            return int(last_line.split()[0])
+        elif lines:
+            # Sum all individual file counts
+            return sum(int(line.strip().split()[0]) for line in lines if line.strip())
+        return 0
+
+    def get_markdown_line_count(root: str) -> int:
+        md_command = f"find {root} -type f -name '*.md' -print | xargs wc -l"
+        result = subprocess.run(
+            md_command,
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        lines = result.stdout.strip().split("\n")
+        if not lines or not lines[0]:
+            return 0
+        last_line = lines[-1].strip()
+        if "total" in last_line:
+            return int(last_line.split()[0])
+        elif lines:
+            return sum(int(line.strip().split()[0]) for line in lines if line.strip())
+        return 0
+
+    cognite_count = get_line_count("cognite", "_legacy")
+    tests_count = get_line_count("tests", "test_legacy")
+    total_count = cognite_count + tests_count
+    plan_count = get_markdown_line_count("plan")
+
+    typer.echo(f"{'Location':<20} {'Count':>10}")
+    typer.echo("-" * 31)
+    typer.echo(f"{'cognite/pygen':<20} {cognite_count:>10,}")
+    typer.echo(f"{'tests':<20} {tests_count:>10,}")
+    typer.echo("-" * 31)
+    typer.echo(f"{'Total':<20} {total_count:>10,}")
+    typer.echo("")
+    typer.echo(f"{'plan (markdown)':<20} {plan_count:>10,}")
+
+
+@app.command("generate-v2", help="Generate v2 of Pygen SDKs (work in progress)")
+def generate_v2() -> None:
+    class MockCredentials:
+        def authorization_header(self) -> tuple[str, str]:
+            return "Authorization", "Bearer mock_token"
+
+    with monkeypatch_pygen_client() as mocked_client:
+        mocked_client.data_models.retrieve.return_value = [create_example_data_model_response()]
+        sdk_config = PygenSDKConfig(
+            top_level_package=SDK_NAME_PYTHON,
+            client_name="ExamplePygenClient",
+        )
+        client_config = PygenClientConfig(
+            cdf_url="https://example.cognitedata.com",
+            project="pygen",
+            credentials=MockCredentials(),
+        )
+        sdk_files = generate_sdk(
+            **EXAMPLE_MODEL,
+            sdk_config=sdk_config,
+            client_config=client_config,
+            output_format="python",
+        )
+        for path, content in sdk_files.items():
+            output_path = EXAMPLES_V2 / SDK_NAME_PYTHON / path
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(content, encoding="utf-8", newline="\n")
+        sdk_files = generate_sdk(
+            **EXAMPLE_MODEL,
+            sdk_config=sdk_config,
+            client_config=client_config,
+            output_format="typescript",
+        )
+        for path, content in sdk_files.items():
+            output_path = EXAMPLES_V2 / SDK_NAME_TYPESCRIPT / path
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(content, encoding="utf-8", newline="\n")
+    typer.echo("v2 SDK generation complete.")
+    sdk_dir = EXAMPLES_V2 / SDK_NAME_PYTHON
+    subprocess.run(["ruff", "check", sdk_dir.as_posix(), "--fix"], check=True)
+    subprocess.run(["ruff", "format", sdk_dir.as_posix()], check=True)
+    typer.echo("Formatted generated v2 SDK.")
+    return None
 
 
 def _remove_top_lines(text: str, lines: int) -> str:

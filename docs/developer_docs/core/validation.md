@@ -1,1 +1,1 @@
-::: cognite.pygen._core.validation
+::: cognite.pygen._legacy._core.validation
