@@ -1,8 +1,10 @@
+import pytest
 from cognite.client.testing import monkeypatch_cognite_client
 from omni import OmniClient
 
 
 class TestSelectMethod:
+    @pytest.mark.filterwarnings("error")
     def test_dump_yaml(self) -> None:
         with monkeypatch_cognite_client() as client:
             pygen = OmniClient(client)
