@@ -1,4 +1,5 @@
 """Interactive OAuth 2.0 authentication for Cognite Data Fusion."""
+
 from __future__ import annotations
 
 import base64
@@ -13,12 +14,13 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import NamedTuple
 
-import requests
+import httpx
 
 
 def _log(message: str) -> None:
     """Log to stderr to avoid breaking MCP protocol on stdout."""
     print(message, file=sys.stderr)
+
 
 # Cognite's public CLI client ID (no secret required)
 CLIENT_ID = "c6f97d29-79a5-48ac-85de-1de8229226cb"
@@ -116,10 +118,12 @@ class _CallbackHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", "text/html")
         self.end_headers()
-        html = f"<html><body style='font-family:system-ui;text-align:center;padding:50px'><h1>{message}</h1></body></html>"
+        html = (
+            f"<html><body style='font-family:system-ui;text-align:center;padding:50px'><h1>{message}</h1></body></html>"
+        )
         self.wfile.write(html.encode())
 
-    def log_message(self, format: str, *args: object) -> None:  # noqa: A002
+    def log_message(self, format: str, *args: object) -> None:
         pass  # Suppress HTTP logs
 
 
@@ -145,7 +149,7 @@ def interactive_login(organization: str | None = None) -> Tokens:
     state = secrets.token_urlsafe(16)
 
     # Discover endpoints
-    config = requests.get(f"{AUTHORITY}/.well-known/openid-configuration", timeout=30).json()
+    config = httpx.get(f"{AUTHORITY}/.well-known/openid-configuration", timeout=30).json()
 
     # Build auth URL
     params = {
@@ -186,7 +190,7 @@ def interactive_login(organization: str | None = None) -> Tokens:
 
     # Exchange code for tokens
     _log("Exchanging code for token...")
-    resp = requests.post(
+    resp = httpx.post(
         config["token_endpoint"],
         data={
             "grant_type": "authorization_code",
@@ -198,7 +202,7 @@ def interactive_login(organization: str | None = None) -> Tokens:
         timeout=30,
     )
 
-    if not resp.ok:
+    if not resp.is_success:
         raise RuntimeError(f"Token exchange failed: {resp.text}")
 
     data = resp.json()

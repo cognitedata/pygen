@@ -1,4 +1,5 @@
 """MCP server support for pygen-generated SDKs."""
+
 from __future__ import annotations
 
 import json
@@ -37,7 +38,7 @@ def create_mcp_server(
     external_id, version = rest.split("@")
 
     # Create CogniteClient with token
-    from cognite.client import CogniteClient, ClientConfig
+    from cognite.client import ClientConfig, CogniteClient
     from cognite.client.credentials import Token
 
     config = ClientConfig(
