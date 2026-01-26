@@ -252,6 +252,18 @@ def create_mcp_server(
         _make_list_tool(mcp, api, attr_name)
         _make_retrieve_tool(mcp, api, attr_name)
 
+        # Search tool (if available)
+        if hasattr(api, "search"):
+            _make_search_tool(mcp, api, attr_name)
+
+        # Aggregate tool (if available)
+        if hasattr(api, "aggregate"):
+            _make_aggregate_tool(mcp, api, attr_name)
+
+        # Histogram tool (if available)
+        if hasattr(api, "histogram"):
+            _make_histogram_tool(mcp, api, attr_name)
+
         # Write operations (optional)
         if include_write:
             _make_delete_tool(mcp, api, attr_name)
@@ -270,79 +282,18 @@ def create_mcp_server(
 
 def _make_list_tool(mcp: Any, api_ref: Any, name: str) -> None:
     """Create a list tool for an API with dynamically introspected filter parameters."""
-    # Introspect the list method signature
-    sig = inspect.signature(api_ref.list)
 
-    # Collect MCP-compatible parameters: (name, type, default, marker)
-    param_info: list[tuple[str, type, Any, str | None]] = []
-    param_descriptions: list[str] = []
+    def handle_result(result: Any) -> str:
+        return json.dumps([r.model_dump(mode="json") for r in result], default=str)
 
-    for param_name, param in sig.parameters.items():
-        if param_name == "self":
-            continue
-
-        # Skip complex types that MCP can't handle
-        annotation = param.annotation
-        if not _is_mcp_compatible_type(annotation) and param_name not in ("limit", "space"):
-            continue
-
-        # Get MCP type and conversion marker
-        if param_name == "limit":
-            simple_type, marker = int, None
-        elif param_name == "space":
-            simple_type, marker = str, None
-        elif annotation is inspect.Parameter.empty:
-            simple_type, marker = str, None
-        else:
-            simple_type, marker = _get_mcp_type_info(annotation)
-
-        # Get default value
-        default = param.default if param.default is not inspect.Parameter.empty else None
-
-        # Build description with type hint
-        if marker == _DATETIME_MARKER:
-            type_hint = "str (ISO 8601 datetime)"
-        elif marker == _NODE_REF_MARKER:
-            type_hint = 'object or array ({"space": str, "externalId": str} or [...])'
-        elif hasattr(simple_type, "__name__"):
-            type_hint = simple_type.__name__
-        else:
-            type_hint = str(simple_type)
-
-        param_info.append((param_name, simple_type, default, marker))
-        param_descriptions.append(f"  - {param_name}: {type_hint}")
-
-    # Build docstring with available parameters
-    docstring = f"List {name} items with optional filters.\n\nAvailable parameters:\n" + "\n".join(param_descriptions)
-
-    # Create the tool function that passes through kwargs with conversion
-    def make_list_fn(api, params):
-        # Build marker lookup
-        markers = {pname: marker for pname, _, _, marker in params}
-
-        def list_items(**kwargs: Any) -> str:
-            # Convert and filter out None values
-            converted_kwargs = {}
-            for k, v in kwargs.items():
-                if v is not None:
-                    converted_kwargs[k] = _convert_mcp_value(v, markers.get(k))
-            results = api.list(**converted_kwargs)
-            return json.dumps([r.model_dump(mode="json") for r in results], default=str)
-
-        list_items.__doc__ = docstring
-
-        # Dynamically set the signature using the collected parameters
-        new_params = [
-            inspect.Parameter(
-                pname, inspect.Parameter.KEYWORD_ONLY, default=pdefault, annotation=ptype | None  # type: ignore
-            )
-            for pname, ptype, pdefault, _ in params
-        ]
-        list_items.__signature__ = inspect.Signature(new_params)  # type: ignore
-        return list_items
-
-    tool_fn = make_list_fn(api_ref, param_info)
-    mcp.tool(name=f"{name}_list")(tool_fn)
+    _make_dynamic_tool(
+        mcp,
+        api_ref,
+        "list",
+        f"{name}_list",
+        f"List/filter {name} items.",
+        handle_result,
+    )
 
 
 def _make_retrieve_tool(mcp: Any, api_ref: Any, name: str) -> None:
@@ -365,3 +316,246 @@ def _make_delete_tool(mcp: Any, api_ref: Any, name: str) -> None:
         """Delete an item by external_id."""
         api_ref.delete(external_id)
         return json.dumps({"deleted": external_id})
+
+
+def _parse_docstring_args(docstring: str | None) -> dict[str, str]:
+    """Parse docstring Args section to extract parameter descriptions."""
+    if not docstring:
+        return {}
+
+    descriptions: dict[str, str] = {}
+    in_args = False
+    current_param = None
+    current_desc_lines: list[str] = []
+
+    for line in docstring.split("\n"):
+        stripped = line.strip()
+
+        # Detect Args section
+        if stripped == "Args:":
+            in_args = True
+            continue
+
+        # Detect end of Args section
+        if in_args and stripped and not stripped.startswith(" ") and ":" in stripped and stripped.endswith(":"):
+            # New section like "Returns:", "Raises:", etc.
+            if current_param:
+                descriptions[current_param] = " ".join(current_desc_lines).strip()
+            break
+
+        if in_args:
+            # Check for new parameter (starts with param_name:)
+            if stripped and ":" in stripped and not line.startswith("        "):
+                # Save previous parameter
+                if current_param:
+                    descriptions[current_param] = " ".join(current_desc_lines).strip()
+
+                # Parse new parameter
+                parts = stripped.split(":", 1)
+                current_param = parts[0].strip()
+                current_desc_lines = [parts[1].strip()] if len(parts) > 1 else []
+            elif current_param and stripped:
+                # Continuation of current parameter description
+                current_desc_lines.append(stripped)
+
+    # Don't forget the last parameter
+    if current_param:
+        descriptions[current_param] = " ".join(current_desc_lines).strip()
+
+    return descriptions
+
+
+# Parameters that should always be exposed as strings (method-specific params)
+_FORCE_STRING_PARAMS = {
+    "aggregate",  # Aggregation type: count, sum, avg, min, max
+    "group_by",  # Field name to group by
+    "property",  # Field name for aggregation/histogram
+    "query",  # Search query
+    "search_property",  # Field to search in
+    "properties",  # Fields to search (for search method)
+    "interval",  # Histogram interval (float)
+}
+
+
+def _introspect_method_params(
+    method: Any,
+) -> tuple[list[tuple[str, Any, Any, str | None]], dict[str, str]]:
+    """Introspect a method and return MCP-compatible parameters.
+
+    Returns:
+        (param_info, param_descriptions) where param_info is list of (name, type, default, marker)
+        and param_descriptions is dict of parameter name to description from docstring.
+    """
+    sig = inspect.signature(method)
+    param_info: list[tuple[str, Any, Any, str | None]] = []
+
+    # Parse docstring for descriptions
+    docstring_descs = _parse_docstring_args(method.__doc__)
+
+    for param_name, param in sig.parameters.items():
+        if param_name == "self":
+            continue
+
+        annotation = param.annotation
+
+        # Force include certain method-specific parameters
+        if param_name in _FORCE_STRING_PARAMS:
+            if param_name == "interval":
+                simple_type = float
+            else:
+                simple_type = str
+            default = param.default if param.default is not inspect.Parameter.empty else None
+            param_info.append((param_name, simple_type, default, None))
+            continue
+
+        # Skip complex types that MCP can't handle
+        if not _is_mcp_compatible_type(annotation) and param_name not in ("limit", "space"):
+            continue
+
+        # Get MCP type and conversion marker
+        if param_name == "limit":
+            simple_type, marker = int, None
+        elif param_name == "space":
+            simple_type, marker = str, None
+        elif annotation is inspect.Parameter.empty:
+            simple_type, marker = str, None
+        else:
+            simple_type, marker = _get_mcp_type_info(annotation)
+
+        default = param.default if param.default is not inspect.Parameter.empty else None
+        param_info.append((param_name, simple_type, default, marker))
+
+    return param_info, docstring_descs
+
+
+def _build_param_description(
+    param_info: list[tuple[str, Any, Any, str | None]],
+    docstring_descs: dict[str, str],
+) -> list[str]:
+    """Build parameter descriptions for docstring."""
+    descriptions = []
+    for pname, ptype, _, marker in param_info:
+        if marker == _DATETIME_MARKER:
+            type_hint = "str (ISO 8601 datetime)"
+        elif marker == _NODE_REF_MARKER:
+            type_hint = 'object or array ({"space": str, "externalId": str})'
+        elif hasattr(ptype, "__name__"):
+            type_hint = ptype.__name__
+        else:
+            type_hint = str(ptype)
+
+        # Get description from docstring if available
+        desc = docstring_descs.get(pname, "")
+        if desc:
+            descriptions.append(f"  - {pname} ({type_hint}): {desc}")
+        else:
+            descriptions.append(f"  - {pname}: {type_hint}")
+    return descriptions
+
+
+def _make_dynamic_tool(
+    mcp: Any,
+    api_ref: Any,
+    method_name: str,
+    tool_name: str,
+    base_description: str,
+    result_handler: Any,
+) -> None:
+    """Create a tool with dynamically introspected parameters."""
+    method = getattr(api_ref, method_name)
+    param_info, docstring_descs = _introspect_method_params(method)
+    param_descriptions = _build_param_description(param_info, docstring_descs)
+
+    docstring = f"{base_description}\n\nParameters:\n" + "\n".join(param_descriptions)
+
+    # Build marker lookup for conversions
+    markers = {pname: marker for pname, _, _, marker in param_info}
+
+    def make_fn(api, method_nm, param_markers, handler):
+        def tool_fn(**kwargs: Any) -> str:
+            converted_kwargs = {}
+            for k, v in kwargs.items():
+                if v is not None:
+                    converted_kwargs[k] = _convert_mcp_value(v, param_markers.get(k))
+            result = getattr(api, method_nm)(**converted_kwargs)
+            return handler(result)
+
+        return tool_fn
+
+    tool_fn = make_fn(api_ref, method_name, markers, result_handler)
+    tool_fn.__doc__ = docstring
+
+    # Build signature
+    new_params = [
+        inspect.Parameter(
+            pname, inspect.Parameter.KEYWORD_ONLY, default=pdefault, annotation=ptype | None  # type: ignore
+        )
+        for pname, ptype, pdefault, _ in param_info
+    ]
+    tool_fn.__signature__ = inspect.Signature(new_params)  # type: ignore
+
+    mcp.tool(name=tool_name)(tool_fn)
+
+
+def _make_search_tool(mcp: Any, api_ref: Any, name: str) -> None:
+    """Create a search tool for an API with dynamically introspected parameters."""
+
+    def handle_result(result: Any) -> str:
+        return json.dumps([r.model_dump(mode="json") for r in result], default=str)
+
+    _make_dynamic_tool(
+        mcp,
+        api_ref,
+        "search",
+        f"{name}_search",
+        f"Search {name} items by text query.",
+        handle_result,
+    )
+
+
+def _make_aggregate_tool(mcp: Any, api_ref: Any, name: str) -> None:
+    """Create an aggregate tool for an API with dynamically introspected parameters."""
+
+    def handle_result(result: Any) -> str:
+        if isinstance(result, list):
+            return json.dumps([_serialize_aggregate(r) for r in result], default=str)
+        return json.dumps(_serialize_aggregate(result), default=str)
+
+    _make_dynamic_tool(
+        mcp,
+        api_ref,
+        "aggregate",
+        f"{name}_aggregate",
+        f"Aggregate {name} items (count, sum, avg, min, max).",
+        handle_result,
+    )
+
+
+def _serialize_aggregate(result: Any) -> dict[str, Any]:
+    """Serialize an aggregate result to a dict."""
+    if hasattr(result, "model_dump"):
+        return result.model_dump(mode="json")
+    if hasattr(result, "value"):
+        data: dict[str, Any] = {"value": result.value}
+        if hasattr(result, "aggregate"):
+            data["aggregate"] = result.aggregate
+        return data
+    return {"value": result}
+
+
+def _make_histogram_tool(mcp: Any, api_ref: Any, name: str) -> None:
+    """Create a histogram tool for an API with dynamically introspected parameters."""
+
+    def handle_result(result: Any) -> str:
+        # HistogramValue has .buckets attribute containing the histogram bins
+        buckets = getattr(result, "buckets", result)
+        return json.dumps([{"start": b.start, "count": b.count} for b in buckets], default=str)
+
+    _make_dynamic_tool(
+        mcp,
+        api_ref,
+        "histogram",
+        f"{name}_histogram",
+        f"Generate histogram for {name} numeric properties.",
+        handle_result,
+    )
