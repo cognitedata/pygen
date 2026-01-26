@@ -190,6 +190,8 @@ def create_mcp_server(
     project: str,
     access_token: str,
     *,
+    include_views: set[str] | None = None,
+    include_operations: set[str] | None = None,
     include_graphql: bool = False,
     include_write: bool = False,
 ) -> Any:
@@ -200,6 +202,8 @@ def create_mcp_server(
         cluster: CDF cluster (e.g., "api", "westeurope-1")
         project: CDF project name
         access_token: OAuth access token
+        include_views: Set of view external IDs to include (None = all views)
+        include_operations: Set of operations to enable: list, retrieve, search, aggregate, histogram (None = all)
         include_graphql: Whether to include the graphql_query tool (default: False)
         include_write: Whether to include upsert/delete tools (default: False)
 
@@ -240,6 +244,9 @@ def create_mcp_server(
     # Create MCP server
     mcp = FastMCP(f"{external_id}_mcp")
 
+    # Default operations if not specified
+    ops = include_operations or {"list", "retrieve", "search", "aggregate", "histogram"}
+
     # Register tools for each API
     for attr_name in dir(sdk_client):
         if attr_name.startswith("_"):
@@ -248,24 +255,33 @@ def create_mcp_server(
         if not hasattr(api, "list") or not hasattr(api, "_view_id"):
             continue
 
-        # Create tools with captured api reference
-        _make_list_tool(mcp, api, attr_name)
-        _make_retrieve_tool(mcp, api, attr_name)
+        # Filter by view external ID if specified
+        if include_views is not None:
+            view_id = api._view_id
+            if view_id.external_id not in include_views:
+                continue
 
-        # Search tool (if available)
-        if hasattr(api, "search"):
+        # Create tools based on enabled operations
+        if "list" in ops:
+            _make_list_tool(mcp, api, attr_name)
+
+        if "retrieve" in ops:
+            _make_retrieve_tool(mcp, api, attr_name)
+
+        # Search tool (if available and enabled)
+        if "search" in ops and hasattr(api, "search"):
             _make_search_tool(mcp, api, attr_name)
 
-        # Aggregate tool (if available)
-        if hasattr(api, "aggregate"):
+        # Aggregate tool (if available and enabled)
+        if "aggregate" in ops and hasattr(api, "aggregate"):
             _make_aggregate_tool(mcp, api, attr_name)
 
-        # Histogram tool (if available)
-        if hasattr(api, "histogram"):
+        # Histogram tool (if available and enabled)
+        if "histogram" in ops and hasattr(api, "histogram"):
             _make_histogram_tool(mcp, api, attr_name)
 
-        # Write operations (optional)
-        if include_write:
+        # Write operations (optional, requires --write flag)
+        if include_write and "delete" in ops:
             _make_delete_tool(mcp, api, attr_name)
 
     # GraphQL tool (optional)
