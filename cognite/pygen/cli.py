@@ -196,6 +196,63 @@ if _has_typer:
             except (CogniteAPIError, IndexError) as e:
                 raise typer.Exit(code=1) from e
 
+    @app.command("mcp-serve")
+    def mcp_serve(
+        data_model_id: str = typer.Argument(..., help="Data model ID in format: space/externalId@version"),
+        cluster: str = typer.Option(..., "--cluster", "-c", help="CDF cluster (e.g., 'api', 'westeurope-1')"),
+        project: str = typer.Option(..., "--project", "-p", help="CDF project name"),
+        org: str = typer.Option(None, "--org", "-o", help="Organization hint for login"),
+        views: str = typer.Option(None, "--views", "-v", help="Comma-separated list of view external IDs to include"),
+        operations: str = typer.Option(
+            None,
+            "--operations",
+            "--ops",
+            help="Comma-separated operations to enable: list,retrieve,search,aggregate,histogram (default: all)",
+        ),
+        graphql: bool = typer.Option(False, "--graphql", help="Enable the graphql_query tool"),
+        write: bool = typer.Option(False, "--write", help="Enable write operations (delete)"),
+    ) -> None:
+        """Serve a CDF data model as an MCP server.
+
+        Opens browser for authentication, then starts the MCP server.
+
+        Examples:
+            pygen mcp-serve mySpace/MyModel@v1 --cluster api --project my-project
+
+            # Only include specific views
+            pygen mcp-serve mySpace/MyModel@v1 -c api -p proj --views Asset,Equipment
+
+            # Only enable list and search operations
+            pygen mcp-serve mySpace/MyModel@v1 -c api -p proj --ops list,search
+        """
+        try:
+            from cognite.pygen._auth import interactive_login
+            from cognite.pygen._mcp import create_mcp_server
+        except ImportError as e:
+            typer.echo(f"MCP support requires additional dependencies: {e}")
+            typer.echo("Install with: pip install cognite-pygen[mcp]")
+            raise typer.Exit(code=1) from e
+
+        # Parse views and operations
+        include_views = {v.strip() for v in views.split(",")} if views else None
+        include_operations = {op.strip() for op in operations.split(",")} if operations else None
+
+        # Authenticate
+        tokens = interactive_login(organization=org)
+
+        # Create and run MCP server
+        mcp = create_mcp_server(
+            data_model_id,
+            cluster,
+            project,
+            tokens.access_token,
+            include_views=include_views,
+            include_operations=include_operations,
+            include_graphql=graphql,
+            include_write=write,
+        )
+        mcp.run()
+
     def main():
         app()
 

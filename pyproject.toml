@@ -33,6 +33,10 @@ cli = [
 format = [
     "black>=24.4.2",
 ]
+mcp = [
+    "mcp>=1.1.0",
+    "cryptography>=42.0.0",
+]
 [dependency-groups]
 dev = [
     "twine>=6.0.0",
