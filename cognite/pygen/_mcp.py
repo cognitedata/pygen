@@ -397,6 +397,7 @@ def _introspect_method_params(
             continue
 
         annotation = param.annotation
+        simple_type: Any
 
         # Force include certain method-specific parameters
         if param_name in _FORCE_STRING_PARAMS:
@@ -404,8 +405,7 @@ def _introspect_method_params(
                 simple_type = float
             else:
                 simple_type = str
-            default = param.default if param.default is not inspect.Parameter.empty else None
-            param_info.append((param_name, simple_type, default, None))
+            param_info.append((param_name, simple_type, param.default, None))
             continue
 
         # Skip complex types that MCP can't handle
@@ -422,8 +422,7 @@ def _introspect_method_params(
         else:
             simple_type, marker = _get_mcp_type_info(annotation)
 
-        default = param.default if param.default is not inspect.Parameter.empty else None
-        param_info.append((param_name, simple_type, default, marker))
+        param_info.append((param_name, simple_type, param.default, marker))
 
     return param_info, docstring_descs
 
@@ -485,13 +484,22 @@ def _make_dynamic_tool(
     tool_fn = make_fn(api_ref, method_name, markers, result_handler)
     tool_fn.__doc__ = docstring
 
-    # Build signature
-    new_params = [
-        inspect.Parameter(
-            pname, inspect.Parameter.KEYWORD_ONLY, default=pdefault, annotation=ptype | None  # type: ignore
-        )
-        for pname, ptype, pdefault, _ in param_info
-    ]
+    # Build signature - required params (empty default) vs optional params
+    new_params = []
+    for pname, ptype, pdefault, _ in param_info:
+        if pdefault is inspect.Parameter.empty:
+            # Required parameter - no default, type is not nullable
+            new_params.append(inspect.Parameter(pname, inspect.Parameter.KEYWORD_ONLY, annotation=ptype))
+        else:
+            # Optional parameter - has default, type is nullable
+            new_params.append(
+                inspect.Parameter(
+                    pname,
+                    inspect.Parameter.KEYWORD_ONLY,
+                    default=pdefault,
+                    annotation=ptype | None,  # type: ignore
+                )
+            )
     tool_fn.__signature__ = inspect.Signature(new_params)  # type: ignore
 
     mcp.tool(name=tool_name)(tool_fn)
