@@ -202,6 +202,8 @@ if _has_typer:
         cluster: str = typer.Option(..., "--cluster", "-c", help="CDF cluster (e.g., 'api', 'westeurope-1')"),
         project: str = typer.Option(..., "--project", "-p", help="CDF project name"),
         org: str = typer.Option(None, "--org", "-o", help="Organization hint for login"),
+        graphql: bool = typer.Option(False, "--graphql", help="Enable the graphql_query tool"),
+        write: bool = typer.Option(False, "--write", help="Enable write operations (delete)"),
     ) -> None:
         """Serve a CDF data model as an MCP server.
 
@@ -222,7 +224,14 @@ if _has_typer:
         tokens = interactive_login(organization=org)
 
         # Create and run MCP server
-        mcp = create_mcp_server(data_model_id, cluster, project, tokens.access_token)
+        mcp = create_mcp_server(
+            data_model_id,
+            cluster,
+            project,
+            tokens.access_token,
+            include_graphql=graphql,
+            include_write=write,
+        )
         mcp.run()
 
     def main():

@@ -14,6 +14,9 @@ def create_mcp_server(
     cluster: str,
     project: str,
     access_token: str,
+    *,
+    include_graphql: bool = False,
+    include_write: bool = False,
 ) -> Any:
     """Create an MCP server for a CDF data model.
 
@@ -22,6 +25,8 @@ def create_mcp_server(
         cluster: CDF cluster (e.g., "api", "westeurope-1")
         project: CDF project name
         access_token: OAuth access token
+        include_graphql: Whether to include the graphql_query tool (default: False)
+        include_write: Whether to include upsert/delete tools (default: False)
 
     Returns:
         FastMCP server instance ready to run
@@ -72,12 +77,18 @@ def create_mcp_server(
         _make_list_tool(mcp, api, attr_name)
         _make_retrieve_tool(mcp, api, attr_name)
 
-    # GraphQL tool
-    @mcp.tool(name="graphql_query")
-    def graphql_query(query: str) -> str:
-        """Execute a GraphQL query against the data model."""
-        result = sdk_client.graphql_query(query)
-        return json.dumps([r.model_dump(mode="json") for r in result], default=str)
+        # Write operations (optional)
+        if include_write:
+            _make_delete_tool(mcp, api, attr_name)
+
+    # GraphQL tool (optional)
+    if include_graphql:
+
+        @mcp.tool(name="graphql_query")
+        def graphql_query(query: str) -> str:
+            """Execute a GraphQL query against the data model."""
+            result = sdk_client.graphql_query(query)
+            return json.dumps([r.model_dump(mode="json") for r in result], default=str)
 
     return mcp
 
@@ -102,3 +113,13 @@ def _make_retrieve_tool(mcp: Any, api_ref: Any, name: str) -> None:
         if result is None:
             return json.dumps({"error": "Not found"})
         return json.dumps(result.model_dump(mode="json"), default=str)
+
+
+def _make_delete_tool(mcp: Any, api_ref: Any, name: str) -> None:
+    """Create a delete tool for an API."""
+
+    @mcp.tool(name=f"{name}_delete")
+    def delete_item(external_id: str) -> str:
+        """Delete an item by external_id."""
+        api_ref.delete(external_id)
+        return json.dumps({"deleted": external_id})
