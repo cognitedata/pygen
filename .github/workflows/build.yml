@@ -168,9 +168,6 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            try {
-              fs.unlinkSync('last_git_message.txt');
-            } catch (error) {}
             const description = context.payload.pull_request.body;
             fs.writeFileSync('last_git_message.txt', description);
       - name: Validate Changelog section in PR description
