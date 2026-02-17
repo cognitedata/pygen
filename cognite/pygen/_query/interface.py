@@ -544,11 +544,13 @@ class QueryExecutor:
     def iterate(
         self,
         view: dm.ViewId,
-        properties: list[str],
+        properties: SelectedProperties,
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
+        instance_types: list[Literal["node", "edge"]] | None = None,
         initial_cursor: str | None = None,
         chunk_size: int | None = None,
+        nested_limit: int = 10,
     ) -> Iterator[Page]:
         """Iterate over nodes in a view.
 
