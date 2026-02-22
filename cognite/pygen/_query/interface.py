@@ -576,7 +576,7 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         limit: int | None = None,
-        instance_types: list[Literal["node", "edge"]] | None = None,
+        instance_types: Sequence[Literal["node", "edge"]] | None = None,
     ) -> list[dict[str, Any]]:
         """List nodes/edges in a view.
 
