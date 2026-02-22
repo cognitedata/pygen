@@ -139,6 +139,8 @@ class QueryUnpacker:
         edge_connections: How to represent the connections of edges. If "list", the connections are represented
             as a list of dictionaries. If "object", the connections are represented as a dictionary with the
             connection property as the key and the target node as the value. Default is "list".
+        nested_connection_limit: The maximum number of nested connections to include in the unpacking. If None,
+            there is no limit.
 
     Example:
         Unpacking query steps including edges:
@@ -199,6 +201,7 @@ class QueryUnpacker:
         edge_type_key: str = "edge_type",
         node_type_key: str = "node_type",
         edge_connections: Literal["list", "object"] = "list",
+        nested_connection_limit: int | None = None,
     ) -> None:
         self._steps = steps
         self._edges = edges
@@ -206,6 +209,7 @@ class QueryUnpacker:
         self._edge_type_key = edge_type_key
         self._node_type_key = node_type_key
         self._edge_connections = edge_connections
+        self._nested_connection_limit = nested_connection_limit
 
     def unpack(self) -> list[dict[str, Any]]:
         if not self._steps:
