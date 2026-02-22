@@ -408,7 +408,12 @@ class QueryExecutor:
 
         for step in executor.iterate(self._client, remove_not_connected=False, init_cursors=init_cursors):
             items = QueryUnpacker(
-                step, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
+                step,
+                edges=self._unpack_edges,
+                as_data_record=False,
+                edge_type_key="type",
+                node_type_key="type",
+                nested_connection_limit=nested_limit,
             ).unpack()
             yield Page(items=items, cursor=step._cursors.get(factory.root_name))
 
