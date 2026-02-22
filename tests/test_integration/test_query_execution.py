@@ -410,7 +410,7 @@ class TestQueryExecutorIterate:
         ]
         assert not incorrect_items, f"Items with unexpected properties: {incorrect_items}"
 
-    def test_iterate_with_nested(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+    def test_iterate_with_nested_reverse(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
         view = omni_views["ConnectionItemE"]
         executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
         properties: SelectedProperties = [
@@ -428,6 +428,53 @@ class TestQueryExecutorIterate:
             subitem
             for item in first_page.items
             for subitem in item.get("directReverseMulti", [])
+            if not (set(subitem.keys()) <= {"name", "externalId"})
+        ]
+        assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+
+    def test_iterate_with_nested_outwards(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+        view = omni_views["ConnectionItemA"]
+        executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
+        properties: SelectedProperties = [
+            "externalId",
+            "name",
+            {"outwards": [{"node": ["name", "externalId"]}, "type"]},
+        ]
+        first_page = next(iter(executor.iterate(view.as_id(), properties, chunk_size=2, nested_limit=1)))
+        assert len(first_page.items) == 2
+        flatten_props = {"name", "outwards", "externalId"}
+        ill_formed_items = [item for item in first_page.items if not (set(item.keys()) <= flatten_props)]
+        assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+        assert any(item.get("outwards") for item in first_page.items), "No subitems found"
+        ill_formed_subitems = [
+            subitem
+            for item in first_page.items
+            for edge in item.get("outwards", [])
+            for subitem in edge.get("node", [])
+            if not (set(subitem.keys()) <= {"name", "externalId"})
+        ]
+        assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+
+    def test_iterate_with_nested_direct(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+        view = omni_views["ConnectionItemA"]
+        executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
+        properties: SelectedProperties = [
+            "externalId",
+            "name",
+            {"selfDirect": ["name", "externalId"]},
+        ]
+        first_page = next(iter(executor.iterate(view.as_id(), properties, chunk_size=2, nested_limit=1)))
+        assert len(first_page.items) == 2
+        flatten_props = {"name", "externalId"}
+        ill_formed_items = [
+            item for item in first_page.items if not (set(item.keys()) <= flatten_props.union({"selfDirect"}))
+        ]
+        assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+        assert any(item.get("selfDirect") for item in first_page.items), "No subitems found"
+        ill_formed_subitems = [
+            subitem
+            for item in first_page.items
+            for subitem in item.get("selfDirect", [])
             if not (set(subitem.keys()) <= {"name", "externalId"})
         ]
         assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"

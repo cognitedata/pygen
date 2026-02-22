@@ -370,8 +370,7 @@ class QueryExecutor:
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         cursor: str | None = None,
-        chunk_size: int | None = None,
-        instance_types: list[Literal["node", "edge"]] | None = None,
+        chunk_size: int = 10,
         nested_limit: int = 10,
     ) -> Iterator[Page]:
         view = self._get_view(view_id)
@@ -393,7 +392,12 @@ class QueryExecutor:
             }
             for connection_id, connection in factory.connection_properties.items():
                 connection_steps = factory.from_connection(
-                    connection_id, connection, reverse_views, max_retrieve_limit=nested_limit
+                    # We need to set the max_retrieve_limit to nested_limit*chunk_size to ensure that we retrieve
+                    # enough instances per root instance.
+                    connection_id,
+                    connection,
+                    reverse_views,
+                    max_retrieve_limit=nested_limit * chunk_size,
                 )
                 builder.extend(connection_steps)
 
@@ -559,9 +563,8 @@ class QueryExecutor:
         properties: SelectedProperties,
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
-        instance_types: list[Literal["node", "edge"]] | None = None,
         initial_cursor: str | None = None,
-        chunk_size: int | None = None,
+        chunk_size: int = 10,
         nested_limit: int = 10,
     ) -> Iterator[Page]:
         """Iterate over nodes in a view.
@@ -571,9 +574,8 @@ class QueryExecutor:
             properties: The properties to include in the result.
             filter: The filter to apply ahead of the list operation.
             sort: The sort order of the results.
-            instance_types: The instance types to iterate over. If None, defaults to the view's supported types.
             initial_cursor: The cursor to start from. If None, starts from the beginning.
-            chunk_size: The number of results to include in each page. If None, defaults to 1000.
+            chunk_size: The number of results to include in each page. Defaults to 10.
             nested_limit: The maximum number of nested properties to include in the result. Defaults to 10.
 
         Returns:
@@ -581,9 +583,7 @@ class QueryExecutor:
 
         """
         filter = self._equals_none_to_not_exists(filter)
-        yield from self._execute_iterate(
-            view, properties, filter, sort, initial_cursor, chunk_size, instance_types, nested_limit
-        )
+        yield from self._execute_iterate(view, properties, filter, sort, initial_cursor, chunk_size, nested_limit)
 
     def list(
         self,
