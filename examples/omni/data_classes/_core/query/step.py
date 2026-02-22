@@ -263,7 +263,11 @@ class QueryBuildStepFactory:
         )
 
     def from_connection(
-        self, connection_id: str, connection: ViewProperty, reverse_views: dict[dm.ViewId, dm.View]
+        self,
+        connection_id: str,
+        connection: ViewProperty,
+        reverse_views: dict[dm.ViewId, dm.View],
+        max_retrieve_limit: int = -1,
     ) -> list[QueryBuildStep]:
         connection_property = ViewPropertyId(self._view_id, connection_id)
         selected_properties: list[str | dict[str, list[str]]] = ["*"]
@@ -271,18 +275,31 @@ class QueryBuildStepFactory:
             selected_properties = nested[connection_id]
 
         if isinstance(connection, dm.EdgeConnection):
-            return self.from_edge(connection.source, connection.direction, connection_property, selected_properties)
+            return self.from_edge(
+                connection.source,
+                connection.direction,
+                connection_property,
+                selected_properties,
+                max_retrieve_limit=max_retrieve_limit,
+            )
         elif isinstance(connection, ReverseDirectRelation):
             connection_type: Literal["reverse-list"] | None = (
                 "reverse-list" if self._is_listable(connection.through, reverse_views) else None
             )
             validated = self._validate_flat_properties(selected_properties)
             return self.from_reverse_relation(
-                connection.source, connection.through, connection_type, connection_property, validated
+                connection.source,
+                connection.through,
+                connection_type,
+                connection_property,
+                validated,
+                max_retrieve_limit=max_retrieve_limit,
             )
         elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
             validated = self._validate_flat_properties(selected_properties)
-            return self.from_direct_relation(connection.source, connection_property, validated)
+            return self.from_direct_relation(
+                connection.source, connection_property, validated, max_retrieve_limit=max_retrieve_limit
+            )
         else:
             warnings.warn(f"Unexpected connection type: {connection!r}", UserWarning, stacklevel=2)
         return []
@@ -293,6 +310,7 @@ class QueryBuildStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
+        max_retrieve_limit: int = -1,
     ) -> list[QueryBuildStep]:
         query_properties = self._create_query_properties(selected_properties, None)
         return [
@@ -308,6 +326,7 @@ class QueryBuildStepFactory:
                 select=self._create_select(query_properties, source) if source is not None else dm.query.Select(),
                 selected_properties=selected_properties,
                 view_id=source,
+                max_retrieve_limit=max_retrieve_limit,
             )
         ]
 
@@ -320,6 +339,7 @@ class QueryBuildStepFactory:
         include_end_node: bool = True,
         has_container_fields: bool = True,
         edge_view: dm.ViewId | None = None,
+        max_retrieve_limit: int = -1,
     ) -> list[QueryBuildStep]:
         edge_name = self._create_step_name(self._root_name)
         steps = [
@@ -333,6 +353,7 @@ class QueryBuildStepFactory:
                 view_id=edge_view,
                 selected_properties=[prop for prop in selected_properties or [] if isinstance(prop, str)] or None,
                 connection_property=connection_property,
+                max_retrieve_limit=max_retrieve_limit,
             )
         ]
         if not include_end_node:
@@ -375,6 +396,7 @@ class QueryBuildStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
+        max_retrieve_limit: int = -1,
     ) -> list[QueryBuildStep]:
         query_properties = self._create_query_properties(selected_properties, through.property)
         other_view_id = source
@@ -392,6 +414,7 @@ class QueryBuildStepFactory:
                 selected_properties=selected_properties,
                 view_id=source,
                 connection_type=connection_type,
+                max_retrieve_limit=max_retrieve_limit,
             )
         ]
 
