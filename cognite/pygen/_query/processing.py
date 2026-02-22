@@ -299,6 +299,11 @@ class QueryUnpacker:
                         item[key] = value
         return item
 
+    def _limit_connections(self, items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        if self._nested_connection_limit is not None:
+            return items[: self._nested_connection_limit]
+        return items
+
     def _unpack_node(
         self,
         step: QueryResultStep,
@@ -319,15 +324,14 @@ class QueryUnpacker:
             # Add all nodes from the subsequent steps that are connected to this node
             for connection_property, node_targets_by_source in connections:
                 if node_targets := node_targets_by_source.get(node_id):
-                    # Reverse direct relation or Edge
-                    dumped[connection_property] = node_targets
+                    dumped[connection_property] = self._limit_connections(node_targets)
                 elif connection_property in dumped:
                     # Direct relation.
                     identifier = dumped.pop(connection_property)
                     if isinstance(identifier, dict):
                         other_id = dm.NodeId.load(identifier)
                         if other_id in node_targets_by_source:
-                            dumped[connection_property] = node_targets_by_source[other_id]
+                            dumped[connection_property] = self._limit_connections(node_targets_by_source[other_id])
                         else:
                             warnings.warn(
                                 f"Node {other_id} not found in {node_targets_by_source.keys()}",
@@ -348,6 +352,7 @@ class QueryUnpacker:
                                     stacklevel=2,
                                 )
                                 dumped[connection_property].append(item)
+                        dumped[connection_property] = self._limit_connections(dumped[connection_property])
 
             if direct_property is None:
                 unpacked_by_source[node_id].append(dumped)
@@ -411,7 +416,7 @@ class QueryUnpacker:
         for connection_property, node_targets_by_source in connections:
             if dumped_target_node := node_targets_by_source.get(target_node):
                 if self._edge_connections == "list":
-                    dumped_edge[connection_property] = dumped_target_node
+                    dumped_edge[connection_property] = self._limit_connections(dumped_target_node)
                 elif self._edge_connections == "object":
                     if len(dumped_target_node) != 1:
                         raise ValueError(
