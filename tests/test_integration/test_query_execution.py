@@ -372,7 +372,7 @@ class TestQueryExecutorIterate:
     def test_iterate_from_last_page(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
         view = omni_views["PrimitiveRequired"]
         executor = QueryExecutor(cognite_client, views=[view], unpack_edges="skip")
-        properties = ["externalId", "text", "boolean", "externalId"]
+        properties: SelectedProperties = ["externalId", "text", "boolean", "externalId"]
         first_page = next(iter(executor.iterate(view.as_id(), properties, chunk_size=2)))
         assert len(first_page.items) == 2
         incorrect_items = [item for item in first_page.items if not (set(item.keys()) <= set(properties))]
@@ -390,7 +390,7 @@ class TestQueryExecutorIterate:
     def test_iterate_two_pages(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
         view = omni_views["PrimitiveRequired"]
         executor = QueryExecutor(cognite_client, views=[view], unpack_edges="skip")
-        properties = ["externalId", "text", "boolean", "externalId"]
+        properties: SelectedProperties = ["externalId", "text", "boolean", "externalId"]
         first_page: Page | None = None
         second_page: Page | None = None
         for page in executor.iterate(view.as_id(), properties, chunk_size=2):
@@ -413,7 +413,7 @@ class TestQueryExecutorIterate:
     def test_iterate_with_nested(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
         view = omni_views["ConnectionItemE"]
         executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
-        properties: list[str | dict[str, Any]] = [
+        properties: SelectedProperties = [
             "externalId",
             "name",
             {"directReverseMulti": ["name", "externalId"]},

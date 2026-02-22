@@ -1,4 +1,3 @@
-from collections.abc import Mapping, Sequence
 from typing import Any, TypeAlias
 
 INSTANCE_QUERY_LIMIT = 1_000
@@ -16,7 +15,7 @@ AGGREGATION_LIMIT = 1_000
 
 NODE_PROPERTIES = frozenset({"externalId", "space", "version", "lastUpdatedTime", "createdTime", "deletedTime", "type"})
 DATA_RECORD_PROPERTIES = frozenset({"version", "lastUpdatedTime", "createdTime", "deletedTime"})
-SelectedProperties: TypeAlias = Sequence[str | Mapping[str, Sequence[str | Mapping[str, Any]]]]
+SelectedProperties: TypeAlias = list[str | dict[str, list[str | dict[str, Any]]]]
 
 
 class NotSetSentinel:
