@@ -99,6 +99,129 @@ def node_with_edge_and_node_results(node_with_edge_results: list[QueryResultStep
     return results
 
 
+@pytest.fixture(scope="module")
+def node_with_three_edges_and_nodes() -> list[QueryResultStep]:
+    view_id_a = ViewId("sp_pygen_models", "ConnectionItemA", "1")
+    view_id_b = ViewId("sp_pygen_models", "ConnectionItemB", "1")
+    names = ["brenda", "charlie", "dave"]
+    return [
+        QueryResultStep(
+            results=NodeListWithCursor(
+                [
+                    Node(
+                        space="test_space",
+                        external_id="jennifer",
+                        properties=Properties({view_id_a: {"name": "Jennifer"}}),
+                        type=None,
+                        **DEFAULT_INSTANCE_ARGS,
+                    )
+                ],
+                cursor=None,
+            ),
+            name="0",
+            expression=query.NodeResultSetExpression(filter=filters.HasData(views=[view_id_a])),
+            view_id=view_id_a,
+        ),
+        QueryResultStep(
+            results=EdgeListWithCursor(
+                [
+                    Edge(
+                        space="test_space",
+                        external_id=f"edge_{i}",
+                        start_node=DirectRelationReference("test_space", "jennifer"),
+                        end_node=DirectRelationReference("test_space", name),
+                        type=DirectRelationReference("sp_pygen_models", "outwards"),
+                        properties=None,
+                        **DEFAULT_INSTANCE_ARGS,
+                    )
+                    for i, name in enumerate(names)
+                ],
+                cursor=None,
+            ),
+            name="0_1",
+            expression=query.EdgeResultSetExpression(from_="0", chain_to="source", direction="outwards"),
+            selected_properties=None,
+            connection_property=ViewPropertyId(view_id_a, "outwards"),
+        ),
+        QueryResultStep(
+            results=NodeListWithCursor(
+                [
+                    Node(
+                        space="test_space",
+                        external_id=name,
+                        properties=Properties({view_id_b: {"name": name.capitalize()}}),
+                        type=None,
+                        **DEFAULT_INSTANCE_ARGS,
+                    )
+                    for name in names
+                ],
+                cursor=None,
+            ),
+            name="0_1_1",
+            expression=query.NodeResultSetExpression(filter=filters.HasData(views=[view_id_b]), from_="0_1"),
+            view_id=view_id_b,
+            connection_property=ViewPropertyId(view_id_b, "endNode"),
+        ),
+    ]
+
+
+@pytest.fixture(scope="module")
+def node_with_three_direct_relations() -> list[QueryResultStep]:
+    view_id_a = ViewId("sp_pygen_models", "ConnectionItemA", "1")
+    view_id_b = ViewId("sp_pygen_models", "ConnectionItemB", "1")
+    names = ["brenda", "charlie", "dave"]
+    return [
+        QueryResultStep(
+            results=NodeListWithCursor(
+                [
+                    Node(
+                        space="test_space",
+                        external_id="jennifer",
+                        properties=Properties(
+                            {
+                                view_id_a: {
+                                    "name": "Jennifer",
+                                    "friends": [{"space": "test_space", "externalId": name} for name in names],
+                                }
+                            }
+                        ),
+                        type=None,
+                        **DEFAULT_INSTANCE_ARGS,
+                    )
+                ],
+                cursor=None,
+            ),
+            name="0",
+            expression=query.NodeResultSetExpression(filter=filters.HasData(views=[view_id_a])),
+            view_id=view_id_a,
+        ),
+        QueryResultStep(
+            results=NodeListWithCursor(
+                [
+                    Node(
+                        space="test_space",
+                        external_id=name,
+                        properties=Properties({view_id_b: {"name": name.capitalize()}}),
+                        type=None,
+                        **DEFAULT_INSTANCE_ARGS,
+                    )
+                    for name in names
+                ],
+                cursor=None,
+            ),
+            name="0_1",
+            expression=query.NodeResultSetExpression(
+                filter=filters.HasData(views=[view_id_b]),
+                from_="0",
+                direction="outwards",
+                through=view_id_a.as_property_ref("friends"),
+            ),
+            view_id=view_id_b,
+            connection_property=ViewPropertyId(view_id_a, "friends"),
+        ),
+    ]
+
+
 class TestQueryUnpacker:
     def test_empty_response(self) -> None:
         unpacker = QueryUnpacker(steps=[])
@@ -303,3 +426,36 @@ class TestQueryUnpacker:
         flatten = QueryUnpacker.flatten_dump(instance, None, None)
 
         assert flatten == expected
+
+    @pytest.mark.parametrize(
+        "limit, expected_count",
+        [
+            pytest.param(2, 2, id="Limit of 2"),
+            pytest.param(1, 1, id="Limit of 1"),
+            pytest.param(None, 3, id="No limit"),
+        ],
+    )
+    def test_nested_connection_limit_edges_skip(
+        self, limit: int | None, expected_count: int, node_with_three_edges_and_nodes: list[QueryResultStep]
+    ) -> None:
+        unpacker = QueryUnpacker(steps=node_with_three_edges_and_nodes, edges="skip", nested_connection_limit=limit)
+        unpacked = unpacker.unpack()
+
+        assert len(unpacked) == 1
+        assert len(unpacked[0]["outwards"]) == expected_count
+
+    @pytest.mark.parametrize(
+        "limit, expected_count",
+        [
+            pytest.param(2, 2, id="Limit of 2"),
+            pytest.param(None, 3, id="No limit"),
+        ],
+    )
+    def test_nested_connection_limit_direct_relation(
+        self, limit: int | None, expected_count: int, node_with_three_direct_relations: list[QueryResultStep]
+    ) -> None:
+        unpacker = QueryUnpacker(steps=node_with_three_direct_relations, edges="skip", nested_connection_limit=limit)
+        unpacked = unpacker.unpack()
+
+        assert len(unpacked) == 1
+        assert len(unpacked[0]["friends"]) == expected_count
