@@ -10,11 +10,14 @@ from cognite.client import ClientConfig, CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
 from cognite_core import CogniteCoreClient
+from dotenv import load_dotenv
 from omni import OmniClient
 from omni_sub import OmniSubClient
 from wind_turbine import WindTurbineClient
 
-from tests.constants import OMNI_SDK
+from tests.constants import OMNI_SDK, REPO_ROOT
+
+load_dotenv(REPO_ROOT / ".env")
 
 
 @pytest.fixture(scope="session")
