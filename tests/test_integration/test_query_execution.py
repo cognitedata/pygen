@@ -431,6 +431,10 @@ class TestQueryExecutorIterate:
             if not (set(subitem.keys()) <= {"name", "externalId"})
         ]
         assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+        items_exceeding_nested_limit = [
+            item for item in first_page.items if len(item.get("directReverseMulti", [])) > 1
+        ]
+        assert not items_exceeding_nested_limit, f"Items exceeding nested_limit: {items_exceeding_nested_limit}"
 
     def test_iterate_with_nested_outwards(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
         view = omni_views["ConnectionItemA"]
@@ -454,6 +458,8 @@ class TestQueryExecutorIterate:
             if not (set(subitem.keys()) <= {"name", "externalId"})
         ]
         assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+        items_exceeding_nested_limit = [item for item in first_page.items if len(item.get("outwards", [])) > 1]
+        assert not items_exceeding_nested_limit, f"Items exceeding nested_limit: {items_exceeding_nested_limit}"
 
     def test_iterate_with_nested_direct(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
         view = omni_views["ConnectionItemA"]
@@ -478,3 +484,5 @@ class TestQueryExecutorIterate:
             if not (set(subitem.keys()) <= {"name", "externalId"})
         ]
         assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+        items_exceeding_nested_limit = [item for item in first_page.items if len(item.get("selfDirect", [])) > 1]
+        assert not items_exceeding_nested_limit, f"Items exceeding nested_limit: {items_exceeding_nested_limit}"
