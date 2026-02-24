@@ -372,7 +372,7 @@ class TestQueryExecutorIterate:
     def test_iterate_from_last_page(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
         view = omni_views["PrimitiveRequired"]
         executor = QueryExecutor(cognite_client, views=[view], unpack_edges="skip")
-        properties = ["externalId", "text", "boolean", "externalId"]
+        properties: SelectedProperties = ["externalId", "text", "boolean", "externalId"]
         first_page = next(iter(executor.iterate(view.as_id(), properties, chunk_size=2)))
         assert len(first_page.items) == 2
         incorrect_items = [item for item in first_page.items if not (set(item.keys()) <= set(properties))]
@@ -390,7 +390,7 @@ class TestQueryExecutorIterate:
     def test_iterate_two_pages(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
         view = omni_views["PrimitiveRequired"]
         executor = QueryExecutor(cognite_client, views=[view], unpack_edges="skip")
-        properties = ["externalId", "text", "boolean", "externalId"]
+        properties: SelectedProperties = ["externalId", "text", "boolean", "externalId"]
         first_page: Page | None = None
         second_page: Page | None = None
         for page in executor.iterate(view.as_id(), properties, chunk_size=2):
@@ -409,3 +409,80 @@ class TestQueryExecutorIterate:
             item for item in first_page.items + second_page.items if not (set(item.keys()) <= set(properties))
         ]
         assert not incorrect_items, f"Items with unexpected properties: {incorrect_items}"
+
+    def test_iterate_with_nested_reverse(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+        view = omni_views["ConnectionItemE"]
+        executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
+        properties: SelectedProperties = [
+            "externalId",
+            "name",
+            {"directReverseMulti": ["name", "externalId"]},
+        ]
+        first_page = next(iter(executor.iterate(view.as_id(), properties, chunk_size=2, nested_limit=1)))
+        assert len(first_page.items) == 2
+        flatten_props = {"name", "directReverseMulti", "externalId"}
+        ill_formed_items = [item for item in first_page.items if not (set(item.keys()) <= flatten_props)]
+        assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+        assert any(item.get("directReverseMulti") for item in first_page.items), "No subitems found"
+        ill_formed_subitems = [
+            subitem
+            for item in first_page.items
+            for subitem in item.get("directReverseMulti", [])
+            if not (set(subitem.keys()) <= {"name", "externalId"})
+        ]
+        assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+        items_exceeding_nested_limit = [
+            item for item in first_page.items if len(item.get("directReverseMulti", [])) > 1
+        ]
+        assert not items_exceeding_nested_limit, f"Items exceeding nested_limit: {items_exceeding_nested_limit}"
+
+    def test_iterate_with_nested_outwards(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+        view = omni_views["ConnectionItemA"]
+        executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
+        properties: SelectedProperties = [
+            "externalId",
+            "name",
+            {"outwards": [{"node": ["name", "externalId"]}, "type"]},
+        ]
+        first_page = next(iter(executor.iterate(view.as_id(), properties, chunk_size=2, nested_limit=1)))
+        assert len(first_page.items) == 2
+        flatten_props = {"name", "outwards", "externalId"}
+        ill_formed_items = [item for item in first_page.items if not (set(item.keys()) <= flatten_props)]
+        assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+        assert any(item.get("outwards") for item in first_page.items), "No subitems found"
+        ill_formed_subitems = [
+            subitem
+            for item in first_page.items
+            for edge in item.get("outwards", [])
+            for subitem in edge.get("node", [])
+            if not (set(subitem.keys()) <= {"name", "externalId"})
+        ]
+        assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+        items_exceeding_nested_limit = [item for item in first_page.items if len(item.get("outwards", [])) > 1]
+        assert not items_exceeding_nested_limit, f"Items exceeding nested_limit: {items_exceeding_nested_limit}"
+
+    def test_iterate_with_nested_direct(self, cognite_client: CogniteClient, omni_views: dict[str, dm.View]) -> None:
+        view = omni_views["ConnectionItemA"]
+        executor = QueryExecutor(cognite_client, views=[view], unpack_edges="include")
+        properties: SelectedProperties = [
+            "externalId",
+            "name",
+            {"selfDirect": ["name", "externalId"]},
+        ]
+        first_page = next(iter(executor.iterate(view.as_id(), properties, chunk_size=2, nested_limit=1)))
+        assert len(first_page.items) == 2
+        flatten_props = {"name", "externalId"}
+        ill_formed_items = [
+            item for item in first_page.items if not (set(item.keys()) <= flatten_props.union({"selfDirect"}))
+        ]
+        assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
+        assert any(item.get("selfDirect") for item in first_page.items), "No subitems found"
+        ill_formed_subitems = [
+            subitem
+            for item in first_page.items
+            for subitem in item.get("selfDirect", [])
+            if not (set(subitem.keys()) <= {"name", "externalId"})
+        ]
+        assert not ill_formed_subitems, f"Subitems with unexpected properties: {ill_formed_subitems}"
+        items_exceeding_nested_limit = [item for item in first_page.items if len(item.get("selfDirect", [])) > 1]
+        assert not items_exceeding_nested_limit, f"Items exceeding nested_limit: {items_exceeding_nested_limit}"

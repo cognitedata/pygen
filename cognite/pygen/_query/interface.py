@@ -19,7 +19,7 @@ from .builder import QueryBuilder
 from .constants import AGGREGATION_LIMIT, IN_FILTER_CHUNK_SIZE, SEARCH_LIMIT, SelectedProperties
 from .executor import chunker
 from .processing import QueryUnpacker
-from .step import QueryBuildStepFactory, QueryResultStepList
+from .step import QueryBuildStepFactory
 
 
 @dataclass
@@ -366,33 +366,54 @@ class QueryExecutor:
     def _execute_iterate(
         self,
         view_id: dm.ViewId,
-        properties: list[str],
+        properties: SelectedProperties,
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         cursor: str | None = None,
-        chunk_size: int | None = None,
+        chunk_size: int = 10,
+        nested_limit: int = 10,
     ) -> Iterator[Page]:
         view = self._get_view(view_id)
         builder = QueryBuilder()
         factory = QueryBuildStepFactory(
-            # MyPy complains about invariance.
             builder.create_name,
             view=view,
-            user_selected_properties=properties,  # type: ignore[arg-type]
+            user_selected_properties=properties,
             unpack_edges=self._unpack_edges,
         )
         builder.append(
             factory.root(filter, limit=None, sort=self._as_sort_list(sort), max_retrieve_batch_limit=chunk_size)
         )
+        if factory.connection_properties:
+            reverse_views = {
+                prop.through.source: self._get_view(prop.through.source)
+                for prop in factory.reverse_properties.values()
+                if isinstance(prop.through.source, dm.ViewId)
+            }
+            for connection_id, connection in factory.connection_properties.items():
+                connection_steps = factory.from_connection(
+                    # We need to set the max_retrieve_limit to nested_limit*chunk_size to ensure that we retrieve
+                    # enough instances per root instance.
+                    connection_id,
+                    connection,
+                    reverse_views,
+                    max_retrieve_limit=nested_limit * chunk_size,
+                )
+                builder.extend(connection_steps)
 
         executor = builder.build()
         init_cursors: dict[str, str | None] | None = None
         if cursor is not None:
             init_cursors = {factory.root_name: cursor}
-        step: QueryResultStepList
+
         for step in executor.iterate(self._client, remove_not_connected=False, init_cursors=init_cursors):
             items = QueryUnpacker(
-                step, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
+                step,
+                edges=self._unpack_edges,
+                as_data_record=False,
+                edge_type_key="type",
+                node_type_key="type",
+                nested_connection_limit=nested_limit,
             ).unpack()
             yield Page(items=items, cursor=step._cursors.get(factory.root_name))
 
@@ -544,11 +565,12 @@ class QueryExecutor:
     def iterate(
         self,
         view: dm.ViewId,
-        properties: list[str],
+        properties: SelectedProperties,
         filter: filters.Filter | None = None,
         sort: Sequence[dm.InstanceSort] | dm.InstanceSort | None = None,
         initial_cursor: str | None = None,
-        chunk_size: int | None = None,
+        chunk_size: int = 10,
+        nested_limit: int = 10,
     ) -> Iterator[Page]:
         """Iterate over nodes in a view.
 
@@ -558,14 +580,15 @@ class QueryExecutor:
             filter: The filter to apply ahead of the list operation.
             sort: The sort order of the results.
             initial_cursor: The cursor to start from. If None, starts from the beginning.
-            chunk_size: The number of results to include in each page. If None, defaults to 1000.
+            chunk_size: The number of results to include in each page. Defaults to 10.
+            nested_limit: The maximum number of nested properties to include in the result. Defaults to 10.
 
         Returns:
             Page: The page of results.
 
         """
         filter = self._equals_none_to_not_exists(filter)
-        yield from self._execute_iterate(view, properties, filter, sort, initial_cursor, chunk_size)
+        yield from self._execute_iterate(view, properties, filter, sort, initial_cursor, chunk_size, nested_limit)
 
     def list(
         self,
