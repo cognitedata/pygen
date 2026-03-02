@@ -14,3 +14,11 @@ class TestSelectMethod:
         query_yaml = pygen.connection_item_a.select().other_direct._dump_yaml()
 
         assert isinstance(query_yaml, str)
+
+    @pytest.mark.filterwarnings(
+        r"error:You may be trying to combine two \(or more\) filters using 'and' or 'or'.*:UserWarning"
+    )
+    def test_select_no_user_warning(self) -> None:
+        with monkeypatch_cognite_client() as client:
+            pygen = OmniClient(client)
+        pygen.connection_item_a.select().name.equals("test").list_full()
