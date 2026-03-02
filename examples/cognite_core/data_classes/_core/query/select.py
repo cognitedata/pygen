@@ -99,7 +99,7 @@ global_config.max_select_depth = {global_config.max_select_depth+1}
     def _assemble_filter(self) -> dm.filters.Filter | None:
         filters: list[dm.filters.Filter] = [self._view_filter] if self._view_filter is not None else []
         for filter_cls in self._filter_classes:
-            if item := filter_cls._as_filter():
+            if (item := filter_cls._as_filter()) is not None:
                 filters.append(item)
         return dm.filters.And(*filters) if filters else None
 
