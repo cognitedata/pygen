@@ -5,7 +5,6 @@ from typing import Any, Literal, overload, TYPE_CHECKING
 
 from cognite.client import data_modeling as dm
 
-
 if TYPE_CHECKING:
     from omni_sub.data_classes._core.base import DomainModel, T_DomainModel
 

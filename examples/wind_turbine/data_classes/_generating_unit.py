@@ -35,7 +35,6 @@ from wind_turbine.data_classes._core import (
     FloatFilter,
 )
 
-
 __all__ = [
     "GeneratingUnit",
     "GeneratingUnitWrite",

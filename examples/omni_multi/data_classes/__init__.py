@@ -54,7 +54,6 @@ from ._sub_interface import (
     SubInterfaceWriteList,
 )
 
-
 __all__ = [
     "DataRecord",
     "DataRecordGraphQL",

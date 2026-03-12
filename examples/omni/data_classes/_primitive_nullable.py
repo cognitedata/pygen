@@ -41,7 +41,6 @@ from omni.data_classes._core import (
     TimestampFilter,
 )
 
-
 __all__ = [
     "PrimitiveNullable",
     "PrimitiveNullableWrite",

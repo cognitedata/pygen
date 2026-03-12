@@ -31,7 +31,6 @@ from omni_multi.data_classes._core.query.builder import QueryBuilder
 from omni_multi.data_classes._core.query.processing import QueryUnpacker
 from omni_multi.data_classes._core.query.step import QueryBuildStep, ViewPropertyId
 
-
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 
 

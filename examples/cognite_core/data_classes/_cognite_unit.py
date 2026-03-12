@@ -36,7 +36,6 @@ from cognite_core.data_classes._core import (
 )
 from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
 
-
 __all__ = [
     "CogniteUnit",
     "CogniteUnitWrite",

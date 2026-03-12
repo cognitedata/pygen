@@ -37,7 +37,6 @@ from wind_turbine.data_classes._core import (
     BooleanFilter,
 )
 
-
 __all__ = [
     "SensorTimeSeries",
     "SensorTimeSeriesWrite",

@@ -34,7 +34,6 @@ from omni_multi.data_classes._core import (
     ViewPropertyId,
 )
 
-
 __all__ = [
     "Implementation1v1",
     "Implementation1v1Write",

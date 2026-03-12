@@ -36,7 +36,6 @@ from cognite_core.data_classes._core import (
     FloatFilter,
 )
 
-
 __all__ = [
     "Cognite3DTransformationNode",
     "Cognite3DTransformationNodeWrite",

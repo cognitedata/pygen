@@ -39,7 +39,6 @@ from wind_turbine.data_classes._core import (
     TimestampFilter,
 )
 
-
 __all__ = [
     "DataSheet",
     "DataSheetWrite",
