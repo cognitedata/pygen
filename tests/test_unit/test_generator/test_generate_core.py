@@ -125,12 +125,15 @@ def test_generate_data_class_core_constant_no_default_space(omnisub_multi_api_ge
     assert actual == expected
 
 
-def test_generate_data_class_core_helpers_no_default_space(omnisub_multi_api_generator: MultiAPIGenerator) -> None:
+def test_generate_data_class_core_helpers_no_default_space(
+    omnisub_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
+) -> None:
     # Arrange
     expected = OmniSubFiles.data_core_helpers.read_text()
 
     # Act
     actual = omnisub_multi_api_generator.generate_data_class_core_helpers_file()
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected
