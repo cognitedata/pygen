@@ -24,6 +24,7 @@ from pydantic import BaseModel, BeforeValidator, model_validator, field_validato
 from pydantic.alias_generators import to_camel
 from pydantic.functional_serializers import PlainSerializer
 
+
 TimeSeries = Annotated[
     CogniteTimeSeries,
     PlainSerializer(

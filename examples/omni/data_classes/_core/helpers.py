@@ -7,6 +7,7 @@ from cognite.client import data_modeling as dm
 
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
 
+
 if TYPE_CHECKING:
     from omni.data_classes._core.base import DomainModel, T_DomainModel
 
