@@ -52,7 +52,6 @@ from omni.data_classes._core import (
     ViewPropertyId,
 )
 
-
 __all__ = [
     "CDFExternalReferences",
     "CDFExternalReferencesWrite",

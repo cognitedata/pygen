@@ -38,7 +38,6 @@ from omni.data_classes._core import (
     IntFilter,
 )
 
-
 __all__ = [
     "PrimitiveWithDefaults",
     "PrimitiveWithDefaultsWrite",

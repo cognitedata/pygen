@@ -37,7 +37,6 @@ from cognite_core.data_classes._core import (
     TimestampFilter,
 )
 
-
 __all__ = [
     "CogniteSchedulable",
     "CogniteSchedulableWrite",

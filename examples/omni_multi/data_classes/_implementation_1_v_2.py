@@ -35,7 +35,6 @@ from omni_multi.data_classes._core import (
 )
 from omni_multi.data_classes._sub_interface import SubInterface, SubInterfaceWrite
 
-
 __all__ = [
     "Implementation1v2",
     "Implementation1v2Write",

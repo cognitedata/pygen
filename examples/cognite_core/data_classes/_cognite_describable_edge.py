@@ -35,7 +35,6 @@ from cognite_core.data_classes._core import (
     ViewPropertyId,
 )
 
-
 __all__ = [
     "CogniteDescribableEdge",
     "CogniteDescribableEdgeWrite",

@@ -36,7 +36,6 @@ from omni.data_classes._core import (
 )
 from omni.data_classes._sub_interface import SubInterface, SubInterfaceWrite
 
-
 __all__ = [
     "Implementation1",
     "Implementation1Write",
