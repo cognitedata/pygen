@@ -48,12 +48,7 @@ from cognite.client.utils import ms_to_datetime
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from cognite_core.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
-from cognite_core.data_classes._core.cdf_external import (
-    FileMetadataGraphQL,
-    GraphQLExternal,
-    SequenceGraphQL,
-    TimeSeriesGraphQL,
-)
+from cognite_core.data_classes._core.cdf_external import GraphQLExternal
 from cognite_core.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
 from cognite_core.config import global_config
 
@@ -892,20 +887,6 @@ def as_read_args(model: GraphQLCore | GraphQLExternal) -> dict[str, Any]:
                 )
         else:
             output[key] = as_read_value(value)
-    if isinstance(model, TimeSeriesGraphQL | FileMetadataGraphQL | SequenceGraphQL):
-        # GraphQL objects does not guarantee required fields are set,
-        # so we set dummy values for the required fields.
-        if "id" not in output:
-            output["id"] = -1
-        if "createdTime" not in output:
-            output["createdTime"] = 0
-        if "lastUpdatedTime" not in output:
-            output["lastUpdatedTime"] = 1
-    if isinstance(model, TimeSeriesGraphQL):
-        if "isStep" not in output:
-            output["isStep"] = False
-        if "isString" not in output:
-            output["isString"] = False
     return output
 
 

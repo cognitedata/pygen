@@ -123,7 +123,10 @@ class TimeSeriesGraphQL(GraphQLExternal):
                     )
                 data["datapoints"] = datapoints["items"]
                 if missing := [name for name in ["id", "isString", "isStep"] if data.get(name) is None]:
-                    raise ValueError(f"Cannot create datapoints, missing required fields: {', '.join(missing)}")
+                    raise ValueError(
+                        f"Cannot create datapoints, missing required fields: {', '.join(missing)}. "
+                        "You need to include these in your query."
+                    )
                 if "type" not in data:
                     # Type is not supported in the timeseries you retrieve through GraphQL, but it is required
                     # for the Datapoints object. Luckily it can be inferred from the isString field, so we set it here.
