@@ -286,6 +286,9 @@ class TestAsWrite:
                 mime_type="application/json",
                 directory="/tmp",
                 name="my_file_external_id",
+                uploaded=True,
+                last_updated_time=1,
+                created_time=0,
             ),
             timeseries=TimeSeries(
                 id=987654321,
@@ -293,6 +296,8 @@ class TestAsWrite:
                 name="my_timeseries_external_id",
                 is_step=False,
                 is_string=False,
+                last_updated_time=1,
+                created_time=0,
             ),
             sequence=Sequence(
                 id=1122334455,
@@ -302,9 +307,11 @@ class TestAsWrite:
                     SequenceColumn(
                         external_id="column1",
                         name="column1",
-                        value_type="String",
+                        value_type="STRING",
                     )
                 ],
+                last_updated_time=1,
+                created_time=0,
             ),
         )
 
