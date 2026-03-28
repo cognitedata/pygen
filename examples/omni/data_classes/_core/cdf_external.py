@@ -147,7 +147,7 @@ class TimeSeriesGraphQL(GraphQLExternal):
 
     def as_read(self) -> CogniteTimeSeries:
         return CogniteTimeSeries(
-            id=self.id,
+            id=self.id or -1,
             external_id=self.external_id,
             instance_id=self.instance_id,
             name=self.name,
@@ -159,8 +159,8 @@ class TimeSeriesGraphQL(GraphQLExternal):
             is_step=self.is_step or False,
             description=self.description,
             security_categories=self.security_categories,
-            created_time=self.created_time,
-            last_updated_time=self.last_updated_time,
+            created_time=self.created_time or 0,
+            last_updated_time=self.last_updated_time or 1,
         )
 
 
