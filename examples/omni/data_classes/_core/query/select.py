@@ -224,7 +224,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     step.connection_property = item._connection_property
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
-                step.expression.sort = item._create_sort()
+                step.expression.sort = item._create_sort() or []
                 builder.append(step)
             elif isinstance(item, NodeQueryCore) and isinstance(item._expression, dm.query.EdgeResultSetExpression):
                 # Edge without properties
