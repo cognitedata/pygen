@@ -239,7 +239,7 @@ class SequenceColumnGraphQL(GraphQLExternal):
     @field_validator("value_type", mode="before")
     def title_value_type(cls, value: Any) -> Any:
         if isinstance(value, str):
-            return value.title()
+            return value.upper()
         return value
 
     @no_type_check
@@ -296,14 +296,14 @@ class SequenceGraphQL(GraphQLExternal):
     @no_type_check
     def as_read(self) -> CogniteSequence:
         return CogniteSequence(
-            id=self.id,
+            id=self.id or -1,
             name=self.name,
             description=self.description,
             asset_id=self.asset_id,
             external_id=self.external_id,
             metadata=self.metadata,
             columns=[col.as_read() for col in self.columns or []] if self.columns else None,
-            created_time=self.created_time,
-            last_updated_time=self.last_updated_time,
+            created_time=self.created_time or 0,
+            last_updated_time=self.last_updated_time or 1,
             data_set_id=self.data_set_id,
         )
