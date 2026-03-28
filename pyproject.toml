@@ -7,8 +7,8 @@ readme="README.md"
 requires-python = ">=3.10,<4.0"
 license = "Apache-2.0"
 dependencies = [
-    "cognite-sdk>=7.86.0, <8.0.0",
-    # pydantic 2.7.0 is the latest versoion supported by pyodide '0.26.2' which is what is used in the
+    "cognite-sdk>=8.0.1, <9.0.0",
+    # pydantic 2.7.0 is the latest version supported by pyodide '0.26.2' which is what is used in the
     # Cognite JupyterLab environment.
     # Thus, we pin it to ensure compatibility with the pyodide build.
     "pydantic>=2.7",
@@ -61,7 +61,7 @@ dev = [
     "Faker>=18.0.0",
     "hypothesis>=6.0.0",
     "jupyterlab>=3.0.0",
-    "cognite-toolkit==0.5.87",
+#    "cognite-toolkit==0.5.87",
     "marko>=2.1.0, <3.0.0",
 ]
 
