@@ -64,6 +64,9 @@ if _has_typer:
             cdf_cluster: str = typer.Option(
                 default=loaded_settings.cdf_cluster.default, help=loaded_settings.cdf_cluster.help
             ),
+            cdf_url: Optional[str] = typer.Option(
+                default=loaded_settings.cdf_url.default, help=loaded_settings.cdf_url.help
+            ),
             cdf_project: str = typer.Option(
                 default=loaded_settings.cdf_project.default, help=loaded_settings.cdf_project.help
             ),
@@ -98,9 +101,16 @@ if _has_typer:
                 )
                 client = CogniteClient(clientConfig)
             else:
-                client = CogniteClient.default_oauth_client_credentials(
-                    cdf_project, cdf_cluster, tenant_id, client_id, client_secret
+                credentials = OAuthClientCredentials.default_for_azure_ad(
+                    tenant_id, client_id, client_secret, cdf_cluster
                 )
+                clientConfig = ClientConfig(
+                    client_name="pygen",
+                    project=cdf_project,
+                    credentials=credentials,
+                    base_url=cdf_url or f"https://{cdf_cluster}.cognitedata.com",
+                )
+                client = CogniteClient(clientConfig)
             data_models: list[tuple[str, str, str]]
             if settings and settings.data_models:
                 data_models = settings.data_models
@@ -140,6 +150,7 @@ if _has_typer:
             client_secret: Annotated[str, typer.Option(..., help="Client Secret for connecting to CDF")],
             cdf_cluster: Annotated[str, typer.Option(..., help=default_settings.cdf_cluster.help)],
             cdf_project: Annotated[str, typer.Option(..., help=default_settings.cdf_project.help)],
+            cdf_url: Annotated[Optional[str], typer.Option(..., help=default_settings.cdf_url.help)] = None,
             tenant_id: Annotated[Optional[str], typer.Option(..., help=default_settings.tenant_id.help)] = None,
             token_url: Annotated[Optional[str], typer.Option(..., help=default_settings.token_url.help)] = None,
             scopes: Annotated[Optional[str], typer.Option(..., help=default_settings.scopes.help)] = None,
@@ -175,9 +186,16 @@ if _has_typer:
                 )
                 client = CogniteClient(clientConfig)
             elif tenant_id:
-                client = CogniteClient.default_oauth_client_credentials(
-                    cdf_project, cdf_cluster, tenant_id, client_id, client_secret
+                credentials = OAuthClientCredentials.default_for_azure_ad(
+                    tenant_id, client_id, client_secret, cdf_cluster
                 )
+                clientConfig = ClientConfig(
+                    client_name="pygen",
+                    project=cdf_project,
+                    credentials=credentials,
+                    base_url=cdf_url or f"https://{cdf_cluster}.cognitedata.com",
+                )
+                client = CogniteClient(clientConfig)
             else:
                 print("Either tenant-id or token-url is required parameters")
                 raise typer.Exit(code=1)
