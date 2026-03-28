@@ -60,24 +60,31 @@ def test_generate_data_class_core_query_init(omni_multi_api_generator: MultiAPIG
     assert actual == expected
 
 
-def test_generate_data_class_core_query_filter_classes(omni_multi_api_generator: MultiAPIGenerator) -> None:
+def test_generate_data_class_core_query_filter_classes(
+    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
+) -> None:
     # Arrange
     expected = OmniFiles.data_core_query_filter_classes.read_text()
 
     # Act
     actual = omni_multi_api_generator.generate_data_class_core_query_filter_classes()
 
+    actual = code_formatter.format_code(actual)
+
     # Assert
     assert actual == expected
 
 
-def test_generate_data_class_core_query_select(omni_multi_api_generator: MultiAPIGenerator) -> None:
+def test_generate_data_class_core_query_select(
+    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
+) -> None:
     # Arrange
     expected = OmniFiles.data_core_query_select.read_text()
 
     # Act
     actual = omni_multi_api_generator.generate_data_class_core_query_select()
 
+    actual = code_formatter.format_code(actual)
     # Assert
     assert actual == expected
 
@@ -92,12 +99,16 @@ def test_generate_data_class_query_files(omni_multi_api_generator: MultiAPIGener
         assert actual == expected, f"File: {filename}"
 
 
-def test_generate_data_class_core_cdf_external(omni_multi_api_generator: MultiAPIGenerator) -> None:
+def test_generate_data_class_core_cdf_external(
+    omni_multi_api_generator: MultiAPIGenerator, code_formatter: CodeFormatter
+) -> None:
     # Arrange
     expected = OmniFiles.data_core_cdf_external.read_text()
 
     # Act
     actual = omni_multi_api_generator.generate_data_class_core_cdf_external_file()
+
+    actual = code_formatter.format_code(actual)
 
     # Assert
     assert actual == expected
