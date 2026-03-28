@@ -123,7 +123,7 @@ class TimeSeriesGraphQL(GraphQLExternal):
                     )
                 data["datapoints"] = datapoints["items"]
                 if "id" not in data:
-                    data["id"] =data.get("id", -1)
+                    data["id"] = data.get("id", -1)
                 if "isStep" not in data:
                     data["isStep"] = data.get("isStep", False)
                 is_string = data.get("isString", False)
