@@ -122,6 +122,15 @@ class TimeSeriesGraphQL(GraphQLExternal):
                         datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
                     )
                 data["datapoints"] = datapoints["items"]
+                if "id" not in data:
+                    data["id"] =data.get("id", -1)
+                if "isStep" not in data:
+                    data["isStep"] = data.get("isStep", False)
+                is_string = data.get("isString", False)
+                if "isString" not in data:
+                    data["isString"] = is_string
+                if "type" not in data:
+                    data["type"] = "string" if is_string else "numeric"
                 data["data"] = Datapoints.load(data)
         if isinstance(data, dict) and "getLatestDataPoint" in data:
             latest = data.pop("getLatestDataPoint")
