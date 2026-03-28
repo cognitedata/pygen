@@ -1,6 +1,8 @@
 from typing import Any
+from unittest.mock import MagicMock
 
 import pytest
+from cognite.client import ClientConfig
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes.data_modeling.instances import Properties
 from cognite.client.testing import monkeypatch_cognite_client
@@ -171,6 +173,8 @@ class TestGraphQLQuery:
 class TestAPIClass:
     def test_skip_validation(self) -> None:
         with monkeypatch_cognite_client() as mock_client:
+            mock_client.config = MagicMock(spec=ClientConfig)
+            mock_client.config.client_name = "CognitePygen"
             mock_client.data_modeling.instances.list.return_value = dm.NodeList[dm.Node](
                 [
                     dm.Node(
@@ -214,6 +218,8 @@ class TestAPIClass:
 
     def test_retrieve_extra_arguments(self) -> None:
         with monkeypatch_cognite_client() as mock_client:
+            mock_client.config = MagicMock(spec=ClientConfig)
+            mock_client.config.client_name = "CognitePygen"
             mock_client.data_modeling.instances.list.return_value = dm.NodeList[dm.Node](
                 [
                     dm.Node(
@@ -250,6 +256,8 @@ class TestAPIClass:
 
     def test_retrieve_unknown_enum(self) -> None:
         with monkeypatch_cognite_client() as mock_client:
+            mock_client.config = MagicMock(spec=ClientConfig)
+            mock_client.config.client_name = "CognitePygen"
             mock_client.data_modeling.instances.list.return_value = dm.NodeList[dm.Node](
                 [
                     dm.Node(
