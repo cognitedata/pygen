@@ -122,8 +122,12 @@ class TimeSeriesGraphQL(GraphQLExternal):
                         datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
                     )
                 data["datapoints"] = datapoints["items"]
-                if missing := [name for name in ["id", "isString", "isStep", "type"] if data.get(name) is None]:
+                if missing := [name for name in ["id", "isString", "isStep"] if data.get(name) is None]:
                     raise ValueError(f"Cannot create datapoints, missing required fields: {', '.join(missing)}")
+                if "type" not in data:
+                    # Type is not supported in the timeseries you retrieve through GraphQL, but it is required
+                    # for the Datapoints object. Luckily it can be inferred from the isString field, so we set it here.
+                    data["type"] = "string" if data["isString"] else "numeric"
                 data["data"] = Datapoints.load(data)
         if isinstance(data, dict) and "getLatestDataPoint" in data:
             latest = data.pop("getLatestDataPoint")

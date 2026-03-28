@@ -168,6 +168,9 @@ def test_query_with_datapoints(turbine_client: WindTurbineClient) -> None:
       temperature{
         externalId
         name
+        id
+        isStep
+        isString
         getDataPoints(granularity: "1d", aggregates: SUM, first: 100){
           items{
             timestamp
