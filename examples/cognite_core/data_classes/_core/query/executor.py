@@ -256,7 +256,7 @@ class QueryExecutor:
                 is_selected = is_items if step.raw_filter is None else dm.filters.And(is_items, step.raw_filter)
 
                 chunk_result = client.data_modeling.instances.search(
-                    view_id, properties=None, filter=is_selected, limit=api_limit
+                    view=view_id, properties=None, filter=is_selected, limit=api_limit
                 )
                 for node in chunk_result:
                     node_id = node.as_id()
