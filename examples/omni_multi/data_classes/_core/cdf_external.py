@@ -122,15 +122,8 @@ class TimeSeriesGraphQL(GraphQLExternal):
                         datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
                     )
                 data["datapoints"] = datapoints["items"]
-                if "id" not in data:
-                    data["id"] = data.get("id", -1)
-                if "isStep" not in data:
-                    data["isStep"] = data.get("isStep", False)
-                is_string = data.get("isString", False)
-                if "isString" not in data:
-                    data["isString"] = is_string
-                if "type" not in data:
-                    data["type"] = "string" if is_string else "numeric"
+                if missing := [name for name in ["id", "isString", "isStep", "type"] if data.get(name) is None]:
+                    raise ValueError(f"Cannot create datapoints, missing required fields: {', '.join(missing)}")
                 data["data"] = Datapoints.load(data)
         if isinstance(data, dict) and "getLatestDataPoint" in data:
             latest = data.pop("getLatestDataPoint")
@@ -154,22 +147,23 @@ class TimeSeriesGraphQL(GraphQLExternal):
             description=self.description,
         )
 
+    @no_type_check
     def as_read(self) -> CogniteTimeSeries:
         return CogniteTimeSeries(
-            id=self.id or -1,
+            id=self.id,
             external_id=self.external_id,
             instance_id=self.instance_id,
             name=self.name,
-            is_string=self.is_string or False,
+            is_string=self.is_string,
             metadata=self.metadata,
             unit=self.unit,
             unit_external_id=self.unit_external_id,
             asset_id=self.asset_id,
-            is_step=self.is_step or False,
+            is_step=self.is_step,
             description=self.description,
             security_categories=self.security_categories,
-            created_time=self.created_time or 0,
-            last_updated_time=self.last_updated_time or 1,
+            created_time=self.created_time,
+            last_updated_time=self.last_updated_time,
         )
 
 
@@ -304,14 +298,14 @@ class SequenceGraphQL(GraphQLExternal):
     @no_type_check
     def as_read(self) -> CogniteSequence:
         return CogniteSequence(
-            id=self.id or -1,
+            id=self.id,
             name=self.name,
             description=self.description,
             asset_id=self.asset_id,
             external_id=self.external_id,
             metadata=self.metadata,
             columns=[col.as_read() for col in self.columns or []] if self.columns else None,
-            created_time=self.created_time or 0,
-            last_updated_time=self.last_updated_time or 1,
+            created_time=self.created_time,
+            last_updated_time=self.last_updated_time,
             data_set_id=self.data_set_id,
         )
