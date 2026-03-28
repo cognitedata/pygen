@@ -37,11 +37,15 @@ def test_query_cdf_external_timeseries_and_sequence(omni_client: OmniClient) -> 
       timeseries {
         externalId
         name
+        id
+        isStep
+        isString
       }
 
       sequence{
         externalId
         name
+        id
         columns{
           externalId
           valueType
@@ -78,11 +82,15 @@ def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClie
       timeseries {
         externalId
         name
+        id
+        isStep
+        isString
       }
 
       sequences{
         externalId
         name
+        id
         columns{
           externalId
           valueType
