@@ -48,8 +48,12 @@ from cognite.client.utils import ms_to_datetime
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from omni.data_classes._core.constants import DEFAULT_INSTANCE_SPACE
-from omni.data_classes._core.cdf_external import GraphQLExternal, TimeSeriesGraphQL, FileMetadataGraphQL, \
-    SequenceGraphQL
+from omni.data_classes._core.cdf_external import (
+    FileMetadataGraphQL,
+    GraphQLExternal,
+    SequenceGraphQL,
+    TimeSeriesGraphQL,
+)
 from omni.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
 from omni.config import global_config
 
@@ -888,7 +892,6 @@ def as_read_args(model: GraphQLCore | GraphQLExternal) -> dict[str, Any]:
                 )
         else:
             output[key] = as_read_value(value)
-
     if isinstance(model, TimeSeriesGraphQL | FileMetadataGraphQL | SequenceGraphQL):
         # GraphQL objects does not guarantee required fields are set,
         # so we set dummy values for the required fields.
