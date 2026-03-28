@@ -263,7 +263,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 )
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
-                step.expression.sort = item._create_sort()
+                step.expression.sort = item._create_sort() or []
                 builder.append(step)
             else:
                 raise TypeError(f"Unsupported query step type: {type(item._expression)}")
