@@ -426,7 +426,7 @@ class MockGenerator:
                             },
                             created_time=0,
                             last_updated_time=1,
-                            uploaded=False
+                            uploaded=False,
                         )
                         for file_set in values
                         for file in (cast(list[str], file_set) if isinstance(file_set, list) else [cast(str, file_set)])
