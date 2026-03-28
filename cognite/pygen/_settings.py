@@ -27,7 +27,9 @@ class PygenSettings(BaseModel):
     client_id: Argument = Argument(default=None, help="Client ID for connecting to CDF")
     client_secret: Argument = Argument(default=None, help="Client secret for connecting to CDF")
     cdf_cluster: Argument = Argument(default=None, help="CDF Cluster to connect to")
-    cdf_url: Argument = Argument(default=None, help="CDF base URL override, e.g. for private link (https://p001.plink.<cluster>.cognitedata.com)")
+    cdf_url: Argument = Argument(
+        default=None, help="CDF base URL override, e.g. for private link (https://p001.plink.<cluster>.cognitedata.com)"
+    )
     cdf_project: Argument = Argument(default=None, help="CDF Project to connect to")
     output_dir: Argument = Argument(default=None, help="Output directory for generated SDK")
     top_level_package: Argument = Argument(default="my_domain.client", help="Package name for the generated client.")
