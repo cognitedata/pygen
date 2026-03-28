@@ -29,6 +29,7 @@ from pydantic.functional_serializers import PlainSerializer
 
 T_CogniteResource = TypeVar("T_CogniteResource", bound=CogniteTimeSeries | CogniteSequence | CogniteFileMetadata)
 
+_MISSING_VALUE = -999
 
 def _create_load_method(resource_cls: type[T_CogniteResource], required_fields: Set[str]) -> Callable[[Any], Any]:
     def _load_if_dict(value: Any) -> Any:
@@ -36,7 +37,11 @@ def _create_load_method(resource_cls: type[T_CogniteResource], required_fields: 
             return value
         if missing_values := set(required_fields) - set(value.keys()):
             raise ValueError(f"Missing required fields: {', '.join(missing_values)}")
+        for key in ["createdTime", "lastUpdatedTime"]:
+            # GraphQL does not support returning these properties, while the read classes requires them.
+            value[key] = _MISSING_VALUE
         return resource_cls.load(value)
+
     return _load_if_dict
 
 
