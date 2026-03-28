@@ -424,8 +424,9 @@ class MockGenerator:
                             metadata={
                                 "source": f"Pygen{type(self).__name__}",
                             },
-                created_time=0,
+                            created_time=0,
                             last_updated_time=1,
+                            uploaded=False
                         )
                         for file_set in values
                         for file in (cast(list[str], file_set) if isinstance(file_set, list) else [cast(str, file_set)])
@@ -839,7 +840,7 @@ class MockData(UserList[ViewMockData]):
             if nodes or edges:
                 # There is an 'edge' if there is an outward and inward edge on two views, we can get duplicated edges.
                 # We should remove the duplicates.
-                edges = dm.EdgeApplyList({edge.as_id(): edge for edge in edges}.values())
+                edges = dm.EdgeApplyList(list({edge.as_id(): edge for edge in edges}.values()))
 
                 created = client.data_modeling.instances.apply(
                     nodes,
