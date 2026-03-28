@@ -56,6 +56,8 @@ def load_cognite_client_from_toml(
     cdf_cluster = "<cdf-cluster>"
     client_id = "<client-id>"
     client_secret = "<client-secret>"
+    # Optional: override base URL, e.g. for private link
+    base_url = "https://<private-link-prefix>.plink.<cluster>.cognitedata.com"
     ```
 
     Args:
@@ -73,10 +75,14 @@ def load_cognite_client_from_toml(
         toml_content = toml_content[section]
 
     login_flow = toml_content.pop("login_flow", None)
+    base_url = toml_content.pop("base_url", None)
     if login_flow == "interactive":
-        return CogniteClient.default_oauth_interactive(**toml_content)
+        client = CogniteClient.default_oauth_interactive(**toml_content)
     else:
-        return CogniteClient.default_oauth_client_credentials(**toml_content)
+        client = CogniteClient.default_oauth_client_credentials(**toml_content)
+    if base_url:
+        client.config.base_url = base_url
+    return client
 
 
 class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
