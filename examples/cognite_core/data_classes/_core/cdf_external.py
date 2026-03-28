@@ -53,9 +53,7 @@ TimeSeries = Annotated[
         return_type=dict,
         when_used="unless-none",
     ),
-    BeforeValidator(
-        _create_load_method(CogniteTimeSeries, {"id", "createdTime", "lastUpdatedTime", "isStep", "isString"})
-    ),
+    BeforeValidator(_create_load_method(CogniteTimeSeries, {"id", "isStep", "isString"})),
 ]
 
 
@@ -66,7 +64,7 @@ SequenceRead = Annotated[
         return_type=dict,
         when_used="unless-none",
     ),
-    BeforeValidator(_create_load_method(CogniteSequence, {"id", "createdTime", "lastUpdatedTime", "columns"})),
+    BeforeValidator(_create_load_method(CogniteSequence, {"id", "columns"})),
 ]
 
 
@@ -77,9 +75,7 @@ FileMetadata = Annotated[
         return_type=dict,
         when_used="unless-none",
     ),
-    BeforeValidator(
-        _create_load_method(CogniteFileMetadata, {"id", "createdTime", "lastUpdatedTime", "uploaded", "name"})
-    ),
+    BeforeValidator(_create_load_method(CogniteFileMetadata, {"id", "uploaded", "name"})),
 ]
 
 
