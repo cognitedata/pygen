@@ -4,9 +4,11 @@ These are tests that apply to all generated SDKs.
 
 import importlib
 from collections.abc import Iterable
+from unittest.mock import MagicMock
 
 import pytest
-from cognite.client import CogniteClient
+from cognite.client import ClientConfig, CogniteClient
+from cognite.client.testing import CogniteClientMock
 
 from tests.constants import EXAMPLE_SDKS, ExampleSDK
 
@@ -21,14 +23,18 @@ def example_sdk_generated(skip_typed: bool = False) -> Iterable[ExampleSDK]:
 
 
 @pytest.mark.parametrize("example_sdk", example_sdk_generated())
-def test_import_client(example_sdk: ExampleSDK, mock_cognite_client: CogniteClient) -> None:
+def test_import_client(example_sdk: ExampleSDK) -> None:
+    client = CogniteClientMock()
+    client.config = MagicMock(spec=ClientConfig)
+    client.config.client_name = "CognitePygen"
+
     # Act
     module = vars(importlib.import_module(example_sdk.top_level_package))
 
     # Assert
     if not example_sdk.is_typed:
         assert example_sdk.client_name in module
-        assert module[example_sdk.client_name](mock_cognite_client)
+        assert module[example_sdk.client_name](client)
 
 
 @pytest.mark.parametrize("example_sdk", example_sdk_generated(skip_typed=True))

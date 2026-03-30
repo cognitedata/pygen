@@ -74,10 +74,10 @@ def test_upsert_multiple_requests(omni_client: OmniClient, cognite_client: Cogni
         ],
     )
     resources = new_item_a.to_instances_write()
-
-    limit = omni_client.connection_item_a._client.data_modeling.instances._CREATE_LIMIT
+    async_client = omni_client.connection_item_a._client.get_async_client()
+    limit = async_client.data_modeling.instances._CREATE_LIMIT
     try:
-        omni_client.connection_item_a._client.data_modeling.instances._CREATE_LIMIT = 1
+        async_client.data_modeling.instances._CREATE_LIMIT = 1
 
         # Act
         created = omni_client.upsert(new_item_a)
@@ -86,7 +86,7 @@ def test_upsert_multiple_requests(omni_client: OmniClient, cognite_client: Cogni
         assert len(created.nodes) == 4
         assert len(created.edges) == 3
     finally:
-        omni_client.connection_item_a._client.data_modeling.instances._CREATE_LIMIT = limit
+        async_client.data_modeling.instances._CREATE_LIMIT = limit
 
         cognite_client.data_modeling.instances.delete(resources.nodes.as_ids(), resources.edges.as_ids())
 
@@ -259,7 +259,7 @@ def test_upsert_with_cdf_external(omni_client: OmniClient, cognite_client: Cogni
                 SequenceColumnWrite(
                     external_id=f"{test_name}:Column1",
                     name="Column1",
-                    value_type="String",
+                    value_type="STRING",
                 )
             ],
         ),
@@ -309,7 +309,7 @@ def test_upsert_with_cdf_external_listed(omni_client: OmniClient, cognite_client
                     SequenceColumnWrite(
                         external_id=f"{test_name}:Column1",
                         name="Column1",
-                        value_type="String",
+                        value_type="STRING",
                     )
                 ],
             )

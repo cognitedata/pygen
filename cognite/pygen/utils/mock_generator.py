@@ -107,7 +107,7 @@ class MockGenerator:
 
     @property
     def _views(self) -> dm.ViewList:
-        return dm.ViewList(self._view_by_id.values())
+        return dm.ViewList(list(self._view_by_id.values()))
 
     def __str__(self):
         args = [
@@ -390,6 +390,7 @@ class MockGenerator:
                 external.timeseries.extend(
                     [
                         TimeSeries(
+                            id=-1,
                             external_id=ts,
                             name=ts,
                             data_set_id=self._data_set_id,
@@ -398,6 +399,8 @@ class MockGenerator:
                             metadata={
                                 "source": f"Pygen{type(self).__name__}",
                             },
+                            created_time=0,
+                            last_updated_time=1,
                         )
                         for timeseries_set in values
                         for ts in (
@@ -412,6 +415,7 @@ class MockGenerator:
                 external.file.extend(
                     [
                         FileMetadata(
+                            id=-1,
                             external_id=file,
                             name=file,
                             source=self._instance_space,
@@ -420,6 +424,9 @@ class MockGenerator:
                             metadata={
                                 "source": f"Pygen{type(self).__name__}",
                             },
+                            created_time=0,
+                            last_updated_time=1,
+                            uploaded=False,
                         )
                         for file_set in values
                         for file in (cast(list[str], file_set) if isinstance(file_set, list) else [cast(str, file_set)])
@@ -430,13 +437,14 @@ class MockGenerator:
                 external.sequence.extend(
                     [
                         Sequence(
+                            id=-1,
                             external_id=seq,
                             name=seq,
                             data_set_id=self._data_set_id,
                             columns=[
                                 SequenceColumn(
                                     external_id="value",
-                                    value_type=cast(Literal["Double"], "DOUBLE"),
+                                    value_type="DOUBLE",
                                     metadata={
                                         "source": f"Pygen{type(self).__name__}",
                                     },
@@ -445,6 +453,8 @@ class MockGenerator:
                             metadata={
                                 "source": f"Pygen{type(self).__name__}",
                             },
+                            created_time=0,
+                            last_updated_time=1,
                         )
                         for seq_set in values
                         for seq in (cast(list[str], seq_set) if isinstance(seq_set, list) else [cast(str, seq_set)])
@@ -830,7 +840,7 @@ class MockData(UserList[ViewMockData]):
             if nodes or edges:
                 # There is an 'edge' if there is an outward and inward edge on two views, we can get duplicated edges.
                 # We should remove the duplicates.
-                edges = dm.EdgeApplyList({edge.as_id(): edge for edge in edges}.values())
+                edges = dm.EdgeApplyList(list({edge.as_id(): edge for edge in edges}.values()))
 
                 created = client.data_modeling.instances.apply(
                     nodes,
