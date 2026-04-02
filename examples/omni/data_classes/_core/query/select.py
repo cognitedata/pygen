@@ -172,9 +172,6 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     def list_full(
         self, limit: int = DEFAULT_QUERY_LIMIT, selected_properties: list[str] | None = None
     ) -> T_DomainModelList:
-        if selected_properties is not None:
-            default_properties = {"space", "externalId", "version", "lastUpdatedTime", "createdTime"}
-            selected_properties = list(set(selected_properties) | default_properties)
         builder = self._create_query(
             limit, return_step="first", try_reverse=True, selected_properties=selected_properties
         )
