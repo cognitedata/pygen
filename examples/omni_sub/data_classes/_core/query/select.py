@@ -169,8 +169,15 @@ global_config.max_select_depth = {global_config.max_select_depth+1}
 class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
     _result_cls: ClassVar[type[DomainModel]]
 
-    def list_full(self, limit: int = DEFAULT_QUERY_LIMIT) -> T_DomainModelList:
-        builder = self._create_query(limit, return_step="first", try_reverse=True)
+    def list_full(
+        self, limit: int = DEFAULT_QUERY_LIMIT, selected_properties: list[str] | None = None
+    ) -> T_DomainModelList:
+        if selected_properties is not None:
+            default_properties = {"space", "externalId", "version", "lastUpdatedTime", "createdTime"}
+            selected_properties = list(set(selected_properties) | default_properties)
+        builder = self._create_query(
+            limit, return_step="first", try_reverse=True, selected_properties=selected_properties
+        )
         executor = builder.build()
         results = executor.execute_query(self._client, remove_not_connected=True)
         unpacked = QueryUnpacker(results).unpack()
@@ -194,6 +201,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
         limit: int,
         return_step: Literal["first", "last"] | None = None,
         try_reverse: bool = False,
+        selected_properties: list[str] | None = None,
     ) -> QueryBuilder:
         builder = QueryBuilder()
         from_: str | None = None
@@ -217,6 +225,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     max_retrieve_limit=max_retrieve_limit,
                     connection_type=item._connection_type,
                     view_id=item._view_id,
+                    selected_properties=selected_properties,
                 )
                 if not item is self._creation_path[0]:
                     if not item._connection_property:
