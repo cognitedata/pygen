@@ -561,8 +561,10 @@ class GraphQLQueryResponse:
         elif "__typename" in data:
             try:
                 item = self._data_class_by_type[data["__typename"]].model_validate(data)
-            except KeyError:
-                raise ValueError(f"Could not find class for type {data['__typename']}") from None
+            except KeyError as key_error:
+                if key_error.args[0] == data["__typename"]:
+                    raise ValueError(f"Could not find class for type {data['__typename']}") from None
+                raise key_error
             else:
                 self._output.append(item)
         else:

@@ -5,7 +5,7 @@ from collections.abc import Callable
 from typing import Any, cast
 
 from cognite.client import CogniteClient
-from cognite.client.data_classes import DataSet
+from cognite.client.data_classes import DataSet, DataSetWrite
 from cognite.client.data_classes.data_modeling import (
     DataModel,
     MappedProperty,
@@ -146,7 +146,7 @@ class SolarFarmAPM:
             new_dataset = cast(
                 DataSet,
                 client.data_sets.create(
-                    DataSet(
+                    DataSetWrite(
                         external_id=self._data_set_external_id,
                         name=self._data_set_external_id,
                         description="This data set was created by pygen for demo purposes.",

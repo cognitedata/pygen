@@ -1,7 +1,8 @@
 from collections.abc import Iterable
+from unittest.mock import MagicMock
 
 import pytest
-from cognite.client import CogniteClient
+from cognite.client import ClientConfig, CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.testing import monkeypatch_cognite_client
 
@@ -24,6 +25,8 @@ def pygen_config() -> PygenConfig:
 @pytest.fixture()
 def mock_cognite_client() -> Iterable[CogniteClient]:
     with monkeypatch_cognite_client() as m:
+        m.config = MagicMock(spec=ClientConfig)
+        m.config.client_name = "CognitePygen"
         yield m
 
 

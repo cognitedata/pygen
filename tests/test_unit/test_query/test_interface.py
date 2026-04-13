@@ -104,6 +104,7 @@ class TestQueryInterface:
                 client_name,
                 project="test_project",
                 credentials=Token("223ienie"),
+                cluster="api",
             )
         )
 

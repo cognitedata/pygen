@@ -37,11 +37,15 @@ def test_query_cdf_external_timeseries_and_sequence(omni_client: OmniClient) -> 
       timeseries {
         externalId
         name
+        id
+        isStep
+        isString
       }
 
       sequence{
         externalId
         name
+        id
         columns{
           externalId
           valueType
@@ -78,11 +82,15 @@ def test_query_cdf_external_listed_timeseries_and_sequence(omni_client: OmniClie
       timeseries {
         externalId
         name
+        id
+        isStep
+        isString
       }
 
       sequences{
         externalId
         name
+        id
         columns{
           externalId
           valueType
@@ -168,6 +176,9 @@ def test_query_with_datapoints(turbine_client: WindTurbineClient) -> None:
       temperature{
         externalId
         name
+        id
+        isStep
+        isString
         getDataPoints(granularity: "1d", aggregates: SUM, first: 100){
           items{
             timestamp

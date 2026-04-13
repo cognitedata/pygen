@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Callable
 from typing import (
     Annotated,
     Optional,
     Any,
     no_type_check,
+    TypeVar,
+    Set,
 )
 
 from cognite.client import data_modeling as dm
@@ -24,6 +27,24 @@ from pydantic import BaseModel, BeforeValidator, model_validator, field_validato
 from pydantic.alias_generators import to_camel
 from pydantic.functional_serializers import PlainSerializer
 
+T_CogniteResource = TypeVar("T_CogniteResource", bound=CogniteTimeSeries | CogniteSequence | CogniteFileMetadata)
+
+_MISSING_VALUE = -999
+
+
+def _create_load_method(resource_cls: type[T_CogniteResource], required_fields: Set[str]) -> Callable[[Any], Any]:
+    def _load_if_dict(value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if missing_values := set(required_fields) - set(value.keys()):
+            raise ValueError(f"Missing required fields: {', '.join(missing_values)}")
+        for key in ["createdTime", "lastUpdatedTime"]:
+            # GraphQL does not support returning these properties, while the read classes requires them.
+            value[key] = _MISSING_VALUE
+        return resource_cls.load(value)
+
+    return _load_if_dict
+
 
 TimeSeries = Annotated[
     CogniteTimeSeries,
@@ -32,7 +53,7 @@ TimeSeries = Annotated[
         return_type=dict,
         when_used="unless-none",
     ),
-    BeforeValidator(lambda v: CogniteTimeSeries.load(v) if isinstance(v, dict) else v),
+    BeforeValidator(_create_load_method(CogniteTimeSeries, {"id", "isStep", "isString"})),
 ]
 
 
@@ -43,7 +64,7 @@ SequenceRead = Annotated[
         return_type=dict,
         when_used="unless-none",
     ),
-    BeforeValidator(lambda v: CogniteSequence.load(v) if isinstance(v, dict) else v),
+    BeforeValidator(_create_load_method(CogniteSequence, {"id", "columns"})),
 ]
 
 
@@ -54,7 +75,7 @@ FileMetadata = Annotated[
         return_type=dict,
         when_used="unless-none",
     ),
-    BeforeValidator(lambda v: CogniteFileMetadata.load(v) if isinstance(v, dict) else v),
+    BeforeValidator(_create_load_method(CogniteFileMetadata, {"id", "uploaded", "name"})),
 ]
 
 
@@ -123,6 +144,15 @@ class TimeSeriesGraphQL(GraphQLExternal):
                         datetime.datetime.fromisoformat(item["timestamp"].replace("Z", "+00:00"))
                     )
                 data["datapoints"] = datapoints["items"]
+                if missing := [name for name in ["id", "isString", "isStep"] if data.get(name) is None]:
+                    raise ValueError(
+                        f"Cannot create datapoints, missing required fields: {', '.join(missing)}. "
+                        "You need to include these in your query."
+                    )
+                if "type" not in data:
+                    # Type is not supported in the timeseries you retrieve through GraphQL, but it is required
+                    # for the Datapoints object. Luckily it can be inferred from the isString field, so we set it here.
+                    data["type"] = "string" if data["isString"] else "numeric"
                 data["data"] = Datapoints.load(data)
         if isinstance(data, dict) and "getLatestDataPoint" in data:
             latest = data.pop("getLatestDataPoint")
@@ -146,6 +176,7 @@ class TimeSeriesGraphQL(GraphQLExternal):
             description=self.description,
         )
 
+    @no_type_check
     def as_read(self) -> CogniteTimeSeries:
         return CogniteTimeSeries(
             id=self.id,
@@ -160,6 +191,8 @@ class TimeSeriesGraphQL(GraphQLExternal):
             is_step=self.is_step,
             description=self.description,
             security_categories=self.security_categories,
+            created_time=self.created_time,
+            last_updated_time=self.last_updated_time,
         )
 
 
@@ -237,7 +270,7 @@ class SequenceColumnGraphQL(GraphQLExternal):
     @field_validator("value_type", mode="before")
     def title_value_type(cls, value: Any) -> Any:
         if isinstance(value, str):
-            return value.title()
+            return value.upper()
         return value
 
     @no_type_check

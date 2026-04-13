@@ -31,7 +31,6 @@ from omni.data_classes._core.query.builder import QueryBuilder
 from omni.data_classes._core.query.processing import QueryUnpacker
 from omni.data_classes._core.query.step import QueryBuildStep, ViewPropertyId
 
-
 T_DomainListEnd = TypeVar("T_DomainListEnd", bound=Union[DomainModelList, DomainRelationList], covariant=True)
 
 
@@ -225,7 +224,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                     step.connection_property = item._connection_property
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
-                step.expression.sort = item._create_sort()
+                step.expression.sort = item._create_sort() or []
                 builder.append(step)
             elif isinstance(item, NodeQueryCore) and isinstance(item._expression, dm.query.EdgeResultSetExpression):
                 # Edge without properties
@@ -264,7 +263,7 @@ class NodeQueryCore(QueryCore[T_DomainModelList, T_DomainListEnd]):
                 )
                 step.expression.from_ = from_
                 step.expression.filter = item._assemble_filter()
-                step.expression.sort = item._create_sort()
+                step.expression.sort = item._create_sort() or []
                 builder.append(step)
             else:
                 raise TypeError(f"Unsupported query step type: {type(item._expression)}")
