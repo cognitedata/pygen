@@ -1592,6 +1592,7 @@
           Republican go nor view participant both live.: Another mean own eye organization.
         defaultBoolean: true
         defaultFloat32: -152.55
+        defaultStringNonNullable: Old account which.
         autoIncrementInt32: -734336551
 - space: sp_omni_instances
   externalId: PrimitiveWithDefaults:Austin
@@ -1604,6 +1605,7 @@
       PrimitiveWithDefaults/1:
         defaultObject: {}
         defaultString: Remember measure reduce no employee personal improve.
+        defaultStringNonNullable: Remember measure reduce no employee personal improve.
         defaultFloat32: 8.53
         autoIncrementInt32: -1042816311
 - space: sp_omni_instances
@@ -1623,6 +1625,7 @@
           Represent sea notice back modern officer American.: Yes approach red trip
             area.
         defaultString: Whole arm citizen.
+        defaultStringNonNullable: Whole arm citizen.
         defaultBoolean: false
         autoIncrementInt32: 811875011
 - space: sp_omni_instances
@@ -1638,6 +1641,7 @@
           Raise Congress media voice.: School television smile doctor along.
           Paper win exactly anyone start.: Capital feeling our.
         defaultString: Little body few she two analysis at.
+        defaultStringNonNullable: Little body few she two analysis at.
         defaultBoolean: true
         defaultFloat32: 133.56
         autoIncrementInt32: 42539926
@@ -1651,6 +1655,7 @@
     sp_pygen_models:
       PrimitiveWithDefaults/1:
         defaultString: Southern heart college music better lose.
+        defaultStringNonNullable: Southern heart college music better lose.
         defaultBoolean: false
         defaultFloat32: -186.44
         autoIncrementInt32: 994860070
