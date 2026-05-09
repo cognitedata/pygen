@@ -341,7 +341,7 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     assets: Optional[list[Union[CogniteAssetWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     equipment: Optional[list[Union[CogniteEquipmentWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
-    is_step: bool = Field(alias="isStep")
+    is_step: bool = Field(False, alias="isStep")
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
     type_: Literal["numeric", "string"] = Field(alias="type")
     unit: Union[CogniteUnitWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
