@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10, <4.0"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -543,7 +543,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.7" },
     { name = "toml", marker = "extra == 'cli'", specifier = ">=0.10" },
     { name = "typer", marker = "extra == 'cli'", specifier = ">=0.9" },
-    { name = "typing-extensions", specifier = ">=4.14.0" },
+    { name = "typing-extensions", specifier = ">=4.11.0" },
 ]
 provides-extras = ["cli", "format"]
 
