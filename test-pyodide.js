@@ -51,5 +51,9 @@ server.listen(PORT, () => {
   test_cognite_sdk().then((result) => {
     console.log("Response from Python =", result);
     server.close();
+  }).catch((err) => {
+    console.error("Error installing or importing pygen:", err);
+    server.close();
+    process.exit(1);
   });
 });
