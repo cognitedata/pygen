@@ -38,7 +38,7 @@ class WindTurbineClient:
 
     Generated with:
         pygen = 0.0.0
-        cognite-sdk = 7.92.0
+        cognite-sdk = 8.0.5
         pydantic = 2.12.5
 
     Data Model:

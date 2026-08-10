@@ -1,3 +1,6 @@
+from unittest.mock import MagicMock
+
+from cognite.client import ClientConfig
 from cognite.client.data_classes.aggregations import AggregatedNumberedValue
 from cognite.client.data_classes.data_modeling import Node, NodeListWithCursor
 from cognite.client.data_classes.data_modeling.instances import Properties
@@ -17,6 +20,8 @@ class TestIterateMethod:
             return self.single_item_a_result
 
         with monkeypatch_cognite_client() as client:
+            client.config = MagicMock(spec=ClientConfig)
+            client.config.client_name = "CognitePygen"
             client.data_modeling.instances.aggregate.return_value = AggregatedNumberedValue("externalId", 4)
             client.data_modeling.instances.query.side_effect = query_call
             pygen = OmniClient(client)

@@ -12,7 +12,7 @@ from typing import Any, Optional, Protocol, Union, get_args, get_origin, get_typ
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
-from cognite.client._api.files import FilesAPI
+from cognite.client._sync_api.files import SyncFilesAPI
 from cognite.client.data_classes import FileMetadata, FileMetadataList, TimeSeries, TimeSeriesList
 from cognite.client.data_classes._base import CogniteResource, T_CogniteResource, T_CogniteResourceList
 from cognite.client.data_classes.data_modeling import (
@@ -104,7 +104,7 @@ class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
 
 
 class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
-    def __init__(self, files_api: FilesAPI):
+    def __init__(self, files_api: SyncFilesAPI):
         self._files_api = files_api
 
     def retrieve_multiple(

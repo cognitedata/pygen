@@ -150,7 +150,6 @@ class DataPointsAPI:
             uniform_index=uniform_index,
             include_aggregate_name=include_aggregate_name,
             include_granularity_name=include_granularity_name,
-            column_names="instance_id",
         )
 
     def __getattr__(self, item: str) -> Any:

@@ -7,7 +7,7 @@ from typing import Any, Literal
 
 from cognite.client import CogniteClient
 from cognite.client.data_classes import data_modeling as dm
-from cognite.client.data_classes._base import CogniteObject
+from cognite.client.data_classes._base import CogniteResource
 from cognite.client.data_classes.data_modeling.instances import Instance
 from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 
@@ -20,7 +20,7 @@ from omni_sub.data_classes._core.query.constants import (
 
 
 @dataclass(frozen=True)
-class ViewPropertyId(CogniteObject):
+class ViewPropertyId(CogniteResource):
     view: dm.ViewId
     property: str
 
