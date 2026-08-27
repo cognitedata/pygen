@@ -13,6 +13,16 @@ properties:
     autoIncrement: false
     immutable: false
     name: defaultString
+  defaultStringNonNullable:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: false
+    defaultValue: 'my default text'
+    autoIncrement: false
+    immutable: false
+    name: defaultString
   defaultBoolean:
     type:
       list: false

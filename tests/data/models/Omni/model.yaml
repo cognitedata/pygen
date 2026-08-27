@@ -1940,6 +1940,22 @@ views:
       defaultValue: my default text
       name: defaultString
       description: null
+    defaultStringNonNullable:
+      container:
+        space: sp_pygen_models
+        externalId: PrimitiveWithDefaults
+      containerPropertyIdentifier: defaultStringNonNullable
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      nullable: false
+      immutable: false
+      autoIncrement: false
+      source: null
+      defaultValue: my default text
+      name: defaultString
+      description: null
   lastUpdatedTime: 1729345477397
   createdTime: 1729345477397
 - space: sp_pygen_models
