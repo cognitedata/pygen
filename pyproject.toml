@@ -14,7 +14,10 @@ dependencies = [
     "pydantic>=2.7",
     "Jinja2>=3.1",
     "inflect>=6.2",
-    "typing-extensions>=4.14.0",
+    # pyodide 0.26.2 bundles typing-extensions==4.11.0. Pygen only uses `Self` from typing_extensions
+    # (available since 4.0.0), so 4.11.0 is sufficient. Keeping this at >=4.14.0 causes micropip
+    # in pyodide to try to upgrade typing-extensions (which fails since pyodide packages are locked).
+    "typing-extensions>=4.11.0",
 ]
 
 [project.urls]
