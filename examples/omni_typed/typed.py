@@ -23,6 +23,7 @@ class CDFExternalReferencesListedApply(_CDFExternalReferencesListedProperties, T
 
     It is used to when data is written to CDF.
 
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the cdf external references listed.
@@ -58,6 +59,7 @@ class CDFExternalReferencesListed(_CDFExternalReferencesListedProperties, TypedN
     """This represents the reading format of cdf external references listed.
 
     It is used to when data is read from CDF.
+
 
     Args:
         space: The space where the node is located.
@@ -120,6 +122,7 @@ class DependentOnNonWritableApply(_DependentOnNonWritableProperties, TypedNodeAp
 
     It is used to when data is written to CDF.
 
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the dependent on non writable.
@@ -149,6 +152,7 @@ class DependentOnNonWritable(_DependentOnNonWritableProperties, TypedNode):
     """This represents the reading format of dependent on non writable.
 
     It is used to when data is read from CDF.
+
 
     Args:
         space: The space where the node is located.
@@ -206,6 +210,7 @@ class Implementation1Apply(_Implementation1Properties, TypedNodeApply):
 
     It is used to when data is written to CDF.
 
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the implementation 1.
@@ -244,6 +249,7 @@ class Implementation1(_Implementation1Properties, TypedNode):
     """This represents the reading format of implementation 1.
 
     It is used to when data is read from CDF.
+
 
     Args:
         space: The space where the node is located.
@@ -311,6 +317,7 @@ class Implementation2Apply(_Implementation2Properties, TypedNodeApply):
 
     It is used to when data is written to CDF.
 
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the implementation 2.
@@ -343,6 +350,7 @@ class Implementation2(_Implementation2Properties, TypedNode):
     """This represents the reading format of implementation 2.
 
     It is used to when data is read from CDF.
+
 
     Args:
         space: The space where the node is located.
@@ -401,6 +409,7 @@ class MainInterfaceApply(_MainInterfaceProperties, TypedNodeApply):
 
     It is used to when data is written to CDF.
 
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the main interface.
@@ -430,6 +439,7 @@ class MainInterface(_MainInterfaceProperties, TypedNode):
     """This represents the reading format of main interface.
 
     It is used to when data is read from CDF.
+
 
     Args:
         space: The space where the node is located.
@@ -488,6 +498,7 @@ class PrimitiveNullableApply(_PrimitiveNullableProperties, TypedNodeApply):
 
     It is used to when data is written to CDF.
 
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the primitive nullable.
@@ -541,6 +552,7 @@ class PrimitiveNullable(_PrimitiveNullableProperties, TypedNode):
     """This represents the reading format of primitive nullable.
 
     It is used to when data is read from CDF.
+
 
     Args:
         space: The space where the node is located.
@@ -631,6 +643,7 @@ class PrimitiveRequiredListedApply(_PrimitiveRequiredListedProperties, TypedNode
 
     It is used to when data is written to CDF.
 
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the primitive required listed.
@@ -684,6 +697,7 @@ class PrimitiveRequiredListed(_PrimitiveRequiredListedProperties, TypedNode):
     """This represents the reading format of primitive required listed.
 
     It is used to when data is read from CDF.
+
 
     Args:
         space: The space where the node is located.
@@ -771,6 +785,7 @@ class SubInterfaceApply(_SubInterfaceProperties, TypedNodeApply):
 
     It is used to when data is written to CDF.
 
+
     Args:
         space: The space where the node is located.
         external_id: The external id of the sub interface.
@@ -803,6 +818,7 @@ class SubInterface(_SubInterfaceProperties, TypedNode):
     """This represents the reading format of sub interface.
 
     It is used to when data is read from CDF.
+
 
     Args:
         space: The space where the node is located.
