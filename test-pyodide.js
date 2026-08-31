@@ -4,12 +4,14 @@
 // This script will start an HTTP server to serve the pygen wheel file and then try to install the pygen in Python.
 // If the installation is successful, it will run a simple Python script to test pygen.
 const { loadPyodide } = require("pyodide");
+const path = require("path");
 
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
 const PORT = 3000;
+const pyodideIndexURL = path.dirname(require.resolve("pyodide"));
 
 // The Cognite Python SDK wheel filename will be sent in as environment variable
 const wheelFilePath = path.join(__dirname, 'dist', process.env.PYGEN_FILE_PATH);
@@ -34,7 +36,7 @@ server.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}. Now trying to install sdk.`);
 
   async function test_cognite_sdk() {
-    let pyodide = await loadPyodide();
+    let pyodide =  await loadPyodide({ indexURL: pyodideIndexURL });
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
     // Read packages to install from environment variable as JSON
