@@ -5,7 +5,7 @@ on:
   pull_request:
 
 env:
-  PYTHON_VERSION: '3.10'
+  PYTHON_VERSION: '3.12'
 
 jobs:
   lint:
@@ -112,7 +112,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: "20"
+          node-version: "24"
       - name: Install dependencies
         run: npm install pyodide@0.27.6 # stlite currently using pyodide 0.27.6
       - name: Install pygen in pyodide environment
