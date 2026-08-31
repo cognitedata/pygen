@@ -36,7 +36,7 @@ server.listen(PORT, () => {
 
   async function test_cognite_sdk() {
     let pyodide =  await loadPyodide({ indexURL: pyodideIndexURL });
-    await pyodide.loadPackage("micropip");
+    await pyodide.loadPackage(["micropip", "cryptography"]);
     const micropip = pyodide.pyimport("micropip");
     // Read packages to install from environment variable as JSON
 
