@@ -4,7 +4,6 @@
 // This script will start an HTTP server to serve the pygen wheel file and then try to install the pygen in Python.
 // If the installation is successful, it will run a simple Python script to test pygen.
 const { loadPyodide } = require("pyodide");
-const path = require("path");
 
 const http = require('http');
 const fs = require('fs');
