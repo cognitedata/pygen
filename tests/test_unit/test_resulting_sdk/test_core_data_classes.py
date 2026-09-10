@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from typing import Optional
 
 import pytest
 from cognite.client import data_modeling as dm
@@ -13,12 +12,12 @@ from pydantic import Field
 
 class Foo(DomainModel):
     space: str = "FooSpace"
-    bar: Optional[Bar] = Field(None, repr=False)
+    bar: Bar | None = Field(None, repr=False)
 
 
 class Bar(DomainModel):
     space: str = "BarSpace"
-    foo: Optional[Foo] = Field(None, repr=False)
+    foo: Foo | None = Field(None, repr=False)
 
 
 class TestDomainModel:

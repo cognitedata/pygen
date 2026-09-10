@@ -217,8 +217,7 @@ class SolarFarmAPM:
             if not isinstance(answer, str) and hasattr(answer, "result"):
                 # PyodideFuture
                 self._echo(
-                    "The parameter auto_confirm is not supported in a Pyodide environment,"
-                    "please set auto_confirm=True"
+                    "The parameter auto_confirm is not supported in a Pyodide environment,please set auto_confirm=True"
                 )
                 answer = "n"
 

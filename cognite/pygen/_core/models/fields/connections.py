@@ -222,7 +222,7 @@ class BaseConnectionField(Field, ABC):
         """Returns the edge type as a string."""
         if self.edge_type is None:
             raise ValueError("Bug in Pygen: Missing edge type")
-        return f'dm.DirectRelationReference("{ self.edge_type.space }", "{ self.edge_type.external_id }")'
+        return f'dm.DirectRelationReference("{self.edge_type.space}", "{self.edge_type.external_id}")'
 
     @property
     def through_str(self) -> str:

@@ -260,7 +260,8 @@ In a cell, run the following code:
 
 ```python
 import micropip
-micropip.uninstall('typing_extensions')
+
+micropip.uninstall("typing_extensions")
 ```
 
 Then, install `cognite-pygen`:
