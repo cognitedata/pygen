@@ -49,9 +49,11 @@ class Config:
     temperature: float
     max_tokens: int
 
+
 def load_config(path: Path) -> Config:
     data = json.loads(path.read_text())
     return Config(**data)
+
 
 # Bad - untyped dictionary
 def load_config(path: Path) -> dict[str, Any]:
@@ -104,6 +106,7 @@ def render_header(header: str) -> str:
         str: The rendered header
     """
     return f"{header}\n{'=' * len(header)}\n"
+
 
 def walk_sdk_documentation(content: Tag, parser: Parser[T]) -> Iterable[T]:
     """Parse the content of a file and yields documents. The parser controls how
@@ -160,10 +163,12 @@ class FunctionError:
     function_name: str
     message: str
 
+
 # Good
 class QueryCompletion(BaseModel):
     query: str
     variables: dict[str, Any]
+
 
 # Avoid
 error_data = {"function_name": "foo", "message": "bar"}

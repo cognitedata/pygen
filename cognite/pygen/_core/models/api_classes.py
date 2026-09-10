@@ -107,7 +107,7 @@ class EdgeAPIClass(APIClass):
             nodes["from"] = FilterParameter(
                 name=f"from_{self.start_class.variable}",
                 type_=type_,
-                description=f"ID of the source { self.start_class.doc_name}.",
+                description=f"ID of the source {self.start_class.doc_name}.",
                 default=None,
             )
             if self.has_default_instance_space:
@@ -121,7 +121,7 @@ class EdgeAPIClass(APIClass):
             nodes["to"] = FilterParameter(
                 name=f"to_{self.end_class.variable}",
                 type_=type_,
-                description=f"ID of the target { self.end_class.doc_name}.",
+                description=f"ID of the target {self.end_class.doc_name}.",
                 default=None,
             )
             if self.has_default_instance_space:
