@@ -113,6 +113,8 @@ class PrimitiveWithDefaultsAPI(
         max_default_float_32: float | None = None,
         default_string: str | list[str] | None = None,
         default_string_prefix: str | None = None,
+        default_string_non_nullable: str | list[str] | None = None,
+        default_string_non_nullable_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -133,6 +135,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32: The maximum value of the default float 32 to filter on.
             default_string: The default string to filter on.
             default_string_prefix: The prefix of the default string to filter on.
+            default_string_non_nullable: The default string non nullable to filter on.
+            default_string_non_nullable_prefix: The prefix of the default string non nullable to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of primitive with defaults to return. Defaults to 25.
@@ -168,6 +172,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32,
             default_string,
             default_string_prefix,
+            default_string_non_nullable,
+            default_string_non_nullable_prefix,
             external_id_prefix,
             space,
             filter,
@@ -199,6 +205,8 @@ class PrimitiveWithDefaultsAPI(
         max_default_float_32: float | None = None,
         default_string: str | list[str] | None = None,
         default_string_prefix: str | None = None,
+        default_string_non_nullable: str | list[str] | None = None,
+        default_string_non_nullable_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -222,6 +230,8 @@ class PrimitiveWithDefaultsAPI(
         max_default_float_32: float | None = None,
         default_string: str | list[str] | None = None,
         default_string_prefix: str | None = None,
+        default_string_non_nullable: str | list[str] | None = None,
+        default_string_non_nullable_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -249,6 +259,8 @@ class PrimitiveWithDefaultsAPI(
         max_default_float_32: float | None = None,
         default_string: str | list[str] | None = None,
         default_string_prefix: str | None = None,
+        default_string_non_nullable: str | list[str] | None = None,
+        default_string_non_nullable_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -275,6 +287,8 @@ class PrimitiveWithDefaultsAPI(
         max_default_float_32: float | None = None,
         default_string: str | list[str] | None = None,
         default_string_prefix: str | None = None,
+        default_string_non_nullable: str | list[str] | None = None,
+        default_string_non_nullable_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -299,6 +313,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32: The maximum value of the default float 32 to filter on.
             default_string: The default string to filter on.
             default_string_prefix: The prefix of the default string to filter on.
+            default_string_non_nullable: The default string non nullable to filter on.
+            default_string_non_nullable_prefix: The prefix of the default string non nullable to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of primitive with defaults to return. Defaults to 25.
@@ -328,6 +344,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32,
             default_string,
             default_string_prefix,
+            default_string_non_nullable,
+            default_string_non_nullable_prefix,
             external_id_prefix,
             space,
             filter,
@@ -357,6 +375,8 @@ class PrimitiveWithDefaultsAPI(
         max_default_float_32: float | None = None,
         default_string: str | list[str] | None = None,
         default_string_prefix: str | None = None,
+        default_string_non_nullable: str | list[str] | None = None,
+        default_string_non_nullable_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -376,6 +396,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32: The maximum value of the default float 32 to filter on.
             default_string: The default string to filter on.
             default_string_prefix: The prefix of the default string to filter on.
+            default_string_non_nullable: The default string non nullable to filter on.
+            default_string_non_nullable_prefix: The prefix of the default string non nullable to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of primitive with defaults to return.
@@ -396,6 +418,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32,
             default_string,
             default_string_prefix,
+            default_string_non_nullable,
+            default_string_non_nullable_prefix,
             external_id_prefix,
             space,
             filter,
@@ -444,6 +468,8 @@ class PrimitiveWithDefaultsAPI(
         max_default_float_32: float | None = None,
         default_string: str | list[str] | None = None,
         default_string_prefix: str | None = None,
+        default_string_non_nullable: str | list[str] | None = None,
+        default_string_non_nullable_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
@@ -461,6 +487,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32: The maximum value of the default float 32 to filter on.
             default_string: The default string to filter on.
             default_string_prefix: The prefix of the default string to filter on.
+            default_string_non_nullable: The default string non nullable to filter on.
+            default_string_non_nullable_prefix: The prefix of the default string non nullable to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
@@ -522,6 +550,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32,
             default_string,
             default_string_prefix,
+            default_string_non_nullable,
+            default_string_non_nullable_prefix,
             external_id_prefix,
             space,
             filter,
@@ -537,6 +567,8 @@ class PrimitiveWithDefaultsAPI(
         max_default_float_32: float | None = None,
         default_string: str | list[str] | None = None,
         default_string_prefix: str | None = None,
+        default_string_non_nullable: str | list[str] | None = None,
+        default_string_non_nullable_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -555,6 +587,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32: The maximum value of the default float 32 to filter on.
             default_string: The default string to filter on.
             default_string_prefix: The prefix of the default string to filter on.
+            default_string_non_nullable: The default string non nullable to filter on.
+            default_string_non_nullable_prefix: The prefix of the default string non nullable to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of primitive with defaults to return.
@@ -588,6 +622,8 @@ class PrimitiveWithDefaultsAPI(
             max_default_float_32,
             default_string,
             default_string_prefix,
+            default_string_non_nullable,
+            default_string_non_nullable_prefix,
             external_id_prefix,
             space,
             filter,

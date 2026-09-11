@@ -49,9 +49,15 @@ __all__ = [
 ]
 
 
-PrimitiveWithDefaultsTextFields = Literal["external_id", "default_string"]
+PrimitiveWithDefaultsTextFields = Literal["external_id", "default_string", "default_string_non_nullable"]
 PrimitiveWithDefaultsFields = Literal[
-    "external_id", "auto_increment_int_32", "default_boolean", "default_float_32", "default_object", "default_string"
+    "external_id",
+    "auto_increment_int_32",
+    "default_boolean",
+    "default_float_32",
+    "default_object",
+    "default_string",
+    "default_string_non_nullable",
 ]
 
 _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD = {
@@ -61,6 +67,7 @@ _PRIMITIVEWITHDEFAULTS_PROPERTIES_BY_FIELD = {
     "default_float_32": "defaultFloat32",
     "default_object": "defaultObject",
     "default_string": "defaultString",
+    "default_string_non_nullable": "defaultStringNonNullable",
 }
 
 
@@ -79,6 +86,7 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
         default_float_32: The default float 32 field.
         default_object: The default object field.
         default_string: The default string field.
+        default_string_non_nullable: The default string non nullable field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
@@ -87,6 +95,7 @@ class PrimitiveWithDefaultsGraphQL(GraphQLCore):
     default_float_32: Optional[float] = Field(None, alias="defaultFloat32")
     default_object: Optional[dict] = Field(None, alias="defaultObject")
     default_string: Optional[str] = Field(None, alias="defaultString")
+    default_string_non_nullable: Optional[str] = Field(None, alias="defaultStringNonNullable")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -122,6 +131,7 @@ class PrimitiveWithDefaults(DomainModel):
         default_float_32: The default float 32 field.
         default_object: The default object field.
         default_string: The default string field.
+        default_string_non_nullable: The default string non nullable field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
@@ -133,6 +143,7 @@ class PrimitiveWithDefaults(DomainModel):
     default_float_32: Optional[float] = Field(None, alias="defaultFloat32")
     default_object: Optional[dict] = Field(None, alias="defaultObject")
     default_string: Optional[str] = Field(None, alias="defaultString")
+    default_string_non_nullable: str = Field(alias="defaultStringNonNullable")
 
     def as_write(self) -> PrimitiveWithDefaultsWrite:
         """Convert this read version of primitive with default to the writing version."""
@@ -153,6 +164,7 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
         default_float_32: The default float 32 field.
         default_object: The default object field.
         default_string: The default string field.
+        default_string_non_nullable: The default string non nullable field.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (
@@ -161,6 +173,7 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
         "default_float_32",
         "default_object",
         "default_string",
+        "default_string_non_nullable",
     )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "PrimitiveWithDefaults", "1")
@@ -172,6 +185,7 @@ class PrimitiveWithDefaultsWrite(DomainModelWrite):
     default_float_32: Optional[float] = Field(0.42, alias="defaultFloat32")
     default_object: Optional[dict] = Field({"foo": "bar"}, alias="defaultObject")
     default_string: Optional[str] = Field("my default text", alias="defaultString")
+    default_string_non_nullable: str = Field("my default text", alias="defaultStringNonNullable")
 
 
 class PrimitiveWithDefaultsList(DomainModelList[PrimitiveWithDefaults]):
@@ -199,6 +213,8 @@ def _create_primitive_with_default_filter(
     max_default_float_32: float | None = None,
     default_string: str | list[str] | None = None,
     default_string_prefix: str | None = None,
+    default_string_non_nullable: str | list[str] | None = None,
+    default_string_non_nullable_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -226,6 +242,20 @@ def _create_primitive_with_default_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("defaultString"), values=default_string))
     if default_string_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("defaultString"), value=default_string_prefix))
+    if isinstance(default_string_non_nullable, str):
+        filters.append(
+            dm.filters.Equals(view_id.as_property_ref("defaultStringNonNullable"), value=default_string_non_nullable)
+        )
+    if default_string_non_nullable and isinstance(default_string_non_nullable, list):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("defaultStringNonNullable"), values=default_string_non_nullable)
+        )
+    if default_string_non_nullable_prefix is not None:
+        filters.append(
+            dm.filters.Prefix(
+                view_id.as_property_ref("defaultStringNonNullable"), value=default_string_non_nullable_prefix
+            )
+        )
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -274,6 +304,7 @@ class _PrimitiveWithDefaultsQuery(NodeQueryCore[T_DomainModelList, PrimitiveWith
         self.default_boolean = BooleanFilter(self, self._view_id.as_property_ref("defaultBoolean"))
         self.default_float_32 = FloatFilter(self, self._view_id.as_property_ref("defaultFloat32"))
         self.default_string = StringFilter(self, self._view_id.as_property_ref("defaultString"))
+        self.default_string_non_nullable = StringFilter(self, self._view_id.as_property_ref("defaultStringNonNullable"))
         self._filter_classes.extend(
             [
                 self.space,
@@ -282,6 +313,7 @@ class _PrimitiveWithDefaultsQuery(NodeQueryCore[T_DomainModelList, PrimitiveWith
                 self.default_boolean,
                 self.default_float_32,
                 self.default_string,
+                self.default_string_non_nullable,
             ]
         )
 

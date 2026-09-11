@@ -10,6 +10,13 @@ properties:
       type: container
     containerPropertyIdentifier: defaultString
     name: defaultString
+  defaultStringNonNullable:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: PrimitiveWithDefaults
+      type: container
+    containerPropertyIdentifier: defaultStringNonNullable
+    name: defaultStringNonNullable
   defaultBoolean:
     container:
       space: {{ pygen_models_space }}

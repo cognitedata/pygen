@@ -192,7 +192,7 @@ class SensorTimeSeriesWrite(DomainModelWrite):
     aliases: Optional[list[str]] = None
     concept_id: Optional[str] = Field(None, alias="conceptId")
     description: Optional[str] = None
-    is_step: bool = Field(alias="isStep")
+    is_step: bool = Field(False, alias="isStep")
     name: Optional[str] = None
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
     standard_name: Optional[str] = Field(None, alias="standardName")
