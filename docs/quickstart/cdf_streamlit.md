@@ -31,20 +31,21 @@ The following is a minimal example of a Streamlit app that uses `pygen` to gener
 import streamlit as st
 from cognite.client import CogniteClient
 from cognite.pygen import generate_sdk_notebook
+
 st.title("An example app in CDF with Pygen")
 
 client = CogniteClient()
 
+
 @st.cache_data
 def get_client():
-  return generate_sdk_notebook(
-    ("IntegrationTestsImmutable", "ScenarioInstance", "1"), client
-  )
+    return generate_sdk_notebook(("IntegrationTestsImmutable", "ScenarioInstance", "1"), client)
+
 
 @st.cache_data
 def get_scenario_instances():
-  client = get_client()
-  return client.scenario_instance.list().to_pandas()
+    client = get_client()
+    return client.scenario_instance.list().to_pandas()
 
 
 st.dataframe(get_scenario_instances())
@@ -74,9 +75,7 @@ cached for subsequent calls.
 ```python
 @st.cache_data
 def get_client():
-  return generate_sdk_notebook(
-    ("IntegrationTestsImmutable", "ScenarioInstance", "1"), client
-  )
+    return generate_sdk_notebook(("IntegrationTestsImmutable", "ScenarioInstance", "1"), client)
 ```
 
 We then define a function that uses the generated SDK to list all `ScenarioInstance` objects in the project. We also
@@ -85,8 +84,8 @@ cache the result of this function.
 ```python
 @st.cache_data
 def get_scenario_instances():
-  client = get_client()
-  return client.scenario_instance.list().to_pandas()
+    client = get_client()
+    return client.scenario_instance.list().to_pandas()
 ```
 
 Finally, we call the `get_scenario_instances` function and display the result in a dataframe.

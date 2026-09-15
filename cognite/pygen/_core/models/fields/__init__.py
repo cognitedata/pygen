@@ -14,17 +14,17 @@ from .connections import (
 from .primitive import BasePrimitiveField, ContainerProperty, PrimitiveField, PrimitiveListField
 
 __all__ = [
-    "Field",
+    "BaseConnectionField",
     "BasePrimitiveField",
-    "PrimitiveField",
-    "PrimitiveListField",
     "CDFExternalField",
     "CDFExternalListField",
-    "EndNodeField",
-    "EdgeClass",
-    "T_Field",
-    "BaseConnectionField",
-    "OneToOneConnectionField",
-    "OneToManyConnectionField",
     "ContainerProperty",
+    "EdgeClass",
+    "EndNodeField",
+    "Field",
+    "OneToManyConnectionField",
+    "OneToOneConnectionField",
+    "PrimitiveField",
+    "PrimitiveListField",
+    "T_Field",
 ]

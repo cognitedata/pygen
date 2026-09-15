@@ -140,7 +140,7 @@ class PrimitiveField(BasePrimitiveField):
         # We allow string for enum responses. This is in case a new value is added to the enum
         str_ = " | str" if isinstance(self.type_, Enum) else ""
         if self.need_alias and self.is_nullable:
-            return f"Optional[{self.type_as_string}]{str_} = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
+            return f'Optional[{self.type_as_string}]{str_} = {self.pydantic_field}(None, alias="{self.prop_name}")'
         elif self.need_alias:
             return f'{self.type_as_string}{str_} = {self.pydantic_field}(alias="{self.prop_name}")'
         elif self.is_nullable:
@@ -150,7 +150,7 @@ class PrimitiveField(BasePrimitiveField):
 
     def as_graphql_type_hint(self) -> str:
         if self.need_alias:
-            return f"Optional[{self.type_as_string}] = {self.pydantic_field}" f'(None, alias="{self.prop_name}")'
+            return f'Optional[{self.type_as_string}] = {self.pydantic_field}(None, alias="{self.prop_name}")'
         else:
             return f"Optional[{self.type_as_string}] = None"
 

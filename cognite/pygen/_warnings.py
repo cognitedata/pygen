@@ -192,8 +192,7 @@ def _print_group(console: Callable[[str], None], group: type[PygenWarning], warn
         relation_warnings = cast(list[MissingReverseDirectRelationTargetWarning], warning_list)
         for relation_warn in relation_warnings:
             console(
-                f"{indent} Skipping reverse direct "
-                f"relation {relation_warn.view.external_id}.{relation_warn.property_}."
+                f"{indent} Skipping reverse direct relation {relation_warn.view.external_id}.{relation_warn.property_}."
             )
     else:
         for warning in warning_list:
