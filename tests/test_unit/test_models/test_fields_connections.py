@@ -64,8 +64,7 @@ class TestConnections:
             pytest.param(
                 "ConnectionItemE",
                 "inwardsSingle",
-                "Union[ConnectionItemD, str, dm.NodeId, None] = "
-                'Field(default=None, repr=False, alias="inwardsSingle")',
+                'Union[ConnectionItemD, str, dm.NodeId, None] = Field(default=None, repr=False, alias="inwardsSingle")',
                 id="Inwards SingleEdge no properties",
             ),
         ],

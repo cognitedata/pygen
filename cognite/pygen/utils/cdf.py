@@ -8,7 +8,7 @@ from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
 from time import sleep
-from typing import Any, Optional, Protocol, Union, get_args, get_origin, get_type_hints
+from typing import Any, Protocol, Union, get_args, get_origin, get_type_hints
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -88,8 +88,8 @@ def load_cognite_client_from_toml(
 class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
     def retrieve_multiple(
         self,
-        ids: Optional[Sequence[int]] = None,
-        external_ids: Optional[SequenceNotStr[str]] = None,
+        ids: Sequence[int] | None = None,
+        external_ids: SequenceNotStr[str] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> T_CogniteResourceList: ...
 
@@ -97,8 +97,8 @@ class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
 
     def delete(
         self,
-        id: Optional[Union[int, Sequence[int]]] = None,
-        external_id: Optional[Union[str, SequenceNotStr[str]]] = None,
+        id: Union[int, Sequence[int]] | None = None,
+        external_id: Union[str, SequenceNotStr[str]] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> None: ...
 
@@ -109,8 +109,8 @@ class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
 
     def retrieve_multiple(
         self,
-        ids: Optional[Sequence[int]] = None,
-        external_ids: Optional[SequenceNotStr[str]] = None,
+        ids: Sequence[int] | None = None,
+        external_ids: SequenceNotStr[str] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> FileMetadataList:
         return self._files_api.retrieve_multiple(
@@ -125,8 +125,8 @@ class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
 
     def delete(
         self,
-        id: Optional[Union[int, Sequence[int]]] = None,
-        external_id: Optional[Union[str, SequenceNotStr[str]]] = None,
+        id: Union[int, Sequence[int]] | None = None,
+        external_id: Union[str, SequenceNotStr[str]] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> None:
         with suppress(CogniteNotFoundError):
@@ -150,7 +150,7 @@ class CSVLoader:
     def __init__(
         self,
         source_dir: pathlib.Path,
-        echo: Optional[Callable[[str], None]] = None,
+        echo: Callable[[str], None] | None = None,
         data_set_id: int | None = None,
         data_model: DataModel[View] | None = None,
     ):
@@ -299,7 +299,7 @@ class CSVLoader:
         elif created_edges == 0:
             self._echo(f"All {len(all_edges)} edges already exists")
         else:
-            self._echo(f"Created {created_edges} edges, {len(all_edges)-created_edges} edges already exists")
+            self._echo(f"Created {created_edges} edges, {len(all_edges) - created_edges} edges already exists")
         return created.edges
 
     @staticmethod
@@ -782,7 +782,7 @@ def _reduce_model(
             new_views.append(new_view)
     if not new_views:
         raise ValueError(
-            f"No views left in {model.as_id()}. Please check your exclude_views and exclude_spaces" f"parameters"
+            f"No views left in {model.as_id()}. Please check your exclude_views and exclude_spacesparameters"
         )
 
     for view in new_views:
