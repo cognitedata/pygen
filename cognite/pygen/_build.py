@@ -6,7 +6,6 @@ import shutil
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 from cognite.client import CogniteClient
@@ -30,14 +29,14 @@ from ._generator import (
 
 def build_wheel(
     model_id: DataModel | Sequence[DataModel],
-    client: Optional[CogniteClient] = None,
+    client: CogniteClient | None = None,
     *,
-    top_level_package: Optional[str] = None,
-    client_name: Optional[str] = None,
+    top_level_package: str | None = None,
+    client_name: str | None = None,
     default_instance_space: str | None = None,
     output_dir: Path = Path("dist"),
     format_code: bool = True,
-    config: Optional[PygenConfig] = None,
+    config: PygenConfig | None = None,
 ) -> None:
     """
     Generates a wheel with Python SDK tailored to the given Data Model(s).

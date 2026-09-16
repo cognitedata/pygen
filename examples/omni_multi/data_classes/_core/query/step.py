@@ -73,7 +73,7 @@ class QueryBuildStep:
         view_id: dm.ViewId | None = None,
         max_retrieve_limit: int = -1,
         max_retrieve_batch_limit: int | None = None,
-        select: dm.query.Select | None | type[NotSetSentinel] = NotSetSentinel,
+        select: dm.query.Select | type[NotSetSentinel] | None = NotSetSentinel,
         raw_filter: dm.Filter | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         connection_property: ViewPropertyId | None = None,
@@ -201,7 +201,7 @@ class QueryBuildStepFactory:
     def connection_properties(self) -> dict[str, ViewProperty]:
         output: dict[str, ViewProperty] = {}
         if self._root_properties is None or self._view is None:
-            raise ValueError("View or user selected properties is required for finding" " connection properties")
+            raise ValueError("View or user selected properties is required for finding connection properties")
         for prop in self._root_properties:
             definition = self._view.properties.get(prop)
             if not definition:
@@ -491,7 +491,7 @@ class QueryResultStep(QueryBuildStep):
         expression: dm.query.NodeOrEdgeResultSetExpression,
         view_id: dm.ViewId | None = None,
         max_retrieve_limit: int = -1,
-        select: dm.query.Select | None | type[NotSetSentinel] = NotSetSentinel,
+        select: dm.query.Select | type[NotSetSentinel] | None = NotSetSentinel,
         raw_filter: dm.Filter | None = None,
         connection_type: Literal["reverse-list"] | None = None,
         connection_property: ViewPropertyId | None = None,
