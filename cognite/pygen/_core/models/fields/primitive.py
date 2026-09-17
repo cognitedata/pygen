@@ -161,6 +161,8 @@ class PrimitiveField(BasePrimitiveField):
                 f"Optional[{self.type_as_string}] = "
                 f'{self.pydantic_field}({self.default_code}, alias="{self.prop_name}")'
             )
+        elif not self.is_nullable and self.need_alias and self.default is not None:
+            out_type = f'{self.type_as_string} = {self.pydantic_field}({self.default_code}, alias="{self.prop_name}")'
         elif self.need_alias:
             out_type = f'{self.type_as_string} = {self.pydantic_field}(alias="{self.prop_name}")'
         elif self.is_nullable:
