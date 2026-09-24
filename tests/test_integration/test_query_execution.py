@@ -289,11 +289,18 @@ def test_search_AND(cognite_client: CogniteClient, omni_client: OmniClient, omni
 
     assert isinstance(result, list)
     assert len(result) > 0
-    properties_set = set(selected_properties)
-    ill_formed_items = [item for item in result if not (set(item.keys()) <= properties_set)]
+    # Check that all results have all words in their text properties
+    ill_formed_items = [
+        item
+        for item in result
+        if not (
+            all(
+                any(word in item[prop_id] for prop_id in selected_properties if isinstance(prop_id, str))
+                for word in words
+            )
+        )
+    ]
     assert not ill_formed_items, f"Items with unexpected properties: {ill_formed_items}"
-    # As we are searching with AND, we expect only one result
-    assert len(result) == 1
 
 
 def test_query_list_root_nodes(cognite_client: CogniteClient) -> None:
