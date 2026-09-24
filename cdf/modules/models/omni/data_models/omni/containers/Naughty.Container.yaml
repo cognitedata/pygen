@@ -1,0 +1,14 @@
+space: {{ pygen_models_space }}
+externalId: Naughty
+name: Naughty
+usedFor: node
+properties:
+  type:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: type
