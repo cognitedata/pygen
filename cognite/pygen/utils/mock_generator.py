@@ -855,11 +855,11 @@ class MockData(UserList[ViewMockData]):
                         f"and {sum(1 for e in created.edges if e.was_modified)} edges"
                     )
             if (timeseries := self.unique_timeseries) and (exclude is None or "timeseries" not in exclude):
-                client.time_series.upsert(timeseries)
+                client.time_series.upsert(timeseries.as_write())
                 if verbose:
                     print(f"Created/Updated {len(timeseries)} timeseries")
             if (sequences := self.unique_sequences) and (exclude is None or "sequences" not in exclude):
-                client.sequences.upsert(sequences)
+                client.sequences.upsert(sequences.as_write())
                 if verbose:
                     print(f"Created/Updated {len(sequences)} sequences")
             if (files := self.unique_files) and (exclude is None or "files" not in exclude):
@@ -870,7 +870,7 @@ class MockData(UserList[ViewMockData]):
                 )
                 new_files = FileMetadataList([file for file in files if file.external_id not in existing])
                 for file in new_files:
-                    client.files.create(file)
+                    client.files.create(file.as_write())
                 if verbose:
                     print(f"Created {len(new_files)} files")
 
