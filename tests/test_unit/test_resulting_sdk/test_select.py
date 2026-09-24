@@ -29,3 +29,13 @@ class TestSelectMethod:
             client.config.client_name = "CognitePygen"
             pygen = OmniClient(client)
         pygen.connection_item_a.select().name.equals("test").list_full()
+
+    def test_select_empty_to_pandas_dropna(self) -> None:
+        with monkeypatch_cognite_client() as client:
+            client.config = MagicMock(spec=ClientConfig)
+            client.config.client_name = "CognitePygen"
+            pygen = OmniClient(client)
+        df_dropna = (
+            pygen.connection_item_a.select().name.equals("does_not_exist").list_full().to_pandas(dropna_columns=True)
+        )
+        assert df_dropna.columns.empty
