@@ -47,6 +47,7 @@ from cognite_core.data_classes import (
     CogniteAsset,
     CogniteEquipment,
     CogniteFile,
+    CogniteStateSet,
     CogniteTimeSeries,
 )
 
@@ -63,6 +64,7 @@ class CogniteSourceableNodeAPI(
         "CogniteAsset": CogniteAsset,
         "CogniteEquipment": CogniteEquipment,
         "CogniteFile": CogniteFile,
+        "CogniteStateSet": CogniteStateSet,
         "CogniteTimeSeries": CogniteTimeSeries,
     }
     _class_type = CogniteSourceableNode
@@ -79,7 +81,14 @@ class CogniteSourceableNodeAPI(
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
             SequenceNotStr[
-                Literal["CogniteActivity", "CogniteAsset", "CogniteEquipment", "CogniteFile", "CogniteTimeSeries"]
+                Literal[
+                    "CogniteActivity",
+                    "CogniteAsset",
+                    "CogniteEquipment",
+                    "CogniteFile",
+                    "CogniteStateSet",
+                    "CogniteTimeSeries",
+                ]
             ]
             | None
         ) = None,
@@ -93,7 +102,14 @@ class CogniteSourceableNodeAPI(
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
             SequenceNotStr[
-                Literal["CogniteActivity", "CogniteAsset", "CogniteEquipment", "CogniteFile", "CogniteTimeSeries"]
+                Literal[
+                    "CogniteActivity",
+                    "CogniteAsset",
+                    "CogniteEquipment",
+                    "CogniteFile",
+                    "CogniteStateSet",
+                    "CogniteTimeSeries",
+                ]
             ]
             | None
         ) = None,
@@ -106,7 +122,14 @@ class CogniteSourceableNodeAPI(
         space: str = DEFAULT_INSTANCE_SPACE,
         as_child_class: (
             SequenceNotStr[
-                Literal["CogniteActivity", "CogniteAsset", "CogniteEquipment", "CogniteFile", "CogniteTimeSeries"]
+                Literal[
+                    "CogniteActivity",
+                    "CogniteAsset",
+                    "CogniteEquipment",
+                    "CogniteFile",
+                    "CogniteStateSet",
+                    "CogniteTimeSeries",
+                ]
             ]
             | None
         ) = None,

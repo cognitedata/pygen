@@ -73,7 +73,7 @@ class CogniteVisualizableGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite visualizable.
         data_record: The data record of the Cognite visualizable node.
-        object_3d: Direct relation to an Object3D instance representing the 3D resource
+        object_3d: Direct relation to a Cognite3DObject instance representing the 3D resource.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteVisualizable", "v1")
@@ -116,7 +116,7 @@ class CogniteVisualizable(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the Cognite visualizable.
         data_record: The data record of the Cognite visualizable node.
-        object_3d: Direct relation to an Object3D instance representing the 3D resource
+        object_3d: Direct relation to a Cognite3DObject instance representing the 3D resource.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteVisualizable", "v1")
@@ -144,7 +144,7 @@ class CogniteVisualizableWrite(DomainModelWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite visualizable.
         data_record: The data record of the Cognite visualizable node.
-        object_3d: Direct relation to an Object3D instance representing the 3D resource
+        object_3d: Direct relation to a Cognite3DObject instance representing the 3D resource.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = ("object_3d",)

@@ -59,6 +59,7 @@ from cognite_core.data_classes import (
     CognitePointCloudModel,
     CognitePointCloudVolume,
     CogniteSourceSystem,
+    CogniteStateSet,
     CogniteTimeSeries,
     CogniteUnit,
 )
@@ -90,6 +91,7 @@ class CogniteDescribableNodeAPI(
         "CognitePointCloudModel": CognitePointCloudModel,
         "CognitePointCloudVolume": CognitePointCloudVolume,
         "CogniteSourceSystem": CogniteSourceSystem,
+        "CogniteStateSet": CogniteStateSet,
         "CogniteTimeSeries": CogniteTimeSeries,
         "CogniteUnit": CogniteUnit,
     }
@@ -126,6 +128,7 @@ class CogniteDescribableNodeAPI(
                     "CognitePointCloudModel",
                     "CognitePointCloudVolume",
                     "CogniteSourceSystem",
+                    "CogniteStateSet",
                     "CogniteTimeSeries",
                     "CogniteUnit",
                 ]
@@ -160,6 +163,7 @@ class CogniteDescribableNodeAPI(
                     "CognitePointCloudModel",
                     "CognitePointCloudVolume",
                     "CogniteSourceSystem",
+                    "CogniteStateSet",
                     "CogniteTimeSeries",
                     "CogniteUnit",
                 ]
@@ -193,6 +197,7 @@ class CogniteDescribableNodeAPI(
                     "CognitePointCloudModel",
                     "CognitePointCloudVolume",
                     "CogniteSourceSystem",
+                    "CogniteStateSet",
                     "CogniteTimeSeries",
                     "CogniteUnit",
                 ]

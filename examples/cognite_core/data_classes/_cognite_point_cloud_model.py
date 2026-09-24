@@ -88,11 +88,11 @@ class CognitePointCloudModelGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud model.
         data_record: The data record of the Cognite point cloud model node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
         revisions: List of revisions for this PointCloud model
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
         thumbnail: Thumbnail of the 3D model
         type_: CAD, PointCloud or Image360
     """
@@ -143,11 +143,11 @@ class CognitePointCloudModel(Cognite3DModel):
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud model.
         data_record: The data record of the Cognite point cloud model node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
         revisions: List of revisions for this PointCloud model
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
         thumbnail: Thumbnail of the 3D model
         type_: CAD, PointCloud or Image360
     """
@@ -183,10 +183,10 @@ class CognitePointCloudModelWrite(Cognite3DModelWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud model.
         data_record: The data record of the Cognite point cloud model node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
         thumbnail: Thumbnail of the 3D model
         type_: CAD, PointCloud or Image360
     """

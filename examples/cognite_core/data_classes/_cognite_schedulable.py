@@ -71,10 +71,10 @@ class CogniteSchedulableGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite schedulable.
         data_record: The data record of the Cognite schedulable node.
-        end_time: The actual end time of an activity (or similar that extends this)
-        scheduled_end_time: The planned end time of an activity (or similar that extends this)
-        scheduled_start_time: The planned start time of an activity (or similar that extends this)
-        start_time: The actual start time of an activity (or similar that extends this)
+        end_time: The actual end time of an activity (or similar that extends this).
+        scheduled_end_time: The planned end time of an activity (or similar that extends this).
+        scheduled_start_time: The planned start time of an activity (or similar that extends this).
+        start_time: The actual start time of an activity (or similar that extends this).
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSchedulable", "v1")
@@ -112,10 +112,10 @@ class CogniteSchedulable(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the Cognite schedulable.
         data_record: The data record of the Cognite schedulable node.
-        end_time: The actual end time of an activity (or similar that extends this)
-        scheduled_end_time: The planned end time of an activity (or similar that extends this)
-        scheduled_start_time: The planned start time of an activity (or similar that extends this)
-        start_time: The actual start time of an activity (or similar that extends this)
+        end_time: The actual end time of an activity (or similar that extends this).
+        scheduled_end_time: The planned end time of an activity (or similar that extends this).
+        scheduled_start_time: The planned start time of an activity (or similar that extends this).
+        start_time: The actual start time of an activity (or similar that extends this).
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSchedulable", "v1")
@@ -141,10 +141,10 @@ class CogniteSchedulableWrite(DomainModelWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite schedulable.
         data_record: The data record of the Cognite schedulable node.
-        end_time: The actual end time of an activity (or similar that extends this)
-        scheduled_end_time: The planned end time of an activity (or similar that extends this)
-        scheduled_start_time: The planned start time of an activity (or similar that extends this)
-        start_time: The actual start time of an activity (or similar that extends this)
+        end_time: The actual end time of an activity (or similar that extends this).
+        scheduled_end_time: The planned end time of an activity (or similar that extends this).
+        scheduled_start_time: The planned start time of an activity (or similar that extends this).
+        start_time: The actual start time of an activity (or similar that extends this).
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

@@ -149,25 +149,27 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
         external_id: The external id of the Cognite time series.
         data_record: The data record of the Cognite time series node.
         activities: An automatically updated list of activities the time series is related to.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         assets: A list of assets the time series is related to.
-        description: Description of the instance
+        description: The description of the instance.
         equipment: A list of equipment the time series is related to.
-        is_step: Specifies whether the time series is a step time series or not.
-        name: Name of the instance
-        source: Direct relation to a source system
+        is_step: Specifies whether the time series is a step time series or not. It is only in effect when the type is
+            'numeric'.
+        name: The name of the instance.
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
         source_unit: The unit specified in the source system.
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
-        type_: Specifies the data type of the data points.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        state_set: The state set of the time series. It is only in effect when the type is 'state'.
+        tags: A list of tags for the instance. Max: 1000.
+        type_: Specifies the data type of the data points. Valid values: 'numeric', 'string', 'state'.
         unit: The unit of the time series.
     """
 
@@ -187,8 +189,9 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
+    state_set: Optional[dict] = Field(default=None, alias="stateSet")
     tags: Optional[list[str]] = None
-    type_: Optional[Literal["numeric", "string"]] = Field(None, alias="type")
+    type_: Optional[Literal["numeric", "state", "string"]] = Field(None, alias="type")
     unit: Optional[CogniteUnitGraphQL] = Field(default=None, repr=False)
 
     @model_validator(mode="before")
@@ -202,7 +205,7 @@ class CogniteTimeSeriesGraphQL(GraphQLCore):
             )
         return values
 
-    @field_validator("activities", "assets", "equipment", "source", "unit", mode="before")
+    @field_validator("activities", "assets", "equipment", "source", "state_set", "unit", mode="before")
     def parse_graphql(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
@@ -229,25 +232,27 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
         external_id: The external id of the Cognite time series.
         data_record: The data record of the Cognite time series node.
         activities: An automatically updated list of activities the time series is related to.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         assets: A list of assets the time series is related to.
-        description: Description of the instance
+        description: The description of the instance.
         equipment: A list of equipment the time series is related to.
-        is_step: Specifies whether the time series is a step time series or not.
-        name: Name of the instance
-        source: Direct relation to a source system
+        is_step: Specifies whether the time series is a step time series or not. It is only in effect when the type is
+            'numeric'.
+        name: The name of the instance.
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
         source_unit: The unit specified in the source system.
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
-        type_: Specifies the data type of the data points.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        state_set: The state set of the time series. It is only in effect when the type is 'state'.
+        tags: A list of tags for the instance. Max: 1000.
+        type_: Specifies the data type of the data points. Valid values: 'numeric', 'string', 'state'.
         unit: The unit of the time series.
     """
 
@@ -259,10 +264,11 @@ class CogniteTimeSeries(CogniteDescribableNode, CogniteSourceableNode):
     equipment: Optional[list[Union[CogniteEquipment, str, dm.NodeId]]] = Field(default=None, repr=False)
     is_step: bool = Field(alias="isStep")
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
-    type_: Literal["numeric", "string"] | str = Field(alias="type")
+    state_set: Union[str, dm.NodeId, None] = Field(default=None, alias="stateSet")
+    type_: Literal["numeric", "state", "string"] | str = Field(alias="type")
     unit: Union[CogniteUnit, str, dm.NodeId, None] = Field(default=None, repr=False)
 
-    @field_validator("source", "unit", mode="before")
+    @field_validator("source", "state_set", "unit", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
@@ -288,25 +294,27 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
         space: The space where the node is located.
         external_id: The external id of the Cognite time series.
         data_record: The data record of the Cognite time series node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         assets: A list of assets the time series is related to.
-        description: Description of the instance
+        description: The description of the instance.
         equipment: A list of equipment the time series is related to.
-        is_step: Specifies whether the time series is a step time series or not.
-        name: Name of the instance
-        source: Direct relation to a source system
+        is_step: Specifies whether the time series is a step time series or not. It is only in effect when the type is
+            'numeric'.
+        name: The name of the instance.
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
         source_unit: The unit specified in the source system.
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
-        type_: Specifies the data type of the data points.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        state_set: The state set of the time series. It is only in effect when the type is 'state'.
+        tags: A list of tags for the instance. Max: 1000.
+        type_: Specifies the data type of the data points. Valid values: 'numeric', 'string', 'state'.
         unit: The unit of the time series.
     """
 
@@ -325,6 +333,7 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
         "source_unit",
         "source_updated_time",
         "source_updated_user",
+        "state_set",
         "tags",
         "type_",
         "unit",
@@ -333,6 +342,7 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
         "assets",
         "equipment",
         "source",
+        "state_set",
         "unit",
     )
 
@@ -343,7 +353,8 @@ class CogniteTimeSeriesWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeW
     equipment: Optional[list[Union[CogniteEquipmentWrite, str, dm.NodeId]]] = Field(default=None, repr=False)
     is_step: bool = Field(alias="isStep")
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
-    type_: Literal["numeric", "string"] = Field(alias="type")
+    state_set: Union[str, dm.NodeId, None] = Field(default=None, alias="stateSet")
+    type_: Literal["numeric", "state", "string"] = Field(alias="type")
     unit: Union[CogniteUnitWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
 
     @field_validator("assets", "equipment", "unit", mode="before")
@@ -486,7 +497,15 @@ def _create_cognite_time_series_filter(
     max_source_updated_time: datetime.datetime | None = None,
     source_updated_user: str | list[str] | None = None,
     source_updated_user_prefix: str | None = None,
-    type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
+    state_set: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
+    type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
     unit: (
         str
         | tuple[str, str]
@@ -583,6 +602,12 @@ def _create_cognite_time_series_filter(
     if source_updated_user_prefix is not None:
         filters.append(
             dm.filters.Prefix(view_id.as_property_ref("sourceUpdatedUser"), value=source_updated_user_prefix)
+        )
+    if isinstance(state_set, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(state_set):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("stateSet"), value=as_instance_dict_id(state_set)))
+    if state_set and isinstance(state_set, Sequence) and not isinstance(state_set, str) and not is_tuple_id(state_set):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("stateSet"), values=[as_instance_dict_id(item) for item in state_set])
         )
     if isinstance(type_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
@@ -725,6 +750,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
         self.source_unit = StringFilter(self, self._view_id.as_property_ref("sourceUnit"))
         self.source_updated_time = TimestampFilter(self, self._view_id.as_property_ref("sourceUpdatedTime"))
         self.source_updated_user = StringFilter(self, self._view_id.as_property_ref("sourceUpdatedUser"))
+        self.state_set_filter = DirectRelationFilter(self, self._view_id.as_property_ref("stateSet"))
         self.unit_filter = DirectRelationFilter(self, self._view_id.as_property_ref("unit"))
         self._filter_classes.extend(
             [
@@ -741,6 +767,7 @@ class _CogniteTimeSeriesQuery(NodeQueryCore[T_DomainModelList, CogniteTimeSeries
                 self.source_unit,
                 self.source_updated_time,
                 self.source_updated_user,
+                self.state_set_filter,
                 self.unit_filter,
             ]
         )

@@ -153,25 +153,25 @@ class CogniteEquipmentGraphQL(GraphQLCore):
         external_id: The external id of the Cognite equipment.
         data_record: The data record of the Cognite equipment node.
         activities: An automatically updated list of activities related to the equipment.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         asset: The asset the equipment is related to.
-        description: Description of the instance
-        equipment_type: Specifies the type of the equipment. It's a direct relation to CogniteEquipmentType.
+        description: The description of the instance.
+        equipment_type: Specifies the type of the equipment.
         files: A list of files the equipment relates to.
         manufacturer: The manufacturer of the equipment.
-        name: Name of the instance
+        name: The name of the instance.
         serial_number: The serial number of the equipment.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        tags: A list of tags for the instance. Max: 1000.
         time_series: An automatically updated list of time series related to the equipment.
     """
 
@@ -233,25 +233,25 @@ class CogniteEquipment(CogniteDescribableNode, CogniteSourceableNode):
         external_id: The external id of the Cognite equipment.
         data_record: The data record of the Cognite equipment node.
         activities: An automatically updated list of activities related to the equipment.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         asset: The asset the equipment is related to.
-        description: Description of the instance
-        equipment_type: Specifies the type of the equipment. It's a direct relation to CogniteEquipmentType.
+        description: The description of the instance.
+        equipment_type: Specifies the type of the equipment.
         files: A list of files the equipment relates to.
         manufacturer: The manufacturer of the equipment.
-        name: Name of the instance
+        name: The name of the instance.
         serial_number: The serial number of the equipment.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        tags: A list of tags for the instance. Max: 1000.
         time_series: An automatically updated list of time series related to the equipment.
     """
 
@@ -294,25 +294,25 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
         space: The space where the node is located.
         external_id: The external id of the Cognite equipment.
         data_record: The data record of the Cognite equipment node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         asset: The asset the equipment is related to.
-        description: Description of the instance
-        equipment_type: Specifies the type of the equipment. It's a direct relation to CogniteEquipmentType.
+        description: The description of the instance.
+        equipment_type: Specifies the type of the equipment.
         files: A list of files the equipment relates to.
         manufacturer: The manufacturer of the equipment.
-        name: Name of the instance
+        name: The name of the instance.
         serial_number: The serial number of the equipment.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

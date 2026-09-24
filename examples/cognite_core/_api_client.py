@@ -39,6 +39,7 @@ from cognite_core._api import (
     CogniteSchedulableAPI,
     CogniteSourceSystemAPI,
     CogniteSourceableNodeAPI,
+    CogniteStateSetAPI,
     CogniteTimeSeriesAPI,
     CogniteUnitAPI,
     CogniteVisualizableAPI,
@@ -104,6 +105,7 @@ class CogniteCoreClient:
         self.cognite_schedulable = CogniteSchedulableAPI(client)
         self.cognite_source_system = CogniteSourceSystemAPI(client)
         self.cognite_sourceable_node = CogniteSourceableNodeAPI(client)
+        self.cognite_state_set = CogniteStateSetAPI(client)
         self.cognite_time_series = CogniteTimeSeriesAPI(client)
         self.cognite_unit = CogniteUnitAPI(client)
         self.cognite_visualizable = CogniteVisualizableAPI(client)
@@ -300,6 +302,7 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cognite_schedulable<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cognite_source_system<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cognite_sourceable_node<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.cognite_state_set<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cognite_time_series<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cognite_unit<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.cognite_visualizable<br />

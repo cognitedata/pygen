@@ -90,16 +90,16 @@ class CogniteSourceableEdgeGraphQL(GraphQLCore):
         external_id: The external id of the Cognite sourceable edge.
         data_record: The data record of the Cognite sourceable edge node.
         end_node: The end node of this edge.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
@@ -131,16 +131,16 @@ class CogniteSourceableEdge(DomainRelation):
         external_id: The external id of the Cognite sourceable edge.
         data_record: The data record of the Cognite sourceable edge edge.
         end_node: The end node of this edge.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
@@ -188,16 +188,16 @@ class CogniteSourceableEdgeWrite(DomainRelationWrite):
         external_id: The external id of the Cognite sourceable edge.
         data_record: The data record of the Cognite sourceable edge edge.
         end_node: The end node of this edge.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

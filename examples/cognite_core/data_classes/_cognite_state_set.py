@@ -37,6 +37,8 @@ from cognite_core.data_classes._core import (
     DirectRelationFilter,
     TimestampFilter,
 )
+from cognite_core.data_classes._cognite_describable_node import CogniteDescribableNode, CogniteDescribableNodeWrite
+from cognite_core.data_classes._cognite_sourceable_node import CogniteSourceableNode, CogniteSourceableNodeWrite
 
 if TYPE_CHECKING:
     from cognite_core.data_classes._cognite_source_system import (
@@ -49,50 +51,71 @@ if TYPE_CHECKING:
 
 
 __all__ = [
-    "CogniteSourceableNode",
-    "CogniteSourceableNodeWrite",
-    "CogniteSourceableNodeList",
-    "CogniteSourceableNodeWriteList",
-    "CogniteSourceableNodeFields",
-    "CogniteSourceableNodeTextFields",
-    "CogniteSourceableNodeGraphQL",
+    "CogniteStateSet",
+    "CogniteStateSetWrite",
+    "CogniteStateSetList",
+    "CogniteStateSetWriteList",
+    "CogniteStateSetFields",
+    "CogniteStateSetTextFields",
+    "CogniteStateSetGraphQL",
 ]
 
 
-CogniteSourceableNodeTextFields = Literal[
-    "external_id", "source_context", "source_created_user", "source_id", "source_updated_user"
-]
-CogniteSourceableNodeFields = Literal[
+CogniteStateSetTextFields = Literal[
     "external_id",
+    "aliases",
+    "description",
+    "name",
+    "source_context",
+    "source_created_user",
+    "source_id",
+    "source_updated_user",
+    "tags",
+]
+CogniteStateSetFields = Literal[
+    "external_id",
+    "aliases",
+    "description",
+    "name",
     "source_context",
     "source_created_time",
     "source_created_user",
     "source_id",
     "source_updated_time",
     "source_updated_user",
+    "states",
+    "tags",
 ]
 
-_COGNITESOURCEABLENODE_PROPERTIES_BY_FIELD = {
+_COGNITESTATESET_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
+    "aliases": "aliases",
+    "description": "description",
+    "name": "name",
     "source_context": "sourceContext",
     "source_created_time": "sourceCreatedTime",
     "source_created_user": "sourceCreatedUser",
     "source_id": "sourceId",
     "source_updated_time": "sourceUpdatedTime",
     "source_updated_user": "sourceUpdatedUser",
+    "states": "states",
+    "tags": "tags",
 }
 
 
-class CogniteSourceableNodeGraphQL(GraphQLCore):
-    """This represents the reading version of Cognite sourceable node, used
+class CogniteStateSetGraphQL(GraphQLCore):
+    """This represents the reading version of Cognite state set, used
     when data is retrieved from CDF using GraphQL.
 
     It is used when retrieving data from CDF using GraphQL.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the Cognite sourceable node.
-        data_record: The data record of the Cognite sourceable node node.
+        external_id: The external id of the Cognite state set.
+        data_record: The data record of the Cognite state set node.
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
         source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
@@ -103,9 +126,14 @@ class CogniteSourceableNodeGraphQL(GraphQLCore):
         source_updated_time: The time the instance was last updated in the source system (if available).
         source_updated_user: The user identifier from the source system who last updated the source data. This
             identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        states: A list of valid states. Each state contains a numeric value and a string value.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteStateSet", "v1")
+    aliases: Optional[list[str]] = None
+    description: Optional[str] = None
+    name: Optional[str] = None
     source: Optional[CogniteSourceSystemGraphQL] = Field(default=None, repr=False)
     source_context: Optional[str] = Field(None, alias="sourceContext")
     source_created_time: Optional[datetime.datetime] = Field(None, alias="sourceCreatedTime")
@@ -113,6 +141,8 @@ class CogniteSourceableNodeGraphQL(GraphQLCore):
     source_id: Optional[str] = Field(None, alias="sourceId")
     source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
     source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
+    states: Optional[list[dict]] = None
+    tags: Optional[list[str]] = None
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -133,24 +163,27 @@ class CogniteSourceableNodeGraphQL(GraphQLCore):
             return value["items"]
         return value
 
-    def as_read(self) -> CogniteSourceableNode:
-        """Convert this GraphQL format of Cognite sourceable node to the reading format."""
-        return CogniteSourceableNode.model_validate(as_read_args(self))
+    def as_read(self) -> CogniteStateSet:
+        """Convert this GraphQL format of Cognite state set to the reading format."""
+        return CogniteStateSet.model_validate(as_read_args(self))
 
-    def as_write(self) -> CogniteSourceableNodeWrite:
-        """Convert this GraphQL format of Cognite sourceable node to the writing format."""
-        return CogniteSourceableNodeWrite.model_validate(as_write_args(self))
+    def as_write(self) -> CogniteStateSetWrite:
+        """Convert this GraphQL format of Cognite state set to the writing format."""
+        return CogniteStateSetWrite.model_validate(as_write_args(self))
 
 
-class CogniteSourceableNode(DomainModel):
-    """This represents the reading version of Cognite sourceable node.
+class CogniteStateSet(CogniteDescribableNode, CogniteSourceableNode):
+    """This represents the reading version of Cognite state set.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the Cognite sourceable node.
-        data_record: The data record of the Cognite sourceable node node.
+        external_id: The external id of the Cognite state set.
+        data_record: The data record of the Cognite state set node.
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
         source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
@@ -161,39 +194,37 @@ class CogniteSourceableNode(DomainModel):
         source_updated_time: The time the instance was last updated in the source system (if available).
         source_updated_user: The user identifier from the source system who last updated the source data. This
             identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        states: A list of valid states. Each state contains a numeric value and a string value.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteStateSet", "v1")
 
-    space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
-    source: Union[CogniteSourceSystem, str, dm.NodeId, None] = Field(default=None, repr=False)
-    source_context: Optional[str] = Field(None, alias="sourceContext")
-    source_created_time: Optional[datetime.datetime] = Field(None, alias="sourceCreatedTime")
-    source_created_user: Optional[str] = Field(None, alias="sourceCreatedUser")
-    source_id: Optional[str] = Field(None, alias="sourceId")
-    source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
-    source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
+    states: list[dict]
 
     @field_validator("source", mode="before")
     @classmethod
     def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
         return parse_single_connection(value, info.field_name)
 
-    def as_write(self) -> CogniteSourceableNodeWrite:
-        """Convert this read version of Cognite sourceable node to the writing version."""
-        return CogniteSourceableNodeWrite.model_validate(as_write_args(self))
+    def as_write(self) -> CogniteStateSetWrite:
+        """Convert this read version of Cognite state set to the writing version."""
+        return CogniteStateSetWrite.model_validate(as_write_args(self))
 
 
-class CogniteSourceableNodeWrite(DomainModelWrite):
-    """This represents the writing version of Cognite sourceable node.
+class CogniteStateSetWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWrite):
+    """This represents the writing version of Cognite state set.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the Cognite sourceable node.
-        data_record: The data record of the Cognite sourceable node node.
+        external_id: The external id of the Cognite state set.
+        data_record: The data record of the Cognite state set node.
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
         source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
@@ -204,9 +235,14 @@ class CogniteSourceableNodeWrite(DomainModelWrite):
         source_updated_time: The time the instance was last updated in the source system (if available).
         source_updated_user: The user identifier from the source system who last updated the source data. This
             identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        states: A list of valid states. Each state contains a numeric value and a string value.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (
+        "aliases",
+        "description",
+        "name",
         "source",
         "source_context",
         "source_created_time",
@@ -214,40 +250,25 @@ class CogniteSourceableNodeWrite(DomainModelWrite):
         "source_id",
         "source_updated_time",
         "source_updated_user",
+        "states",
+        "tags",
     )
     _direct_relations: ClassVar[tuple[str, ...]] = ("source",)
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceable", "v1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteStateSet", "v1")
 
-    space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
-    source: Union[CogniteSourceSystemWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
-    source_context: Optional[str] = Field(None, alias="sourceContext")
-    source_created_time: Optional[datetime.datetime] = Field(None, alias="sourceCreatedTime")
-    source_created_user: Optional[str] = Field(None, alias="sourceCreatedUser")
-    source_id: Optional[str] = Field(None, alias="sourceId")
-    source_updated_time: Optional[datetime.datetime] = Field(None, alias="sourceUpdatedTime")
-    source_updated_user: Optional[str] = Field(None, alias="sourceUpdatedUser")
-
-    @field_validator("source", mode="before")
-    def as_node_id(cls, value: Any) -> Any:
-        if isinstance(value, dm.DirectRelationReference):
-            return dm.NodeId(value.space, value.external_id)
-        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
-            return dm.NodeId(value[0], value[1])
-        elif isinstance(value, list):
-            return [cls.as_node_id(item) for item in value]
-        return value
+    states: list[dict]
 
 
-class CogniteSourceableNodeList(DomainModelList[CogniteSourceableNode]):
-    """List of Cognite sourceable nodes in the read version."""
+class CogniteStateSetList(DomainModelList[CogniteStateSet]):
+    """List of Cognite state sets in the read version."""
 
-    _INSTANCE = CogniteSourceableNode
+    _INSTANCE = CogniteStateSet
 
-    def as_write(self) -> CogniteSourceableNodeWriteList:
-        """Convert these read versions of Cognite sourceable node to the writing versions."""
-        return CogniteSourceableNodeWriteList([node.as_write() for node in self.data])
+    def as_write(self) -> CogniteStateSetWriteList:
+        """Convert these read versions of Cognite state set to the writing versions."""
+        return CogniteStateSetWriteList([node.as_write() for node in self.data])
 
     @property
     def source(self) -> CogniteSourceSystemList:
@@ -258,10 +279,10 @@ class CogniteSourceableNodeList(DomainModelList[CogniteSourceableNode]):
         )
 
 
-class CogniteSourceableNodeWriteList(DomainModelWriteList[CogniteSourceableNodeWrite]):
-    """List of Cognite sourceable nodes in the writing version."""
+class CogniteStateSetWriteList(DomainModelWriteList[CogniteStateSetWrite]):
+    """List of Cognite state sets in the writing version."""
 
-    _INSTANCE = CogniteSourceableNodeWrite
+    _INSTANCE = CogniteStateSetWrite
 
     @property
     def source(self) -> CogniteSourceSystemWriteList:
@@ -272,8 +293,12 @@ class CogniteSourceableNodeWriteList(DomainModelWriteList[CogniteSourceableNodeW
         )
 
 
-def _create_cognite_sourceable_node_filter(
+def _create_cognite_state_set_filter(
     view_id: dm.ViewId,
+    description: str | list[str] | None = None,
+    description_prefix: str | None = None,
+    name: str | list[str] | None = None,
+    name_prefix: str | None = None,
     source: (
         str
         | tuple[str, str]
@@ -299,6 +324,18 @@ def _create_cognite_sourceable_node_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
+    if isinstance(description, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("description"), value=description))
+    if description and isinstance(description, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("description"), values=description))
+    if description_prefix is not None:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("description"), value=description_prefix))
+    if isinstance(name, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("name"), value=name))
+    if name and isinstance(name, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
+    if name_prefix is not None:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
     if isinstance(source, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(source):
         filters.append(dm.filters.Equals(view_id.as_property_ref("source"), value=as_instance_dict_id(source)))
     if source and isinstance(source, Sequence) and not isinstance(source, str) and not is_tuple_id(source):
@@ -360,10 +397,10 @@ def _create_cognite_sourceable_node_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSourceableNodeList]):
-    _view_id = CogniteSourceableNode._view_id
-    _result_cls = CogniteSourceableNode
-    _result_list_cls_end = CogniteSourceableNodeList
+class _CogniteStateSetQuery(NodeQueryCore[T_DomainModelList, CogniteStateSetList]):
+    _view_id = CogniteStateSet._view_id
+    _result_cls = CogniteStateSet
+    _result_list_cls_end = CogniteStateSetList
 
     def __init__(
         self,
@@ -408,6 +445,8 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
 
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.description = StringFilter(self, self._view_id.as_property_ref("description"))
+        self.name = StringFilter(self, self._view_id.as_property_ref("name"))
         self.source_filter = DirectRelationFilter(self, self._view_id.as_property_ref("source"))
         self.source_context = StringFilter(self, self._view_id.as_property_ref("sourceContext"))
         self.source_created_time = TimestampFilter(self, self._view_id.as_property_ref("sourceCreatedTime"))
@@ -419,6 +458,8 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
             [
                 self.space,
                 self.external_id,
+                self.description,
+                self.name,
                 self.source_filter,
                 self.source_context,
                 self.source_created_time,
@@ -429,10 +470,10 @@ class _CogniteSourceableNodeQuery(NodeQueryCore[T_DomainModelList, CogniteSource
             ]
         )
 
-    def list_cognite_sourceable_node(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteSourceableNodeList:
+    def list_cognite_state_set(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteStateSetList:
         return self._list(limit=limit)
 
 
-class CogniteSourceableNodeQuery(_CogniteSourceableNodeQuery[CogniteSourceableNodeList]):
+class CogniteStateSetQuery(_CogniteStateSetQuery[CogniteStateSetList]):
     def __init__(self, client: CogniteClient):
-        super().__init__(set(), [], client, CogniteSourceableNodeList)
+        super().__init__(set(), [], client, CogniteStateSetList)

@@ -73,12 +73,12 @@ class CogniteSourceSystemGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite source system.
         data_record: The data record of the Cognite source system node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        manufacturer: Manufacturer of the source system
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
-        version_: Version identifier for the source system
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        manufacturer: The manufacturer of the source system.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
+        version_: The version identifier for the source system.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
@@ -118,12 +118,12 @@ class CogniteSourceSystem(CogniteDescribableNode):
         space: The space where the node is located.
         external_id: The external id of the Cognite source system.
         data_record: The data record of the Cognite source system node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        manufacturer: Manufacturer of the source system
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
-        version_: Version identifier for the source system
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        manufacturer: The manufacturer of the source system.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
+        version_: The version identifier for the source system.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteSourceSystem", "v1")
@@ -146,12 +146,12 @@ class CogniteSourceSystemWrite(CogniteDescribableNodeWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite source system.
         data_record: The data record of the Cognite source system node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        manufacturer: Manufacturer of the source system
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
-        version_: Version identifier for the source system
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        manufacturer: The manufacturer of the source system.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
+        version_: The version identifier for the source system.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

@@ -77,14 +77,14 @@ class CogniteEquipmentTypeGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite equipment type.
         data_record: The data record of the Cognite equipment type node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         code: A unique identifier for the type of equipment.
-        description: Description of the instance
-        equipment_class: Represents the class of equipment.
-        name: Name of the instance
-        standard: An identifier for the standard this equipment type is sourced from, for example, ISO14224.
+        description: The description of the instance.
+        equipment_class: The class of equipment.
+        name: The name of the instance.
+        standard: An identifier for the standard this equipment type is sourced from, for example, ISO 14224.
         standard_reference: A reference to the source of the equipment standard.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteEquipmentType", "v1")
@@ -126,14 +126,14 @@ class CogniteEquipmentType(CogniteDescribableNode):
         space: The space where the node is located.
         external_id: The external id of the Cognite equipment type.
         data_record: The data record of the Cognite equipment type node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         code: A unique identifier for the type of equipment.
-        description: Description of the instance
-        equipment_class: Represents the class of equipment.
-        name: Name of the instance
-        standard: An identifier for the standard this equipment type is sourced from, for example, ISO14224.
+        description: The description of the instance.
+        equipment_class: The class of equipment.
+        name: The name of the instance.
+        standard: An identifier for the standard this equipment type is sourced from, for example, ISO 14224.
         standard_reference: A reference to the source of the equipment standard.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteEquipmentType", "v1")
@@ -158,14 +158,14 @@ class CogniteEquipmentTypeWrite(CogniteDescribableNodeWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite equipment type.
         data_record: The data record of the Cognite equipment type node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         code: A unique identifier for the type of equipment.
-        description: Description of the instance
-        equipment_class: Represents the class of equipment.
-        name: Name of the instance
-        standard: An identifier for the standard this equipment type is sourced from, for example, ISO14224.
+        description: The description of the instance.
+        equipment_class: The class of equipment.
+        name: The name of the instance.
+        standard: An identifier for the standard this equipment type is sourced from, for example, ISO 14224.
         standard_reference: A reference to the source of the equipment standard.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

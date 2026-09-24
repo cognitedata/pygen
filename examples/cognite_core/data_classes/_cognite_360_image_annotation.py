@@ -124,24 +124,24 @@ class Cognite360ImageAnnotationGraphQL(GraphQLCore):
         external_id: The external id of the Cognite 360 image annotation.
         data_record: The data record of the Cognite 360 image annotation node.
         end_node: The end node of this edge.
-        aliases: Alternative names for the node
-        confidence: The confidence that the annotation is a good match
-        description: Description of the instance
+        aliases: Alternative names for the instance.
+        confidence: The confidence that the annotation is a good match.
+        description: The description of the instance.
         format_version: Specifies the storage representation for the polygon
-        name: Name of the instance
+        name: The name of the instance.
         polygon: List of floats representing the polygon. Format depends on formatVersion
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        status: The status of the annotation
-        tags: Text based labels for generic use, limited to 1000
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        status: The status of the annotation.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageAnnotation", "v1")
@@ -181,24 +181,24 @@ class Cognite360ImageAnnotation(CogniteAnnotation):
         external_id: The external id of the Cognite 360 image annotation.
         data_record: The data record of the Cognite 360 image annotation edge.
         end_node: The end node of this edge.
-        aliases: Alternative names for the node
-        confidence: The confidence that the annotation is a good match
-        description: Description of the instance
+        aliases: Alternative names for the instance.
+        confidence: The confidence that the annotation is a good match.
+        description: The description of the instance.
         format_version: Specifies the storage representation for the polygon
-        name: Name of the instance
+        name: The name of the instance.
         polygon: List of floats representing the polygon. Format depends on formatVersion
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        status: The status of the annotation
-        tags: Text based labels for generic use, limited to 1000
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        status: The status of the annotation.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageAnnotation", "v1")
@@ -243,24 +243,24 @@ class Cognite360ImageAnnotationWrite(CogniteAnnotationWrite):
         external_id: The external id of the Cognite 360 image annotation.
         data_record: The data record of the Cognite 360 image annotation edge.
         end_node: The end node of this edge.
-        aliases: Alternative names for the node
-        confidence: The confidence that the annotation is a good match
-        description: Description of the instance
+        aliases: Alternative names for the instance.
+        confidence: The confidence that the annotation is a good match.
+        description: The description of the instance.
         format_version: Specifies the storage representation for the polygon
-        name: Name of the instance
+        name: The name of the instance.
         polygon: List of floats representing the polygon. Format depends on formatVersion
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        status: The status of the annotation
-        tags: Text based labels for generic use, limited to 1000
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        status: The status of the annotation.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

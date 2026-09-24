@@ -81,10 +81,10 @@ class Cognite3DModelGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite 3D model.
         data_record: The data record of the Cognite 3D model node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
         thumbnail: Thumbnail of the 3D model
         type_: CAD, PointCloud or Image360
     """
@@ -134,10 +134,10 @@ class Cognite3DModel(CogniteDescribableNode):
         space: The space where the node is located.
         external_id: The external id of the Cognite 3D model.
         data_record: The data record of the Cognite 3D model node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
         thumbnail: Thumbnail of the 3D model
         type_: CAD, PointCloud or Image360
     """
@@ -167,10 +167,10 @@ class Cognite3DModelWrite(CogniteDescribableNodeWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite 3D model.
         data_record: The data record of the Cognite 3D model node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
         thumbnail: Thumbnail of the 3D model
         type_: CAD, PointCloud or Image360
     """

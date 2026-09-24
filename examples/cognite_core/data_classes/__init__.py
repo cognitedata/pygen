@@ -314,6 +314,15 @@ from ._cognite_sourceable_node import (
     CogniteSourceableNodeWrite,
     CogniteSourceableNodeWriteList,
 )
+from ._cognite_state_set import (
+    CogniteStateSet,
+    CogniteStateSetFields,
+    CogniteStateSetGraphQL,
+    CogniteStateSetList,
+    CogniteStateSetTextFields,
+    CogniteStateSetWrite,
+    CogniteStateSetWriteList,
+)
 from ._cognite_time_series import (
     CogniteTimeSeries,
     CogniteTimeSeriesFields,
@@ -399,6 +408,9 @@ CognitePointCloudVolumeWrite.model_rebuild()
 CogniteSourceableNode.model_rebuild()
 CogniteSourceableNodeGraphQL.model_rebuild()
 CogniteSourceableNodeWrite.model_rebuild()
+CogniteStateSet.model_rebuild()
+CogniteStateSetGraphQL.model_rebuild()
+CogniteStateSetWrite.model_rebuild()
 CogniteTimeSeries.model_rebuild()
 CogniteTimeSeriesGraphQL.model_rebuild()
 CogniteTimeSeriesWrite.model_rebuild()
@@ -668,6 +680,13 @@ __all__ = [
     "CogniteSourceableNodeWriteList",
     "CogniteSourceableNodeFields",
     "CogniteSourceableNodeTextFields",
+    "CogniteStateSet",
+    "CogniteStateSetGraphQL",
+    "CogniteStateSetWrite",
+    "CogniteStateSetList",
+    "CogniteStateSetWriteList",
+    "CogniteStateSetFields",
+    "CogniteStateSetTextFields",
     "CogniteTimeSeries",
     "CogniteTimeSeriesGraphQL",
     "CogniteTimeSeriesWrite",

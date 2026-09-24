@@ -96,7 +96,7 @@ class SensorTimeSeriesGraphQL(GraphQLCore):
     name: Optional[str] = None
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
     standard_name: Optional[str] = Field(None, alias="standardName")
-    type_: Optional[Literal["numeric", "string"]] = Field(None, alias="type")
+    type_: Optional[Literal["numeric", "state", "string"]] = Field(None, alias="type")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -148,7 +148,7 @@ class SensorTimeSeries(DomainModel):
     name: Optional[str] = None
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
     standard_name: Optional[str] = Field(None, alias="standardName")
-    type_: Literal["numeric", "string"] | str = Field(alias="type")
+    type_: Literal["numeric", "state", "string"] | str = Field(alias="type")
 
     def as_write(self) -> SensorTimeSeriesWrite:
         """Convert this read version of sensor time series to the writing version."""
@@ -196,7 +196,7 @@ class SensorTimeSeriesWrite(DomainModelWrite):
     name: Optional[str] = None
     source_unit: Optional[str] = Field(None, alias="sourceUnit")
     standard_name: Optional[str] = Field(None, alias="standardName")
-    type_: Literal["numeric", "string"] = Field(alias="type")
+    type_: Literal["numeric", "state", "string"] = Field(alias="type")
 
 
 class SensorTimeSeriesList(DomainModelList[SensorTimeSeries]):
@@ -228,7 +228,7 @@ def _create_sensor_time_series_filter(
     source_unit_prefix: str | None = None,
     standard_name: str | list[str] | None = None,
     standard_name_prefix: str | None = None,
-    type_: Literal["numeric", "string"] | list[Literal["numeric", "string"]] | None = None,
+    type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,

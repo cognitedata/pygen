@@ -67,10 +67,10 @@ class CogniteDescribableEdgeGraphQL(GraphQLCore):
         external_id: The external id of the Cognite describable edge.
         data_record: The data record of the Cognite describable edge node.
         end_node: The end node of this edge.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
@@ -99,10 +99,10 @@ class CogniteDescribableEdge(DomainRelation):
         external_id: The external id of the Cognite describable edge.
         data_record: The data record of the Cognite describable edge edge.
         end_node: The end node of this edge.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteDescribable", "v1")
@@ -147,10 +147,10 @@ class CogniteDescribableEdgeWrite(DomainRelationWrite):
         external_id: The external id of the Cognite describable edge.
         data_record: The data record of the Cognite describable edge edge.
         end_node: The end node of this edge.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

@@ -590,6 +590,7 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[G
         "Implementation1NonWriteable": data_classes.Implementation1NonWriteableGraphQL,
         "Implementation2": data_classes.Implementation2GraphQL,
         "MainInterface": data_classes.MainInterfaceGraphQL,
+        "Naughty": data_classes.NaughtyGraphQL,
         "PrimitiveNullable": data_classes.PrimitiveNullableGraphQL,
         "PrimitiveNullableListed": data_classes.PrimitiveNullableListedGraphQL,
         "PrimitiveRequired": data_classes.PrimitiveRequiredGraphQL,
