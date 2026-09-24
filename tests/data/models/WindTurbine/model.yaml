@@ -21,13 +21,11 @@ views:
       type:
         list: false
         type: boolean
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: is_damaged
-      description: null
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -37,13 +35,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Name of the instance
+      constraintState: {}
     sensor_positions:
       source:
         space: sp_pygen_power
@@ -60,8 +56,8 @@ views:
       name: null
       description: null
       connectionType: multi_reverse_direct_relation
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: DataSheet
   name: DataSheet
@@ -81,13 +77,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Description of the instance
+      constraintState: {}
     directory:
       container:
         space: cdf_cdm
@@ -97,14 +91,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Directory
       description: Contains the path elements from the source (if the source system
         has a file system hierarchy or similar.)
+      constraintState: {}
     isUploaded:
       container:
         space: cdf_cdm
@@ -113,14 +106,14 @@ views:
       type:
         list: false
         type: boolean
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: false
       name: Is uploaded
+      defaultValue: false
       description: Specifies if the file content has been uploaded to Cognite Data
         Fusion or not.
+      constraintState: {}
     mimeType:
       container:
         space: cdf_cdm
@@ -130,13 +123,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: MIME type
       description: The MIME type of the file.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -146,13 +138,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Name of the instance
+      constraintState: {}
     uploadedTime:
       container:
         space: cdf_cdm
@@ -161,15 +151,14 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Uploaded time
       description: The time the file upload completed.
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: Distance
   name: Distance
@@ -189,15 +178,13 @@ views:
         unit:
           externalId: length:m
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: distance
-      description: null
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: Gearbox
   name: Gearbox
@@ -219,12 +206,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: displacement_x
-      description: null
+      constraintState: {}
     displacement_y:
       container:
         space: sp_pygen_power_enterprise
@@ -237,12 +223,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: displacement_y
-      description: null
+      constraintState: {}
     displacement_z:
       container:
         space: sp_pygen_power_enterprise
@@ -255,12 +240,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: displacement_z
-      description: null
+      constraintState: {}
     nacelle:
       source:
         space: sp_pygen_power
@@ -277,8 +261,8 @@ views:
       name: null
       description: null
       connectionType: single_reverse_direct_relation
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: GeneratingUnit
   name: GeneratingUnit
@@ -298,13 +282,11 @@ views:
         unit:
           externalId: power:megaw
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: capacity
-      description: null
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -314,13 +296,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Description of the instance
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -330,15 +310,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Name of the instance
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: Generator
   name: Generator
@@ -360,12 +338,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: generator_speed_controller
-      description: null
+      constraintState: {}
     generator_speed_controller_reference:
       container:
         space: sp_pygen_power_enterprise
@@ -378,12 +355,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: generator_speed_controller_reference
-      description: null
+      constraintState: {}
     nacelle:
       source:
         space: sp_pygen_power
@@ -400,8 +376,8 @@ views:
       name: null
       description: null
       connectionType: single_reverse_direct_relation
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: HighSpeedShaft
   name: HighSpeedShaft
@@ -423,12 +399,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: bending_moment_y
-      description: null
+      constraintState: {}
     bending_monent_x:
       container:
         space: sp_pygen_power_enterprise
@@ -441,12 +416,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: bending_monent_x
-      description: null
+      constraintState: {}
     nacelle:
       source:
         space: sp_pygen_power
@@ -475,14 +449,13 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: torque
-      description: null
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: MainShaft
   name: MainShaft
@@ -504,12 +477,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: bending_x
-      description: null
+      constraintState: {}
     bending_y:
       container:
         space: sp_pygen_power_enterprise
@@ -522,12 +494,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: bending_y
-      description: null
+      constraintState: {}
     calculated_tilt_moment:
       container:
         space: sp_pygen_power_enterprise
@@ -540,12 +511,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: calculated_tilt_moment
-      description: null
+      constraintState: {}
     calculated_yaw_moment:
       container:
         space: sp_pygen_power_enterprise
@@ -558,12 +528,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: calculated_yaw_moment
-      description: null
+      constraintState: {}
     nacelle:
       source:
         space: sp_pygen_power
@@ -592,14 +561,13 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: torque
-      description: null
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: Metmast
   name: Metmast
@@ -617,13 +585,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: position
-      description: null
+      constraintState: {}
     temperature:
       container:
         space: sp_pygen_power_enterprise
@@ -632,13 +598,11 @@ views:
       type:
         list: false
         type: timeseries
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: temperature
-      description: null
+      constraintState: {}
     tilt_angle:
       container:
         space: sp_pygen_power_enterprise
@@ -647,13 +611,11 @@ views:
       type:
         list: false
         type: timeseries
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: tilt_angle
-      description: null
+      constraintState: {}
     wind_speed:
       container:
         space: sp_pygen_power_enterprise
@@ -662,13 +624,11 @@ views:
       type:
         list: false
         type: timeseries
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: wind_speed
-      description: null
+      constraintState: {}
     wind_turbines:
       type:
         space: sp_pygen_power_enterprise
@@ -687,8 +647,8 @@ views:
         type: view
       direction: inwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: Nacelle
   name: Nacelle
@@ -706,13 +666,11 @@ views:
       type:
         list: false
         type: direct
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: acc_from_back_side_x
-      description: null
+      constraintState: {}
     acc_from_back_side_y:
       container:
         space: sp_pygen_power_enterprise
@@ -725,12 +683,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: acc_from_back_side_y
-      description: null
+      constraintState: {}
     acc_from_back_side_z:
       container:
         space: sp_pygen_power_enterprise
@@ -743,12 +700,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: acc_from_back_side_z
-      description: null
+      constraintState: {}
     gearbox:
       container:
         space: sp_pygen_power_enterprise
@@ -761,12 +717,11 @@ views:
           space: sp_pygen_power
           externalId: Gearbox
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: gearbox
-      description: null
+      constraintState: {}
     generator:
       container:
         space: sp_pygen_power_enterprise
@@ -779,12 +734,11 @@ views:
           space: sp_pygen_power
           externalId: Generator
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: generator
-      description: null
+      constraintState: {}
     high_speed_shaft:
       container:
         space: sp_pygen_power_enterprise
@@ -797,12 +751,11 @@ views:
           space: sp_pygen_power
           externalId: HighSpeedShaft
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: high_speed_shaft
-      description: null
+      constraintState: {}
     main_shaft:
       container:
         space: sp_pygen_power_enterprise
@@ -815,12 +768,11 @@ views:
           space: sp_pygen_power
           externalId: MainShaft
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: main_shaft
-      description: null
+      constraintState: {}
     power_inverter:
       container:
         space: sp_pygen_power_enterprise
@@ -833,12 +785,11 @@ views:
           space: sp_pygen_power
           externalId: PowerInverter
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: power_inverter
-      description: null
+      constraintState: {}
     wind_turbine:
       source:
         space: sp_pygen_power
@@ -867,12 +818,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: yaw_direction
-      description: null
+      constraintState: {}
     yaw_error:
       container:
         space: sp_pygen_power_enterprise
@@ -885,14 +835,13 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: yaw_error
-      description: null
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: PowerInverter
   name: PowerInverter
@@ -914,12 +863,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: active_power_total
-      description: null
+      constraintState: {}
     apparent_power_total:
       container:
         space: sp_pygen_power_enterprise
@@ -932,12 +880,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: apparent_power_total
-      description: null
+      constraintState: {}
     nacelle:
       source:
         space: sp_pygen_power
@@ -966,14 +913,13 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: reactive_power_total
-      description: null
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: Rotor
   name: Rotor
@@ -995,12 +941,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: rotor_speed_controller
-      description: null
+      constraintState: {}
     rpm_low_speed_shaft:
       container:
         space: sp_pygen_power_enterprise
@@ -1013,12 +958,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: rpm_low_speed_shaft
-      description: null
+      constraintState: {}
     wind_turbine:
       source:
         space: sp_pygen_power
@@ -1035,8 +979,8 @@ views:
       name: null
       description: null
       connectionType: single_reverse_direct_relation
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: SensorPosition
   name: SensorPosition
@@ -1058,12 +1002,11 @@ views:
           space: sp_pygen_power
           externalId: Blade
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: blade
-      description: null
+      constraintState: {}
     edgewise_bend_mom_crosstalk_corrected:
       container:
         space: sp_pygen_power_enterprise
@@ -1076,12 +1019,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: edgewise_bend_mom_crosstalk_corrected
-      description: null
+      constraintState: {}
     edgewise_bend_mom_offset:
       container:
         space: sp_pygen_power_enterprise
@@ -1094,12 +1036,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: edgewise_bend_mom_offset
-      description: null
+      constraintState: {}
     edgewise_bend_mom_offset_crosstalk_corrected:
       container:
         space: sp_pygen_power_enterprise
@@ -1112,12 +1053,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: edgewise_bend_mom_offset_crosstalk_corrected
-      description: null
+      constraintState: {}
     edgewisewise_bend_mom:
       container:
         space: sp_pygen_power_enterprise
@@ -1130,12 +1070,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: edgewisewise_bend_mom
-      description: null
+      constraintState: {}
     flapwise_bend_mom:
       container:
         space: sp_pygen_power_enterprise
@@ -1148,12 +1087,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: flapwise_bend_mom
-      description: null
+      constraintState: {}
     flapwise_bend_mom_crosstalk_corrected:
       container:
         space: sp_pygen_power_enterprise
@@ -1166,12 +1104,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: flapwise_bend_mom_crosstalk_corrected
-      description: null
+      constraintState: {}
     flapwise_bend_mom_offset:
       container:
         space: sp_pygen_power_enterprise
@@ -1184,12 +1121,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: flapwise_bend_mom_offset
-      description: null
+      constraintState: {}
     flapwise_bend_mom_offset_crosstalk_corrected:
       container:
         space: sp_pygen_power_enterprise
@@ -1202,12 +1138,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: flapwise_bend_mom_offset_crosstalk_corrected
-      description: null
+      constraintState: {}
     position:
       container:
         space: sp_pygen_power_enterprise
@@ -1216,15 +1151,13 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: position
-      description: null
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: SensorTimeSeries
   name: SensorTimeSeries
@@ -1243,13 +1176,11 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Alternative names for the node
+      constraintState: {}
     conceptId:
       container:
         space: sp_pygen_power_enterprise
@@ -1259,13 +1190,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Concept ID
       description: The concept ID of the time series.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -1275,13 +1205,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Description of the instance
+      constraintState: {}
     isStep:
       container:
         space: cdf_cdm
@@ -1290,13 +1218,14 @@ views:
       type:
         list: false
         type: boolean
-      nullable: false
       immutable: false
+      nullable: false
       autoIncrement: false
-      source: null
-      defaultValue: false
       name: Is step
+      defaultValue: false
       description: Specifies whether the time series is a step time series or not.
+      constraintState:
+        nullability: current
     name:
       container:
         space: cdf_cdm
@@ -1306,13 +1235,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Name of the instance
+      constraintState: {}
     sourceUnit:
       container:
         space: cdf_cdm
@@ -1322,13 +1249,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Source unit
       description: The unit specified in the source system.
+      constraintState: {}
     standardName:
       container:
         space: sp_pygen_power_enterprise
@@ -1338,19 +1264,19 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: standardName
       description: The standard name of the time series.
+      constraintState: {}
     type:
       container:
         space: cdf_cdm
         externalId: CogniteTimeSeries
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           string:
             name: string
@@ -1358,16 +1284,18 @@ views:
           numeric:
             name: numeric
             description: Time series with double floating point data points.
-        type: enum
-      nullable: false
+          state:
+            name: state
+            description: Time series with state data points.
       immutable: true
+      nullable: false
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Type
       description: Specifies the data type of the data points.
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState:
+        nullability: current
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: SolarPanel
   name: SolarPanel
@@ -1391,13 +1319,11 @@ views:
         unit:
           externalId: power:megaw
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: capacity
-      description: null
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -1407,13 +1333,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Description of the instance
+      constraintState: {}
     efficiency:
       container:
         space: sp_pygen_power_enterprise
@@ -1426,12 +1350,11 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: efficiency
-      description: null
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -1441,13 +1364,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Name of the instance
+      constraintState: {}
     orientation:
       container:
         space: sp_pygen_power_enterprise
@@ -1460,14 +1381,13 @@ views:
           space: sp_pygen_power
           externalId: SensorTimeSeries
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: orientation
-      description: null
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_power
   externalId: WindTurbine
   name: WindTurbine
@@ -1493,12 +1413,11 @@ views:
           space: sp_pygen_power
           externalId: Blade
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: blades
-      description: null
+      constraintState: {}
     capacity:
       container:
         space: sp_pygen_power_enterprise
@@ -1509,13 +1428,11 @@ views:
         unit:
           externalId: power:megaw
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: capacity
-      description: null
+      constraintState: {}
     datasheets:
       container:
         space: sp_pygen_power_enterprise
@@ -1528,12 +1445,11 @@ views:
           space: sp_pygen_power
           externalId: DataSheet
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: datasheets
-      description: null
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -1543,13 +1459,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Description of the instance
+      constraintState: {}
     metmast:
       type:
         space: sp_pygen_power_enterprise
@@ -1580,12 +1494,11 @@ views:
           space: sp_pygen_power
           externalId: Nacelle
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: nacelle
-      description: null
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -1595,13 +1508,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Name of the instance
+      constraintState: {}
     powerCurve:
       container:
         space: sp_pygen_power_enterprise
@@ -1610,13 +1521,11 @@ views:
       type:
         list: false
         type: sequence
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: powerCurve
-      description: null
+      constraintState: {}
     rotor:
       container:
         space: sp_pygen_power_enterprise
@@ -1629,12 +1538,11 @@ views:
           space: sp_pygen_power
           externalId: Rotor
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: rotor
-      description: null
+      constraintState: {}
     windfarm:
       container:
         space: sp_pygen_power_enterprise
@@ -1644,15 +1552,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: windfarm
-      description: null
-  lastUpdatedTime: 1731748766969
-  createdTime: 1731748766969
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 isGlobal: false
-lastUpdatedTime: 1731748769133
-createdTime: 1731748769133
+lastUpdatedTime: 1789576888254
+createdTime: 1789576888254

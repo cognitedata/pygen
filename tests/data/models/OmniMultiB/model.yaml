@@ -1,10 +1,11 @@
-space: pygen-models
+space: sp_pygen_models
 externalId: OmniMultiB
 name: OmniMultiB
-description: ''
+description: This is a small model with one view, which has been designed to test
+  the generation of one SDK for multiple models.
 version: '1'
 views:
-- space: pygen-models
+- space: sp_pygen_models
   externalId: Implementation1
   name: Implementation1
   filter:
@@ -34,13 +35,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: MainValue
-      description: null
+      constraintState: {}
     subValue:
       container:
         space: pygen-models
@@ -50,13 +49,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: SubValue
-      description: null
+      constraintState: {}
     value2:
       container:
         space: pygen-models
@@ -66,16 +63,15 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: false
       immutable: false
+      nullable: false
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Value2
-      description: null
-  lastUpdatedTime: 1704113811088
-  createdTime: 1704113811088
-- space: pygen-models
+      constraintState:
+        nullability: current
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
+- space: sp_pygen_models
   externalId: MainInterface
   name: MainInterface
   implements: []
@@ -86,23 +82,21 @@ views:
   properties:
     mainValue:
       container:
-        space: pygen-models
+        space: sp_pygen_models
         externalId: MainInterface
       containerPropertyIdentifier: mainValue
       type:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: MainValue
-      description: null
-  lastUpdatedTime: 1703845437017
-  createdTime: 1703845437017
-- space: pygen-models
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
+- space: sp_pygen_models
   externalId: SubInterface
   name: SubInterface
   filter:
@@ -111,12 +105,12 @@ views:
       - node
       - type
       values:
-      - space: pygen-models
+      - space: sp_pygen_models
         externalId: Implementation1
-      - space: pygen-models
+      - space: sp_pygen_models
         externalId: Implementation2
   implements:
-  - space: pygen-models
+  - space: sp_pygen_models
     externalId: MainInterface
     version: '1'
     type: view
@@ -127,38 +121,34 @@ views:
   properties:
     mainValue:
       container:
-        space: pygen-models
+        space: sp_pygen_models
         externalId: MainInterface
       containerPropertyIdentifier: mainValue
       type:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: MainValue
-      description: null
+      constraintState: {}
     subValue:
       container:
-        space: pygen-models
+        space: sp_pygen_models
         externalId: SubInterface
       containerPropertyIdentifier: subValue
       type:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: SubValue
-      description: null
-  lastUpdatedTime: 1703845437017
-  createdTime: 1703845437017
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 isGlobal: false
-lastUpdatedTime: 1704114825424
-createdTime: 1704114713866
+lastUpdatedTime: 1789576888254
+createdTime: 1789576888254

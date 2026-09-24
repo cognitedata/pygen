@@ -6,7 +6,7 @@ version: v1
 views:
 - space: cdf_cdm
   externalId: Cognite360Image
-  description: ''
+  description: "Represents a 360\xB0 image capture."
   implements:
   - space: cdf_cdm
     externalId: Cognite3DTransformation
@@ -37,13 +37,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the back projection of the cube
         map
+      constraintState: {}
     bottom:
       container:
         space: cdf_cdm_3d
@@ -60,13 +59,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the bottom projection of the
         cube map
+      constraintState: {}
     collection360:
       container:
         space: cdf_cdm_3d
@@ -83,12 +81,11 @@ views:
           space: cdf_cdm
           externalId: Cognite360ImageCollection
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to Cognite360ImageCollection
+      constraintState: {}
     eulerRotationX:
       container:
         space: cdf_cdm_3d
@@ -97,13 +94,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The rotation of the object around the X-axis in radians
+      constraintState: {}
     eulerRotationY:
       container:
         space: cdf_cdm_3d
@@ -112,13 +107,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The rotation of the object around the Y-axis in radians
+      constraintState: {}
     eulerRotationZ:
       container:
         space: cdf_cdm_3d
@@ -127,13 +120,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The rotation of the object around the Z-axis in radians
+      constraintState: {}
     front:
       container:
         space: cdf_cdm_3d
@@ -150,13 +141,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the front projection of the cube
         map
+      constraintState: {}
     left:
       container:
         space: cdf_cdm_3d
@@ -173,13 +163,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the left projection of the cube
         map
+      constraintState: {}
     right:
       container:
         space: cdf_cdm_3d
@@ -196,13 +185,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the right projection of the cube
         map
+      constraintState: {}
     scaleX:
       container:
         space: cdf_cdm_3d
@@ -211,13 +199,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The scaling factor applied to the object along the X-axis
+      constraintState: {}
     scaleY:
       container:
         space: cdf_cdm_3d
@@ -226,13 +212,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The scaling factor applied to the object along the Y-axis
+      constraintState: {}
     scaleZ:
       container:
         space: cdf_cdm_3d
@@ -241,13 +225,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The scaling factor applied to the object along the Z-axis
+      constraintState: {}
     station360:
       container:
         space: cdf_cdm_3d
@@ -264,13 +246,12 @@ views:
           space: cdf_cdm
           externalId: Cognite360ImageStation
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to Cognite3DGroup instance that groups different
         Cognite360Image instances to the same station
+      constraintState: {}
     takenAt:
       container:
         space: cdf_cdm_3d
@@ -279,13 +260,11 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The timestamp when the 6 photos were taken
+      constraintState: {}
     top:
       container:
         space: cdf_cdm_3d
@@ -302,13 +281,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the top projection of the cube
         map
+      constraintState: {}
     translationX:
       container:
         space: cdf_cdm_3d
@@ -317,14 +295,12 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The displacement of the object along the X-axis in the 3D coordinate
         system
+      constraintState: {}
     translationY:
       container:
         space: cdf_cdm_3d
@@ -333,14 +309,12 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The displacement of the object along the Y-axis in the 3D coordinate
         system
+      constraintState: {}
     translationZ:
       container:
         space: cdf_cdm_3d
@@ -349,19 +323,18 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The displacement of the object along the Z-axis in the 3D coordinate
         system
-  lastUpdatedTime: 1724420993904
+      constraintState: {}
+  lastUpdatedTime: 1783423040279
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: Cognite360ImageAnnotation
-  description: ''
+  description: This concept defines edges connecting Cognite360Image to Cognite3DObject.
+    The status is always approved.
   implements:
   - space: cdf_cdm
     externalId: CogniteDescribable
@@ -389,13 +362,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     confidence:
       container:
         space: cdf_cdm
@@ -404,13 +376,12 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The confidence that the annotation is a good match
+      name: Confidence
+      description: The confidence that the annotation is a good match.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -420,13 +391,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     formatVersion:
       container:
         space: cdf_cdm_3d
@@ -436,13 +406,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Specifies the storage representation for the polygon
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -452,13 +420,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     polygon:
       container:
         space: cdf_cdm_3d
@@ -467,13 +434,11 @@ views:
       type:
         list: true
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: List of floats representing the polygon. Format depends on formatVersion
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -490,12 +455,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -505,14 +470,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -521,13 +485,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -537,14 +500,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -554,13 +517,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -569,13 +531,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -585,39 +547,34 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
     status:
       container:
         space: cdf_cdm
         externalId: CogniteAnnotation
       containerPropertyIdentifier: status
       type:
+        type: enum
         values:
           Suggested:
             name: Suggested
-            description: null
           Approved:
             name: Approved
-            description: null
           Rejected:
             name: Rejected
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The status of the annotation
+      name: Status
+      description: The status of the annotation.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -627,14 +584,13 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
-  lastUpdatedTime: 1724420993904
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1783423040279
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: Cognite360ImageCollection
@@ -674,13 +630,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -690,13 +645,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     model3D:
       container:
         space: cdf_cdm_3d
@@ -713,12 +667,11 @@ views:
           space: cdf_cdm
           externalId: Cognite360ImageModel
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: ''
+      description: Direct relation to the model this revision belongs to.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -728,13 +681,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     published:
       container:
         space: cdf_cdm_3d
@@ -743,40 +695,33 @@ views:
       type:
         list: false
         type: boolean
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
+      description: Whether this revision is published and visible to end users.
+      constraintState: {}
     status:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DRevision
       containerPropertyIdentifier: status
       type:
+        type: enum
         values:
           Queued:
             name: Queued
-            description: null
           Processing:
             name: Processing
-            description: null
           Done:
             name: Done
-            description: null
           Failed:
             name: Failed
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
+      description: 'Processing status of the revision. Valid values: Queued, Processing,
+        Done, or Failed'
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -786,38 +731,33 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     type:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DRevision
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           CAD:
             name: CAD
-            description: null
           PointCloud:
             name: PointCloud
-            description: null
           Image360:
             name: Image360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
-  lastUpdatedTime: 1725531145462
+      description: 'The type of 3D model this is a revision of. Valid values: CAD,
+        PointCloud, or Image360.'
+      constraintState: {}
+  lastUpdatedTime: 1783423040279
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: Cognite360ImageModel
@@ -857,13 +797,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     collections:
       source:
         space: cdf_cdm
@@ -889,13 +828,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -905,13 +843,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -921,13 +858,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     thumbnail:
       container:
         space: cdf_cdm_3d
@@ -944,36 +880,30 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Thumbnail of the 3D model
+      constraintState: {}
     type:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DModel
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           CAD:
             name: CAD
-            description: null
           PointCloud:
             name: PointCloud
-            description: null
           Image360:
             name: Image360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: CAD, PointCloud or Image360
+      constraintState: {}
   lastUpdatedTime: 1725531145462
   createdTime: 1724420993904
 - space: cdf_cdm
@@ -1011,13 +941,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -1027,31 +956,27 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     groupType:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DGroup
       containerPropertyIdentifier: groupType
       type:
+        type: enum
         values:
           Station360:
             name: Station360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Type of group
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -1061,13 +986,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -1077,13 +1001,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
   lastUpdatedTime: 1724420993904
   createdTime: 1724420993904
 - space: cdf_cdm
@@ -1109,13 +1032,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -1125,13 +1047,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -1141,13 +1062,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -1157,13 +1077,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     thumbnail:
       container:
         space: cdf_cdm_3d
@@ -1180,36 +1099,30 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Thumbnail of the 3D model
+      constraintState: {}
     type:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DModel
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           CAD:
             name: CAD
-            description: null
           PointCloud:
             name: PointCloud
-            description: null
           Image360:
             name: Image360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: CAD, PointCloud or Image360
+      constraintState: {}
   lastUpdatedTime: 1725531145462
   createdTime: 1724420993904
 - space: cdf_cdm
@@ -1235,13 +1148,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     asset:
       source:
         space: cdf_cdm
@@ -1283,13 +1195,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     images360:
       type:
         space: cdf_cdm
@@ -1318,13 +1229,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     pointCloudVolumes:
       source:
         space: cdf_cdm
@@ -1351,13 +1261,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     xMax:
       container:
         space: cdf_cdm_3d
@@ -1366,13 +1275,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Highest X value in bounding box
+      constraintState: {}
     xMin:
       container:
         space: cdf_cdm_3d
@@ -1381,13 +1288,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Lowest X value in bounding box
+      constraintState: {}
     yMax:
       container:
         space: cdf_cdm_3d
@@ -1396,13 +1301,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Highest Y value in bounding box
+      constraintState: {}
     yMin:
       container:
         space: cdf_cdm_3d
@@ -1411,13 +1314,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Lowest Y value in bounding box
+      constraintState: {}
     zMax:
       container:
         space: cdf_cdm_3d
@@ -1426,13 +1327,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Highest Z value in bounding box
+      constraintState: {}
     zMin:
       container:
         space: cdf_cdm_3d
@@ -1441,13 +1340,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Lowest Z value in bounding box
+      constraintState: {}
   lastUpdatedTime: 1724420993904
   createdTime: 1724420993904
 - space: cdf_cdm
@@ -1478,12 +1375,11 @@ views:
           space: cdf_cdm
           externalId: Cognite3DModel
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: null
+      description: Direct relation to the model this revision belongs to.
+      constraintState: {}
     published:
       container:
         space: cdf_cdm_3d
@@ -1492,65 +1388,54 @@ views:
       type:
         list: false
         type: boolean
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
+      description: Whether this revision is published and visible to end users.
+      constraintState: {}
     status:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DRevision
       containerPropertyIdentifier: status
       type:
+        type: enum
         values:
           Queued:
             name: Queued
-            description: null
           Processing:
             name: Processing
-            description: null
           Done:
             name: Done
-            description: null
           Failed:
             name: Failed
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
+      description: 'Processing status of the revision. Valid values: Queued, Processing,
+        Done, or Failed'
+      constraintState: {}
     type:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DRevision
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           CAD:
             name: CAD
-            description: null
           PointCloud:
             name: PointCloud
-            description: null
           Image360:
             name: Image360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
-  lastUpdatedTime: 1724420993904
+      description: 'The type of 3D model this is a revision of. Valid values: CAD,
+        PointCloud, or Image360.'
+      constraintState: {}
+  lastUpdatedTime: 1783423040279
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: Cognite3DTransformation
@@ -1577,13 +1462,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The rotation of the object around the X-axis in radians
+      constraintState: {}
     eulerRotationY:
       container:
         space: cdf_cdm_3d
@@ -1592,13 +1475,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The rotation of the object around the Y-axis in radians
+      constraintState: {}
     eulerRotationZ:
       container:
         space: cdf_cdm_3d
@@ -1607,13 +1488,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The rotation of the object around the Z-axis in radians
+      constraintState: {}
     scaleX:
       container:
         space: cdf_cdm_3d
@@ -1622,13 +1501,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The scaling factor applied to the object along the X-axis
+      constraintState: {}
     scaleY:
       container:
         space: cdf_cdm_3d
@@ -1637,13 +1514,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The scaling factor applied to the object along the Y-axis
+      constraintState: {}
     scaleZ:
       container:
         space: cdf_cdm_3d
@@ -1652,13 +1527,11 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The scaling factor applied to the object along the Z-axis
+      constraintState: {}
     translationX:
       container:
         space: cdf_cdm_3d
@@ -1667,14 +1540,12 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The displacement of the object along the X-axis in the 3D coordinate
         system
+      constraintState: {}
     translationY:
       container:
         space: cdf_cdm_3d
@@ -1683,14 +1554,12 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The displacement of the object along the Y-axis in the 3D coordinate
         system
+      constraintState: {}
     translationZ:
       container:
         space: cdf_cdm_3d
@@ -1699,14 +1568,12 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The displacement of the object along the Z-axis in the 3D coordinate
         system
+      constraintState: {}
   lastUpdatedTime: 1726822073640
   createdTime: 1724420993904
 - space: cdf_cdm
@@ -1741,13 +1608,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     assets:
       container:
         space: cdf_cdm
@@ -1755,17 +1621,19 @@ views:
       containerPropertyIdentifier: assets
       type:
         list: true
+        maxListSize: 1200
         type: direct
         source:
           space: cdf_cdm
           externalId: CogniteAsset
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Assets
       description: A list of assets the activity is related to.
+      constraintState:
+        maxListSize: current
     description:
       container:
         space: cdf_cdm
@@ -1775,13 +1643,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     endTime:
       container:
         space: cdf_cdm
@@ -1790,13 +1657,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The actual end time of an activity (or similar that extends this)
+      name: End time
+      description: The actual end time of an activity (or similar that extends this).
+      constraintState: {}
     equipment:
       container:
         space: cdf_cdm
@@ -1809,12 +1675,12 @@ views:
           space: cdf_cdm
           externalId: CogniteEquipment
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Equipment
       description: A list of equipment the activity is related to.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -1824,13 +1690,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     scheduledEndTime:
       container:
         space: cdf_cdm
@@ -1839,13 +1704,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The planned end time of an activity (or similar that extends this)
+      name: Scheduled end time
+      description: The planned end time of an activity (or similar that extends this).
+      constraintState: {}
     scheduledStartTime:
       container:
         space: cdf_cdm
@@ -1854,14 +1718,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Scheduled start time
       description: The planned start time of an activity (or similar that extends
-        this)
+        this).
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -1878,12 +1741,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -1893,14 +1756,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -1909,13 +1771,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -1925,14 +1786,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -1942,13 +1803,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -1957,13 +1817,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -1973,15 +1833,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
     startTime:
       container:
         space: cdf_cdm
@@ -1990,13 +1849,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The actual start time of an activity (or similar that extends this)
+      name: Start time
+      description: The actual start time of an activity (or similar that extends this).
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -2006,13 +1864,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     timeSeries:
       container:
         space: cdf_cdm
@@ -2025,17 +1882,18 @@ views:
           space: cdf_cdm
           externalId: CogniteTimeSeries
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Time series
       description: A list of time series the activity is related to.
+      constraintState: {}
   lastUpdatedTime: 1726822073640
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteAnnotation
-  description: Annotation represents contextualization results or links
+  name: Annotation
+  description: Annotation represents contextualization results or links.
   implements:
   - space: cdf_cdm
     externalId: CogniteDescribable
@@ -2059,13 +1917,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     confidence:
       container:
         space: cdf_cdm
@@ -2074,13 +1931,12 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The confidence that the annotation is a good match
+      name: Confidence
+      description: The confidence that the annotation is a good match.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -2090,13 +1946,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -2106,13 +1961,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -2129,12 +1983,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -2144,14 +1998,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -2160,13 +2013,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -2176,14 +2028,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -2193,13 +2045,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -2208,13 +2059,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -2224,39 +2075,34 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
     status:
       container:
         space: cdf_cdm
         externalId: CogniteAnnotation
       containerPropertyIdentifier: status
       type:
+        type: enum
         values:
           Suggested:
             name: Suggested
-            description: null
           Approved:
             name: Approved
-            description: null
           Rejected:
             name: Rejected
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The status of the annotation
+      name: Status
+      description: The status of the annotation.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -2266,20 +2112,19 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
-  lastUpdatedTime: 1724420993904
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteAsset
   name: Asset
   description: Assets represent systems that support industrial functions or processes.
-    Assets are often called 'functional location'.
+    Assets are often called 'functional locations'.
   implements:
   - space: cdf_cdm
     externalId: CogniteVisualizable
@@ -2323,13 +2168,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     assetClass:
       container:
         space: cdf_cdm
@@ -2346,12 +2190,12 @@ views:
           space: cdf_cdm
           externalId: CogniteAssetClass
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Asset class
       description: Specifies the class of the asset. It's a direct relation to CogniteAssetClass.
+      constraintState: {}
     children:
       source:
         space: cdf_cdm
@@ -2378,13 +2222,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     equipment:
       source:
         space: cdf_cdm
@@ -2426,13 +2269,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     object3D:
       container:
         space: cdf_cdm
@@ -2445,12 +2287,13 @@ views:
           space: cdf_cdm
           externalId: Cognite3DObject
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to an Object3D instance representing the 3D resource
+      name: 3D object
+      description: Direct relation to a Cognite3DObject instance representing the
+        3D resource.
+      constraintState: {}
     parent:
       container:
         space: cdf_cdm
@@ -2463,12 +2306,12 @@ views:
           space: cdf_cdm
           externalId: CogniteAsset
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Parent
       description: The parent of the asset.
+      constraintState: {}
     path:
       container:
         space: cdf_cdm
@@ -2476,19 +2319,21 @@ views:
       containerPropertyIdentifier: assetHierarchy_path
       type:
         list: true
+        maxListSize: 100
         type: direct
         source:
           space: cdf_cdm
           externalId: CogniteAsset
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Path
       description: An automatically updated ordered list of this asset's ancestors,
         starting with the root asset. Enables subtree filtering to find all assets
         under a parent.
+      constraintState:
+        maxListSize: current
     pathLastUpdatedTime:
       container:
         space: cdf_cdm
@@ -2497,13 +2342,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Path last updated time
       description: The last time the path was updated for this asset.
+      constraintState: {}
     root:
       container:
         space: cdf_cdm
@@ -2516,13 +2360,13 @@ views:
           space: cdf_cdm
           externalId: CogniteAsset
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Root
       description: An automatically updated reference to the top-level asset of the
         hierarchy.
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -2539,12 +2383,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -2554,14 +2398,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -2570,13 +2413,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -2586,14 +2428,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -2603,13 +2445,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -2618,13 +2459,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -2634,15 +2475,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -2652,13 +2492,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     timeSeries:
       source:
         space: cdf_cdm
@@ -2691,13 +2530,13 @@ views:
           space: cdf_cdm
           externalId: CogniteAssetType
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Asset type
-      description: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
-  lastUpdatedTime: 1726822073640
+      description: Specifies the type of the asset.
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteAssetClass
@@ -2722,13 +2561,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     code:
       container:
         space: cdf_cdm
@@ -2738,13 +2576,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Code
       description: A unique identifier for the class of asset.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -2754,13 +2591,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -2770,13 +2606,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     standard:
       container:
         space: cdf_cdm
@@ -2786,13 +2621,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Standard
       description: A text string to specify which standard the class is from.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -2802,13 +2636,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
   lastUpdatedTime: 1726822073640
   createdTime: 1724420993904
 - space: cdf_cdm
@@ -2834,13 +2667,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     assetClass:
       container:
         space: cdf_cdm
@@ -2857,13 +2689,12 @@ views:
           space: cdf_cdm
           externalId: CogniteAssetClass
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Asset class
-      description: Specifies the class the type belongs to. It's a direct relation
-        to CogniteAssetClass.
+      description: Specifies the class the type belongs to.
+      constraintState: {}
     code:
       container:
         space: cdf_cdm
@@ -2873,13 +2704,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Code
       description: A unique identifier for the type of asset.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -2889,13 +2719,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -2905,13 +2734,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     standard:
       container:
         space: cdf_cdm
@@ -2921,13 +2749,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Standard
       description: A text string to specify which standard the type is from.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -2937,14 +2764,13 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
-  lastUpdatedTime: 1726822073640
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteCADModel
@@ -2984,13 +2810,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -3000,13 +2825,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -3016,13 +2840,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     revisions:
       source:
         space: cdf_cdm
@@ -3048,13 +2871,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     thumbnail:
       container:
         space: cdf_cdm_3d
@@ -3071,36 +2893,30 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Thumbnail of the 3D model
+      constraintState: {}
     type:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DModel
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           CAD:
             name: CAD
-            description: null
           PointCloud:
             name: PointCloud
-            description: null
           Image360:
             name: Image360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: CAD, PointCloud or Image360
+      constraintState: {}
   lastUpdatedTime: 1724420993904
   createdTime: 1724420993904
 - space: cdf_cdm
@@ -3125,13 +2941,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     cadNodeReference:
       container:
         space: cdf_cdm_3d
@@ -3141,13 +2956,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Reference to a node within a CAD model from the 3D API
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -3157,13 +2970,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     model3D:
       container:
         space: cdf_cdm_3d
@@ -3180,12 +2992,11 @@ views:
           space: cdf_cdm
           externalId: CogniteCADModel
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to Cognite3DModel
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -3195,13 +3006,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     object3D:
       container:
         space: cdf_cdm_3d
@@ -3218,12 +3028,11 @@ views:
           space: cdf_cdm
           externalId: Cognite3DObject
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to object3D grouping for this node
+      constraintState: {}
     revisions:
       container:
         space: cdf_cdm_3d
@@ -3240,13 +3049,12 @@ views:
           space: cdf_cdm
           externalId: CogniteCADRevision
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: List of direct relations to instances of Cognite3DRevision which
         this CogniteCADNode exists in.
+      constraintState: {}
     subTreeSizes:
       container:
         space: cdf_cdm_3d
@@ -3255,17 +3063,15 @@ views:
       type:
         list: true
         type: int64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: 'List of subtree sizes in the same order as revisions. Used by
         Reveal and similar applications to know how many nodes exists below this node
         in the hierarchy
 
         '
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -3275,13 +3081,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     treeIndexes:
       container:
         space: cdf_cdm_3d
@@ -3290,21 +3095,19 @@ views:
       type:
         list: true
         type: int64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: 'List of tree indexes in the same order as revisions. Used by Reveal
         and similar applications to map from CogniteCADNode to tree index
 
         '
+      constraintState: {}
   lastUpdatedTime: 1724420993904
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteCADRevision
-  description: ''
+  description: Represents revision data for CAD models.
   filter:
     and:
     - hasData:
@@ -3343,12 +3146,11 @@ views:
           space: cdf_cdm
           externalId: CogniteCADModel
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: .
+      description: Direct relation to the model this revision belongs to.
+      constraintState: {}
     published:
       container:
         space: cdf_cdm_3d
@@ -3357,13 +3159,11 @@ views:
       type:
         list: false
         type: boolean
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
+      description: Whether this revision is published and visible to end users.
+      constraintState: {}
     revisionId:
       container:
         space: cdf_cdm_3d
@@ -3372,65 +3172,54 @@ views:
       type:
         list: false
         type: int64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The 3D API revision identifier for this CAD model
+      constraintState: {}
     status:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DRevision
       containerPropertyIdentifier: status
       type:
+        type: enum
         values:
           Queued:
             name: Queued
-            description: null
           Processing:
             name: Processing
-            description: null
           Done:
             name: Done
-            description: null
           Failed:
             name: Failed
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
+      description: 'Processing status of the revision. Valid values: Queued, Processing,
+        Done, or Failed'
+      constraintState: {}
     type:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DRevision
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           CAD:
             name: CAD
-            description: null
           PointCloud:
             name: PointCloud
-            description: null
           Image360:
             name: Image360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
-  lastUpdatedTime: 1724420993904
+      description: 'The type of 3D model this is a revision of. Valid values: CAD,
+        PointCloud, or Image360.'
+      constraintState: {}
+  lastUpdatedTime: 1783423040279
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteCubeMap
@@ -3460,13 +3249,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the back projection of the cube
         map
+      constraintState: {}
     bottom:
       container:
         space: cdf_cdm_3d
@@ -3483,13 +3271,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the bottom projection of the
         cube map
+      constraintState: {}
     front:
       container:
         space: cdf_cdm_3d
@@ -3506,13 +3293,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the front projection of the cube
         map
+      constraintState: {}
     left:
       container:
         space: cdf_cdm_3d
@@ -3529,13 +3315,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the left projection of the cube
         map
+      constraintState: {}
     right:
       container:
         space: cdf_cdm_3d
@@ -3552,13 +3337,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the right projection of the cube
         map
+      constraintState: {}
     top:
       container:
         space: cdf_cdm_3d
@@ -3575,19 +3359,19 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to a file holding the top projection of the cube
         map
+      constraintState: {}
   lastUpdatedTime: 1724420993904
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteDescribable
+  name: Describable
   description: 'The describable core concept is used as a standard way of holding
-    the bare minimum of information about the instance
+    the bare minimum of information about the instance.
 
     '
   implements: []
@@ -3605,13 +3389,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -3621,13 +3404,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -3637,13 +3419,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -3653,18 +3434,19 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
-  lastUpdatedTime: 1724420993904
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteDiagramAnnotation
-  description: Annotation for diagrams
+  name: Diagram annotation
+  description: Represents an annotation on a diagram, with bounding box coordinates
+    for the annotated region.
   implements:
   - space: cdf_cdm
     externalId: CogniteDescribable
@@ -3692,13 +3474,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     confidence:
       container:
         space: cdf_cdm
@@ -3707,13 +3488,12 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The confidence that the annotation is a good match
+      name: Confidence
+      description: The confidence that the annotation is a good match.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -3723,13 +3503,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     endNodePageNumber:
       container:
         space: cdf_cdm
@@ -3738,16 +3517,15 @@ views:
       type:
         list: false
         type: int64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: End node page number
       description: 'The number of the page on which this annotation is located in
-        the endNode File if an endNode is present. The first page has number 1
+        the endNode file if an endNode is present. The first page has number 1.
 
         '
+      constraintState: {}
     endNodeText:
       container:
         space: cdf_cdm
@@ -3757,16 +3535,15 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: End node text
       description: 'The text extracted from within the bounding box on the endNode.
-        Only applicable if an endNode is defined
+        Only applicable if an endNode is defined.
 
         '
+      constraintState: {}
     endNodeXMax:
       container:
         space: cdf_cdm
@@ -3775,17 +3552,16 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: 'Value between [0,1]. Maximum abscissa of the bounding box (right
-        edge). Must be strictly more than endNodeXMin. Only applicable if an endNode
-        is defined
+      name: End node X max
+      description: 'A value between [0,1]. The maximum abscissa of the bounding box
+        (right edge). Must be strictly more than endNodeXMin. Only applicable if an
+        endNode is defined.
 
         '
+      constraintState: {}
     endNodeXMin:
       container:
         space: cdf_cdm
@@ -3794,17 +3570,16 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: 'Value between [0,1]. Minimum abscissa of the bounding box (left
-        edge). Must be strictly less than endNodeXMax. Only applicable if an endNode
-        is defined
+      name: End node X min
+      description: 'A value between [0,1]. The minimum abscissa of the bounding box
+        (left edge). Must be strictly less than endNodeXMax. Only applicable if an
+        endNode is defined.
 
         '
+      constraintState: {}
     endNodeYMax:
       container:
         space: cdf_cdm
@@ -3813,17 +3588,16 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: 'Value between [0,1]. Maximum ordinate of the bounding box (top
-        edge). Must be strictly more than endNodeYMin. Only applicable if an endNode
-        is defined
+      name: End node Y max
+      description: 'A value between [0,1]. The maximum ordinate of the bounding box
+        (top edge). Must be strictly more than endNodeYMin. Only applicable if an
+        endNode is defined.
 
         '
+      constraintState: {}
     endNodeYMin:
       container:
         space: cdf_cdm
@@ -3832,17 +3606,16 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: 'Value between [0,1]. Minimum ordinate of the bounding box (bottom
-        edge). Must be strictly less than endNodeYMax. Only applicable if an endNode
-        is defined
+      name: End node Y min
+      description: 'A value between [0,1]. The minimum ordinate of the bounding box
+        (bottom edge). Must be strictly less than endNodeYMax. Only applicable if
+        an endNode is defined.
 
         '
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -3852,13 +3625,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -3875,12 +3647,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -3890,14 +3662,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -3906,13 +3677,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -3922,14 +3692,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -3939,13 +3709,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -3954,13 +3723,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -3970,15 +3739,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
     startNodePageNumber:
       container:
         space: cdf_cdm
@@ -3987,16 +3755,15 @@ views:
       type:
         list: false
         type: int64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Start node page number
       description: 'The number of the page on which this annotation is located in
-        `startNode` File. The first page has number 1
+        startNode file. The first page has number 1.
 
         '
+      constraintState: {}
     startNodeText:
       container:
         space: cdf_cdm
@@ -4006,13 +3773,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The text extracted from within the bounding box on the startNode
+      name: Start node text
+      description: The text extracted from within the bounding box on the startNode.
+      constraintState: {}
     startNodeXMax:
       container:
         space: cdf_cdm
@@ -4021,16 +3787,15 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: 'Value between [0,1]. Maximum abscissa of the bounding box (right
-        edge). Must be strictly more than startNodeXMin
+      name: Start node X max
+      description: 'A value between [0,1]. The maximum abscissa of the bounding box
+        (right edge). Must be strictly more than startNodeXMin.
 
         '
+      constraintState: {}
     startNodeXMin:
       container:
         space: cdf_cdm
@@ -4039,16 +3804,15 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: 'Value between [0,1]. Minimum abscissa of the bounding box (left
-        edge). Must be strictly less than startNodeXMax
+      name: Start node X min
+      description: 'A value between [0,1]. The minimum abscissa of the bounding box
+        (left edge). Must be strictly less than startNodeXMax.
 
         '
+      constraintState: {}
     startNodeYMax:
       container:
         space: cdf_cdm
@@ -4057,16 +3821,15 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: 'Value between [0,1]. Maximum ordinate of the bounding box (top
-        edge). Must be strictly more than startNodeYMin
+      name: Start node Y max
+      description: 'A value between [0,1]. The maximum ordinate of the bounding box
+        (top edge). Must be strictly more than startNodeYMin.
 
         '
+      constraintState: {}
     startNodeYMin:
       container:
         space: cdf_cdm
@@ -4075,40 +3838,35 @@ views:
       type:
         list: false
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: 'Value between [0,1]. Minimum ordinate of the bounding box (bottom
-        edge). Must be strictly less than startNodeYMax
+      name: Start node Y min
+      description: 'A value between [0,1]. The minimum ordinate of the bounding box
+        (bottom edge). Must be strictly less than startNodeYMax.
 
         '
+      constraintState: {}
     status:
       container:
         space: cdf_cdm
         externalId: CogniteAnnotation
       containerPropertyIdentifier: status
       type:
+        type: enum
         values:
           Suggested:
             name: Suggested
-            description: null
           Approved:
             name: Approved
-            description: null
           Rejected:
             name: Rejected
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The status of the annotation
+      name: Status
+      description: The status of the annotation.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -4118,14 +3876,13 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
-  lastUpdatedTime: 1724420993904
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteEquipment
@@ -4170,13 +3927,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     asset:
       container:
         space: cdf_cdm
@@ -4189,12 +3945,12 @@ views:
           space: cdf_cdm
           externalId: CogniteAsset
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Asset
       description: The asset the equipment is related to.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -4204,13 +3960,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     equipmentType:
       container:
         space: cdf_cdm
@@ -4227,13 +3982,12 @@ views:
           space: cdf_cdm
           externalId: CogniteEquipmentType
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Equipment type
-      description: Specifies the type of the equipment. It's a direct relation to
-        CogniteEquipmentType.
+      description: Specifies the type of the equipment.
+      constraintState: {}
     files:
       container:
         space: cdf_cdm
@@ -4246,12 +4000,12 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Files
       description: A list of files the equipment relates to.
+      constraintState: {}
     manufacturer:
       container:
         space: cdf_cdm
@@ -4261,13 +4015,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Manufacturer
       description: The manufacturer of the equipment.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -4277,13 +4030,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     serialNumber:
       container:
         space: cdf_cdm
@@ -4293,13 +4045,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Serial number
       description: The serial number of the equipment.
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -4316,12 +4067,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -4331,14 +4082,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -4347,13 +4097,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -4363,14 +4112,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -4380,13 +4129,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -4395,13 +4143,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -4411,15 +4159,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -4429,13 +4176,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     timeSeries:
       source:
         space: cdf_cdm
@@ -4452,7 +4198,7 @@ views:
       name: Time series
       description: An automatically updated list of time series related to the equipment.
       connectionType: multi_reverse_direct_relation
-  lastUpdatedTime: 1726822073640
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteEquipmentType
@@ -4477,13 +4223,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     code:
       container:
         space: cdf_cdm
@@ -4493,13 +4238,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Code
       description: A unique identifier for the type of equipment.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -4509,13 +4253,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     equipmentClass:
       container:
         space: cdf_cdm
@@ -4525,13 +4268,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Equipment class
-      description: Represents the class of equipment.
+      description: The class of equipment.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -4541,13 +4283,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     standard:
       container:
         space: cdf_cdm
@@ -4557,14 +4298,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Standard
       description: An identifier for the standard this equipment type is sourced from,
-        for example, ISO14224.
+        for example, ISO 14224.
+      constraintState: {}
     standardReference:
       container:
         space: cdf_cdm
@@ -4574,13 +4314,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Standard reference
       description: A reference to the source of the equipment standard.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -4590,14 +4329,13 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
-  lastUpdatedTime: 1726822073640
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteFile
@@ -4626,13 +4364,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     assets:
       container:
         space: cdf_cdm
@@ -4640,17 +4377,19 @@ views:
       containerPropertyIdentifier: assets
       type:
         list: true
+        maxListSize: 1200
         type: direct
         source:
           space: cdf_cdm
           externalId: CogniteAsset
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Assets
       description: A list of assets this file is related to.
+      constraintState:
+        maxListSize: current
     category:
       container:
         space: cdf_cdm
@@ -4663,13 +4402,13 @@ views:
           space: cdf_cdm
           externalId: CogniteFileCategory
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Category
       description: Specifies the detected category the file belongs to. It's a direct
         relation to an instance of CogniteFileCategory.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -4679,13 +4418,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     directory:
       container:
         space: cdf_cdm
@@ -4695,14 +4433,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Directory
       description: Contains the path elements from the source (if the source system
-        has a file system hierarchy or similar.)
+        has a file system hierarchy or similar).
+      constraintState: {}
     equipment:
       source:
         space: cdf_cdm
@@ -4728,14 +4465,14 @@ views:
       type:
         list: false
         type: boolean
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: false
       name: Is uploaded
+      defaultValue: false
       description: Specifies if the file content has been uploaded to Cognite Data
         Fusion or not.
+      constraintState: {}
     mimeType:
       container:
         space: cdf_cdm
@@ -4745,13 +4482,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: MIME type
       description: The MIME type of the file.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -4761,13 +4497,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -4784,12 +4519,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -4799,14 +4534,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -4815,13 +4549,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -4831,14 +4564,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -4848,13 +4581,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -4863,13 +4595,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -4879,15 +4611,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -4897,13 +4628,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     uploadedTime:
       container:
         space: cdf_cdm
@@ -4912,14 +4642,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Uploaded time
       description: The time the file upload completed.
-  lastUpdatedTime: 1726822073640
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteFileCategory
@@ -4945,13 +4674,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     code:
       container:
         space: cdf_cdm
@@ -4961,14 +4689,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: false
       immutable: false
+      nullable: false
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Code
       description: An identifier for the category, for example, 'AA' for Accounting
-        (from Norsok.)
+        (from NORSOK).
+      constraintState:
+        nullability: current
     description:
       container:
         space: cdf_cdm
@@ -4978,13 +4706,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -4994,13 +4721,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     standard:
       container:
         space: cdf_cdm
@@ -5010,14 +4736,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Standard
       description: The name of the standard the category originates from, for example,
-        'Norsok'.
+        'NORSOK'.
+      constraintState: {}
     standardReference:
       container:
         space: cdf_cdm
@@ -5027,13 +4752,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Standard reference
       description: A reference to the source of the category standard.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -5043,14 +4767,13 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
-  lastUpdatedTime: 1726822073640
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CognitePointCloudModel
@@ -5090,13 +4813,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -5106,13 +4828,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -5122,13 +4843,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     revisions:
       source:
         space: cdf_cdm
@@ -5154,13 +4874,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     thumbnail:
       container:
         space: cdf_cdm_3d
@@ -5177,36 +4896,30 @@ views:
           space: cdf_cdm
           externalId: CogniteFile
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Thumbnail of the 3D model
+      constraintState: {}
     type:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DModel
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           CAD:
             name: CAD
-            description: null
           PointCloud:
             name: PointCloud
-            description: null
           Image360:
             name: Image360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: CAD, PointCloud or Image360
+      constraintState: {}
   lastUpdatedTime: 1724420993904
   createdTime: 1724420993904
 - space: cdf_cdm
@@ -5250,12 +4963,11 @@ views:
           space: cdf_cdm
           externalId: CognitePointCloudModel
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: .
+      description: Direct relation to the model this revision belongs to.
+      constraintState: {}
     published:
       container:
         space: cdf_cdm_3d
@@ -5264,13 +4976,11 @@ views:
       type:
         list: false
         type: boolean
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
+      description: Whether this revision is published and visible to end users.
+      constraintState: {}
     revisionId:
       container:
         space: cdf_cdm_3d
@@ -5279,65 +4989,54 @@ views:
       type:
         list: false
         type: int64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: The 3D API revision identifier for this PointCloud model
+      constraintState: {}
     status:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DRevision
       containerPropertyIdentifier: status
       type:
+        type: enum
         values:
           Queued:
             name: Queued
-            description: null
           Processing:
             name: Processing
-            description: null
           Done:
             name: Done
-            description: null
           Failed:
             name: Failed
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
+      description: 'Processing status of the revision. Valid values: Queued, Processing,
+        Done, or Failed'
+      constraintState: {}
     type:
       container:
         space: cdf_cdm_3d
         externalId: Cognite3DRevision
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           CAD:
             name: CAD
-            description: null
           PointCloud:
             name: PointCloud
-            description: null
           Image360:
             name: Image360
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: null
-  lastUpdatedTime: 1724420993904
+      description: 'The type of 3D model this is a revision of. Valid values: CAD,
+        PointCloud, or Image360.'
+      constraintState: {}
+  lastUpdatedTime: 1783423040279
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CognitePointCloudVolume
@@ -5361,13 +5060,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -5377,13 +5075,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     formatVersion:
       container:
         space: cdf_cdm_3d
@@ -5393,14 +5090,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: "Specifies the version the \u2018volume\u2019 field is following.\
-        \ Volume definition is today 9 floats (property volume)\n"
+      description: 'Version identifier for the encoding of the volume field.
+
+        '
+      constraintState: {}
     model3D:
       container:
         space: cdf_cdm_3d
@@ -5417,12 +5113,11 @@ views:
           space: cdf_cdm
           externalId: CogniteCADModel
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to Cognite3DModel instance
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -5432,13 +5127,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     object3D:
       container:
         space: cdf_cdm_3d
@@ -5455,12 +5149,11 @@ views:
           space: cdf_cdm
           externalId: Cognite3DObject
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: Direct relation to object3D grouping for this node
+      constraintState: {}
     revisions:
       container:
         space: cdf_cdm_3d
@@ -5477,12 +5170,11 @@ views:
           space: cdf_cdm
           externalId: CogniteCADRevision
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
       description: List of direct relations to revision information
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -5492,13 +5184,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     volume:
       container:
         space: cdf_cdm_3d
@@ -5507,14 +5198,11 @@ views:
       type:
         list: true
         type: float64
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Relevant coordinates for the volume type, 9 floats in total, that
-        defines the volume
+      description: Numerical representation of a 3D volume.
+      constraintState: {}
     volumeReferences:
       container:
         space: cdf_cdm_3d
@@ -5524,39 +5212,34 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Unique volume metric hashes used to access the 3D specialized data
         storage
+      constraintState: {}
     volumeType:
       container:
         space: cdf_cdm_3d
         externalId: CognitePointCloudVolume
       containerPropertyIdentifier: volumeType
       type:
+        type: enum
         values:
           Cylinder:
             name: Cylinder
-            description: null
           Box:
             name: Box
-            description: null
-        type: enum
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
       description: Type of volume (Cylinder or Box)
-  lastUpdatedTime: 1724420993904
+      constraintState: {}
+  lastUpdatedTime: 1783423040279
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteSchedulable
+  name: Schedulable
   description: CogniteSchedulable represents the metadata about when an activity (or
     similar) starts and ends.
   implements: []
@@ -5573,13 +5256,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The actual end time of an activity (or similar that extends this)
+      name: End time
+      description: The actual end time of an activity (or similar that extends this).
+      constraintState: {}
     scheduledEndTime:
       container:
         space: cdf_cdm
@@ -5588,13 +5270,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The planned end time of an activity (or similar that extends this)
+      name: Scheduled end time
+      description: The planned end time of an activity (or similar that extends this).
+      constraintState: {}
     scheduledStartTime:
       container:
         space: cdf_cdm
@@ -5603,14 +5284,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Scheduled start time
       description: The planned start time of an activity (or similar that extends
-        this)
+        this).
+      constraintState: {}
     startTime:
       container:
         space: cdf_cdm
@@ -5619,17 +5299,17 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The actual start time of an activity (or similar that extends this)
-  lastUpdatedTime: 1724420993904
+      name: Start time
+      description: The actual start time of an activity (or similar that extends this).
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteSourceSystem
+  name: Source system
   description: The CogniteSourceSystem core concept is used to standardize the way
     source system is stored.
   implements:
@@ -5651,13 +5331,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -5667,13 +5346,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     manufacturer:
       container:
         space: cdf_cdm
@@ -5683,13 +5361,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Manufacturer of the source system
+      name: Manufacturer
+      description: The manufacturer of the source system.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -5699,13 +5376,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -5715,13 +5391,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     version:
       container:
         space: cdf_cdm
@@ -5731,17 +5406,21 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Version identifier for the source system
-  lastUpdatedTime: 1724420993904
+      name: Version
+      description: The version identifier for the source system.
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteSourceable
+  name: Sourceable
+  description: 'The CogniteSourceable core concept is used to standardize the way
+    source information is stored.
+
+    '
   implements: []
   version: v1
   writable: true
@@ -5764,12 +5443,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -5779,14 +5458,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -5795,13 +5473,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -5811,14 +5488,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -5828,13 +5505,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -5843,13 +5519,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -5859,21 +5535,232 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
-  lastUpdatedTime: 1724420993904
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
+- space: cdf_cdm
+  externalId: CogniteStateSet
+  name: State set
+  description: Represents a set of valid states for state time series.
+  implements:
+  - space: cdf_cdm
+    externalId: CogniteDescribable
+    version: v1
+    type: view
+  - space: cdf_cdm
+    externalId: CogniteSourceable
+    version: v1
+    type: view
+  version: v1
+  writable: true
+  usedFor: node
+  isGlobal: true
+  properties:
+    aliases:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: aliases
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
+    description:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: description
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
+    name:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
+    source:
+      container:
+        space: cdf_cdm
+        externalId: CogniteSourceable
+      containerPropertyIdentifier: source
+      type:
+        list: false
+        container:
+          space: cdf_cdm
+          externalId: CogniteSourceSystem
+          type: container
+        type: direct
+        source:
+          space: cdf_cdm
+          externalId: CogniteSourceSystem
+          version: v1
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
+    sourceContext:
+      container:
+        space: cdf_cdm
+        externalId: CogniteSourceable
+      containerPropertyIdentifier: sourceContext
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Source context
+      description: Context of the source id. For systems where the sourceId is globally
+        unique, the sourceContext is expected to not be set.
+      constraintState: {}
+    sourceCreatedTime:
+      container:
+        space: cdf_cdm
+        externalId: CogniteSourceable
+      containerPropertyIdentifier: sourceCreatedTime
+      type:
+        list: false
+        type: timestamp
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
+    sourceCreatedUser:
+      container:
+        space: cdf_cdm
+        externalId: CogniteSourceable
+      containerPropertyIdentifier: sourceCreatedUser
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
+    sourceId:
+      container:
+        space: cdf_cdm
+        externalId: CogniteSourceable
+      containerPropertyIdentifier: sourceId
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
+    sourceUpdatedTime:
+      container:
+        space: cdf_cdm
+        externalId: CogniteSourceable
+      containerPropertyIdentifier: sourceUpdatedTime
+      type:
+        list: false
+        type: timestamp
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
+    sourceUpdatedUser:
+      container:
+        space: cdf_cdm
+        externalId: CogniteSourceable
+      containerPropertyIdentifier: sourceUpdatedUser
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
+    states:
+      container:
+        space: cdf_cdm
+        externalId: CogniteStateSet
+      containerPropertyIdentifier: states
+      type:
+        list: true
+        type: json
+      immutable: false
+      nullable: false
+      autoIncrement: false
+      name: States
+      description: A list of valid states. Each state contains a numeric value and
+        a string value.
+      constraintState:
+        nullability: current
+    tags:
+      container:
+        space: cdf_cdm
+        externalId: CogniteDescribable
+      containerPropertyIdentifier: tags
+      type:
+        list: true
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
+  createdTime: 1760442994495
 - space: cdf_cdm
   externalId: CogniteTimeSeries
   name: Time series
-  description: Represents a series of data points in time order."
+  description: Represents a series of data points in time order.
   implements:
   - space: cdf_cdm
     externalId: CogniteDescribable
@@ -5914,13 +5801,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     assets:
       container:
         space: cdf_cdm
@@ -5928,17 +5814,19 @@ views:
       containerPropertyIdentifier: assets
       type:
         list: true
+        maxListSize: 1200
         type: direct
         source:
           space: cdf_cdm
           externalId: CogniteAsset
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Assets
       description: A list of assets the time series is related to.
+      constraintState:
+        maxListSize: current
     description:
       container:
         space: cdf_cdm
@@ -5948,13 +5836,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     equipment:
       container:
         space: cdf_cdm
@@ -5967,12 +5854,12 @@ views:
           space: cdf_cdm
           externalId: CogniteEquipment
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Equipment
       description: A list of equipment the time series is related to.
+      constraintState: {}
     isStep:
       container:
         space: cdf_cdm
@@ -5981,13 +5868,15 @@ views:
       type:
         list: false
         type: boolean
-      nullable: false
       immutable: false
+      nullable: false
       autoIncrement: false
-      source: null
-      defaultValue: false
       name: Is step
+      defaultValue: false
       description: Specifies whether the time series is a step time series or not.
+        It is only in effect when the type is 'numeric'.
+      constraintState:
+        nullability: current
     name:
       container:
         space: cdf_cdm
@@ -5997,13 +5886,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -6020,12 +5908,12 @@ views:
           space: cdf_cdm
           externalId: CogniteSourceSystem
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to a source system
+      name: Source
+      description: A direct relation to a source system instance.
+      constraintState: {}
     sourceContext:
       container:
         space: cdf_cdm
@@ -6035,14 +5923,13 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
+      name: Source context
       description: Context of the source id. For systems where the sourceId is globally
         unique, the sourceContext is expected to not be set.
+      constraintState: {}
     sourceCreatedTime:
       container:
         space: cdf_cdm
@@ -6051,13 +5938,12 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was created in source system (if available)
+      name: Source created
+      description: The time the instance was created in the source system (if available).
+      constraintState: {}
     sourceCreatedUser:
       container:
         space: cdf_cdm
@@ -6067,14 +5953,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who created the source
-        data. This identifier is not guaranteed to match the user identifiers in CDF
+      name: Source created by
+      description: The user identifier from the source system who created the source
+        data. This identifier is not guaranteed to match user identifiers in Cognite
+        Data Fusion.
+      constraintState: {}
     sourceId:
       container:
         space: cdf_cdm
@@ -6084,13 +5970,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Identifier from the source system
+      name: Source ID
+      description: The identifier in the source system.
+      constraintState: {}
     sourceUnit:
       container:
         space: cdf_cdm
@@ -6100,13 +5985,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Source unit
       description: The unit specified in the source system.
+      constraintState: {}
     sourceUpdatedTime:
       container:
         space: cdf_cdm
@@ -6115,13 +5999,13 @@ views:
       type:
         list: false
         type: timestamp
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: When the instance was last updated in the source system (if available)
+      name: Source last updated
+      description: The time the instance was last updated in the source system (if
+        available).
+      constraintState: {}
     sourceUpdatedUser:
       container:
         space: cdf_cdm
@@ -6131,15 +6015,33 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: User identifier from the source system on who last updated the
-        source data. This identifier is not guaranteed to match the user identifiers
-        in CDF
+      name: Source last updated by
+      description: The user identifier from the source system who last updated the
+        source data. This identifier is not guaranteed to match user identifiers in
+        Cognite Data Fusion.
+      constraintState: {}
+    stateSet:
+      container:
+        space: cdf_cdm
+        externalId: CogniteTimeSeries
+      containerPropertyIdentifier: stateSet
+      type:
+        list: false
+        container:
+          space: cdf_cdm
+          externalId: CogniteStateSet
+          type: container
+        type: direct
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: State set
+      description: The state set of the time series. It is only in effect when the
+        type is 'state'.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -6149,19 +6051,19 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
     type:
       container:
         space: cdf_cdm
         externalId: CogniteTimeSeries
       containerPropertyIdentifier: type
       type:
+        type: enum
         values:
           string:
             name: string
@@ -6169,14 +6071,17 @@ views:
           numeric:
             name: numeric
             description: Time series with double floating point data points.
-        type: enum
-      nullable: false
+          state:
+            name: state
+            description: Time series with state data points.
       immutable: true
+      nullable: false
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Type
-      description: Specifies the data type of the data points.
+      description: 'Specifies the data type of the data points. Valid values: ''numeric'',
+        ''string'', ''state''.'
+      constraintState:
+        nullability: current
     unit:
       container:
         space: cdf_cdm
@@ -6193,17 +6098,18 @@ views:
           space: cdf_cdm
           externalId: CogniteUnit
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: Unit
       description: The unit of the time series.
-  lastUpdatedTime: 1726822073640
+      constraintState: {}
+  lastUpdatedTime: 1784583987682
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteUnit
-  description: Represents a single unit of measurement
+  name: Unit
+  description: Represents a single unit of measurement.
   implements:
   - space: cdf_cdm
     externalId: CogniteDescribable
@@ -6223,13 +6129,12 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Alternative names for the node
+      name: Aliases
+      description: Alternative names for the instance.
+      constraintState: {}
     description:
       container:
         space: cdf_cdm
@@ -6239,13 +6144,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Description of the instance
+      name: Description
+      description: The description of the instance.
+      constraintState: {}
     name:
       container:
         space: cdf_cdm
@@ -6255,13 +6159,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Name of the instance
+      name: Name
+      description: The name of the instance.
+      constraintState: {}
     quantity:
       container:
         space: cdf_cdm
@@ -6271,13 +6174,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Specifies the physical quantity the unit measures
+      name: Quantity
+      description: Specifies the physical quantity the unit measures.
+      constraintState: {}
     source:
       container:
         space: cdf_cdm
@@ -6287,13 +6189,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Source of the unit definition
+      name: Source
+      description: The source of the unit specification.
+      constraintState: {}
     sourceReference:
       container:
         space: cdf_cdm
@@ -6303,13 +6204,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Reference to the source of the unit definition
+      name: Source reference
+      description: A reference to the source of the unit specification.
+      constraintState: {}
     symbol:
       container:
         space: cdf_cdm
@@ -6319,13 +6219,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: The symbol for the unit of measurement
+      name: Symbol
+      description: The symbol for the unit of measurement.
+      constraintState: {}
     tags:
       container:
         space: cdf_cdm
@@ -6335,19 +6234,19 @@ views:
         list: true
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
-      name: null
-      description: Text based labels for generic use, limited to 1000
-  lastUpdatedTime: 1724420993904
+      name: Tags
+      description: 'A list of tags for the instance. Max: 1000.'
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 - space: cdf_cdm
   externalId: CogniteVisualizable
+  name: Visualizable
   description: CogniteVisualizable defines the standard way to reference a related
-    3D resource
+    3D resource.
   implements: []
   version: v1
   writable: true
@@ -6366,13 +6265,14 @@ views:
           space: cdf_cdm
           externalId: Cognite3DObject
           version: v1
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
-      name: null
-      description: Direct relation to an Object3D instance representing the 3D resource
-  lastUpdatedTime: 1724420993904
+      name: 3D object
+      description: Direct relation to a Cognite3DObject instance representing the
+        3D resource.
+      constraintState: {}
+  lastUpdatedTime: 1781790512849
   createdTime: 1724420993904
 isGlobal: true
 lastUpdatedTime: 1724421012137

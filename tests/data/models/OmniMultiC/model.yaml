@@ -1,10 +1,11 @@
-space: pygen-models
+space: sp_pygen_models
 externalId: OmniMultiC
 name: OmniMultiC
-description: ''
+description: This is a small model with one view, which has been designed to test
+  the generation of one SDK for multiple models.
 version: '1'
 views:
-- space: pygen-models-other
+- space: sp_pygen_models_other
   externalId: Implementation1
   name: Implementation1
   filter:
@@ -30,13 +31,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: mainValue
-      description: null
+      constraintState: {}
     value1:
       container:
         space: pygen-models
@@ -46,13 +45,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Value1
-      description: null
+      constraintState: {}
     value2:
       container:
         space: pygen-models
@@ -62,15 +59,14 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: false
       immutable: false
+      nullable: false
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: Value2
-      description: null
-  lastUpdatedTime: 1704113811088
-  createdTime: 1704113811088
+      constraintState:
+        nullability: current
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 isGlobal: false
-lastUpdatedTime: 1704114825424
-createdTime: 1704114714727
+lastUpdatedTime: 1789576888254
+createdTime: 1789576888254
