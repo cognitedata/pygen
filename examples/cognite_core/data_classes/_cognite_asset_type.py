@@ -82,13 +82,13 @@ class CogniteAssetTypeGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite asset type.
         data_record: The data record of the Cognite asset type node.
-        aliases: Alternative names for the node
-        asset_class: Specifies the class the type belongs to. It's a direct relation to CogniteAssetClass.
+        aliases: Alternative names for the instance.
+        asset_class: Specifies the class the type belongs to.
         code: A unique identifier for the type of asset.
-        description: Description of the instance
-        name: Name of the instance
+        description: The description of the instance.
+        name: The name of the instance.
         standard: A text string to specify which standard the type is from.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAssetType", "v1")
@@ -137,13 +137,13 @@ class CogniteAssetType(CogniteDescribableNode):
         space: The space where the node is located.
         external_id: The external id of the Cognite asset type.
         data_record: The data record of the Cognite asset type node.
-        aliases: Alternative names for the node
-        asset_class: Specifies the class the type belongs to. It's a direct relation to CogniteAssetClass.
+        aliases: Alternative names for the instance.
+        asset_class: Specifies the class the type belongs to.
         code: A unique identifier for the type of asset.
-        description: Description of the instance
-        name: Name of the instance
+        description: The description of the instance.
+        name: The name of the instance.
         standard: A text string to specify which standard the type is from.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAssetType", "v1")
@@ -172,13 +172,13 @@ class CogniteAssetTypeWrite(CogniteDescribableNodeWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite asset type.
         data_record: The data record of the Cognite asset type node.
-        aliases: Alternative names for the node
-        asset_class: Specifies the class the type belongs to. It's a direct relation to CogniteAssetClass.
+        aliases: Alternative names for the instance.
+        asset_class: Specifies the class the type belongs to.
         code: A unique identifier for the type of asset.
-        description: Description of the instance
-        name: Name of the instance
+        description: The description of the instance.
+        name: The name of the instance.
         standard: A text string to specify which standard the type is from.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

@@ -26,6 +26,7 @@ from cognite_core._api.cognite_point_cloud_volume import CognitePointCloudVolume
 from cognite_core._api.cognite_schedulable import CogniteSchedulableAPI
 from cognite_core._api.cognite_source_system import CogniteSourceSystemAPI
 from cognite_core._api.cognite_sourceable_node import CogniteSourceableNodeAPI
+from cognite_core._api.cognite_state_set import CogniteStateSetAPI
 from cognite_core._api.cognite_time_series import CogniteTimeSeriesAPI
 from cognite_core._api.cognite_unit import CogniteUnitAPI
 from cognite_core._api.cognite_visualizable import CogniteVisualizableAPI
@@ -59,6 +60,7 @@ __all__ = [
     "CogniteSchedulableAPI",
     "CogniteSourceSystemAPI",
     "CogniteSourceableNodeAPI",
+    "CogniteStateSetAPI",
     "CogniteTimeSeriesAPI",
     "CogniteUnitAPI",
     "CogniteVisualizableAPI",

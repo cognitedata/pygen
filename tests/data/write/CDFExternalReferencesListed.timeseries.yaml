@@ -1,77 +1,110 @@
-- externalId: timeseries_dillon
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_dillon
   name: timeseries_dillon
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_dalton
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_dalton
   name: timeseries_dalton
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_julie
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_julie
   name: timeseries_julie
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_brittany
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_brittany
   name: timeseries_brittany
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_susan
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_susan
   name: timeseries_susan
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_michael
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_michael
   name: timeseries_michael
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_stephen
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_stephen
   name: timeseries_stephen
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_david
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_david
   name: timeseries_david
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_kelly
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_kelly
   name: timeseries_kelly
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_dean
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
+  isString: false
+  externalId: timeseries_dean
   name: timeseries_dean
-  isString: false
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196
-- externalId: timeseries_alyssa
-  name: timeseries_alyssa
+- id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  isStep: false
   isString: false
+  externalId: timeseries_alyssa
+  name: timeseries_alyssa
   metadata:
     source: PygenMockGenerator
-  isStep: false
   dataSetId: 5472779523460196

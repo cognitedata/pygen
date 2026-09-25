@@ -96,3 +96,7 @@ views:
   externalId: CDFExternalReferencesListed
   version: "1"
   type: view
+- space: {{ pygen_models_space }}
+  externalId: Naughty
+  version: "1"
+  type: view

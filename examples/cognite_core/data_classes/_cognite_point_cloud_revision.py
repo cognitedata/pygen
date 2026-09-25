@@ -81,11 +81,11 @@ class CognitePointCloudRevisionGraphQL(GraphQLCore, protected_namespaces=()):
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud revision.
         data_record: The data record of the Cognite point cloud revision node.
-        model_3d: .
-        published: The published field.
+        model_3d: Direct relation to the model this revision belongs to.
+        published: Whether this revision is published and visible to end users.
         revision_id: The 3D API revision identifier for this PointCloud model
-        status: The status field.
-        type_: The type field.
+        status: Processing status of the revision. Valid values: Queued, Processing, Done, or Failed
+        type_: The type of 3D model this is a revision of. Valid values: CAD, PointCloud, or Image360.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudRevision", "v1")
@@ -132,11 +132,11 @@ class CognitePointCloudRevision(Cognite3DRevision, protected_namespaces=()):
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud revision.
         data_record: The data record of the Cognite point cloud revision node.
-        model_3d: .
-        published: The published field.
+        model_3d: Direct relation to the model this revision belongs to.
+        published: Whether this revision is published and visible to end users.
         revision_id: The 3D API revision identifier for this PointCloud model
-        status: The status field.
-        type_: The type field.
+        status: Processing status of the revision. Valid values: Queued, Processing, Done, or Failed
+        type_: The type of 3D model this is a revision of. Valid values: CAD, PointCloud, or Image360.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CognitePointCloudRevision", "v1")
@@ -164,11 +164,11 @@ class CognitePointCloudRevisionWrite(Cognite3DRevisionWrite, protected_namespace
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud revision.
         data_record: The data record of the Cognite point cloud revision node.
-        model_3d: .
-        published: The published field.
+        model_3d: Direct relation to the model this revision belongs to.
+        published: Whether this revision is published and visible to end users.
         revision_id: The 3D API revision identifier for this PointCloud model
-        status: The status field.
-        type_: The type field.
+        status: Processing status of the revision. Valid values: Queued, Processing, Done, or Failed
+        type_: The type of 3D model this is a revision of. Valid values: CAD, PointCloud, or Image360.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

@@ -31,13 +31,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: name
-      description: null
+      constraintState: {}
     otherDirect:
       container:
         space: sp_pygen_models
@@ -50,12 +48,11 @@ views:
           space: sp_pygen_models
           externalId: ConnectionItemC
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: otherDirect
-      description: null
+      constraintState: {}
     outwards:
       type:
         space: sp_pygen_models
@@ -82,30 +79,13 @@ views:
           space: sp_pygen_models
           externalId: ConnectionItemA
           version: '1'
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      defaultValue: null
       name: selfDirect
-      description: null
-    properties:
-      container:
-        space: sp_pygen_models
-        externalId: ConnectionBase
-      containerPropertyIdentifier: properties
-      type:
-        list: false
-        collation: ucs_basic
-        type: text
-      nullable: true
-      immutable: false
-      autoIncrement: false
-      source: null
-      defaultValue: null
-      name: name
-      description: null
-  lastUpdatedTime: 1729345477397
-  createdTime: 1729345477397
+      constraintState: {}
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_models
   externalId: ConnectionItemB
   name: ConnectionItemB
@@ -146,13 +126,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: name
-      description: null
+      constraintState: {}
     selfEdge:
       type:
         space: sp_pygen_models
@@ -167,8 +145,8 @@ views:
       edgeSource: null
       direction: outwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1729345477397
-  createdTime: 1729345477397
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 - space: sp_pygen_models
   externalId: ConnectionItemC
   name: ConnectionItemC
@@ -214,8 +192,8 @@ views:
       edgeSource: null
       direction: outwards
       connectionType: multi_edge_connection
-  lastUpdatedTime: 1729345477397
-  createdTime: 1729345477397
+  lastUpdatedTime: 1789576882660
+  createdTime: 1789576882660
 isGlobal: false
-lastUpdatedTime: 1729345479132
-createdTime: 1729345479132
+lastUpdatedTime: 1789576888254
+createdTime: 1789576888254

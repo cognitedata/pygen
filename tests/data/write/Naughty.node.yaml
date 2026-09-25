@@ -1,0 +1,55 @@
+- space: sp_omni_instances
+  externalId: Naughty:Margaret
+  instanceType: node
+  sources:
+  - properties:
+      type: Range little exactly suggest thus sit.
+    source:
+      space: sp_pygen_models
+      externalId: Naughty
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: Naughty:Dawn
+  instanceType: node
+  sources:
+  - properties:
+      type: Today important tough.
+    source:
+      space: sp_pygen_models
+      externalId: Naughty
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: Naughty:Sean
+  instanceType: node
+  sources:
+  - properties:
+      type: null
+    source:
+      space: sp_pygen_models
+      externalId: Naughty
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: Naughty:Anthony
+  instanceType: node
+  sources:
+  - properties:
+      type: Yes head win ever television.
+    source:
+      space: sp_pygen_models
+      externalId: Naughty
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: Naughty:Kimberly
+  instanceType: node
+  sources:
+  - properties:
+      type: Fly ago born.
+    source:
+      space: sp_pygen_models
+      externalId: Naughty
+      version: '1'
+      type: view

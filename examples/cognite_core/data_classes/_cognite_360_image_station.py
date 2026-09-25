@@ -70,11 +70,11 @@ class Cognite360ImageStationGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite 360 image station.
         data_record: The data record of the Cognite 360 image station node.
-        aliases: Alternative names for the node
-        description: Description of the instance
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
         group_type: Type of group
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageStation", "v1")
@@ -113,11 +113,11 @@ class Cognite360ImageStation(CogniteDescribableNode):
         space: The space where the node is located.
         external_id: The external id of the Cognite 360 image station.
         data_record: The data record of the Cognite 360 image station node.
-        aliases: Alternative names for the node
-        description: Description of the instance
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
         group_type: Type of group
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageStation", "v1")
@@ -139,11 +139,11 @@ class Cognite360ImageStationWrite(CogniteDescribableNodeWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite 360 image station.
         data_record: The data record of the Cognite 360 image station node.
-        aliases: Alternative names for the node
-        description: Description of the instance
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
         group_type: Type of group
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

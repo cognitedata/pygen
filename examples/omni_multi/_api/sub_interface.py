@@ -40,15 +40,15 @@ from omni_multi.data_classes import (
     SubInterfaceList,
     SubInterfaceWriteList,
     SubInterfaceTextFields,
-    Implementation1v2,
+    Implementation1sSpPygenModels,
 )
 
 
 class SubInterfaceAPI(NodeAPI[SubInterface, SubInterfaceWrite, SubInterfaceList, SubInterfaceWriteList]):
-    _view_id = dm.ViewId("pygen-models", "SubInterface", "1")
+    _view_id = dm.ViewId("sp_pygen_models", "SubInterface", "1")
     _properties_by_field: ClassVar[dict[str, str]] = _SUBINTERFACE_PROPERTIES_BY_FIELD
     _direct_children_by_external_id: ClassVar[dict[str, type[DomainModel]]] = {
-        "Implementation1": Implementation1v2,
+        "Implementation1": Implementation1sSpPygenModels,
     }
     _class_type = SubInterface
     _class_list = SubInterfaceList

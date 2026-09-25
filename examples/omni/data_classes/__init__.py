@@ -167,6 +167,15 @@ from ._main_interface import (
     MainInterfaceWrite,
     MainInterfaceWriteList,
 )
+from ._naughty import (
+    Naughty,
+    NaughtyFields,
+    NaughtyGraphQL,
+    NaughtyList,
+    NaughtyTextFields,
+    NaughtyWrite,
+    NaughtyWriteList,
+)
 from ._primitive_nullable import (
     PrimitiveNullable,
     PrimitiveNullableFields,
@@ -404,6 +413,13 @@ __all__ = [
     "MainInterfaceWriteList",
     "MainInterfaceFields",
     "MainInterfaceTextFields",
+    "Naughty",
+    "NaughtyGraphQL",
+    "NaughtyWrite",
+    "NaughtyList",
+    "NaughtyWriteList",
+    "NaughtyFields",
+    "NaughtyTextFields",
     "PrimitiveNullable",
     "PrimitiveNullableGraphQL",
     "PrimitiveNullableWrite",

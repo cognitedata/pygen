@@ -164,32 +164,32 @@ class CogniteAssetGraphQL(GraphQLCore):
         external_id: The external id of the Cognite asset.
         data_record: The data record of the Cognite asset node.
         activities: An automatically updated list of activities related to the asset.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         asset_class: Specifies the class of the asset. It's a direct relation to CogniteAssetClass.
         children: An automatically updated list of assets with this asset as their parent.
-        description: Description of the instance
+        description: The description of the instance.
         equipment: An automatically updated list of equipment related to the asset.
         files: An automatically updated list of files related to the asset.
-        name: Name of the instance
-        object_3d: Direct relation to an Object3D instance representing the 3D resource
+        name: The name of the instance.
+        object_3d: Direct relation to a Cognite3DObject instance representing the 3D resource.
         parent: The parent of the asset.
         path: An automatically updated ordered list of this asset's ancestors, starting with the root asset. Enables
             subtree filtering to find all assets under a parent.
         path_last_updated_time: The last time the path was updated for this asset.
         root: An automatically updated reference to the top-level asset of the hierarchy.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        tags: A list of tags for the instance. Max: 1000.
         time_series: An automatically updated list of time series related to the asset.
-        type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
+        type_: Specifies the type of the asset.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
@@ -269,32 +269,32 @@ class CogniteAsset(CogniteVisualizable, CogniteDescribableNode, CogniteSourceabl
         external_id: The external id of the Cognite asset.
         data_record: The data record of the Cognite asset node.
         activities: An automatically updated list of activities related to the asset.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         asset_class: Specifies the class of the asset. It's a direct relation to CogniteAssetClass.
         children: An automatically updated list of assets with this asset as their parent.
-        description: Description of the instance
+        description: The description of the instance.
         equipment: An automatically updated list of equipment related to the asset.
         files: An automatically updated list of files related to the asset.
-        name: Name of the instance
-        object_3d: Direct relation to an Object3D instance representing the 3D resource
+        name: The name of the instance.
+        object_3d: Direct relation to a Cognite3DObject instance representing the 3D resource.
         parent: The parent of the asset.
         path: An automatically updated ordered list of this asset's ancestors, starting with the root asset. Enables
             subtree filtering to find all assets under a parent.
         path_last_updated_time: The last time the path was updated for this asset.
         root: An automatically updated reference to the top-level asset of the hierarchy.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        tags: A list of tags for the instance. Max: 1000.
         time_series: An automatically updated list of time series related to the asset.
-        type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
+        type_: Specifies the type of the asset.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAsset", "v1")
@@ -338,24 +338,24 @@ class CogniteAssetWrite(CogniteVisualizableWrite, CogniteDescribableNodeWrite, C
         space: The space where the node is located.
         external_id: The external id of the Cognite asset.
         data_record: The data record of the Cognite asset node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         asset_class: Specifies the class of the asset. It's a direct relation to CogniteAssetClass.
-        description: Description of the instance
-        name: Name of the instance
-        object_3d: Direct relation to an Object3D instance representing the 3D resource
+        description: The description of the instance.
+        name: The name of the instance.
+        object_3d: Direct relation to a Cognite3DObject instance representing the 3D resource.
         parent: The parent of the asset.
-        source: Direct relation to a source system
+        source: A direct relation to a source system instance.
         source_context: Context of the source id. For systems where the sourceId is globally unique, the sourceContext
             is expected to not be set.
-        source_created_time: When the instance was created in source system (if available)
-        source_created_user: User identifier from the source system on who created the source data. This identifier is
-            not guaranteed to match the user identifiers in CDF
-        source_id: Identifier from the source system
-        source_updated_time: When the instance was last updated in the source system (if available)
-        source_updated_user: User identifier from the source system on who last updated the source data. This
-            identifier is not guaranteed to match the user identifiers in CDF
-        tags: Text based labels for generic use, limited to 1000
-        type_: Specifies the type of the asset. It's a direct relation to CogniteAssetType.
+        source_created_time: The time the instance was created in the source system (if available).
+        source_created_user: The user identifier from the source system who created the source data. This identifier is
+            not guaranteed to match user identifiers in Cognite Data Fusion.
+        source_id: The identifier in the source system.
+        source_updated_time: The time the instance was last updated in the source system (if available).
+        source_updated_user: The user identifier from the source system who last updated the source data. This
+            identifier is not guaranteed to match user identifiers in Cognite Data Fusion.
+        tags: A list of tags for the instance. Max: 1000.
+        type_: Specifies the type of the asset.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

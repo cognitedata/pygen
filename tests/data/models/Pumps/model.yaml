@@ -22,13 +22,12 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: false
       immutable: false
+      nullable: false
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: name
-      description: null
+      constraintState:
+        nullability: current
   lastUpdatedTime: 1694968752489
   createdTime: 1694968752489
 - space: IntegrationTestsImmutable
@@ -63,13 +62,11 @@ views:
         list: false
         collation: ucs_basic
         type: text
-      nullable: true
       immutable: false
+      nullable: true
       autoIncrement: false
-      source: null
-      defaultValue: null
       name: name
-      description: null
+      constraintState: {}
   lastUpdatedTime: 1694968752489
   createdTime: 1694968752489
 isGlobal: false

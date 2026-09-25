@@ -24,33 +24,38 @@ from omni_multi.data_classes._core import (
     QueryUnpacker,
     ViewPropertyId,
 )
-from omni_multi.data_classes._implementation_1_v_1 import (
-    Implementation1v1Query,
-    _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD,
-    _create_implementation_1_v_1_filter,
+from omni_multi.data_classes._implementation_1_s_sp_pygen_models import (
+    Implementation1sSpPygenModelsQuery,
+    _IMPLEMENTATION1SSPPYGENMODELS_PROPERTIES_BY_FIELD,
+    _create_implementation_1_s_sp_pygen_model_filter,
 )
 from omni_multi.data_classes import (
     DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
-    Implementation1v1,
-    Implementation1v1Write,
-    Implementation1v1Fields,
-    Implementation1v1List,
-    Implementation1v1WriteList,
-    Implementation1v1TextFields,
+    Implementation1sSpPygenModels,
+    Implementation1sSpPygenModelsWrite,
+    Implementation1sSpPygenModelsFields,
+    Implementation1sSpPygenModelsList,
+    Implementation1sSpPygenModelsWriteList,
+    Implementation1sSpPygenModelsTextFields,
 )
 
 
-class Implementation1v1API(
-    NodeAPI[Implementation1v1, Implementation1v1Write, Implementation1v1List, Implementation1v1WriteList]
+class Implementation1sSpPygenModelsAPI(
+    NodeAPI[
+        Implementation1sSpPygenModels,
+        Implementation1sSpPygenModelsWrite,
+        Implementation1sSpPygenModelsList,
+        Implementation1sSpPygenModelsWriteList,
+    ]
 ):
-    _view_id = dm.ViewId("pygen-models-other", "Implementation1", "1")
-    _properties_by_field: ClassVar[dict[str, str]] = _IMPLEMENTATION1V1_PROPERTIES_BY_FIELD
-    _class_type = Implementation1v1
-    _class_list = Implementation1v1List
-    _class_write_list = Implementation1v1WriteList
+    _view_id = dm.ViewId("sp_pygen_models", "Implementation1", "1")
+    _properties_by_field: ClassVar[dict[str, str]] = _IMPLEMENTATION1SSPPYGENMODELS_PROPERTIES_BY_FIELD
+    _class_type = Implementation1sSpPygenModels
+    _class_list = Implementation1sSpPygenModelsList
+    _class_write_list = Implementation1sSpPygenModelsWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
@@ -60,37 +65,37 @@ class Implementation1v1API(
         self,
         external_id: str | dm.NodeId | tuple[str, str],
         space: str,
-    ) -> Implementation1v1 | None: ...
+    ) -> Implementation1sSpPygenModels | None: ...
 
     @overload
     def retrieve(
         self,
         external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str,
-    ) -> Implementation1v1List: ...
+    ) -> Implementation1sSpPygenModelsList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str,
-    ) -> Implementation1v1 | Implementation1v1List | None:
-        """Retrieve one or more implementation 1 v 1 by id(s).
+    ) -> Implementation1sSpPygenModels | Implementation1sSpPygenModelsList | None:
+        """Retrieve one or more implementation 1 s sp pygen models by id(s).
 
         Args:
-            external_id: External id or list of external ids of the implementation 1 v 1.
-            space: The space where all the implementation 1 v 1 are located.
+            external_id: External id or list of external ids of the implementation 1 s sp pygen models.
+            space: The space where all the implementation 1 s sp pygen models are located.
 
         Returns:
-            The requested implementation 1 v 1.
+            The requested implementation 1 s sp pygen models.
 
         Examples:
 
-            Retrieve implementation_1_v_1 by id:
+            Retrieve implementation_1_s_sp_pygen_model by id:
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_1 = client.implementation_1_v_1.retrieve(
-                ...     "my_implementation_1_v_1"
+                >>> implementation_1_s_sp_pygen_model = client.implementation_1_s_sp_pygen_models.retrieve(
+                ...     "my_implementation_1_s_sp_pygen_model"
                 ... )
 
         """
@@ -102,9 +107,13 @@ class Implementation1v1API(
     def search(
         self,
         query: str,
-        properties: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
+        properties: (
+            Implementation1sSpPygenModelsTextFields | SequenceNotStr[Implementation1sSpPygenModelsTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
         value_1_prefix: str | None = None,
         value_2: str | list[str] | None = None,
@@ -113,24 +122,28 @@ class Implementation1v1API(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
+        sort_by: (
+            Implementation1sSpPygenModelsFields | SequenceNotStr[Implementation1sSpPygenModelsFields] | None
+        ) = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-    ) -> Implementation1v1List:
-        """Search implementation 1 v 1
+    ) -> Implementation1sSpPygenModelsList:
+        """Search implementation 1 s sp pygen models
 
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
+            sub_value: The sub value to filter on.
+            sub_value_prefix: The prefix of the sub value to filter on.
             value_1: The value 1 to filter on.
             value_1_prefix: The prefix of the value 1 to filter on.
             value_2: The value 2 to filter on.
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25.
+            limit: Maximum number of implementation 1 s sp pygen models to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -141,23 +154,25 @@ class Implementation1v1API(
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
-            Search results implementation 1 v 1 matching the query.
+            Search results implementation 1 s sp pygen models matching the query.
 
         Examples:
 
-           Search for 'my_implementation_1_v_1' in all text properties:
+           Search for 'my_implementation_1_s_sp_pygen_model' in all text properties:
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_1_list = client.implementation_1_v_1.search(
-                ...     'my_implementation_1_v_1'
+                >>> implementation_1_s_sp_pygen_models = client.implementation_1_s_sp_pygen_models.search(
+                ...     'my_implementation_1_s_sp_pygen_model'
                 ... )
 
         """
-        filter_ = _create_implementation_1_v_1_filter(
+        filter_ = _create_implementation_1_s_sp_pygen_model_filter(
             self._view_id,
             main_value,
             main_value_prefix,
+            sub_value,
+            sub_value_prefix,
             value_1,
             value_1_prefix,
             value_2,
@@ -181,11 +196,17 @@ class Implementation1v1API(
         self,
         aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
-        property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
+        property: (
+            Implementation1sSpPygenModelsFields | SequenceNotStr[Implementation1sSpPygenModelsFields] | None
+        ) = None,
         query: str | None = None,
-        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
+        search_property: (
+            Implementation1sSpPygenModelsTextFields | SequenceNotStr[Implementation1sSpPygenModelsTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
         value_1_prefix: str | None = None,
         value_2: str | list[str] | None = None,
@@ -201,11 +222,17 @@ class Implementation1v1API(
         self,
         aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: None = None,
-        property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
+        property: (
+            Implementation1sSpPygenModelsFields | SequenceNotStr[Implementation1sSpPygenModelsFields] | None
+        ) = None,
         query: str | None = None,
-        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
+        search_property: (
+            Implementation1sSpPygenModelsTextFields | SequenceNotStr[Implementation1sSpPygenModelsTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
         value_1_prefix: str | None = None,
         value_2: str | list[str] | None = None,
@@ -224,12 +251,18 @@ class Implementation1v1API(
             | dm.aggregations.MetricAggregation
             | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        group_by: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields],
-        property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
+        group_by: Implementation1sSpPygenModelsFields | SequenceNotStr[Implementation1sSpPygenModelsFields],
+        property: (
+            Implementation1sSpPygenModelsFields | SequenceNotStr[Implementation1sSpPygenModelsFields] | None
+        ) = None,
         query: str | None = None,
-        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
+        search_property: (
+            Implementation1sSpPygenModelsTextFields | SequenceNotStr[Implementation1sSpPygenModelsTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
         value_1_prefix: str | None = None,
         value_2: str | list[str] | None = None,
@@ -247,12 +280,20 @@ class Implementation1v1API(
             | dm.aggregations.MetricAggregation
             | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        group_by: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
-        property: Implementation1v1Fields | SequenceNotStr[Implementation1v1Fields] | None = None,
+        group_by: (
+            Implementation1sSpPygenModelsFields | SequenceNotStr[Implementation1sSpPygenModelsFields] | None
+        ) = None,
+        property: (
+            Implementation1sSpPygenModelsFields | SequenceNotStr[Implementation1sSpPygenModelsFields] | None
+        ) = None,
         query: str | None = None,
-        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
+        search_property: (
+            Implementation1sSpPygenModelsTextFields | SequenceNotStr[Implementation1sSpPygenModelsTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
         value_1_prefix: str | None = None,
         value_2: str | list[str] | None = None,
@@ -266,7 +307,7 @@ class Implementation1v1API(
         | list[dm.aggregations.AggregatedNumberedValue]
         | InstanceAggregationResultList
     ):
-        """Aggregate data across implementation 1 v 1
+        """Aggregate data across implementation 1 s sp pygen models
 
         Args:
             aggregate: The aggregation to perform.
@@ -276,13 +317,15 @@ class Implementation1v1API(
             search_property: The text field to search in.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
+            sub_value: The sub value to filter on.
+            sub_value_prefix: The prefix of the sub value to filter on.
             value_1: The value 1 to filter on.
             value_1_prefix: The prefix of the value 1 to filter on.
             value_2: The value 2 to filter on.
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to 25.
+            limit: Maximum number of implementation 1 s sp pygen models to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write
                 your own filtering which will be ANDed with the filter above.
@@ -292,18 +335,20 @@ class Implementation1v1API(
 
         Examples:
 
-            Count implementation 1 v 1 in space `my_space`:
+            Count implementation 1 s sp pygen models in space `my_space`:
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> result = client.implementation_1_v_1.aggregate("count", space="my_space")
+                >>> result = client.implementation_1_s_sp_pygen_models.aggregate("count", space="my_space")
 
         """
 
-        filter_ = _create_implementation_1_v_1_filter(
+        filter_ = _create_implementation_1_s_sp_pygen_model_filter(
             self._view_id,
             main_value,
             main_value_prefix,
+            sub_value,
+            sub_value_prefix,
             value_1,
             value_1_prefix,
             value_2,
@@ -324,12 +369,16 @@ class Implementation1v1API(
 
     def histogram(
         self,
-        property: Implementation1v1Fields,
+        property: Implementation1sSpPygenModelsFields,
         interval: float,
         query: str | None = None,
-        search_property: Implementation1v1TextFields | SequenceNotStr[Implementation1v1TextFields] | None = None,
+        search_property: (
+            Implementation1sSpPygenModelsTextFields | SequenceNotStr[Implementation1sSpPygenModelsTextFields] | None
+        ) = None,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
         value_1_prefix: str | None = None,
         value_2: str | list[str] | None = None,
@@ -339,7 +388,7 @@ class Implementation1v1API(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for implementation 1 v 1
+        """Produces histograms for implementation 1 s sp pygen models
 
         Args:
             property: The property to use as the value in the histogram.
@@ -348,13 +397,15 @@ class Implementation1v1API(
             search_property: The text field to search in.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
+            sub_value: The sub value to filter on.
+            sub_value_prefix: The prefix of the sub value to filter on.
             value_1: The value 1 to filter on.
             value_1_prefix: The prefix of the value 1 to filter on.
             value_2: The value 2 to filter on.
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return.
+            limit: Maximum number of implementation 1 s sp pygen models to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -363,10 +414,12 @@ class Implementation1v1API(
             Bucketed histogram results.
 
         """
-        filter_ = _create_implementation_1_v_1_filter(
+        filter_ = _create_implementation_1_s_sp_pygen_model_filter(
             self._view_id,
             main_value,
             main_value_prefix,
+            sub_value,
+            sub_value_prefix,
             value_1,
             value_1_prefix,
             value_2,
@@ -384,9 +437,9 @@ class Implementation1v1API(
             filter_,
         )
 
-    def select(self) -> Implementation1v1Query:
-        """Start selecting from implementation 1 v 1."""
-        return Implementation1v1Query(self._client)
+    def select(self) -> Implementation1sSpPygenModelsQuery:
+        """Start selecting from implementation 1 s sp pygen models."""
+        return Implementation1sSpPygenModelsQuery(self._client)
 
     def _build(
         self,
@@ -414,6 +467,8 @@ class Implementation1v1API(
         chunk_size: int = DEFAULT_CHUNK_SIZE,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
         value_1_prefix: str | None = None,
         value_2: str | list[str] | None = None,
@@ -423,13 +478,15 @@ class Implementation1v1API(
         filter: dm.Filter | None = None,
         limit: int | None = None,
         cursors: dict[str, str | None] | None = None,
-    ) -> Iterator[Implementation1v1List]:
-        """Iterate over implementation 1 v 1
+    ) -> Iterator[Implementation1sSpPygenModelsList]:
+        """Iterate over implementation 1 s sp pygen models
 
         Args:
-            chunk_size: The number of implementation 1 v 1 to return in each iteration. Defaults to 100.
+            chunk_size: The number of implementation 1 s sp pygen models to return in each iteration. Defaults to 100.
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
+            sub_value: The sub value to filter on.
+            sub_value_prefix: The prefix of the sub value to filter on.
             value_1: The value 1 to filter on.
             value_1_prefix: The prefix of the value 1 to filter on.
             value_2: The value 2 to filter on.
@@ -438,58 +495,60 @@ class Implementation1v1API(
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of implementation 1 v 1 to return. Defaults to None, which will return all items.
+            limit: Maximum number of implementation 1 s sp pygen models to return. Defaults to None, which will return all items.
             cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
                 specific point. See example below for more details.
 
         Returns:
-            Iteration of implementation 1 v 1
+            Iteration of implementation 1 s sp pygen models
 
         Examples:
 
-            Iterate implementation 1 v 1 in chunks of 100 up to 2000 items:
+            Iterate implementation 1 s sp pygen models in chunks of 100 up to 2000 items:
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> for implementation_1_v_1_list in client.implementation_1_v_1.iterate(chunk_size=100, limit=2000):
-                ...     for implementation_1_v_1 in implementation_1_v_1_list:
-                ...         print(implementation_1_v_1.external_id)
+                >>> for implementation_1_s_sp_pygen_models in client.implementation_1_s_sp_pygen_models.iterate(chunk_size=100, limit=2000):
+                ...     for implementation_1_s_sp_pygen_model in implementation_1_s_sp_pygen_models:
+                ...         print(implementation_1_s_sp_pygen_model.external_id)
 
-            Iterate implementation 1 v 1 in chunks of 100 sorted by external_id in descending order:
+            Iterate implementation 1 s sp pygen models in chunks of 100 sorted by external_id in descending order:
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> for implementation_1_v_1_list in client.implementation_1_v_1.iterate(
+                >>> for implementation_1_s_sp_pygen_models in client.implementation_1_s_sp_pygen_models.iterate(
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
                 ... ):
-                ...     for implementation_1_v_1 in implementation_1_v_1_list:
-                ...         print(implementation_1_v_1.external_id)
+                ...     for implementation_1_s_sp_pygen_model in implementation_1_s_sp_pygen_models:
+                ...         print(implementation_1_s_sp_pygen_model.external_id)
 
-            Iterate implementation 1 v 1 in chunks of 100 and use cursors to resume the iteration:
+            Iterate implementation 1 s sp pygen models in chunks of 100 and use cursors to resume the iteration:
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> for first_iteration in client.implementation_1_v_1.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.implementation_1_s_sp_pygen_models.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for implementation_1_v_1_list in client.implementation_1_v_1.iterate(
+                >>> for implementation_1_s_sp_pygen_models in client.implementation_1_s_sp_pygen_models.iterate(
                 ...     chunk_size=100,
                 ...     limit=2000,
                 ...     cursors=first_iteration.cursors,
                 ... ):
-                ...     for implementation_1_v_1 in implementation_1_v_1_list:
-                ...         print(implementation_1_v_1.external_id)
+                ...     for implementation_1_s_sp_pygen_model in implementation_1_s_sp_pygen_models:
+                ...         print(implementation_1_s_sp_pygen_model.external_id)
 
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
         )
-        filter_ = _create_implementation_1_v_1_filter(
+        filter_ = _create_implementation_1_s_sp_pygen_model_filter(
             self._view_id,
             main_value,
             main_value_prefix,
+            sub_value,
+            sub_value_prefix,
             value_1,
             value_1_prefix,
             value_2,
@@ -504,6 +563,8 @@ class Implementation1v1API(
         self,
         main_value: str | list[str] | None = None,
         main_value_prefix: str | None = None,
+        sub_value: str | list[str] | None = None,
+        sub_value_prefix: str | None = None,
         value_1: str | list[str] | None = None,
         value_1_prefix: str | None = None,
         value_2: str | list[str] | None = None,
@@ -512,22 +573,24 @@ class Implementation1v1API(
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: Implementation1v1Fields | Sequence[Implementation1v1Fields] | None = None,
+        sort_by: Implementation1sSpPygenModelsFields | Sequence[Implementation1sSpPygenModelsFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-    ) -> Implementation1v1List:
-        """List/filter implementation 1 v 1
+    ) -> Implementation1sSpPygenModelsList:
+        """List/filter implementation 1 s sp pygen models
 
         Args:
             main_value: The main value to filter on.
             main_value_prefix: The prefix of the main value to filter on.
+            sub_value: The sub value to filter on.
+            sub_value_prefix: The prefix of the sub value to filter on.
             value_1: The value 1 to filter on.
             value_1_prefix: The prefix of the value 1 to filter on.
             value_2: The value 2 to filter on.
             value_2_prefix: The prefix of the value 2 to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of implementation 1 v 1 to return.
+            limit: Maximum number of implementation 1 s sp pygen models to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -538,21 +601,23 @@ class Implementation1v1API(
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
-            List of requested implementation 1 v 1
+            List of requested implementation 1 s sp pygen models
 
         Examples:
 
-            List implementation 1 v 1 and limit to 5:
+            List implementation 1 s sp pygen models and limit to 5:
 
                 >>> from omni_multi import OmniMultiClient
                 >>> client = OmniMultiClient()
-                >>> implementation_1_v_1_list = client.implementation_1_v_1.list(limit=5)
+                >>> implementation_1_s_sp_pygen_models = client.implementation_1_s_sp_pygen_models.list(limit=5)
 
         """
-        filter_ = _create_implementation_1_v_1_filter(
+        filter_ = _create_implementation_1_s_sp_pygen_model_filter(
             self._view_id,
             main_value,
             main_value_prefix,
+            sub_value,
+            sub_value_prefix,
             value_1,
             value_1_prefix,
             value_2,

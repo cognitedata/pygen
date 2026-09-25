@@ -1,0 +1,12 @@
+space: {{ pygen_models_space }}
+externalId: Naughty
+name: Naughty
+version: '1'
+properties:
+  type:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: Naughty
+      type: container
+    containerPropertyIdentifier: type
+    name: type

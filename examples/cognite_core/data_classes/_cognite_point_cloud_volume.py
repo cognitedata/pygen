@@ -110,16 +110,15 @@ class CognitePointCloudVolumeGraphQL(GraphQLCore, protected_namespaces=()):
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud volume.
         data_record: The data record of the Cognite point cloud volume node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
-            (property volume)
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        format_version: Version identifier for the encoding of the volume field.
         model_3d: Direct relation to Cognite3DModel instance
-        name: Name of the instance
+        name: The name of the instance.
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to revision information
-        tags: Text based labels for generic use, limited to 1000
-        volume: Relevant coordinates for the volume type, 9 floats in total, that defines the volume
+        tags: A list of tags for the instance. Max: 1000.
+        volume: Numerical representation of a 3D volume.
         volume_references: Unique volume metric hashes used to access the 3D specialized data storage
         volume_type: Type of volume (Cylinder or Box)
     """
@@ -174,16 +173,15 @@ class CognitePointCloudVolume(CogniteDescribableNode, protected_namespaces=()):
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud volume.
         data_record: The data record of the Cognite point cloud volume node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
-            (property volume)
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        format_version: Version identifier for the encoding of the volume field.
         model_3d: Direct relation to Cognite3DModel instance
-        name: Name of the instance
+        name: The name of the instance.
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to revision information
-        tags: Text based labels for generic use, limited to 1000
-        volume: Relevant coordinates for the volume type, 9 floats in total, that defines the volume
+        tags: A list of tags for the instance. Max: 1000.
+        volume: Numerical representation of a 3D volume.
         volume_references: Unique volume metric hashes used to access the 3D specialized data storage
         volume_type: Type of volume (Cylinder or Box)
     """
@@ -225,16 +223,15 @@ class CognitePointCloudVolumeWrite(CogniteDescribableNodeWrite, protected_namesp
         space: The space where the node is located.
         external_id: The external id of the Cognite point cloud volume.
         data_record: The data record of the Cognite point cloud volume node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        format_version: Specifies the version the 'volume' field is following. Volume definition is today 9 floats
-            (property volume)
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        format_version: Version identifier for the encoding of the volume field.
         model_3d: Direct relation to Cognite3DModel instance
-        name: Name of the instance
+        name: The name of the instance.
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to revision information
-        tags: Text based labels for generic use, limited to 1000
-        volume: Relevant coordinates for the volume type, 9 floats in total, that defines the volume
+        tags: A list of tags for the instance. Max: 1000.
+        volume: Numerical representation of a 3D volume.
         volume_references: Unique volume metric hashes used to access the 3D specialized data storage
         volume_type: Type of volume (Cylinder or Box)
     """

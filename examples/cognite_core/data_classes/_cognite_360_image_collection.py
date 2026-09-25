@@ -87,14 +87,14 @@ class Cognite360ImageCollectionGraphQL(GraphQLCore, protected_namespaces=()):
         space: The space where the node is located.
         external_id: The external id of the Cognite 360 image collection.
         data_record: The data record of the Cognite 360 image collection node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        model_3d: The model 3d field.
-        name: Name of the instance
-        published: The published field.
-        status: The status field.
-        tags: Text based labels for generic use, limited to 1000
-        type_: The type field.
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        model_3d: Direct relation to the model this revision belongs to.
+        name: The name of the instance.
+        published: Whether this revision is published and visible to end users.
+        status: Processing status of the revision. Valid values: Queued, Processing, Done, or Failed
+        tags: A list of tags for the instance. Max: 1000.
+        type_: The type of 3D model this is a revision of. Valid values: CAD, PointCloud, or Image360.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
@@ -144,14 +144,14 @@ class Cognite360ImageCollection(CogniteDescribableNode, Cognite3DRevision, prote
         space: The space where the node is located.
         external_id: The external id of the Cognite 360 image collection.
         data_record: The data record of the Cognite 360 image collection node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        model_3d: The model 3d field.
-        name: Name of the instance
-        published: The published field.
-        status: The status field.
-        tags: Text based labels for generic use, limited to 1000
-        type_: The type field.
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        model_3d: Direct relation to the model this revision belongs to.
+        name: The name of the instance.
+        published: Whether this revision is published and visible to end users.
+        status: Processing status of the revision. Valid values: Queued, Processing, Done, or Failed
+        tags: A list of tags for the instance. Max: 1000.
+        type_: The type of 3D model this is a revision of. Valid values: CAD, PointCloud, or Image360.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "Cognite360ImageCollection", "v1")
@@ -178,14 +178,14 @@ class Cognite360ImageCollectionWrite(CogniteDescribableNodeWrite, Cognite3DRevis
         space: The space where the node is located.
         external_id: The external id of the Cognite 360 image collection.
         data_record: The data record of the Cognite 360 image collection node.
-        aliases: Alternative names for the node
-        description: Description of the instance
-        model_3d: The model 3d field.
-        name: Name of the instance
-        published: The published field.
-        status: The status field.
-        tags: Text based labels for generic use, limited to 1000
-        type_: The type field.
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
+        model_3d: Direct relation to the model this revision belongs to.
+        name: The name of the instance.
+        published: Whether this revision is published and visible to end users.
+        status: Processing status of the revision. Valid values: Queued, Processing, Done, or Failed
+        tags: A list of tags for the instance. Max: 1000.
+        type_: The type of 3D model this is a revision of. Valid values: CAD, PointCloud, or Image360.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

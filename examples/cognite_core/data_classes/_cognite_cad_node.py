@@ -99,16 +99,16 @@ class CogniteCADNodeGraphQL(GraphQLCore, protected_namespaces=()):
         space: The space where the node is located.
         external_id: The external id of the Cognite cad node.
         data_record: The data record of the Cognite cad node node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         cad_node_reference: Reference to a node within a CAD model from the 3D API
-        description: Description of the instance
+        description: The description of the instance.
         model_3d: Direct relation to Cognite3DModel
-        name: Name of the instance
+        name: The name of the instance.
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to instances of Cognite3DRevision which this CogniteCADNode exists in.
         sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications
             to know how many nodes exists below this node in the hierarchy
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
         tree_indexes: List of tree indexes in the same order as revisions. Used by Reveal and similar applications to
             map from CogniteCADNode to tree index
     """
@@ -162,16 +162,16 @@ class CogniteCADNode(CogniteDescribableNode, protected_namespaces=()):
         space: The space where the node is located.
         external_id: The external id of the Cognite cad node.
         data_record: The data record of the Cognite cad node node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         cad_node_reference: Reference to a node within a CAD model from the 3D API
-        description: Description of the instance
+        description: The description of the instance.
         model_3d: Direct relation to Cognite3DModel
-        name: Name of the instance
+        name: The name of the instance.
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to instances of Cognite3DRevision which this CogniteCADNode exists in.
         sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications
             to know how many nodes exists below this node in the hierarchy
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
         tree_indexes: List of tree indexes in the same order as revisions. Used by Reveal and similar applications to
             map from CogniteCADNode to tree index
     """
@@ -212,16 +212,16 @@ class CogniteCADNodeWrite(CogniteDescribableNodeWrite, protected_namespaces=()):
         space: The space where the node is located.
         external_id: The external id of the Cognite cad node.
         data_record: The data record of the Cognite cad node node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         cad_node_reference: Reference to a node within a CAD model from the 3D API
-        description: Description of the instance
+        description: The description of the instance.
         model_3d: Direct relation to Cognite3DModel
-        name: Name of the instance
+        name: The name of the instance.
         object_3d: Direct relation to object3D grouping for this node
         revisions: List of direct relations to instances of Cognite3DRevision which this CogniteCADNode exists in.
         sub_tree_sizes: List of subtree sizes in the same order as revisions. Used by Reveal and similar applications
             to know how many nodes exists below this node in the hierarchy
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
         tree_indexes: List of tree indexes in the same order as revisions. Used by Reveal and similar applications to
             map from CogniteCADNode to tree index
     """

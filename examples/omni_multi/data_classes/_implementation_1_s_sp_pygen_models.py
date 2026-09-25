@@ -33,46 +33,50 @@ from omni_multi.data_classes._core import (
     StringFilter,
     ViewPropertyId,
 )
+from omni_multi.data_classes._sub_interface import SubInterface, SubInterfaceWrite
 
 __all__ = [
-    "Implementation1v1",
-    "Implementation1v1Write",
-    "Implementation1v1List",
-    "Implementation1v1WriteList",
-    "Implementation1v1Fields",
-    "Implementation1v1TextFields",
-    "Implementation1v1GraphQL",
+    "Implementation1sSpPygenModels",
+    "Implementation1sSpPygenModelsWrite",
+    "Implementation1sSpPygenModelsList",
+    "Implementation1sSpPygenModelsWriteList",
+    "Implementation1sSpPygenModelsFields",
+    "Implementation1sSpPygenModelsTextFields",
+    "Implementation1sSpPygenModelsGraphQL",
 ]
 
 
-Implementation1v1TextFields = Literal["external_id", "main_value", "value_1", "value_2"]
-Implementation1v1Fields = Literal["external_id", "main_value", "value_1", "value_2"]
+Implementation1sSpPygenModelsTextFields = Literal["external_id", "main_value", "sub_value", "value_1", "value_2"]
+Implementation1sSpPygenModelsFields = Literal["external_id", "main_value", "sub_value", "value_1", "value_2"]
 
-_IMPLEMENTATION1V1_PROPERTIES_BY_FIELD = {
+_IMPLEMENTATION1SSPPYGENMODELS_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
     "main_value": "mainValue",
+    "sub_value": "subValue",
     "value_1": "value1",
     "value_2": "value2",
 }
 
 
-class Implementation1v1GraphQL(GraphQLCore):
-    """This represents the reading version of implementation 1 v 1, used
+class Implementation1sSpPygenModelsGraphQL(GraphQLCore):
+    """This represents the reading version of implementation 1 s sp pygen model, used
     when data is retrieved from CDF using GraphQL.
 
     It is used when retrieving data from CDF using GraphQL.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the implementation 1 v 1.
-        data_record: The data record of the implementation 1 v 1 node.
+        external_id: The external id of the implementation 1 s sp pygen model.
+        data_record: The data record of the implementation 1 s sp pygen model node.
         main_value: The main value field.
+        sub_value: The sub value field.
         value_1: The value 1 field.
         value_2: The value 2 field.
     """
 
-    view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models-other", "Implementation1", "1")
+    view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
     main_value: Optional[str] = Field(None, alias="mainValue")
+    sub_value: Optional[str] = Field(None, alias="subValue")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: Optional[str] = Field(None, alias="value2")
 
@@ -87,93 +91,96 @@ class Implementation1v1GraphQL(GraphQLCore):
             )
         return values
 
-    def as_read(self) -> Implementation1v1:
-        """Convert this GraphQL format of implementation 1 v 1 to the reading format."""
-        return Implementation1v1.model_validate(as_read_args(self))
+    def as_read(self) -> Implementation1sSpPygenModels:
+        """Convert this GraphQL format of implementation 1 s sp pygen model to the reading format."""
+        return Implementation1sSpPygenModels.model_validate(as_read_args(self))
 
-    def as_write(self) -> Implementation1v1Write:
-        """Convert this GraphQL format of implementation 1 v 1 to the writing format."""
-        return Implementation1v1Write.model_validate(as_write_args(self))
+    def as_write(self) -> Implementation1sSpPygenModelsWrite:
+        """Convert this GraphQL format of implementation 1 s sp pygen model to the writing format."""
+        return Implementation1sSpPygenModelsWrite.model_validate(as_write_args(self))
 
 
-class Implementation1v1(DomainModel):
-    """This represents the reading version of implementation 1 v 1.
+class Implementation1sSpPygenModels(SubInterface):
+    """This represents the reading version of implementation 1 s sp pygen model.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the implementation 1 v 1.
-        data_record: The data record of the implementation 1 v 1 node.
+        external_id: The external id of the implementation 1 s sp pygen model.
+        data_record: The data record of the implementation 1 s sp pygen model node.
         main_value: The main value field.
+        sub_value: The sub value field.
         value_1: The value 1 field.
         value_2: The value 2 field.
     """
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models-other", "Implementation1", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
 
-    space: str
-    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference("pygen-models", "Implementation1")
-    main_value: Optional[str] = Field(None, alias="mainValue")
+    node_type: Union[dm.DirectRelationReference, None] = dm.DirectRelationReference(
+        "sp_pygen_models", "Implementation1"
+    )
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
-    def as_write(self) -> Implementation1v1Write:
-        """Convert this read version of implementation 1 v 1 to the writing version."""
-        return Implementation1v1Write.model_validate(as_write_args(self))
+    def as_write(self) -> Implementation1sSpPygenModelsWrite:
+        """Convert this read version of implementation 1 s sp pygen model to the writing version."""
+        return Implementation1sSpPygenModelsWrite.model_validate(as_write_args(self))
 
 
-class Implementation1v1Write(DomainModelWrite):
-    """This represents the writing version of implementation 1 v 1.
+class Implementation1sSpPygenModelsWrite(SubInterfaceWrite):
+    """This represents the writing version of implementation 1 s sp pygen model.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the implementation 1 v 1.
-        data_record: The data record of the implementation 1 v 1 node.
+        external_id: The external id of the implementation 1 s sp pygen model.
+        data_record: The data record of the implementation 1 s sp pygen model node.
         main_value: The main value field.
+        sub_value: The sub value field.
         value_1: The value 1 field.
         value_2: The value 2 field.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (
         "main_value",
+        "sub_value",
         "value_1",
         "value_2",
     )
 
-    _view_id: ClassVar[dm.ViewId] = dm.ViewId("pygen-models-other", "Implementation1", "1")
+    _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Implementation1", "1")
 
-    space: str
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = dm.DirectRelationReference(
-        "pygen-models", "Implementation1"
+        "sp_pygen_models", "Implementation1"
     )
-    main_value: Optional[str] = Field(None, alias="mainValue")
     value_1: Optional[str] = Field(None, alias="value1")
     value_2: str = Field(alias="value2")
 
 
-class Implementation1v1List(DomainModelList[Implementation1v1]):
-    """List of implementation 1 v 1 in the read version."""
+class Implementation1sSpPygenModelsList(DomainModelList[Implementation1sSpPygenModels]):
+    """List of implementation 1 s sp pygen models in the read version."""
 
-    _INSTANCE = Implementation1v1
+    _INSTANCE = Implementation1sSpPygenModels
 
-    def as_write(self) -> Implementation1v1WriteList:
-        """Convert these read versions of implementation 1 v 1 to the writing versions."""
-        return Implementation1v1WriteList([node.as_write() for node in self.data])
-
-
-class Implementation1v1WriteList(DomainModelWriteList[Implementation1v1Write]):
-    """List of implementation 1 v 1 in the writing version."""
-
-    _INSTANCE = Implementation1v1Write
+    def as_write(self) -> Implementation1sSpPygenModelsWriteList:
+        """Convert these read versions of implementation 1 s sp pygen model to the writing versions."""
+        return Implementation1sSpPygenModelsWriteList([node.as_write() for node in self.data])
 
 
-def _create_implementation_1_v_1_filter(
+class Implementation1sSpPygenModelsWriteList(DomainModelWriteList[Implementation1sSpPygenModelsWrite]):
+    """List of implementation 1 s sp pygen models in the writing version."""
+
+    _INSTANCE = Implementation1sSpPygenModelsWrite
+
+
+def _create_implementation_1_s_sp_pygen_model_filter(
     view_id: dm.ViewId,
     main_value: str | list[str] | None = None,
     main_value_prefix: str | None = None,
+    sub_value: str | list[str] | None = None,
+    sub_value_prefix: str | None = None,
     value_1: str | list[str] | None = None,
     value_1_prefix: str | None = None,
     value_2: str | list[str] | None = None,
@@ -189,6 +196,12 @@ def _create_implementation_1_v_1_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("mainValue"), values=main_value))
     if main_value_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("mainValue"), value=main_value_prefix))
+    if isinstance(sub_value, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("subValue"), value=sub_value))
+    if sub_value and isinstance(sub_value, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("subValue"), values=sub_value))
+    if sub_value_prefix is not None:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("subValue"), value=sub_value_prefix))
     if isinstance(value_1, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("value1"), value=value_1))
     if value_1 and isinstance(value_1, list):
@@ -212,10 +225,10 @@ def _create_implementation_1_v_1_filter(
     return dm.filters.And(*filters) if filters else None
 
 
-class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1List]):
-    _view_id = Implementation1v1._view_id
-    _result_cls = Implementation1v1
-    _result_list_cls_end = Implementation1v1List
+class _Implementation1sSpPygenModelsQuery(NodeQueryCore[T_DomainModelList, Implementation1sSpPygenModelsList]):
+    _view_id = Implementation1sSpPygenModels._view_id
+    _result_cls = Implementation1sSpPygenModels
+    _result_list_cls_end = Implementation1sSpPygenModelsList
 
     def __init__(
         self,
@@ -246,6 +259,7 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.main_value = StringFilter(self, self._view_id.as_property_ref("mainValue"))
+        self.sub_value = StringFilter(self, self._view_id.as_property_ref("subValue"))
         self.value_1 = StringFilter(self, self._view_id.as_property_ref("value1"))
         self.value_2 = StringFilter(self, self._view_id.as_property_ref("value2"))
         self._filter_classes.extend(
@@ -253,15 +267,18 @@ class _Implementation1v1Query(NodeQueryCore[T_DomainModelList, Implementation1v1
                 self.space,
                 self.external_id,
                 self.main_value,
+                self.sub_value,
                 self.value_1,
                 self.value_2,
             ]
         )
 
-    def list_implementation_1_v_1(self, limit: int = DEFAULT_QUERY_LIMIT) -> Implementation1v1List:
+    def list_implementation_1_s_sp_pygen_model(
+        self, limit: int = DEFAULT_QUERY_LIMIT
+    ) -> Implementation1sSpPygenModelsList:
         return self._list(limit=limit)
 
 
-class Implementation1v1Query(_Implementation1v1Query[Implementation1v1List]):
+class Implementation1sSpPygenModelsQuery(_Implementation1sSpPygenModelsQuery[Implementation1sSpPygenModelsList]):
     def __init__(self, client: CogniteClient):
-        super().__init__(set(), [], client, Implementation1v1List)
+        super().__init__(set(), [], client, Implementation1sSpPygenModelsList)

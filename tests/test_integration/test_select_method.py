@@ -230,14 +230,14 @@ def test_select_earliest_omni(omni_client: OmniClient, primitive_required_list) 
 
 def test_select_sort_ascending(omni_client: OmniClient, primitive_required_list: dc.PrimitiveRequiredList) -> None:
     sorted_list = sorted(primitive_required_list, key=lambda x: x.timestamp)
-    result = omni_client.primitive_required.select().timestamp.sort_ascending().list_full()
+    result = omni_client.primitive_required.select().timestamp.sort_ascending().list_full(limit=-1)
 
     assert [item.external_id for item in result] == [item.external_id for item in sorted_list]
 
 
 def test_select_sort_descending(omni_client: OmniClient, primitive_required_list: dc.PrimitiveRequiredList) -> None:
     sorted_list = sorted(primitive_required_list, key=lambda x: x.timestamp, reverse=True)
-    result = omni_client.primitive_required.select().timestamp.sort_descending().list_full()
+    result = omni_client.primitive_required.select().timestamp.sort_descending().list_full(limit=-1)
 
     assert [item.external_id for item in result] == [item.external_id for item in sorted_list]
 

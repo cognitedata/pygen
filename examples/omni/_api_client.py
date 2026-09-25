@@ -28,6 +28,7 @@ from omni._api import (
     Implementation1NonWriteableAPI,
     Implementation2API,
     MainInterfaceAPI,
+    NaughtyAPI,
     PrimitiveNullableAPI,
     PrimitiveNullableListedAPI,
     PrimitiveRequiredAPI,
@@ -85,6 +86,7 @@ class OmniClient:
         self.implementation_1_non_writeable = Implementation1NonWriteableAPI(client)
         self.implementation_2 = Implementation2API(client)
         self.main_interface = MainInterfaceAPI(client)
+        self.naughty = NaughtyAPI(client)
         self.primitive_nullable = PrimitiveNullableAPI(client)
         self.primitive_nullable_listed = PrimitiveNullableListedAPI(client)
         self.primitive_required = PrimitiveRequiredAPI(client)
@@ -273,6 +275,7 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.implementation_1_non_writeable<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.implementation_2<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.main_interface<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.naughty<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.primitive_nullable<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.primitive_nullable_listed<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.primitive_required<br />

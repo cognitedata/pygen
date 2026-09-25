@@ -5,6 +5,10 @@
   metadata:
     source: PygenMockGenerator
   dataSetId: 5472779523460196
+  id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  uploaded: false
 - externalId: file_william
   name: file_william
   source: sp_omni_instances
@@ -12,6 +16,10 @@
   metadata:
     source: PygenMockGenerator
   dataSetId: 5472779523460196
+  id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  uploaded: false
 - externalId: file_christopher
   name: file_christopher
   source: sp_omni_instances
@@ -19,6 +27,10 @@
   metadata:
     source: PygenMockGenerator
   dataSetId: 5472779523460196
+  id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  uploaded: false
 - externalId: file_sarah
   name: file_sarah
   source: sp_omni_instances
@@ -26,6 +38,10 @@
   metadata:
     source: PygenMockGenerator
   dataSetId: 5472779523460196
+  id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  uploaded: false
 - externalId: file_jacob
   name: file_jacob
   source: sp_omni_instances
@@ -33,6 +49,10 @@
   metadata:
     source: PygenMockGenerator
   dataSetId: 5472779523460196
+  id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  uploaded: false
 - externalId: file_john
   name: file_john
   source: sp_omni_instances
@@ -40,3 +60,7 @@
   metadata:
     source: PygenMockGenerator
   dataSetId: 5472779523460196
+  id: -1
+  createdTime: 0
+  lastUpdatedTime: 1
+  uploaded: false

@@ -603,6 +603,7 @@ _GRAPHQL_DATA_CLASS_BY_DATA_MODEL_BY_TYPE: dict[dm.DataModelId, dict[str, type[G
         "CogniteSchedulable": data_classes.CogniteSchedulableGraphQL,
         "CogniteSourceSystem": data_classes.CogniteSourceSystemGraphQL,
         "CogniteSourceable": data_classes.CogniteSourceableNodeGraphQL,
+        "CogniteStateSet": data_classes.CogniteStateSetGraphQL,
         "CogniteTimeSeries": data_classes.CogniteTimeSeriesGraphQL,
         "CogniteUnit": data_classes.CogniteUnitGraphQL,
         "CogniteVisualizable": data_classes.CogniteVisualizableGraphQL,

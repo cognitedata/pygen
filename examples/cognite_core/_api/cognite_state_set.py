@@ -26,38 +26,32 @@ from cognite_core.data_classes._core import (
     QueryUnpacker,
     ViewPropertyId,
 )
-from cognite_core.data_classes._cognite_time_series import (
-    CogniteTimeSeriesQuery,
-    _COGNITETIMESERIES_PROPERTIES_BY_FIELD,
-    _create_cognite_time_series_filter,
+from cognite_core.data_classes._cognite_state_set import (
+    CogniteStateSetQuery,
+    _COGNITESTATESET_PROPERTIES_BY_FIELD,
+    _create_cognite_state_set_filter,
 )
 from cognite_core.data_classes import (
     DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
-    CogniteTimeSeries,
-    CogniteTimeSeriesWrite,
-    CogniteTimeSeriesFields,
-    CogniteTimeSeriesList,
-    CogniteTimeSeriesWriteList,
-    CogniteTimeSeriesTextFields,
-    CogniteActivity,
-    CogniteAsset,
-    CogniteEquipment,
+    CogniteStateSet,
+    CogniteStateSetWrite,
+    CogniteStateSetFields,
+    CogniteStateSetList,
+    CogniteStateSetWriteList,
+    CogniteStateSetTextFields,
     CogniteSourceSystem,
-    CogniteUnit,
 )
 
 
-class CogniteTimeSeriesAPI(
-    NodeAPI[CogniteTimeSeries, CogniteTimeSeriesWrite, CogniteTimeSeriesList, CogniteTimeSeriesWriteList]
-):
-    _view_id = dm.ViewId("cdf_cdm", "CogniteTimeSeries", "v1")
-    _properties_by_field: ClassVar[dict[str, str]] = _COGNITETIMESERIES_PROPERTIES_BY_FIELD
-    _class_type = CogniteTimeSeries
-    _class_list = CogniteTimeSeriesList
-    _class_write_list = CogniteTimeSeriesWriteList
+class CogniteStateSetAPI(NodeAPI[CogniteStateSet, CogniteStateSetWrite, CogniteStateSetList, CogniteStateSetWriteList]):
+    _view_id = dm.ViewId("cdf_cdm", "CogniteStateSet", "v1")
+    _properties_by_field: ClassVar[dict[str, str]] = _COGNITESTATESET_PROPERTIES_BY_FIELD
+    _class_type = CogniteStateSet
+    _class_list = CogniteStateSetList
+    _class_write_list = CogniteStateSetWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
@@ -68,7 +62,7 @@ class CogniteTimeSeriesAPI(
         external_id: str | dm.NodeId | tuple[str, str],
         space: str = DEFAULT_INSTANCE_SPACE,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-    ) -> CogniteTimeSeries | None: ...
+    ) -> CogniteStateSet | None: ...
 
     @overload
     def retrieve(
@@ -76,34 +70,34 @@ class CogniteTimeSeriesAPI(
         external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-    ) -> CogniteTimeSeriesList: ...
+    ) -> CogniteStateSetList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-    ) -> CogniteTimeSeries | CogniteTimeSeriesList | None:
-        """Retrieve one or more Cognite time series by id(s).
+    ) -> CogniteStateSet | CogniteStateSetList | None:
+        """Retrieve one or more Cognite state sets by id(s).
 
         Args:
-            external_id: External id or list of external ids of the Cognite time series.
-            space: The space where all the Cognite time series are located.
-            retrieve_connections: Whether to retrieve `activities`, `assets`, `equipment`, `source` and `unit` for the
-            Cognite time series. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
-            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            external_id: External id or list of external ids of the Cognite state sets.
+            space: The space where all the Cognite state sets are located.
+            retrieve_connections: Whether to retrieve `source` for the Cognite state sets. Defaults to 'skip'.'skip'
+            will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items,
+            and 'full' will retrieve the full connected items.
 
         Returns:
-            The requested Cognite time series.
+            The requested Cognite state sets.
 
         Examples:
 
-            Retrieve cognite_time_series by id:
+            Retrieve cognite_state_set by id:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_time_series = client.cognite_time_series.retrieve(
-                ...     "my_cognite_time_series"
+                >>> cognite_state_set = client.cognite_state_set.retrieve(
+                ...     "my_cognite_state_set"
                 ... )
 
         """
@@ -116,26 +110,9 @@ class CogniteTimeSeriesAPI(
     def search(
         self,
         query: str,
-        properties: CogniteTimeSeriesTextFields | SequenceNotStr[CogniteTimeSeriesTextFields] | None = None,
-        assets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        properties: CogniteStateSetTextFields | SequenceNotStr[CogniteStateSetTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        is_step: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         source: (
@@ -154,47 +131,25 @@ class CogniteTimeSeriesAPI(
         source_created_user_prefix: str | None = None,
         source_id: str | list[str] | None = None,
         source_id_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
         min_source_updated_time: datetime.datetime | None = None,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        state_set: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
-        unit: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: CogniteTimeSeriesFields | SequenceNotStr[CogniteTimeSeriesFields] | None = None,
+        sort_by: CogniteStateSetFields | SequenceNotStr[CogniteStateSetFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-    ) -> CogniteTimeSeriesList:
-        """Search Cognite time series
+    ) -> CogniteStateSetList:
+        """Search Cognite state sets
 
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            assets: The asset to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment: The equipment to filter on.
-            is_step: The is step to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             source: The source to filter on.
@@ -206,18 +161,13 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix: The prefix of the source created user to filter on.
             source_id: The source id to filter on.
             source_id_prefix: The prefix of the source id to filter on.
-            source_unit: The source unit to filter on.
-            source_unit_prefix: The prefix of the source unit to filter on.
             min_source_updated_time: The minimum value of the source updated time to filter on.
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            state_set: The state set to filter on.
-            type_: The type to filter on.
-            unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite time series to return. Defaults to 25.
+            limit: Maximum number of Cognite state sets to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -228,26 +178,23 @@ class CogniteTimeSeriesAPI(
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
-            Search results Cognite time series matching the query.
+            Search results Cognite state sets matching the query.
 
         Examples:
 
-           Search for 'my_cognite_time_series' in all text properties:
+           Search for 'my_cognite_state_set' in all text properties:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_time_series_list = client.cognite_time_series.search(
-                ...     'my_cognite_time_series'
+                >>> cognite_state_sets = client.cognite_state_set.search(
+                ...     'my_cognite_state_set'
                 ... )
 
         """
-        filter_ = _create_cognite_time_series_filter(
+        filter_ = _create_cognite_state_set_filter(
             self._view_id,
-            assets,
             description,
             description_prefix,
-            equipment,
-            is_step,
             name,
             name_prefix,
             source,
@@ -259,15 +206,10 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix,
             source_id,
             source_id_prefix,
-            source_unit,
-            source_unit_prefix,
             min_source_updated_time,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            state_set,
-            type_,
-            unit,
             external_id_prefix,
             space,
             filter,
@@ -287,28 +229,11 @@ class CogniteTimeSeriesAPI(
         self,
         aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
-        property: CogniteTimeSeriesFields | SequenceNotStr[CogniteTimeSeriesFields] | None = None,
+        property: CogniteStateSetFields | SequenceNotStr[CogniteStateSetFields] | None = None,
         query: str | None = None,
-        search_property: CogniteTimeSeriesTextFields | SequenceNotStr[CogniteTimeSeriesTextFields] | None = None,
-        assets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        search_property: CogniteStateSetTextFields | SequenceNotStr[CogniteStateSetTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        is_step: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         source: (
@@ -327,29 +252,10 @@ class CogniteTimeSeriesAPI(
         source_created_user_prefix: str | None = None,
         source_id: str | list[str] | None = None,
         source_id_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
         min_source_updated_time: datetime.datetime | None = None,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        state_set: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
-        unit: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -361,28 +267,11 @@ class CogniteTimeSeriesAPI(
         self,
         aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: None = None,
-        property: CogniteTimeSeriesFields | SequenceNotStr[CogniteTimeSeriesFields] | None = None,
+        property: CogniteStateSetFields | SequenceNotStr[CogniteStateSetFields] | None = None,
         query: str | None = None,
-        search_property: CogniteTimeSeriesTextFields | SequenceNotStr[CogniteTimeSeriesTextFields] | None = None,
-        assets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        search_property: CogniteStateSetTextFields | SequenceNotStr[CogniteStateSetTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        is_step: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         source: (
@@ -401,29 +290,10 @@ class CogniteTimeSeriesAPI(
         source_created_user_prefix: str | None = None,
         source_id: str | list[str] | None = None,
         source_id_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
         min_source_updated_time: datetime.datetime | None = None,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        state_set: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
-        unit: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -438,29 +308,12 @@ class CogniteTimeSeriesAPI(
             | dm.aggregations.MetricAggregation
             | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        group_by: CogniteTimeSeriesFields | SequenceNotStr[CogniteTimeSeriesFields],
-        property: CogniteTimeSeriesFields | SequenceNotStr[CogniteTimeSeriesFields] | None = None,
+        group_by: CogniteStateSetFields | SequenceNotStr[CogniteStateSetFields],
+        property: CogniteStateSetFields | SequenceNotStr[CogniteStateSetFields] | None = None,
         query: str | None = None,
-        search_property: CogniteTimeSeriesTextFields | SequenceNotStr[CogniteTimeSeriesTextFields] | None = None,
-        assets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        search_property: CogniteStateSetTextFields | SequenceNotStr[CogniteStateSetTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        is_step: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         source: (
@@ -479,29 +332,10 @@ class CogniteTimeSeriesAPI(
         source_created_user_prefix: str | None = None,
         source_id: str | list[str] | None = None,
         source_id_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
         min_source_updated_time: datetime.datetime | None = None,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        state_set: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
-        unit: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -515,29 +349,12 @@ class CogniteTimeSeriesAPI(
             | dm.aggregations.MetricAggregation
             | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        group_by: CogniteTimeSeriesFields | SequenceNotStr[CogniteTimeSeriesFields] | None = None,
-        property: CogniteTimeSeriesFields | SequenceNotStr[CogniteTimeSeriesFields] | None = None,
+        group_by: CogniteStateSetFields | SequenceNotStr[CogniteStateSetFields] | None = None,
+        property: CogniteStateSetFields | SequenceNotStr[CogniteStateSetFields] | None = None,
         query: str | None = None,
-        search_property: CogniteTimeSeriesTextFields | SequenceNotStr[CogniteTimeSeriesTextFields] | None = None,
-        assets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        search_property: CogniteStateSetTextFields | SequenceNotStr[CogniteStateSetTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        is_step: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         source: (
@@ -556,29 +373,10 @@ class CogniteTimeSeriesAPI(
         source_created_user_prefix: str | None = None,
         source_id: str | list[str] | None = None,
         source_id_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
         min_source_updated_time: datetime.datetime | None = None,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        state_set: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
-        unit: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -588,7 +386,7 @@ class CogniteTimeSeriesAPI(
         | list[dm.aggregations.AggregatedNumberedValue]
         | InstanceAggregationResultList
     ):
-        """Aggregate data across Cognite time series
+        """Aggregate data across Cognite state sets
 
         Args:
             aggregate: The aggregation to perform.
@@ -596,11 +394,8 @@ class CogniteTimeSeriesAPI(
             property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            assets: The asset to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment: The equipment to filter on.
-            is_step: The is step to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             source: The source to filter on.
@@ -612,18 +407,13 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix: The prefix of the source created user to filter on.
             source_id: The source id to filter on.
             source_id_prefix: The prefix of the source id to filter on.
-            source_unit: The source unit to filter on.
-            source_unit_prefix: The prefix of the source unit to filter on.
             min_source_updated_time: The minimum value of the source updated time to filter on.
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            state_set: The state set to filter on.
-            type_: The type to filter on.
-            unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite time series to return. Defaults to 25.
+            limit: Maximum number of Cognite state sets to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write
                 your own filtering which will be ANDed with the filter above.
@@ -633,21 +423,18 @@ class CogniteTimeSeriesAPI(
 
         Examples:
 
-            Count Cognite time series in space `my_space`:
+            Count Cognite state sets in space `my_space`:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> result = client.cognite_time_series.aggregate("count", space="my_space")
+                >>> result = client.cognite_state_set.aggregate("count", space="my_space")
 
         """
 
-        filter_ = _create_cognite_time_series_filter(
+        filter_ = _create_cognite_state_set_filter(
             self._view_id,
-            assets,
             description,
             description_prefix,
-            equipment,
-            is_step,
             name,
             name_prefix,
             source,
@@ -659,15 +446,10 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix,
             source_id,
             source_id_prefix,
-            source_unit,
-            source_unit_prefix,
             min_source_updated_time,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            state_set,
-            type_,
-            unit,
             external_id_prefix,
             space,
             filter,
@@ -684,29 +466,12 @@ class CogniteTimeSeriesAPI(
 
     def histogram(
         self,
-        property: CogniteTimeSeriesFields,
+        property: CogniteStateSetFields,
         interval: float,
         query: str | None = None,
-        search_property: CogniteTimeSeriesTextFields | SequenceNotStr[CogniteTimeSeriesTextFields] | None = None,
-        assets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
+        search_property: CogniteStateSetTextFields | SequenceNotStr[CogniteStateSetTextFields] | None = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        is_step: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         source: (
@@ -725,46 +490,24 @@ class CogniteTimeSeriesAPI(
         source_created_user_prefix: str | None = None,
         source_id: str | list[str] | None = None,
         source_id_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
         min_source_updated_time: datetime.datetime | None = None,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        state_set: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
-        unit: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for Cognite time series
+        """Produces histograms for Cognite state sets
 
         Args:
             property: The property to use as the value in the histogram.
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            assets: The asset to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment: The equipment to filter on.
-            is_step: The is step to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             source: The source to filter on.
@@ -776,18 +519,13 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix: The prefix of the source created user to filter on.
             source_id: The source id to filter on.
             source_id_prefix: The prefix of the source id to filter on.
-            source_unit: The source unit to filter on.
-            source_unit_prefix: The prefix of the source unit to filter on.
             min_source_updated_time: The minimum value of the source updated time to filter on.
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            state_set: The state set to filter on.
-            type_: The type to filter on.
-            unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite time series to return.
+            limit: Maximum number of Cognite state sets to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -796,13 +534,10 @@ class CogniteTimeSeriesAPI(
             Bucketed histogram results.
 
         """
-        filter_ = _create_cognite_time_series_filter(
+        filter_ = _create_cognite_state_set_filter(
             self._view_id,
-            assets,
             description,
             description_prefix,
-            equipment,
-            is_step,
             name,
             name_prefix,
             source,
@@ -814,15 +549,10 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix,
             source_id,
             source_id_prefix,
-            source_unit,
-            source_unit_prefix,
             min_source_updated_time,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            state_set,
-            type_,
-            unit,
             external_id_prefix,
             space,
             filter,
@@ -836,9 +566,9 @@ class CogniteTimeSeriesAPI(
             filter_,
         )
 
-    def select(self) -> CogniteTimeSeriesQuery:
-        """Start selecting from Cognite time series."""
-        return CogniteTimeSeriesQuery(self._client)
+    def select(self) -> CogniteStateSetQuery:
+        """Start selecting from Cognite state sets."""
+        return CogniteStateSetQuery(self._client)
 
     def _build(
         self,
@@ -861,39 +591,9 @@ class CogniteTimeSeriesAPI(
         )
         if retrieve_connections == "full":
             builder.extend(
-                factory.from_reverse_relation(
-                    CogniteActivity._view_id,
-                    through=dm.PropertyId(dm.ViewId("cdf_cdm", "CogniteActivity", "v1"), "timeSeries"),
-                    connection_type="reverse-list",
-                    connection_property=ViewPropertyId(self._view_id, "activities"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteAsset._view_id,
-                    ViewPropertyId(self._view_id, "assets"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteEquipment._view_id,
-                    ViewPropertyId(self._view_id, "equipment"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
                 factory.from_direct_relation(
                     CogniteSourceSystem._view_id,
                     ViewPropertyId(self._view_id, "source"),
-                    has_container_fields=True,
-                )
-            )
-            builder.extend(
-                factory.from_direct_relation(
-                    CogniteUnit._view_id,
-                    ViewPropertyId(self._view_id, "unit"),
                     has_container_fields=True,
                 )
             )
@@ -902,25 +602,8 @@ class CogniteTimeSeriesAPI(
     def iterate(
         self,
         chunk_size: int = DEFAULT_CHUNK_SIZE,
-        assets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        is_step: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         source: (
@@ -939,45 +622,23 @@ class CogniteTimeSeriesAPI(
         source_created_user_prefix: str | None = None,
         source_id: str | list[str] | None = None,
         source_id_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
         min_source_updated_time: datetime.datetime | None = None,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        state_set: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
-        unit: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
         cursors: dict[str, str | None] | None = None,
-    ) -> Iterator[CogniteTimeSeriesList]:
-        """Iterate over Cognite time series
+    ) -> Iterator[CogniteStateSetList]:
+        """Iterate over Cognite state sets
 
         Args:
-            chunk_size: The number of Cognite time series to return in each iteration. Defaults to 100.
-            assets: The asset to filter on.
+            chunk_size: The number of Cognite state sets to return in each iteration. Defaults to 100.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment: The equipment to filter on.
-            is_step: The is step to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             source: The source to filter on.
@@ -989,77 +650,69 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix: The prefix of the source created user to filter on.
             source_id: The source id to filter on.
             source_id_prefix: The prefix of the source id to filter on.
-            source_unit: The source unit to filter on.
-            source_unit_prefix: The prefix of the source unit to filter on.
             min_source_updated_time: The minimum value of the source updated time to filter on.
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            state_set: The state set to filter on.
-            type_: The type to filter on.
-            unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            retrieve_connections: Whether to retrieve `activities`, `assets`, `equipment`, `source` and `unit` for the
-            Cognite time series. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
-            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
-            limit: Maximum number of Cognite time series to return. Defaults to None, which will return all items.
+            retrieve_connections: Whether to retrieve `source` for the Cognite state sets. Defaults to 'skip'.'skip'
+            will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items,
+            and 'full' will retrieve the full connected items.
+            limit: Maximum number of Cognite state sets to return. Defaults to None, which will return all items.
             cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
                 specific point. See example below for more details.
 
         Returns:
-            Iteration of Cognite time series
+            Iteration of Cognite state sets
 
         Examples:
 
-            Iterate Cognite time series in chunks of 100 up to 2000 items:
+            Iterate Cognite state sets in chunks of 100 up to 2000 items:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_time_series_list in client.cognite_time_series.iterate(chunk_size=100, limit=2000):
-                ...     for cognite_time_series in cognite_time_series_list:
-                ...         print(cognite_time_series.external_id)
+                >>> for cognite_state_sets in client.cognite_state_set.iterate(chunk_size=100, limit=2000):
+                ...     for cognite_state_set in cognite_state_sets:
+                ...         print(cognite_state_set.external_id)
 
-            Iterate Cognite time series in chunks of 100 sorted by external_id in descending order:
+            Iterate Cognite state sets in chunks of 100 sorted by external_id in descending order:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_time_series_list in client.cognite_time_series.iterate(
+                >>> for cognite_state_sets in client.cognite_state_set.iterate(
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
                 ... ):
-                ...     for cognite_time_series in cognite_time_series_list:
-                ...         print(cognite_time_series.external_id)
+                ...     for cognite_state_set in cognite_state_sets:
+                ...         print(cognite_state_set.external_id)
 
-            Iterate Cognite time series in chunks of 100 and use cursors to resume the iteration:
+            Iterate Cognite state sets in chunks of 100 and use cursors to resume the iteration:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for first_iteration in client.cognite_time_series.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.cognite_state_set.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_time_series_list in client.cognite_time_series.iterate(
+                >>> for cognite_state_sets in client.cognite_state_set.iterate(
                 ...     chunk_size=100,
                 ...     limit=2000,
                 ...     cursors=first_iteration.cursors,
                 ... ):
-                ...     for cognite_time_series in cognite_time_series_list:
-                ...         print(cognite_time_series.external_id)
+                ...     for cognite_state_set in cognite_state_sets:
+                ...         print(cognite_state_set.external_id)
 
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
         )
-        filter_ = _create_cognite_time_series_filter(
+        filter_ = _create_cognite_state_set_filter(
             self._view_id,
-            assets,
             description,
             description_prefix,
-            equipment,
-            is_step,
             name,
             name_prefix,
             source,
@@ -1071,15 +724,10 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix,
             source_id,
             source_id_prefix,
-            source_unit,
-            source_unit_prefix,
             min_source_updated_time,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            state_set,
-            type_,
-            unit,
             external_id_prefix,
             space,
             filter,
@@ -1088,25 +736,8 @@ class CogniteTimeSeriesAPI(
 
     def list(
         self,
-        assets: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         description: str | list[str] | None = None,
         description_prefix: str | None = None,
-        equipment: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        is_step: bool | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
         source: (
@@ -1125,46 +756,24 @@ class CogniteTimeSeriesAPI(
         source_created_user_prefix: str | None = None,
         source_id: str | list[str] | None = None,
         source_id_prefix: str | None = None,
-        source_unit: str | list[str] | None = None,
-        source_unit_prefix: str | None = None,
         min_source_updated_time: datetime.datetime | None = None,
         max_source_updated_time: datetime.datetime | None = None,
         source_updated_user: str | list[str] | None = None,
         source_updated_user_prefix: str | None = None,
-        state_set: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: Literal["numeric", "state", "string"] | list[Literal["numeric", "state", "string"]] | None = None,
-        unit: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: CogniteTimeSeriesFields | Sequence[CogniteTimeSeriesFields] | None = None,
+        sort_by: CogniteStateSetFields | Sequence[CogniteStateSetFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-    ) -> CogniteTimeSeriesList:
-        """List/filter Cognite time series
+    ) -> CogniteStateSetList:
+        """List/filter Cognite state sets
 
         Args:
-            assets: The asset to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment: The equipment to filter on.
-            is_step: The is step to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             source: The source to filter on.
@@ -1176,18 +785,13 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix: The prefix of the source created user to filter on.
             source_id: The source id to filter on.
             source_id_prefix: The prefix of the source id to filter on.
-            source_unit: The source unit to filter on.
-            source_unit_prefix: The prefix of the source unit to filter on.
             min_source_updated_time: The minimum value of the source updated time to filter on.
             max_source_updated_time: The maximum value of the source updated time to filter on.
             source_updated_user: The source updated user to filter on.
             source_updated_user_prefix: The prefix of the source updated user to filter on.
-            state_set: The state set to filter on.
-            type_: The type to filter on.
-            unit: The unit to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite time series to return.
+            limit: Maximum number of Cognite state sets to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -1196,29 +800,26 @@ class CogniteTimeSeriesAPI(
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `activities`, `assets`, `equipment`, `source` and `unit` for the
-            Cognite time series. Defaults to 'skip'.'skip' will not retrieve any connections, 'identifier' will only
-            retrieve the identifier of the connected items, and 'full' will retrieve the full connected items.
+            retrieve_connections: Whether to retrieve `source` for the Cognite state sets. Defaults to 'skip'.'skip'
+            will not retrieve any connections, 'identifier' will only retrieve the identifier of the connected items,
+            and 'full' will retrieve the full connected items.
 
         Returns:
-            List of requested Cognite time series
+            List of requested Cognite state sets
 
         Examples:
 
-            List Cognite time series and limit to 5:
+            List Cognite state sets and limit to 5:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_time_series_list = client.cognite_time_series.list(limit=5)
+                >>> cognite_state_sets = client.cognite_state_set.list(limit=5)
 
         """
-        filter_ = _create_cognite_time_series_filter(
+        filter_ = _create_cognite_state_set_filter(
             self._view_id,
-            assets,
             description,
             description_prefix,
-            equipment,
-            is_step,
             name,
             name_prefix,
             source,
@@ -1230,15 +831,10 @@ class CogniteTimeSeriesAPI(
             source_created_user_prefix,
             source_id,
             source_id_prefix,
-            source_unit,
-            source_unit_prefix,
             min_source_updated_time,
             max_source_updated_time,
             source_updated_user,
             source_updated_user_prefix,
-            state_set,
-            type_,
-            unit,
             external_id_prefix,
             space,
             filter,

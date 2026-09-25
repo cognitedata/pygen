@@ -76,13 +76,13 @@ class CogniteFileCategoryGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite file category.
         data_record: The data record of the Cognite file category node.
-        aliases: Alternative names for the node
-        code: An identifier for the category, for example, 'AA' for Accounting (from Norsok.)
-        description: Description of the instance
-        name: Name of the instance
-        standard: The name of the standard the category originates from, for example, 'Norsok'.
+        aliases: Alternative names for the instance.
+        code: An identifier for the category, for example, 'AA' for Accounting (from NORSOK).
+        description: The description of the instance.
+        name: The name of the instance.
+        standard: The name of the standard the category originates from, for example, 'NORSOK'.
         standard_reference: A reference to the source of the category standard.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteFileCategory", "v1")
@@ -123,13 +123,13 @@ class CogniteFileCategory(CogniteDescribableNode):
         space: The space where the node is located.
         external_id: The external id of the Cognite file category.
         data_record: The data record of the Cognite file category node.
-        aliases: Alternative names for the node
-        code: An identifier for the category, for example, 'AA' for Accounting (from Norsok.)
-        description: Description of the instance
-        name: Name of the instance
-        standard: The name of the standard the category originates from, for example, 'Norsok'.
+        aliases: Alternative names for the instance.
+        code: An identifier for the category, for example, 'AA' for Accounting (from NORSOK).
+        description: The description of the instance.
+        name: The name of the instance.
+        standard: The name of the standard the category originates from, for example, 'NORSOK'.
         standard_reference: A reference to the source of the category standard.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteFileCategory", "v1")
@@ -153,13 +153,13 @@ class CogniteFileCategoryWrite(CogniteDescribableNodeWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite file category.
         data_record: The data record of the Cognite file category node.
-        aliases: Alternative names for the node
-        code: An identifier for the category, for example, 'AA' for Accounting (from Norsok.)
-        description: Description of the instance
-        name: Name of the instance
-        standard: The name of the standard the category originates from, for example, 'Norsok'.
+        aliases: Alternative names for the instance.
+        code: An identifier for the category, for example, 'AA' for Accounting (from NORSOK).
+        description: The description of the instance.
+        name: The name of the instance.
+        standard: The name of the standard the category originates from, for example, 'NORSOK'.
         standard_reference: A reference to the source of the category standard.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (

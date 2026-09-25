@@ -109,14 +109,14 @@ class Cognite3DObjectGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite 3D object.
         data_record: The data record of the Cognite 3D object node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         asset: Asset that is tied to this 3D object
         cad_nodes: List of up to 1000 CADNodes that represents the connected CogniteAsset
-        description: Description of the instance
+        description: The description of the instance.
         images_360: Edge connection to Cognite360Image annotations that represents the connected CogniteAsset
-        name: Name of the instance
+        name: The name of the instance.
         point_cloud_volumes: List of up to 1000 PointCloudVolumes that represents the connected CogniteAsset
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
         x_max: Highest X value in bounding box
         x_min: Lowest X value in bounding box
         y_max: Highest Y value in bounding box
@@ -180,14 +180,14 @@ class Cognite3DObject(CogniteDescribableNode):
         space: The space where the node is located.
         external_id: The external id of the Cognite 3D object.
         data_record: The data record of the Cognite 3D object node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         asset: Asset that is tied to this 3D object
         cad_nodes: List of up to 1000 CADNodes that represents the connected CogniteAsset
-        description: Description of the instance
+        description: The description of the instance.
         images_360: Edge connection to Cognite360Image annotations that represents the connected CogniteAsset
-        name: Name of the instance
+        name: The name of the instance.
         point_cloud_volumes: List of up to 1000 PointCloudVolumes that represents the connected CogniteAsset
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
         x_max: Highest X value in bounding box
         x_min: Lowest X value in bounding box
         y_max: Highest Y value in bounding box
@@ -238,11 +238,11 @@ class Cognite3DObjectWrite(CogniteDescribableNodeWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite 3D object.
         data_record: The data record of the Cognite 3D object node.
-        aliases: Alternative names for the node
-        description: Description of the instance
+        aliases: Alternative names for the instance.
+        description: The description of the instance.
         images_360: Edge connection to Cognite360Image annotations that represents the connected CogniteAsset
-        name: Name of the instance
-        tags: Text based labels for generic use, limited to 1000
+        name: The name of the instance.
+        tags: A list of tags for the instance. Max: 1000.
         x_max: Highest X value in bounding box
         x_min: Lowest X value in bounding box
         y_max: Highest Y value in bounding box

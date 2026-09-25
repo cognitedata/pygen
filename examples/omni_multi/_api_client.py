@@ -12,7 +12,8 @@ from cognite.client.data_classes import FileMetadataList, SequenceList, TimeSeri
 
 from omni_multi import data_classes
 from omni_multi._api import (
-    Implementation1v1API,
+    Implementation1sSpPygenModelsAPI,
+    Implementation1sSpPygenModelsOtherAPI,
     Implementation1v2API,
     MainInterfaceAPI,
     SubInterfaceAPI,
@@ -26,17 +27,18 @@ class OmniMultiAAPIs:
     OmniMultiAAPIs
 
     Data Model:
-        space: pygen-models
+        space: sp_pygen_models
         externalId: OmniMultiA
         version: 1
 
     """
 
-    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
+    _data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
         self._client = client
 
+        self.implementation_1_s_sp_pygen_models = Implementation1sSpPygenModelsAPI(client)
         self.main_interface = MainInterfaceAPI(client)
         self.sub_interface = SubInterfaceAPI(client)
 
@@ -47,7 +49,7 @@ class OmniMultiAAPIs:
             query (str): The GraphQL query to issue.
             variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
-        data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
+        data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiA", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
 
@@ -57,13 +59,13 @@ class OmniMultiBAPIs:
     OmniMultiBAPIs
 
     Data Model:
-        space: pygen-models
+        space: sp_pygen_models
         externalId: OmniMultiB
         version: 1
 
     """
 
-    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
+    _data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
         self._client = client
@@ -79,7 +81,7 @@ class OmniMultiBAPIs:
             query (str): The GraphQL query to issue.
             variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
-        data_model_id = dm.DataModelId("pygen-models", "OmniMultiB", "1")
+        data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiB", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
 
@@ -89,18 +91,18 @@ class OmniMultiCAPIs:
     OmniMultiCAPIs
 
     Data Model:
-        space: pygen-models
+        space: sp_pygen_models
         externalId: OmniMultiC
         version: 1
 
     """
 
-    _data_model_id = dm.DataModelId("pygen-models", "OmniMultiA", "1")
+    _data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiA", "1")
 
     def __init__(self, client: CogniteClient):
         self._client = client
 
-        self.implementation_1_v_1 = Implementation1v1API(client)
+        self.implementation_1_s_sp_pygen_models_other = Implementation1sSpPygenModelsOtherAPI(client)
 
     def graphql_query(self, query: str, variables: dict[str, Any] | None = None) -> GraphQLList:
         """Execute a GraphQl query against the OmniMultiC data model.
@@ -109,7 +111,7 @@ class OmniMultiCAPIs:
             query (str): The GraphQL query to issue.
             variables (dict[str, Any] | None): An optional dict of variables to pass to the query.
         """
-        data_model_id = dm.DataModelId("pygen-models", "OmniMultiC", "1")
+        data_model_id = dm.DataModelId("sp_pygen_models", "OmniMultiC", "1")
         result = self._client.data_modeling.graphql.query(data_model_id, query, variables)
         return GraphQLQueryResponse(data_model_id).parse(result)
 

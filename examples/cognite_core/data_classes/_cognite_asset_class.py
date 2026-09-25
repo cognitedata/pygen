@@ -70,12 +70,12 @@ class CogniteAssetClassGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the Cognite asset clas.
         data_record: The data record of the Cognite asset clas node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         code: A unique identifier for the class of asset.
-        description: Description of the instance
-        name: Name of the instance
+        description: The description of the instance.
+        name: The name of the instance.
         standard: A text string to specify which standard the class is from.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAssetClass", "v1")
@@ -115,12 +115,12 @@ class CogniteAssetClass(CogniteDescribableNode):
         space: The space where the node is located.
         external_id: The external id of the Cognite asset clas.
         data_record: The data record of the Cognite asset clas node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         code: A unique identifier for the class of asset.
-        description: Description of the instance
-        name: Name of the instance
+        description: The description of the instance.
+        name: The name of the instance.
         standard: A text string to specify which standard the class is from.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("cdf_cdm", "CogniteAssetClass", "v1")
@@ -143,12 +143,12 @@ class CogniteAssetClassWrite(CogniteDescribableNodeWrite):
         space: The space where the node is located.
         external_id: The external id of the Cognite asset clas.
         data_record: The data record of the Cognite asset clas node.
-        aliases: Alternative names for the node
+        aliases: Alternative names for the instance.
         code: A unique identifier for the class of asset.
-        description: Description of the instance
-        name: Name of the instance
+        description: The description of the instance.
+        name: The name of the instance.
         standard: A text string to specify which standard the class is from.
-        tags: Text based labels for generic use, limited to 1000
+        tags: A list of tags for the instance. Max: 1000.
     """
 
     _container_fields: ClassVar[tuple[str, ...]] = (
