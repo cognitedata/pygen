@@ -422,6 +422,25 @@ class QueryBuildStepFactory:
     def _create_query_properties(
         cls, properties: list[str] | None, connection_id: str | None = None
     ) -> list[str] | None:
+        """Build the list of properties to request from a view for a query step.
+
+        This filters the user-selected properties down to the ones that should be passed to the
+        query's source selector. Built-in node properties (see ``NODE_PROPERTIES``) are dropped,
+        since they are always returned by the API and do not need to be selected explicitly. When a
+        ``connection_id`` is provided, it ensures that property is included in the result so the
+        connection can be resolved, unless the caller requested all properties via ``"*"``.
+
+        Args:
+            properties: The selected property IDs to retrieve. If ``None``, no filtering is applied
+                and ``None`` is returned to indicate that all properties should be retrieved.
+            connection_id: The property ID of the connection used to link this step to another view.
+                If set, it is appended to the returned list (when not already present and not
+                selecting all properties) so the connection value is retrieved. Defaults to ``None``.
+
+        Returns:
+            The list of property IDs to select, excluding built-in node properties, or ``None`` if
+            ``properties`` was ``None``.
+        """
         if properties is None:
             return None
         include_connection_prop = "*" not in properties
