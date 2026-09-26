@@ -1,64 +1,55 @@
 - space: sp_omni_instances
-  externalId: Naughty:Margaret
+  externalId: NaughtyCompanion:Ashley
   instanceType: node
   sources:
   - properties:
-      type: Range little exactly suggest thus sit.
-      friend:
-        space: sp_omni_instances
-        externalId: NaughtyCompanion:Ashley
+      name: Day thus best manager.
     source:
       space: sp_pygen_models
-      externalId: Naughty
+      externalId: NaughtyCompanion
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: Naughty:Dawn
+  externalId: NaughtyCompanion:Tiffany
   instanceType: node
   sources:
   - properties:
-      type: Today important tough.
+      name: Only shoulder character environmental decide understand budget.
     source:
       space: sp_pygen_models
-      externalId: Naughty
+      externalId: NaughtyCompanion
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: Naughty:Sean
+  externalId: NaughtyCompanion:Megan
   instanceType: node
   sources:
   - properties:
-      type: null
-      friend:
-        space: sp_omni_instances
-        externalId: NaughtyCompanion:Mitchell
+      name: Nation street including affect as land.
     source:
       space: sp_pygen_models
-      externalId: Naughty
+      externalId: NaughtyCompanion
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: Naughty:Anthony
+  externalId: NaughtyCompanion:Mitchell
   instanceType: node
   sources:
   - properties:
-      type: Yes head win ever television.
-      friend:
-        space: sp_omni_instances
-        externalId: NaughtyCompanion:Ashley
+      name: See social just campaign course in.
     source:
       space: sp_pygen_models
-      externalId: Naughty
+      externalId: NaughtyCompanion
       version: '1'
       type: view
 - space: sp_omni_instances
-  externalId: Naughty:Kimberly
+  externalId: NaughtyCompanion:Joshua
   instanceType: node
   sources:
   - properties:
-      type: Fly ago born.
+      name: null
     source:
       space: sp_pygen_models
-      externalId: Naughty
+      externalId: NaughtyCompanion
       version: '1'
       type: view
