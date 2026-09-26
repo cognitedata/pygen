@@ -63,8 +63,9 @@ dev = [
     "jupyterlab>=3.0.0",
     # cognite-toolkit is not yet compatible with PySDK v8 and it is only used to deploy test data.
     # Add back in when it is compatible with PySDK v8.
-#    "cognite-toolkit==0.5.87",
+    #    "cognite-toolkit==0.5.87",
     "marko>=2.1.0, <3.0.0",
+    "cognite-toolkit==0.8.232",
 ]
 
 [tool.uv]
