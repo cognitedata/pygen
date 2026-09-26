@@ -1248,7 +1248,21 @@ views:
       autoIncrement: false
       name: name
       constraintState: {}
-  lastUpdatedTime: 1790416975696
+    type:
+      container:
+        space: sp_pygen_models
+        externalId: NaughtyCompanion
+      containerPropertyIdentifier: type
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: type
+      constraintState: {}
+  lastUpdatedTime: 1790417577604
   createdTime: 1790416975696
 - space: sp_pygen_models
   externalId: PrimitiveNullable

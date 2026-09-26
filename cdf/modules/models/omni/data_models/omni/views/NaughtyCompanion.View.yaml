@@ -10,3 +10,10 @@ properties:
       type: container
     containerPropertyIdentifier: name
     name: name
+  type:
+    container:
+      space: {{ pygen_models_space }}
+      externalId: NaughtyCompanion
+      type: container
+    containerPropertyIdentifier: type
+    name: type

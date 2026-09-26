@@ -158,9 +158,11 @@ def test_query_list_naughty_view(cognite_client: CogniteClient, omni_views: dict
 
     executor = QueryExecutor(cognite_client, views=[view])
 
-    result = executor.list(view.as_id(), ["externalId", "type"], limit=5)
+    result = executor.list(view.as_id(), ["externalId", "type", {"friend": ["externalId", "name", "type"]}], limit=5)
     result_with_type = [item for item in result if "type" in item]
-    assert len(result_with_type) > 0
+    assert len(result_with_type) > 0, "We expect at least one item to have a type property"
+    nested_with_type = [subitem for item in result_with_type for subitem in item.get("friend", []) if "type" in subitem]
+    assert len(nested_with_type) > 0, "We expect at least one nested item to have a type property"
 
 
 @pytest.fixture()

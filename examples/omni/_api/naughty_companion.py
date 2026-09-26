@@ -106,6 +106,8 @@ class NaughtyCompanionAPI(
         properties: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -121,6 +123,8 @@ class NaughtyCompanionAPI(
             properties: The property to search, if nothing is passed all text fields will be searched.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of naughty companions to return. Defaults to 25.
@@ -151,6 +155,8 @@ class NaughtyCompanionAPI(
             self._view_id,
             name,
             name_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -175,6 +181,8 @@ class NaughtyCompanionAPI(
         search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -191,6 +199,8 @@ class NaughtyCompanionAPI(
         search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -211,6 +221,8 @@ class NaughtyCompanionAPI(
         search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -230,6 +242,8 @@ class NaughtyCompanionAPI(
         search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -249,6 +263,8 @@ class NaughtyCompanionAPI(
             search_property: The text field to search in.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of naughty companions to return. Defaults to 25.
@@ -273,6 +289,8 @@ class NaughtyCompanionAPI(
             self._view_id,
             name,
             name_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -295,6 +313,8 @@ class NaughtyCompanionAPI(
         search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -309,6 +329,8 @@ class NaughtyCompanionAPI(
             search_property: The text field to search in.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of naughty companions to return.
@@ -324,6 +346,8 @@ class NaughtyCompanionAPI(
             self._view_id,
             name,
             name_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -367,6 +391,8 @@ class NaughtyCompanionAPI(
         chunk_size: int = DEFAULT_CHUNK_SIZE,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
@@ -379,6 +405,8 @@ class NaughtyCompanionAPI(
             chunk_size: The number of naughty companions to return in each iteration. Defaults to 100.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
@@ -435,6 +463,8 @@ class NaughtyCompanionAPI(
             self._view_id,
             name,
             name_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,
@@ -445,6 +475,8 @@ class NaughtyCompanionAPI(
         self,
         name: str | list[str] | None = None,
         name_prefix: str | None = None,
+        type_: str | list[str] | None = None,
+        type_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -458,6 +490,8 @@ class NaughtyCompanionAPI(
         Args:
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
+            type_: The type to filter on.
+            type_prefix: The prefix of the type to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             limit: Maximum number of naughty companions to return.
@@ -486,6 +520,8 @@ class NaughtyCompanionAPI(
             self._view_id,
             name,
             name_prefix,
+            type_,
+            type_prefix,
             external_id_prefix,
             space,
             filter,

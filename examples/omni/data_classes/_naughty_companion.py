@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
+from pydantic import Field
 from pydantic import field_validator, model_validator, ValidationInfo
 
 from omni.config import global_config
@@ -45,12 +46,13 @@ __all__ = [
 ]
 
 
-NaughtyCompanionTextFields = Literal["external_id", "name"]
-NaughtyCompanionFields = Literal["external_id", "name"]
+NaughtyCompanionTextFields = Literal["external_id", "name", "type_"]
+NaughtyCompanionFields = Literal["external_id", "name", "type_"]
 
 _NAUGHTYCOMPANION_PROPERTIES_BY_FIELD = {
     "external_id": "externalId",
     "name": "name",
+    "type_": "type",
 }
 
 
@@ -65,10 +67,12 @@ class NaughtyCompanionGraphQL(GraphQLCore):
         external_id: The external id of the naughty companion.
         data_record: The data record of the naughty companion node.
         name: The name field.
+        type_: The type field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "NaughtyCompanion", "1")
     name: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     @model_validator(mode="before")
     def parse_data_record(cls, values: Any) -> Any:
@@ -100,6 +104,7 @@ class NaughtyCompanion(DomainModel):
         external_id: The external id of the naughty companion.
         data_record: The data record of the naughty companion node.
         name: The name field.
+        type_: The type field.
     """
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "NaughtyCompanion", "1")
@@ -107,6 +112,7 @@ class NaughtyCompanion(DomainModel):
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
     name: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
     def as_write(self) -> NaughtyCompanionWrite:
         """Convert this read version of naughty companion to the writing version."""
@@ -123,15 +129,20 @@ class NaughtyCompanionWrite(DomainModelWrite):
         external_id: The external id of the naughty companion.
         data_record: The data record of the naughty companion node.
         name: The name field.
+        type_: The type field.
     """
 
-    _container_fields: ClassVar[tuple[str, ...]] = ("name",)
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "name",
+        "type_",
+    )
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "NaughtyCompanion", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
     name: Optional[str] = None
+    type_: Optional[str] = Field(None, alias="type")
 
 
 class NaughtyCompanionList(DomainModelList[NaughtyCompanion]):
@@ -154,6 +165,8 @@ def _create_naughty_companion_filter(
     view_id: dm.ViewId,
     name: str | list[str] | None = None,
     name_prefix: str | None = None,
+    type_: str | list[str] | None = None,
+    type_prefix: str | None = None,
     external_id_prefix: str | None = None,
     space: str | list[str] | None = None,
     filter: dm.Filter | None = None,
@@ -165,6 +178,12 @@ def _create_naughty_companion_filter(
         filters.append(dm.filters.In(view_id.as_property_ref("name"), values=name))
     if name_prefix is not None:
         filters.append(dm.filters.Prefix(view_id.as_property_ref("name"), value=name_prefix))
+    if isinstance(type_, str):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
+    if type_ and isinstance(type_, list):
+        filters.append(dm.filters.In(view_id.as_property_ref("type"), values=type_))
+    if type_prefix is not None:
+        filters.append(dm.filters.Prefix(view_id.as_property_ref("type"), value=type_prefix))
     if external_id_prefix is not None:
         filters.append(dm.filters.Prefix(["node", "externalId"], value=external_id_prefix))
     if isinstance(space, str):
@@ -210,11 +229,13 @@ class _NaughtyCompanionQuery(NodeQueryCore[T_DomainModelList, NaughtyCompanionLi
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
         self.name = StringFilter(self, self._view_id.as_property_ref("name"))
+        self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
                 self.name,
+                self.type_,
             ]
         )
 

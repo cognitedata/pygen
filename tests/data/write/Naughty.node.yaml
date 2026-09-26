@@ -6,7 +6,7 @@
       type: Range little exactly suggest thus sit.
       friend:
         space: sp_omni_instances
-        externalId: NaughtyCompanion:Ashley
+        externalId: NaughtyCompanion:Daryl
     source:
       space: sp_pygen_models
       externalId: Naughty
@@ -31,7 +31,7 @@
       type: null
       friend:
         space: sp_omni_instances
-        externalId: NaughtyCompanion:Mitchell
+        externalId: NaughtyCompanion:Kevin
     source:
       space: sp_pygen_models
       externalId: Naughty
@@ -45,7 +45,7 @@
       type: Yes head win ever television.
       friend:
         space: sp_omni_instances
-        externalId: NaughtyCompanion:Ashley
+        externalId: NaughtyCompanion:Daryl
     source:
       space: sp_pygen_models
       externalId: Naughty
