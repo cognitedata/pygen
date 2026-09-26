@@ -267,6 +267,7 @@ class QueryBuildStepFactory:
         connection_id: str,
         connection: ViewProperty,
         reverse_views: dict[dm.ViewId, dm.View],
+        connection_view: dm.View | None = None,
         max_retrieve_limit: int = -1,
     ) -> list[QueryBuildStep]:
         connection_property = ViewPropertyId(self._view_id, connection_id)
@@ -280,6 +281,7 @@ class QueryBuildStepFactory:
                 connection.direction,
                 connection_property,
                 selected_properties,
+                connection_view=connection_view,
                 max_retrieve_limit=max_retrieve_limit,
             )
         elif isinstance(connection, ReverseDirectRelation):
@@ -293,12 +295,17 @@ class QueryBuildStepFactory:
                 connection_type,
                 connection_property,
                 validated,
+                connection_view=connection_view,
                 max_retrieve_limit=max_retrieve_limit,
             )
         elif isinstance(connection, dm.MappedProperty) and isinstance(connection.type, dm.DirectRelation):
             validated = self._validate_flat_properties(selected_properties)
             return self.from_direct_relation(
-                connection.source, connection_property, validated, max_retrieve_limit=max_retrieve_limit
+                connection.source,
+                connection_property,
+                validated,
+                connection_view=connection_view,
+                max_retrieve_limit=max_retrieve_limit,
             )
         else:
             warnings.warn(f"Unexpected connection type: {connection!r}", UserWarning, stacklevel=2)
@@ -310,9 +317,11 @@ class QueryBuildStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
+        connection_view: dm.View | None = None,
         max_retrieve_limit: int = -1,
     ) -> list[QueryBuildStep]:
-        query_properties = self._create_query_properties(selected_properties, None)
+        view_properties = set(connection_view.properties.keys()) if connection_view else set()
+        query_properties = self._create_query_properties(selected_properties, view_properties, None)
         return [
             QueryBuildStep(
                 self._create_step_name(self.root_name),
@@ -339,6 +348,7 @@ class QueryBuildStepFactory:
         include_end_node: bool = True,
         has_container_fields: bool = True,
         edge_view: dm.ViewId | None = None,
+        connection_view: dm.View | None = None,
         max_retrieve_limit: int = -1,
     ) -> list[QueryBuildStep]:
         edge_name = self._create_step_name(self._root_name)
@@ -371,7 +381,8 @@ class QueryBuildStepFactory:
         else:
             raise ValueError(f"Unexpected unpack_edges value: {self._unpack_edges!r}. Expected 'include' or 'skip'.")
 
-        query_properties = self._create_query_properties(selected_node_properties, None)
+        view_properties = set(connection_view.properties.keys()) if connection_view else set()
+        query_properties = self._create_query_properties(selected_node_properties, view_properties, None)
         target_view = source
 
         step = QueryBuildStep(
@@ -396,9 +407,11 @@ class QueryBuildStepFactory:
         connection_property: ViewPropertyId,
         selected_properties: list[str] | None = None,
         has_container_fields: bool = True,
+        connection_view: dm.View | None = None,
         max_retrieve_limit: int = -1,
     ) -> list[QueryBuildStep]:
-        query_properties = self._create_query_properties(selected_properties, through.property)
+        view_properties = set(connection_view.properties.keys()) if connection_view else set()
+        query_properties = self._create_query_properties(selected_properties, view_properties, through.property)
         other_view_id = source
         return [
             QueryBuildStep(
@@ -420,19 +433,25 @@ class QueryBuildStepFactory:
 
     @classmethod
     def _create_query_properties(
-        cls, properties: list[str] | None, connection_id: str | None = None
+        cls, properties: list[str] | None, view_properties: set[str], connection_id: str | None = None
     ) -> list[str] | None:
         """Build the list of properties to request from a view for a query step.
 
         This filters the user-selected properties down to the ones that should be passed to the
         query's source selector. Built-in node properties (see ``NODE_PROPERTIES``) are dropped,
-        since they are always returned by the API and do not need to be selected explicitly. When a
-        ``connection_id`` is provided, it ensures that property is included in the result so the
+        since they are always returned by the API and do not need to be selected explicitly, unless
+        the view itself defines a property with the same name (i.e. it is present in
+        ``view_properties``), in which case it is kept. NOTE: This assumes that when a user for example
+        selects `type` they want the view-defined property, not the built-in node property.
+        When a ``connection_id`` is provided, it ensures that property is included in the result so the
         connection can be resolved, unless the caller requested all properties via ``"*"``.
 
         Args:
             properties: The selected property IDs to retrieve. If ``None``, no filtering is applied
                 and ``None`` is returned to indicate that all properties should be retrieved.
+            view_properties: The set of property IDs defined on the view being queried. Used to
+                avoid dropping a built-in node property name when the view explicitly defines a
+                property with that same name.
             connection_id: The property ID of the connection used to link this step to another view.
                 If set, it is appended to the returned list (when not already present and not
                 selecting all properties) so the connection value is retrieved. Defaults to ``None``.
@@ -446,7 +465,7 @@ class QueryBuildStepFactory:
         include_connection_prop = "*" not in properties
         nested_properties: list[str] = []
         for prop_id in properties:
-            if prop_id in NODE_PROPERTIES:
+            if prop_id in NODE_PROPERTIES and prop_id not in view_properties:
                 continue
             if prop_id == connection_id:
                 include_connection_prop = False
