@@ -1192,6 +1192,23 @@ views:
   usedFor: node
   isGlobal: false
   properties:
+    friend:
+      container:
+        space: sp_pygen_models
+        externalId: Naughty
+      containerPropertyIdentifier: friend
+      type:
+        list: false
+        type: direct
+        source:
+          space: sp_pygen_models
+          externalId: NaughtyCompanion
+          version: '1'
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: friend
+      constraintState: {}
     type:
       container:
         space: sp_pygen_models
@@ -1206,8 +1223,33 @@ views:
       autoIncrement: false
       name: type
       constraintState: {}
-  lastUpdatedTime: 1790236288206
+  lastUpdatedTime: 1790416975696
   createdTime: 1790236288206
+- space: sp_pygen_models
+  externalId: NaughtyCompanion
+  name: NaughtyCompanion
+  implements: []
+  version: '1'
+  writable: true
+  usedFor: node
+  isGlobal: false
+  properties:
+    name:
+      container:
+        space: sp_pygen_models
+        externalId: NaughtyCompanion
+      containerPropertyIdentifier: name
+      type:
+        list: false
+        collation: ucs_basic
+        type: text
+      immutable: false
+      nullable: true
+      autoIncrement: false
+      name: name
+      constraintState: {}
+  lastUpdatedTime: 1790416975696
+  createdTime: 1790416975696
 - space: sp_pygen_models
   externalId: PrimitiveNullable
   name: PrimitiveNullable
