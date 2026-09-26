@@ -10,6 +10,7 @@ from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from cognite.client.data_classes.aggregations import Aggregation, Avg
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
+from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation
 from cognite.client.exceptions import CogniteAPIError
 from cognite.client.utils.useful_types import SequenceNotStr
 
@@ -340,7 +341,13 @@ class QueryExecutor:
         }
         builder.append(factory.root(filter, limit=limit, sort=self._as_sort_list(sort)))
         for connection_id, connection in factory.connection_properties.items():
-            builder.extend(factory.from_connection(connection_id, connection, reverse_views))
+            connection_view: dm.View | None = None
+            if (
+                isinstance(connection, dm.EdgeConnection | ReverseDirectRelation | dm.MappedProperty)
+                and connection.source is not None
+            ):
+                connection_view = self._get_view(connection.source)
+            builder.extend(factory.from_connection(connection_id, connection, reverse_views, connection_view))
         executor = builder.build()
         results = executor.execute_query(self._client, remove_not_connected=False)
         return QueryUnpacker(
