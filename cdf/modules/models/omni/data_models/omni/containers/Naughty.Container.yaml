@@ -13,9 +13,7 @@ properties:
     immutable: false
     name: type
   friend:
-    container:
-      space: {{ pygen_models_space }}
-      externalId: NaughtyCompanion
-      type: container
-    containerPropertyIdentifier: friend
+    type:
+      type: direct
+    nullable: true
     name: friend

@@ -13,7 +13,7 @@ properties:
   friend:
     container:
       space: {{ pygen_models_space }}
-      externalId: NaughtyCompanion
+      externalId: Naughty
       type: container
     source:
       space: {{ pygen_models_space }}
