@@ -25,32 +25,33 @@ from omni.data_classes._core import (
     QueryUnpacker,
     ViewPropertyId,
 )
-from omni.data_classes._naughty import (
-    NaughtyQuery,
-    _NAUGHTY_PROPERTIES_BY_FIELD,
-    _create_naughty_filter,
+from omni.data_classes._naughty_companion import (
+    NaughtyCompanionQuery,
+    _NAUGHTYCOMPANION_PROPERTIES_BY_FIELD,
+    _create_naughty_companion_filter,
 )
 from omni.data_classes import (
     DomainModel,
     DomainModelCore,
     DomainModelWrite,
     ResourcesWriteResult,
-    Naughty,
-    NaughtyWrite,
-    NaughtyFields,
-    NaughtyList,
-    NaughtyWriteList,
-    NaughtyTextFields,
     NaughtyCompanion,
+    NaughtyCompanionWrite,
+    NaughtyCompanionFields,
+    NaughtyCompanionList,
+    NaughtyCompanionWriteList,
+    NaughtyCompanionTextFields,
 )
 
 
-class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
-    _view_id = dm.ViewId("sp_pygen_models", "Naughty", "1")
-    _properties_by_field: ClassVar[dict[str, str]] = _NAUGHTY_PROPERTIES_BY_FIELD
-    _class_type = Naughty
-    _class_list = NaughtyList
-    _class_write_list = NaughtyWriteList
+class NaughtyCompanionAPI(
+    NodeAPI[NaughtyCompanion, NaughtyCompanionWrite, NaughtyCompanionList, NaughtyCompanionWriteList]
+):
+    _view_id = dm.ViewId("sp_pygen_models", "NaughtyCompanion", "1")
+    _properties_by_field: ClassVar[dict[str, str]] = _NAUGHTYCOMPANION_PROPERTIES_BY_FIELD
+    _class_type = NaughtyCompanion
+    _class_list = NaughtyCompanionList
+    _class_write_list = NaughtyCompanionWriteList
 
     def __init__(self, client: CogniteClient):
         super().__init__(client=client)
@@ -60,85 +61,69 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
         self,
         external_id: str | dm.NodeId | tuple[str, str],
         space: str = DEFAULT_INSTANCE_SPACE,
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-    ) -> Naughty | None: ...
+    ) -> NaughtyCompanion | None: ...
 
     @overload
     def retrieve(
         self,
         external_id: SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-    ) -> NaughtyList: ...
+    ) -> NaughtyCompanionList: ...
 
     def retrieve(
         self,
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-    ) -> Naughty | NaughtyList | None:
-        """Retrieve one or more naughties by id(s).
+    ) -> NaughtyCompanion | NaughtyCompanionList | None:
+        """Retrieve one or more naughty companions by id(s).
 
         Args:
-            external_id: External id or list of external ids of the naughties.
-            space: The space where all the naughties are located.
-            retrieve_connections: Whether to retrieve `friend` for the naughties. Defaults to 'skip'.'skip' will not
-            retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full'
-            will retrieve the full connected items.
+            external_id: External id or list of external ids of the naughty companions.
+            space: The space where all the naughty companions are located.
 
         Returns:
-            The requested naughties.
+            The requested naughty companions.
 
         Examples:
 
-            Retrieve naughty by id:
+            Retrieve naughty_companion by id:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> naughty = client.naughty.retrieve(
-                ...     "my_naughty"
+                >>> naughty_companion = client.naughty_companion.retrieve(
+                ...     "my_naughty_companion"
                 ... )
 
         """
         return self._retrieve(
             external_id,
             space,
-            retrieve_connections=retrieve_connections,
         )
 
     def search(
         self,
         query: str,
-        properties: NaughtyTextFields | SequenceNotStr[NaughtyTextFields] | None = None,
-        friend: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: str | list[str] | None = None,
-        type_prefix: str | None = None,
+        properties: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: NaughtyFields | SequenceNotStr[NaughtyFields] | None = None,
+        sort_by: NaughtyCompanionFields | SequenceNotStr[NaughtyCompanionFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-    ) -> NaughtyList:
-        """Search naughties
+    ) -> NaughtyCompanionList:
+        """Search naughty companions
 
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            friend: The friend to filter on.
-            type_: The type to filter on.
-            type_prefix: The prefix of the type to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of naughties to return. Defaults to 25.
+            limit: Maximum number of naughty companions to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -149,24 +134,23 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
-            Search results naughties matching the query.
+            Search results naughty companions matching the query.
 
         Examples:
 
-           Search for 'my_naughty' in all text properties:
+           Search for 'my_naughty_companion' in all text properties:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> naughties = client.naughty.search(
-                ...     'my_naughty'
+                >>> naughty_companions = client.naughty_companion.search(
+                ...     'my_naughty_companion'
                 ... )
 
         """
-        filter_ = _create_naughty_filter(
+        filter_ = _create_naughty_companion_filter(
             self._view_id,
-            friend,
-            type_,
-            type_prefix,
+            name,
+            name_prefix,
             external_id_prefix,
             space,
             filter,
@@ -186,19 +170,11 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
         self,
         aggregate: Aggregations | dm.aggregations.MetricAggregation,
         group_by: None = None,
-        property: NaughtyFields | SequenceNotStr[NaughtyFields] | None = None,
+        property: NaughtyCompanionFields | SequenceNotStr[NaughtyCompanionFields] | None = None,
         query: str | None = None,
-        search_property: NaughtyTextFields | SequenceNotStr[NaughtyTextFields] | None = None,
-        friend: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: str | list[str] | None = None,
-        type_prefix: str | None = None,
+        search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -210,19 +186,11 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
         self,
         aggregate: SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation],
         group_by: None = None,
-        property: NaughtyFields | SequenceNotStr[NaughtyFields] | None = None,
+        property: NaughtyCompanionFields | SequenceNotStr[NaughtyCompanionFields] | None = None,
         query: str | None = None,
-        search_property: NaughtyTextFields | SequenceNotStr[NaughtyTextFields] | None = None,
-        friend: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: str | list[str] | None = None,
-        type_prefix: str | None = None,
+        search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -237,20 +205,12 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
             | dm.aggregations.MetricAggregation
             | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        group_by: NaughtyFields | SequenceNotStr[NaughtyFields],
-        property: NaughtyFields | SequenceNotStr[NaughtyFields] | None = None,
+        group_by: NaughtyCompanionFields | SequenceNotStr[NaughtyCompanionFields],
+        property: NaughtyCompanionFields | SequenceNotStr[NaughtyCompanionFields] | None = None,
         query: str | None = None,
-        search_property: NaughtyTextFields | SequenceNotStr[NaughtyTextFields] | None = None,
-        friend: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: str | list[str] | None = None,
-        type_prefix: str | None = None,
+        search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -264,20 +224,12 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
             | dm.aggregations.MetricAggregation
             | SequenceNotStr[Aggregations | dm.aggregations.MetricAggregation]
         ),
-        group_by: NaughtyFields | SequenceNotStr[NaughtyFields] | None = None,
-        property: NaughtyFields | SequenceNotStr[NaughtyFields] | None = None,
+        group_by: NaughtyCompanionFields | SequenceNotStr[NaughtyCompanionFields] | None = None,
+        property: NaughtyCompanionFields | SequenceNotStr[NaughtyCompanionFields] | None = None,
         query: str | None = None,
-        search_property: NaughtyTextFields | SequenceNotStr[NaughtyTextFields] | None = None,
-        friend: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: str | list[str] | None = None,
-        type_prefix: str | None = None,
+        search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
@@ -287,7 +239,7 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
         | list[dm.aggregations.AggregatedNumberedValue]
         | InstanceAggregationResultList
     ):
-        """Aggregate data across naughties
+        """Aggregate data across naughty companions
 
         Args:
             aggregate: The aggregation to perform.
@@ -295,12 +247,11 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
             property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            friend: The friend to filter on.
-            type_: The type to filter on.
-            type_prefix: The prefix of the type to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of naughties to return. Defaults to 25.
+            limit: Maximum number of naughty companions to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write
                 your own filtering which will be ANDed with the filter above.
@@ -310,19 +261,18 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
 
         Examples:
 
-            Count naughties in space `my_space`:
+            Count naughty companions in space `my_space`:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> result = client.naughty.aggregate("count", space="my_space")
+                >>> result = client.naughty_companion.aggregate("count", space="my_space")
 
         """
 
-        filter_ = _create_naughty_filter(
+        filter_ = _create_naughty_companion_filter(
             self._view_id,
-            friend,
-            type_,
-            type_prefix,
+            name,
+            name_prefix,
             external_id_prefix,
             space,
             filter,
@@ -339,38 +289,29 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
 
     def histogram(
         self,
-        property: NaughtyFields,
+        property: NaughtyCompanionFields,
         interval: float,
         query: str | None = None,
-        search_property: NaughtyTextFields | SequenceNotStr[NaughtyTextFields] | None = None,
-        friend: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: str | list[str] | None = None,
-        type_prefix: str | None = None,
+        search_property: NaughtyCompanionTextFields | SequenceNotStr[NaughtyCompanionTextFields] | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for naughties
+        """Produces histograms for naughty companions
 
         Args:
             property: The property to use as the value in the histogram.
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            friend: The friend to filter on.
-            type_: The type to filter on.
-            type_prefix: The prefix of the type to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of naughties to return.
+            limit: Maximum number of naughty companions to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -379,11 +320,10 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
             Bucketed histogram results.
 
         """
-        filter_ = _create_naughty_filter(
+        filter_ = _create_naughty_companion_filter(
             self._view_id,
-            friend,
-            type_,
-            type_prefix,
+            name,
+            name_prefix,
             external_id_prefix,
             space,
             filter,
@@ -397,9 +337,9 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
             filter_,
         )
 
-    def select(self) -> NaughtyQuery:
-        """Start selecting from naughties."""
-        return NaughtyQuery(self._client)
+    def select(self) -> NaughtyCompanionQuery:
+        """Start selecting from naughty companions."""
+        return NaughtyCompanionQuery(self._client)
 
     def _build(
         self,
@@ -420,139 +360,107 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
                 has_container_fields=True,
             )
         )
-        if retrieve_connections == "full":
-            builder.extend(
-                factory.from_direct_relation(
-                    NaughtyCompanion._view_id,
-                    ViewPropertyId(self._view_id, "friend"),
-                    has_container_fields=True,
-                )
-            )
         return builder.build()
 
     def iterate(
         self,
         chunk_size: int = DEFAULT_CHUNK_SIZE,
-        friend: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: str | list[str] | None = None,
-        type_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         filter: dm.Filter | None = None,
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
         limit: int | None = None,
         cursors: dict[str, str | None] | None = None,
-    ) -> Iterator[NaughtyList]:
-        """Iterate over naughties
+    ) -> Iterator[NaughtyCompanionList]:
+        """Iterate over naughty companions
 
         Args:
-            chunk_size: The number of naughties to return in each iteration. Defaults to 100.
-            friend: The friend to filter on.
-            type_: The type to filter on.
-            type_prefix: The prefix of the type to filter on.
+            chunk_size: The number of naughty companions to return in each iteration. Defaults to 100.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            retrieve_connections: Whether to retrieve `friend` for the naughties. Defaults to 'skip'.'skip' will not
-            retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full'
-            will retrieve the full connected items.
-            limit: Maximum number of naughties to return. Defaults to None, which will return all items.
+            limit: Maximum number of naughty companions to return. Defaults to None, which will return all items.
             cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
                 specific point. See example below for more details.
 
         Returns:
-            Iteration of naughties
+            Iteration of naughty companions
 
         Examples:
 
-            Iterate naughties in chunks of 100 up to 2000 items:
+            Iterate naughty companions in chunks of 100 up to 2000 items:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for naughties in client.naughty.iterate(chunk_size=100, limit=2000):
-                ...     for naughty in naughties:
-                ...         print(naughty.external_id)
+                >>> for naughty_companions in client.naughty_companion.iterate(chunk_size=100, limit=2000):
+                ...     for naughty_companion in naughty_companions:
+                ...         print(naughty_companion.external_id)
 
-            Iterate naughties in chunks of 100 sorted by external_id in descending order:
+            Iterate naughty companions in chunks of 100 sorted by external_id in descending order:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for naughties in client.naughty.iterate(
+                >>> for naughty_companions in client.naughty_companion.iterate(
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
                 ... ):
-                ...     for naughty in naughties:
-                ...         print(naughty.external_id)
+                ...     for naughty_companion in naughty_companions:
+                ...         print(naughty_companion.external_id)
 
-            Iterate naughties in chunks of 100 and use cursors to resume the iteration:
+            Iterate naughty companions in chunks of 100 and use cursors to resume the iteration:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> for first_iteration in client.naughty.iterate(chunk_size=100, limit=2000):
+                >>> for first_iteration in client.naughty_companion.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for naughties in client.naughty.iterate(
+                >>> for naughty_companions in client.naughty_companion.iterate(
                 ...     chunk_size=100,
                 ...     limit=2000,
                 ...     cursors=first_iteration.cursors,
                 ... ):
-                ...     for naughty in naughties:
-                ...         print(naughty.external_id)
+                ...     for naughty_companion in naughty_companions:
+                ...         print(naughty_companion.external_id)
 
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
         )
-        filter_ = _create_naughty_filter(
+        filter_ = _create_naughty_companion_filter(
             self._view_id,
-            friend,
-            type_,
-            type_prefix,
+            name,
+            name_prefix,
             external_id_prefix,
             space,
             filter,
         )
-        yield from self._iterate(chunk_size, filter_, limit, retrieve_connections, cursors=cursors)
+        yield from self._iterate(chunk_size, filter_, limit, "skip", cursors=cursors)
 
     def list(
         self,
-        friend: (
-            str
-            | tuple[str, str]
-            | dm.NodeId
-            | dm.DirectRelationReference
-            | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
-            | None
-        ) = None,
-        type_: str | list[str] | None = None,
-        type_prefix: str | None = None,
+        name: str | list[str] | None = None,
+        name_prefix: str | None = None,
         external_id_prefix: str | None = None,
         space: str | list[str] | None = None,
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
-        sort_by: NaughtyFields | Sequence[NaughtyFields] | None = None,
+        sort_by: NaughtyCompanionFields | Sequence[NaughtyCompanionFields] | None = None,
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
-        retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
-    ) -> NaughtyList:
-        """List/filter naughties
+    ) -> NaughtyCompanionList:
+        """List/filter naughty companions
 
         Args:
-            friend: The friend to filter on.
-            type_: The type to filter on.
-            type_prefix: The prefix of the type to filter on.
+            name: The name to filter on.
+            name_prefix: The prefix of the name to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of naughties to return.
+            limit: Maximum number of naughty companions to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -561,32 +469,26 @@ class NaughtyAPI(NodeAPI[Naughty, NaughtyWrite, NaughtyList, NaughtyWriteList]):
             sort: (Advanced) If sort_by and direction are not sufficient, you can write your own sorting.
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
-            retrieve_connections: Whether to retrieve `friend` for the naughties. Defaults to 'skip'.'skip' will not
-            retrieve any connections, 'identifier' will only retrieve the identifier of the connected items, and 'full'
-            will retrieve the full connected items.
 
         Returns:
-            List of requested naughties
+            List of requested naughty companions
 
         Examples:
 
-            List naughties and limit to 5:
+            List naughty companions and limit to 5:
 
                 >>> from omni import OmniClient
                 >>> client = OmniClient()
-                >>> naughties = client.naughty.list(limit=5)
+                >>> naughty_companions = client.naughty_companion.list(limit=5)
 
         """
-        filter_ = _create_naughty_filter(
+        filter_ = _create_naughty_companion_filter(
             self._view_id,
-            friend,
-            type_,
-            type_prefix,
+            name,
+            name_prefix,
             external_id_prefix,
             space,
             filter,
         )
         sort_input = self._create_sort(sort_by, direction, sort)  # type: ignore[arg-type]
-        if retrieve_connections == "skip":
-            return self._list(limit=limit, filter=filter_, sort=sort_input)
-        return self._query(filter_, limit, retrieve_connections, sort_input, "list")
+        return self._list(limit=limit, filter=filter_, sort=sort_input)

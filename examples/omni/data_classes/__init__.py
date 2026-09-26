@@ -176,6 +176,15 @@ from ._naughty import (
     NaughtyWrite,
     NaughtyWriteList,
 )
+from ._naughty_companion import (
+    NaughtyCompanion,
+    NaughtyCompanionFields,
+    NaughtyCompanionGraphQL,
+    NaughtyCompanionList,
+    NaughtyCompanionTextFields,
+    NaughtyCompanionWrite,
+    NaughtyCompanionWriteList,
+)
 from ._primitive_nullable import (
     PrimitiveNullable,
     PrimitiveNullableFields,
@@ -266,6 +275,9 @@ DependentOnNonWritableGraphQL.model_rebuild()
 DependentOnNonWritableWrite.model_rebuild()
 Implementation1NonWriteable.model_rebuild()
 Implementation1NonWriteableGraphQL.model_rebuild()
+Naughty.model_rebuild()
+NaughtyGraphQL.model_rebuild()
+NaughtyWrite.model_rebuild()
 ConnectionEdgeA.model_rebuild()
 ConnectionEdgeAGraphQL.model_rebuild()
 ConnectionEdgeAWrite.model_rebuild()
@@ -420,6 +432,13 @@ __all__ = [
     "NaughtyWriteList",
     "NaughtyFields",
     "NaughtyTextFields",
+    "NaughtyCompanion",
+    "NaughtyCompanionGraphQL",
+    "NaughtyCompanionWrite",
+    "NaughtyCompanionList",
+    "NaughtyCompanionWriteList",
+    "NaughtyCompanionFields",
+    "NaughtyCompanionTextFields",
     "PrimitiveNullable",
     "PrimitiveNullableGraphQL",
     "PrimitiveNullableWrite",
