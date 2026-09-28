@@ -1,0 +1,60 @@
+- space: sp_omni_instances
+  externalId: NaughtyCompanion:Daryl
+  instanceType: node
+  sources:
+  - properties:
+      name: Day thus best manager.
+      type: null
+    source:
+      space: sp_pygen_models
+      externalId: NaughtyCompanion
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: NaughtyCompanion:Taylor
+  instanceType: node
+  sources:
+  - properties:
+      name: Only shoulder character environmental decide understand budget.
+      type: Different prepare debate stock community large think.
+    source:
+      space: sp_pygen_models
+      externalId: NaughtyCompanion
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: NaughtyCompanion:Johnny
+  instanceType: node
+  sources:
+  - properties:
+      name: Nation street including affect as land.
+      type: Service pay single important.
+    source:
+      space: sp_pygen_models
+      externalId: NaughtyCompanion
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: NaughtyCompanion:Kevin
+  instanceType: node
+  sources:
+  - properties:
+      name: See social just campaign course in.
+      type: Least itself film bit you gas number.
+    source:
+      space: sp_pygen_models
+      externalId: NaughtyCompanion
+      version: '1'
+      type: view
+- space: sp_omni_instances
+  externalId: NaughtyCompanion:Jennifer
+  instanceType: node
+  sources:
+  - properties:
+      name: null
+      type: Recent member choose officer traditional significant show.
+    source:
+      space: sp_pygen_models
+      externalId: NaughtyCompanion
+      version: '1'
+      type: view

@@ -27,6 +27,7 @@ from omni._api.implementation_1_non_writeable import Implementation1NonWriteable
 from omni._api.implementation_2 import Implementation2API
 from omni._api.main_interface import MainInterfaceAPI
 from omni._api.naughty import NaughtyAPI
+from omni._api.naughty_companion import NaughtyCompanionAPI
 from omni._api.primitive_nullable import PrimitiveNullableAPI
 from omni._api.primitive_nullable_listed import PrimitiveNullableListedAPI
 from omni._api.primitive_required import PrimitiveRequiredAPI
@@ -64,6 +65,7 @@ __all__ = [
     "Implementation2API",
     "MainInterfaceAPI",
     "NaughtyAPI",
+    "NaughtyCompanionAPI",
     "PrimitiveNullableAPI",
     "PrimitiveNullableListedAPI",
     "PrimitiveRequiredAPI",

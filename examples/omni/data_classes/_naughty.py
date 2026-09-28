@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any, ClassVar, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Optional, Union
 
 from cognite.client import data_modeling as dm, CogniteClient
 from pydantic import Field
@@ -33,7 +33,18 @@ from omni.data_classes._core import (
     NodeQueryCore,
     StringFilter,
     ViewPropertyId,
+    DirectRelationFilter,
 )
+
+if TYPE_CHECKING:
+    from omni.data_classes._naughty_companion import (
+        NaughtyCompanion,
+        NaughtyCompanionList,
+        NaughtyCompanionGraphQL,
+        NaughtyCompanionWrite,
+        NaughtyCompanionWriteList,
+    )
+
 
 __all__ = [
     "Naughty",
@@ -65,10 +76,12 @@ class NaughtyGraphQL(GraphQLCore):
         space: The space where the node is located.
         external_id: The external id of the naughty.
         data_record: The data record of the naughty node.
+        friend: The friend field.
         type_: The type field.
     """
 
     view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Naughty", "1")
+    friend: Optional[NaughtyCompanionGraphQL] = Field(default=None, repr=False)
     type_: Optional[str] = Field(None, alias="type")
 
     @model_validator(mode="before")
@@ -81,6 +94,14 @@ class NaughtyGraphQL(GraphQLCore):
                 last_updated_time=values.pop("lastUpdatedTime", None),
             )
         return values
+
+    @field_validator("friend", mode="before")
+    def parse_graphql(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+        if "items" in value:
+            return value["items"]
+        return value
 
     def as_read(self) -> Naughty:
         """Convert this GraphQL format of naughty to the reading format."""
@@ -100,6 +121,7 @@ class Naughty(DomainModel):
         space: The space where the node is located.
         external_id: The external id of the naughty.
         data_record: The data record of the naughty node.
+        friend: The friend field.
         type_: The type field.
     """
 
@@ -107,7 +129,13 @@ class Naughty(DomainModel):
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, None] = None
+    friend: Union[NaughtyCompanion, str, dm.NodeId, None] = Field(default=None, repr=False)
     type_: Optional[str] = Field(None, alias="type")
+
+    @field_validator("friend", mode="before")
+    @classmethod
+    def parse_single(cls, value: Any, info: ValidationInfo) -> Any:
+        return parse_single_connection(value, info.field_name)
 
     def as_write(self) -> NaughtyWrite:
         """Convert this read version of naughty to the writing version."""
@@ -123,16 +151,32 @@ class NaughtyWrite(DomainModelWrite):
         space: The space where the node is located.
         external_id: The external id of the naughty.
         data_record: The data record of the naughty node.
+        friend: The friend field.
         type_: The type field.
     """
 
-    _container_fields: ClassVar[tuple[str, ...]] = ("type_",)
+    _container_fields: ClassVar[tuple[str, ...]] = (
+        "friend",
+        "type_",
+    )
+    _direct_relations: ClassVar[tuple[str, ...]] = ("friend",)
 
     _view_id: ClassVar[dm.ViewId] = dm.ViewId("sp_pygen_models", "Naughty", "1")
 
     space: str = DEFAULT_INSTANCE_SPACE
     node_type: Union[dm.DirectRelationReference, dm.NodeId, tuple[str, str], None] = None
+    friend: Union[NaughtyCompanionWrite, str, dm.NodeId, None] = Field(default=None, repr=False)
     type_: Optional[str] = Field(None, alias="type")
+
+    @field_validator("friend", mode="before")
+    def as_node_id(cls, value: Any) -> Any:
+        if isinstance(value, dm.DirectRelationReference):
+            return dm.NodeId(value.space, value.external_id)
+        elif isinstance(value, tuple) and len(value) == 2 and all(isinstance(item, str) for item in value):
+            return dm.NodeId(value[0], value[1])
+        elif isinstance(value, list):
+            return [cls.as_node_id(item) for item in value]
+        return value
 
 
 class NaughtyList(DomainModelList[Naughty]):
@@ -144,15 +188,37 @@ class NaughtyList(DomainModelList[Naughty]):
         """Convert these read versions of naughty to the writing versions."""
         return NaughtyWriteList([node.as_write() for node in self.data])
 
+    @property
+    def friend(self) -> NaughtyCompanionList:
+        from ._naughty_companion import NaughtyCompanion, NaughtyCompanionList
+
+        return NaughtyCompanionList([item.friend for item in self.data if isinstance(item.friend, NaughtyCompanion)])
+
 
 class NaughtyWriteList(DomainModelWriteList[NaughtyWrite]):
     """List of naughties in the writing version."""
 
     _INSTANCE = NaughtyWrite
 
+    @property
+    def friend(self) -> NaughtyCompanionWriteList:
+        from ._naughty_companion import NaughtyCompanionWrite, NaughtyCompanionWriteList
+
+        return NaughtyCompanionWriteList(
+            [item.friend for item in self.data if isinstance(item.friend, NaughtyCompanionWrite)]
+        )
+
 
 def _create_naughty_filter(
     view_id: dm.ViewId,
+    friend: (
+        str
+        | tuple[str, str]
+        | dm.NodeId
+        | dm.DirectRelationReference
+        | Sequence[str | tuple[str, str] | dm.NodeId | dm.DirectRelationReference]
+        | None
+    ) = None,
     type_: str | list[str] | None = None,
     type_prefix: str | None = None,
     external_id_prefix: str | None = None,
@@ -160,6 +226,12 @@ def _create_naughty_filter(
     filter: dm.Filter | None = None,
 ) -> dm.Filter | None:
     filters: list[dm.Filter] = []
+    if isinstance(friend, str | dm.NodeId | dm.DirectRelationReference) or is_tuple_id(friend):
+        filters.append(dm.filters.Equals(view_id.as_property_ref("friend"), value=as_instance_dict_id(friend)))
+    if friend and isinstance(friend, Sequence) and not isinstance(friend, str) and not is_tuple_id(friend):
+        filters.append(
+            dm.filters.In(view_id.as_property_ref("friend"), values=[as_instance_dict_id(item) for item in friend])
+        )
     if isinstance(type_, str):
         filters.append(dm.filters.Equals(view_id.as_property_ref("type"), value=type_))
     if type_ and isinstance(type_, list):
@@ -194,6 +266,7 @@ class _NaughtyQuery(NodeQueryCore[T_DomainModelList, NaughtyList]):
         connection_type: Literal["reverse-list"] | None = None,
         reverse_expression: dm.query.NodeOrEdgeResultSetExpression | None = None,
     ):
+        from ._naughty_companion import _NaughtyCompanionQuery
 
         super().__init__(
             created_types,
@@ -208,13 +281,29 @@ class _NaughtyQuery(NodeQueryCore[T_DomainModelList, NaughtyList]):
             reverse_expression,
         )
 
+        if _NaughtyCompanionQuery not in created_types and len(creation_path) + 1 < global_config.max_select_depth:
+            self.friend = _NaughtyCompanionQuery(
+                created_types.copy(),
+                self._creation_path,
+                client,
+                result_list_cls,
+                dm.query.NodeResultSetExpression(
+                    through=self._view_id.as_property_ref("friend"),
+                    direction="outwards",
+                ),
+                connection_name="friend",
+                connection_property=ViewPropertyId(self._view_id, "friend"),
+            )
+
         self.space = StringFilter(self, ["node", "space"])
         self.external_id = StringFilter(self, ["node", "externalId"])
+        self.friend_filter = DirectRelationFilter(self, self._view_id.as_property_ref("friend"))
         self.type_ = StringFilter(self, self._view_id.as_property_ref("type"))
         self._filter_classes.extend(
             [
                 self.space,
                 self.external_id,
+                self.friend_filter,
                 self.type_,
             ]
         )

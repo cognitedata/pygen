@@ -100,3 +100,7 @@ views:
   externalId: Naughty
   version: "1"
   type: view
+- space: {{ pygen_models_space }}
+  externalId: NaughtyCompanion
+  version: "1"
+  type: view

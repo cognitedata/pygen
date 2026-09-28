@@ -29,6 +29,7 @@ from omni._api import (
     Implementation2API,
     MainInterfaceAPI,
     NaughtyAPI,
+    NaughtyCompanionAPI,
     PrimitiveNullableAPI,
     PrimitiveNullableListedAPI,
     PrimitiveRequiredAPI,
@@ -46,7 +47,7 @@ class OmniClient:
 
     Generated with:
         pygen = 0.0.0
-        cognite-sdk = 8.0.5
+        cognite-sdk = 8.18.0
         pydantic = 2.12.5
 
     Data Model:
@@ -87,6 +88,7 @@ class OmniClient:
         self.implementation_2 = Implementation2API(client)
         self.main_interface = MainInterfaceAPI(client)
         self.naughty = NaughtyAPI(client)
+        self.naughty_companion = NaughtyCompanionAPI(client)
         self.primitive_nullable = PrimitiveNullableAPI(client)
         self.primitive_nullable_listed = PrimitiveNullableListedAPI(client)
         self.primitive_required = PrimitiveRequiredAPI(client)
@@ -276,6 +278,7 @@ with the following APIs available<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.implementation_2<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.main_interface<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.naughty<br />
+&nbsp;&nbsp;&nbsp;&nbsp;.naughty_companion<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.primitive_nullable<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.primitive_nullable_listed<br />
 &nbsp;&nbsp;&nbsp;&nbsp;.primitive_required<br />

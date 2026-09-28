@@ -1,8 +1,17 @@
 space: {{ pygen_models_space }}
-externalId: Naughty
-name: Naughty
+externalId: NaughtyCompanion
+name: NaughtyCompanion
 usedFor: node
 properties:
+  name:
+    type:
+      list: false
+      collation: ucs_basic
+      type: text
+    nullable: true
+    autoIncrement: false
+    immutable: false
+    name: name
   type:
     type:
       list: false
@@ -12,8 +21,3 @@ properties:
     autoIncrement: false
     immutable: false
     name: type
-  friend:
-    type:
-      type: direct
-    nullable: true
-    name: friend

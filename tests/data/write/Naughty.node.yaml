@@ -4,6 +4,9 @@
   sources:
   - properties:
       type: Range little exactly suggest thus sit.
+      friend:
+        space: sp_omni_instances
+        externalId: NaughtyCompanion:Daryl
     source:
       space: sp_pygen_models
       externalId: Naughty
@@ -26,6 +29,9 @@
   sources:
   - properties:
       type: null
+      friend:
+        space: sp_omni_instances
+        externalId: NaughtyCompanion:Kevin
     source:
       space: sp_pygen_models
       externalId: Naughty
@@ -37,6 +43,9 @@
   sources:
   - properties:
       type: Yes head win ever television.
+      friend:
+        space: sp_omni_instances
+        externalId: NaughtyCompanion:Daryl
     source:
       space: sp_pygen_models
       externalId: Naughty
