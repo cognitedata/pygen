@@ -9,8 +9,9 @@ from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.data_classes import filters
 from cognite.client.data_classes.aggregations import Aggregation, Avg
+from cognite.client.data_classes.data_modeling import View
 from cognite.client.data_classes.data_modeling.instances import InstanceAggregationResultList
-from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation
+from cognite.client.data_classes.data_modeling.views import ReverseDirectRelation, ViewProperty
 from cognite.client.exceptions import CogniteAPIError
 from cognite.client.utils.useful_types import SequenceNotStr
 
@@ -341,18 +342,20 @@ class QueryExecutor:
         }
         builder.append(factory.root(filter, limit=limit, sort=self._as_sort_list(sort)))
         for connection_id, connection in factory.connection_properties.items():
-            connection_view: dm.View | None = None
-            if (
-                isinstance(connection, dm.EdgeConnection | ReverseDirectRelation | dm.MappedProperty)
-                and connection.source is not None
-            ):
-                connection_view = self._get_view(connection.source)
+            connection_view = self._get_connection_view(connection)
             builder.extend(factory.from_connection(connection_id, connection, reverse_views, connection_view))
         executor = builder.build()
         results = executor.execute_query(self._client, remove_not_connected=False)
         return QueryUnpacker(
             results, edges=self._unpack_edges, as_data_record=False, edge_type_key="type", node_type_key="type"
         ).unpack()
+
+    def _get_connection_view(self, connection: ViewProperty) -> View | None:
+        if isinstance(connection, dm.EdgeConnection | ReverseDirectRelation | dm.MappedProperty) and isinstance(
+            connection.source, dm.ViewId
+        ):
+            return self._get_view(connection.source)
+        return None
 
     @staticmethod
     def _get_instance_types(view: dm.View) -> list[Literal["node", "edge"]]:
@@ -398,12 +401,15 @@ class QueryExecutor:
                 if isinstance(prop.through.source, dm.ViewId)
             }
             for connection_id, connection in factory.connection_properties.items():
+                connection_view = self._get_connection_view(connection)
+
                 connection_steps = factory.from_connection(
                     # We need to set the max_retrieve_limit to nested_limit*chunk_size to ensure that we retrieve
                     # enough instances per root instance.
                     connection_id,
                     connection,
                     reverse_views,
+                    connection_view=connection_view,
                     max_retrieve_limit=nested_limit * chunk_size,
                 )
                 builder.extend(connection_steps)
