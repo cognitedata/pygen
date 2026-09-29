@@ -238,7 +238,7 @@ class QueryBuildStepFactory:
         max_retrieve_batch_limit: int | None = None,
     ) -> QueryBuildStep:
         if self._root_properties:
-            # Ship node properties that are not defined on the view. Note this assumes for example if the user
+            # Skip node properties that are not defined on the view. Note this assumes for example if the user
             # selects `type` they want the view-defined property, not the built-in node property.
             node_properties = NODE_PROPERTIES - (set(self._view.properties.keys()) if self._view else set())
             skip = node_properties | set(self.reverse_properties.keys())
