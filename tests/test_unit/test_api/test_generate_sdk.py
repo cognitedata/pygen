@@ -110,6 +110,7 @@ class TestGenerateSDK:
     def test_generate_sdk_reverse_relation_through_direct_relation_outside_model(self, tmp_path: Path) -> None:
         client_name = "WorkOrderClient"
         top_level_package = "work_order_model"
+        printed_messages: list[str] = []
 
         generate_sdk(
             DATA_MODEL_REVERSE_RELATION_THROUGH_DIRECT_RELATION_OUTSIDE_MODEL,
@@ -118,11 +119,18 @@ class TestGenerateSDK:
             overwrite=True,
             client_name=client_name,
             default_instance_space="edm_space",
+            logger=printed_messages.append,
         )
 
         with append_to_sys_path(str(tmp_path)):
             module = vars(importlib.import_module(top_level_package))
-            assert client_name in module
+            assert {
+                "client": client_name in module,
+                "warning": any(
+                    "CogniteMaintenanceOrder" in message and "maintenanceOrder" in message
+                    for message in printed_messages
+                ),
+            } == {"client": True, "warning": True}
 
     def test_generate_sdk_edge_source_outside_model(self, tmp_path: Path) -> None:
         client_name = "HydroClient"

@@ -25,7 +25,7 @@ from pydantic.version import VERSION as PYDANTIC_VERSION
 
 from cognite.pygen._query.extract_code import get_file_content
 from cognite.pygen._version import __version__
-from cognite.pygen._warnings import PydanticNamespaceCollisionWarning
+from cognite.pygen._warnings import DirectRelationTargetOutsideModelWarning, PydanticNamespaceCollisionWarning
 from cognite.pygen.config import PygenConfig
 
 from . import validation
@@ -225,6 +225,7 @@ class MultiAPIGenerator:
         # Used to verify that reverse direct relation's targets exist.
         direct_relations_by_view_id: dict[dm.ViewId, set[str]] = {}
         view_property_by_container_direct_relation: dict[tuple[dm.ContainerId, str], set[dm.PropertyId]] = {}
+        model_view_ids = {view.as_id() for model in data_models for view in model.views}
         for view in itertools.chain.from_iterable(model.views for model in data_models):
             view_id = view.as_id()
             if view_id in seen_views:
@@ -233,6 +234,10 @@ class MultiAPIGenerator:
             seen_views.add(view_id)
             for prop_name, prop in view.properties.items():
                 if not (isinstance(prop, dm.MappedProperty) and isinstance(prop.type, dm.DirectRelation)):
+                    continue
+                # Fields pointing outside the model are omitted, so they are not valid reverse targets.
+                if prop.source is not None and prop.source not in model_view_ids:
+                    DirectRelationTargetOutsideModelWarning(prop.source, view_id, prop_name).warn()
                     continue
                 direct_relations_by_view_id.setdefault(view_id, set()).add(prop_name)
                 view_property_by_container_direct_relation.setdefault(

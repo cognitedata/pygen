@@ -109,6 +109,24 @@ class UnknownConnectionTargetWarning(PygenWarning, UserWarning):
         )
 
 
+class DirectRelationTargetOutsideModelWarning(PygenWarning, UserWarning):
+    """A direct relation points at a view that is not part of the data model.
+
+    The property cannot be used as a reverse direct relation target.
+    """
+
+    def __init__(self, source: ViewId, view: ViewId, property_: str) -> None:
+        self.source = source
+        self.view = view
+        self.property_ = property_
+
+    def __str__(self) -> str:
+        return (
+            f"Target {self.source!r} is not in the model. "
+            f"Skipping {self.view.external_id}.{self.property_} as a reverse direct relation target."
+        )
+
+
 class InvalidCodeGenerated(PygenWarning, UserWarning):
     def __init__(self, filepath: str | Path, error_message: str) -> None:
         self.filepath = filepath
@@ -155,7 +173,10 @@ def _print_warning_group(
         return
     elif group is InvalidCodeGenerated or len(pygen_warnings) == 1:
         _print_one_by_one(console, pygen_warnings)
-    elif issubclass(group, NameCollisionWarning | MissingReverseDirectRelationTargetWarning):
+    elif issubclass(
+        group,
+        NameCollisionWarning | MissingReverseDirectRelationTargetWarning | DirectRelationTargetOutsideModelWarning,
+    ):
         _print_group(console, group, pygen_warnings)
 
 
