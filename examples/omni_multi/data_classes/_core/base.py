@@ -174,8 +174,6 @@ class GraphQLList(UserList):
             id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
         )
         df = df[columns]
-        if df.empty:
-            return df
         if dropna_columns:
             df.dropna(how="all", axis=1, inplace=True)
         return df
@@ -448,8 +446,6 @@ class CoreList(UserList, Generic[T_Core]):
             id_columns + [col for col in df if col not in fixed_columns] + [col for col in end_columns if col in df]
         )
         df = df[columns]
-        if df.empty:
-            return df
         if dropna_columns:
             df.dropna(how="all", axis=1, inplace=True)
         return df
