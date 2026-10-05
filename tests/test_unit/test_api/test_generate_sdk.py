@@ -107,6 +107,31 @@ class TestGenerateSDK:
             module = vars(importlib.import_module(top_level_package))
             assert client_name in module
 
+    def test_generate_sdk_reverse_relation_through_direct_relation_outside_model(self, tmp_path: Path) -> None:
+        client_name = "WorkOrderClient"
+        top_level_package = "work_order_model"
+        printed_messages: list[str] = []
+
+        generate_sdk(
+            DATA_MODEL_REVERSE_RELATION_THROUGH_DIRECT_RELATION_OUTSIDE_MODEL,
+            top_level_package=top_level_package,
+            output_dir=tmp_path / top_level_package,
+            overwrite=True,
+            client_name=client_name,
+            default_instance_space="edm_space",
+            logger=printed_messages.append,
+        )
+
+        with append_to_sys_path(str(tmp_path)):
+            module = vars(importlib.import_module(top_level_package))
+            assert {
+                "client": client_name in module,
+                "warning": any(
+                    "CogniteMaintenanceOrder" in message and "maintenanceOrder" in message
+                    for message in printed_messages
+                ),
+            } == {"client": True, "warning": True}
+
     def test_generate_sdk_edge_source_outside_model(self, tmp_path: Path) -> None:
         client_name = "HydroClient"
         top_level_package = "hydro_model"
@@ -1079,5 +1104,45 @@ DATA_MODEL_WITH_VIEW_PROPERTY_NAMED_QUERY = dm.DataModel(
             writable=True,
             filter=None,
         )
+    ],
+)
+
+DATA_MODEL_REVERSE_RELATION_THROUGH_DIRECT_RELATION_OUTSIDE_MODEL = dm.DataModel(
+    space="edm_space",
+    external_id="EdmModel",
+    version="1",
+    **_DEFAULT_SPACE_VALUES,
+    views=[
+        dm.View(
+            space="edm_space",
+            external_id="WorkOrderOperation",
+            version="1",
+            name="WorkOrderOperation",
+            used_for="node",
+            properties={
+                "maintenanceOrder": dm.MappedProperty(
+                    container=dm.ContainerId("cdf_idm", "CogniteOperation"),
+                    container_property_identifier="maintenanceOrder",
+                    type=dm.DirectRelation(),
+                    source=dm.ViewId("cdf_idm", "CogniteMaintenanceOrder", "v1"),
+                    **_DEFAULT_MAPPED_PROPERTY_VALUES,
+                ),
+            },
+            **_DEFAULT_VIEW_VALUES,
+        ),
+        dm.View(
+            space="edm_space",
+            external_id="WorkOrder",
+            version="1",
+            name="WorkOrder",
+            used_for="node",
+            properties={
+                "operations": dm.MultiReverseDirectRelation(
+                    source=dm.ViewId("edm_space", "WorkOrderOperation", "1"),
+                    through=dm.PropertyId(dm.ViewId("edm_space", "WorkOrderOperation", "1"), "maintenanceOrder"),
+                ),
+            },
+            **_DEFAULT_VIEW_VALUES,
+        ),
     ],
 )
