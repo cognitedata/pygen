@@ -620,7 +620,7 @@ EXPECTED_TS_API_IMPORT_STATEMENTS = """/**
 
 import { InstanceAPI } from "../instance_api/api.ts";
 import type { PygenClientConfig } from "../instance_api/auth/index.ts";
-import type { ViewReference } from "../instance_api/types/references.ts";
+import type { InstanceId, ViewReference } from "../instance_api/types/references.ts";
 import type { Aggregation, PropertySort, SortDirection } from "../instance_api/types/query.ts";
 import type { AggregateResponse, Page } from "../instance_api/types/responses.ts";
 import { InstanceList } from "../instance_api/types/instance.ts";

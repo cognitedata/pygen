@@ -152,6 +152,19 @@ class TypeScriptGenerator(Generator):
         return instance_api_files
 
 
+# Instance-level filters that FilterContainer (instance_api/types/dtypeFilters.ts) already defines. A view property
+# with one of these names (for example a property called `type`) would redeclare the attribute with an incompatible
+# filter type.
+_FILTER_CONTAINER_ATTRIBUTES = frozenset(
+    {"space", "externalId", "version", "type", "createdTime", "lastUpdatedTime", "deletedTime", "startNode", "endNode"}
+)
+
+
+def _filter_attribute_name(field_name: str) -> str:
+    """Name of the filter attribute for a view property, suffixed with `_` when it collides with an instance filter."""
+    return f"{field_name}_" if field_name in _FILTER_CONTAINER_ATTRIBUTES else field_name
+
+
 class TypeScriptDataClassGenerator:
     """Generator for TypeScript data class files.
 
@@ -169,15 +182,11 @@ class TypeScriptDataClassGenerator:
         self._view_const_name = self._create_view_const_name()
 
     def _create_view_const_name(self) -> str:
-        """Create the view constant name in UPPER_SNAKE_CASE."""
-        name = self.data_class.read.name
-        # Convert PascalCase to UPPER_SNAKE_CASE
-        result: list[str] = []
-        for i, char in enumerate(name):
-            if char.isupper() and i > 0:
-                result.append("_")
-            result.append(char.upper())
-        return "".join(result) + "_VIEW"
+        """Create the view constant name in UPPER_SNAKE_CASE.
+
+        Must match the name the index and API files import, so both use TypeScriptGenerator._to_view_const_name.
+        """
+        return TypeScriptGenerator._to_view_const_name(self.data_class.read.name)
 
     def create_import_statements(self) -> str:
         """Generate import statements for the data class file."""
@@ -403,19 +412,20 @@ export class {list_cls.name} extends InstanceList<{read.name}> {{
         for field in self.data_class.read.fields:
             if not field.filter_name:
                 continue
+            attr_name = _filter_attribute_name(field.name)
 
             # Add property declaration
             filter_fields.append(f"  /** Filter for the {field.name} property */")
-            filter_fields.append(f"  readonly {field.name}: {field.filter_name};")
+            filter_fields.append(f"  readonly {attr_name}: {field.filter_name};")
 
             # Add constructor assignment
             view_const = self._view_const_name
             filter_class = field.filter_name
             prop_id = field.cdf_prop_id
             constructor_assignments.append(
-                f'    const {field.name} = new {filter_class}({view_const}, "{prop_id}", operator);'
+                f'    const {attr_name} = new {filter_class}({view_const}, "{prop_id}", operator);'
             )
-            filter_names.append(field.name)
+            filter_names.append(attr_name)
 
         # Build the class
         fields_str = "\n".join(filter_fields)
@@ -523,7 +533,7 @@ def _create_ts_filter_params(field: Field) -> list[TSFilterParam]:
             TSFilterParam(
                 name=param_name,
                 type_hint=type_hint,
-                filter_call=f"filter.{field.name}{filter_call_template.format(param=param_name)}",
+                filter_call=f"filter.{_filter_attribute_name(field.name)}{filter_call_template.format(param=param_name)}",
             )
         )
 
@@ -564,10 +574,6 @@ class TypeScriptAPIGenerator:
         list_name = self.data_class.read_list.name
         view_const = self._view_const_name
 
-        # Check if we need InstanceId import (for direct relation filters)
-        has_direct_relation = any(field.filter_name == "DirectRelationFilter" for field in self.data_class.read.fields)
-        instance_id_import = ", InstanceId" if has_direct_relation else ""
-
         return f"""/**
  * API class for {read_name} instances.
  *
@@ -576,7 +582,7 @@ class TypeScriptAPIGenerator:
 
 import {{ InstanceAPI }} from "../instance_api/api.ts";
 import type {{ PygenClientConfig }} from "../instance_api/auth/index.ts";
-import type {{ ViewReference{instance_id_import} }} from "../instance_api/types/references.ts";
+import type {{ InstanceId, ViewReference }} from "../instance_api/types/references.ts";
 import type {{ Aggregation, PropertySort, SortDirection }} from "../instance_api/types/query.ts";
 import type {{ AggregateResponse, Page }} from "../instance_api/types/responses.ts";
 import {{ InstanceList }} from "../instance_api/types/instance.ts";
