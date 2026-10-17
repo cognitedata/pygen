@@ -6,26 +6,32 @@
  * @packageDocumentation
  */
 
-export {
-  CATEGORY_NODE_VIEW,
+export type {
   CategoryNodeWrite,
   CategoryNode,
+} from "./categoryNode.ts";
+export {
+  CATEGORY_NODE_VIEW,
   categoryNodeAsWrite,
   CategoryNodeList,
   CategoryNodeFilter,
 } from "./categoryNode.ts";
-export {
-  PRODUCT_NODE_VIEW,
+export type {
   ProductNodeWrite,
   ProductNode,
+} from "./productNode.ts";
+export {
+  PRODUCT_NODE_VIEW,
   productNodeAsWrite,
   ProductNodeList,
   ProductNodeFilter,
 } from "./productNode.ts";
-export {
-  RELATES_TO_VIEW,
+export type {
   RelatesToWrite,
   RelatesTo,
+} from "./relatesTo.ts";
+export {
+  RELATES_TO_VIEW,
   relatesToAsWrite,
   RelatesToList,
   RelatesToFilter,

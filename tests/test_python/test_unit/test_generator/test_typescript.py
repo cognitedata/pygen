@@ -548,18 +548,22 @@ EXPECTED_TS_DATA_CLASS_INDEX = """/**
  * @packageDocumentation
  */
 
-export {
-  EXAMPLE_VIEW_VIEW,
+export type {
   ExampleViewWrite,
   ExampleView,
+} from "./exampleView.ts";
+export {
+  EXAMPLE_VIEW_VIEW,
   exampleViewAsWrite,
   ExampleViewList,
   ExampleViewFilter,
 } from "./exampleView.ts";
-export {
-  RELATES_TO_VIEW,
+export type {
   RelatesToWrite,
   RelatesTo,
+} from "./relatesTo.ts";
+export {
+  RELATES_TO_VIEW,
   relatesToAsWrite,
   RelatesToList,
   RelatesToFilter,

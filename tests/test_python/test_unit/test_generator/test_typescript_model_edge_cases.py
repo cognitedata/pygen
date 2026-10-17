@@ -89,3 +89,15 @@ def test_view_constant_name_is_the_same_in_data_class_and_index(generated: dict[
     index = generated[Path("data_classes/index.ts")]
     assert "export const COGNITE_3_D_MODEL_VIEW" in data_class
     assert "COGNITE_3_D_MODEL_VIEW," in index
+
+
+def test_data_class_index_re_exports_interfaces_as_types(generated: dict[Path, str]) -> None:
+    # Vite projects compile with `isolatedModules`, where re-exporting an interface without `export type` is TS1205.
+    index = generated[Path("data_classes/index.ts")]
+    types = 'export type {\n  WorkOrderWrite,\n  WorkOrder,\n} from "./workOrder.ts";'
+    values = (
+        "export {\n  WORK_ORDER_VIEW,\n  workOrderAsWrite,\n  WorkOrderList,\n  WorkOrderFilter,\n"
+        '} from "./workOrder.ts";'
+    )
+    assert types in index
+    assert values in index

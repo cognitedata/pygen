@@ -87,30 +87,24 @@ class TypeScriptGenerator(Generator):
             # Module name is filename without .ts extension
             module_name = data_class_file.filename.replace(".ts", "")
 
-            # Build list of exports from this module
-            exports: list[str] = []
-
-            # Add view constant (UPPER_SNAKE_CASE)
-            view_const = self._to_view_const_name(data_class_file.read.name)
-            exports.append(view_const)
-
-            # Add data classes
+            # The read and write classes are interfaces, so they are re-exported with `export type`. A plain
+            # `export { Interface }` fails under `isolatedModules`, which Vite projects enable (TS1205).
+            type_exports: list[str] = []
             if data_class_file.write:
-                exports.append(data_class_file.write.name)
-            exports.append(data_class_file.read.name)
+                type_exports.append(data_class_file.write.name)
+            type_exports.append(data_class_file.read.name)
 
-            # Add asWrite function
+            # Values: view constant (UPPER_SNAKE_CASE), asWrite function, list and filter classes
+            view_const = self._to_view_const_name(data_class_file.read.name)
             as_write_func = data_class_file.read.name[0].lower() + data_class_file.read.name[1:] + "AsWrite"
-            exports.append(as_write_func)
+            exports = [view_const, as_write_func, data_class_file.read_list.name, data_class_file.filter.name]
 
-            # Add list and filter classes
-            exports.append(data_class_file.read_list.name)
-            exports.append(data_class_file.filter.name)
+            all_exports.extend(type_exports + exports)
 
-            all_exports.extend(exports)
-
-            # Generate export statement
+            # Generate export statements
+            type_exports_str = ",\n  ".join(type_exports)
             exports_str = ",\n  ".join(exports)
+            lines.append(f'export type {{\n  {type_exports_str},\n}} from "./{module_name}.ts";')
             lines.append(f'export {{\n  {exports_str},\n}} from "./{module_name}.ts";')
 
         return "\n".join(lines)
