@@ -53,10 +53,9 @@ def to_pygen_model(
 
 
 def _create_data_class(view: ViewResponse, naming: NamingConfig, output_format: OutputFormat) -> DataClassFile:
-    if view.used_for not in ("node", "edge"):
-        raise NotImplementedError("Data classes for views used for 'all' are not supported yet.")
-    else:
-        used_for = cast(Literal["node", "edge"], view.used_for)
+    # A view used for 'all' can be applied to both nodes and edges. Until edge access is generated for such views,
+    # they are generated as node views, which is how they are used in practice (e.g. CogniteDescribable).
+    used_for = cast(Literal["node", "edge"], "node" if view.used_for == "all" else view.used_for)
 
     write: DataClass | None = None
     if view.writable:

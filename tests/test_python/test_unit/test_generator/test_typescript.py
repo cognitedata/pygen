@@ -548,18 +548,22 @@ EXPECTED_TS_DATA_CLASS_INDEX = """/**
  * @packageDocumentation
  */
 
-export {
-  EXAMPLE_VIEW_VIEW,
+export type {
   ExampleViewWrite,
   ExampleView,
+} from "./exampleView.ts";
+export {
+  EXAMPLE_VIEW_VIEW,
   exampleViewAsWrite,
   ExampleViewList,
   ExampleViewFilter,
 } from "./exampleView.ts";
-export {
-  RELATES_TO_VIEW,
+export type {
   RelatesToWrite,
   RelatesTo,
+} from "./relatesTo.ts";
+export {
+  RELATES_TO_VIEW,
   relatesToAsWrite,
   RelatesToList,
   RelatesToFilter,
@@ -620,7 +624,7 @@ EXPECTED_TS_API_IMPORT_STATEMENTS = """/**
 
 import { InstanceAPI } from "../instance_api/api.ts";
 import type { PygenClientConfig } from "../instance_api/auth/index.ts";
-import type { ViewReference } from "../instance_api/types/references.ts";
+import type { InstanceId, ViewReference } from "../instance_api/types/references.ts";
 import type { Aggregation, PropertySort, SortDirection } from "../instance_api/types/query.ts";
 import type { AggregateResponse, Page } from "../instance_api/types/responses.ts";
 import { InstanceList } from "../instance_api/types/instance.ts";

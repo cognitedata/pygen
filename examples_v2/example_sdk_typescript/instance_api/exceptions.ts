@@ -10,6 +10,14 @@
 import type { FailedRequest, FailedResponse } from "./http_client/types.ts";
 
 /**
+ * `Error.captureStackTrace` exists on V8 (Node, Deno, Chrome) but is not part of the standard `ErrorConstructor`
+ * type, so browser projects without Node types (for example Vite apps) fail to type-check a direct call.
+ */
+const captureStackTrace = (Error as {
+  captureStackTrace?: (target: object, constructorOpt?: unknown) => void;
+}).captureStackTrace;
+
+/**
  * Base class for all exceptions raised by the Pygen API client.
  *
  * This serves as the root of the exception hierarchy, allowing users to
@@ -31,9 +39,7 @@ export class PygenAPIError extends Error {
     super(message);
     this.name = "PygenAPIError";
     // Maintains proper stack trace for where our error was thrown (only available on V8)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, PygenAPIError);
-    }
+    captureStackTrace?.(this, PygenAPIError);
   }
 }
 
@@ -60,9 +66,7 @@ export class OAuth2Error extends PygenAPIError {
   constructor(message: string) {
     super(message);
     this.name = "OAuth2Error";
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, OAuth2Error);
-    }
+    captureStackTrace?.(this, OAuth2Error);
   }
 }
 
@@ -126,9 +130,7 @@ export class MultiRequestError<TResult = unknown> extends PygenAPIError {
     this.failedResponses = failedResponses;
     this.failedRequests = failedRequests;
     this.result = result;
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, MultiRequestError);
-    }
+    captureStackTrace?.(this, MultiRequestError);
   }
 
   /**
