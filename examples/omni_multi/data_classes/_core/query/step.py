@@ -84,6 +84,7 @@ class QueryBuildStep:
         self.view_id = view_id
         self.max_retrieve_limit = max_retrieve_limit
         self._max_retrieve_batch_limit = max_retrieve_batch_limit
+        self.selected_properties = selected_properties
         self.select: dm.query.Select | None
         if select is NotSetSentinel:
             try:
@@ -95,13 +96,13 @@ class QueryBuildStep:
         self.raw_filter = raw_filter
         self.connection_type = connection_type
         self.connection_property = connection_property
-        self.selected_properties = selected_properties
 
     def _default_select(self) -> dm.query.Select:
         if self.view_id is None:
             return dm.query.Select()
         else:
-            return dm.query.Select([dm.query.SourceSelector(self.view_id, ["*"])])
+            properties = self.selected_properties if self.selected_properties is not None else ["*"]
+            return dm.query.Select([dm.query.SourceSelector(self.view_id, properties)])
 
     @property
     def is_queryable(self) -> bool:
