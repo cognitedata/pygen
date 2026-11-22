@@ -85,18 +85,18 @@ class CogniteEquipmentAPI(
         space: str = DEFAULT_INSTANCE_SPACE,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> CogniteEquipment | CogniteEquipmentList | None:
-        """Retrieve one or more Cognite equipments by id(s).
+        """Retrieve one or more Cognite equipment by id(s).
 
         Args:
-            external_id: External id or list of external ids of the Cognite equipments.
-            space: The space where all the Cognite equipments are located.
+            external_id: External id or list of external ids of the Cognite equipment.
+            space: The space where all the Cognite equipment are located.
             retrieve_connections: Whether to retrieve `activities`, `asset`, `equipment_type`, `files`, `source` and
-            `time_series` for the Cognite equipments. Defaults to 'skip'.'skip' will not retrieve any connections,
+            `time_series` for the Cognite equipment. Defaults to 'skip'.'skip' will not retrieve any connections,
             'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full
             connected items.
 
         Returns:
-            The requested Cognite equipments.
+            The requested Cognite equipment.
 
         Examples:
 
@@ -179,7 +179,7 @@ class CogniteEquipmentAPI(
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> CogniteEquipmentList:
-        """Search Cognite equipments
+        """Search Cognite equipment
 
         Args:
             query: The search query,
@@ -210,7 +210,7 @@ class CogniteEquipmentAPI(
             source_updated_user_prefix: The prefix of the source updated user to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite equipments to return. Defaults to 25.
+            limit: Maximum number of Cognite equipment to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -221,7 +221,7 @@ class CogniteEquipmentAPI(
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
-            Search results Cognite equipments matching the query.
+            Search results Cognite equipment matching the query.
 
         Examples:
 
@@ -229,7 +229,7 @@ class CogniteEquipmentAPI(
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_equipments = client.cognite_equipment.search(
+                >>> cognite_equipment_list = client.cognite_equipment.search(
                 ...     'my_cognite_equipment'
                 ... )
 
@@ -548,7 +548,7 @@ class CogniteEquipmentAPI(
         | list[dm.aggregations.AggregatedNumberedValue]
         | InstanceAggregationResultList
     ):
-        """Aggregate data across Cognite equipments
+        """Aggregate data across Cognite equipment
 
         Args:
             aggregate: The aggregation to perform.
@@ -582,7 +582,7 @@ class CogniteEquipmentAPI(
             source_updated_user_prefix: The prefix of the source updated user to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite equipments to return. Defaults to 25.
+            limit: Maximum number of Cognite equipment to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write
                 your own filtering which will be ANDed with the filter above.
@@ -592,7 +592,7 @@ class CogniteEquipmentAPI(
 
         Examples:
 
-            Count Cognite equipments in space `my_space`:
+            Count Cognite equipment in space `my_space`:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
@@ -703,7 +703,7 @@ class CogniteEquipmentAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for Cognite equipments
+        """Produces histograms for Cognite equipment
 
         Args:
             property: The property to use as the value in the histogram.
@@ -736,7 +736,7 @@ class CogniteEquipmentAPI(
             source_updated_user_prefix: The prefix of the source updated user to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite equipments to return.
+            limit: Maximum number of Cognite equipment to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -785,7 +785,7 @@ class CogniteEquipmentAPI(
         )
 
     def select(self) -> CogniteEquipmentQuery:
-        """Start selecting from Cognite equipments."""
+        """Start selecting from Cognite equipment."""
         return CogniteEquipmentQuery(self._client)
 
     def _build(
@@ -918,10 +918,10 @@ class CogniteEquipmentAPI(
         limit: int | None = None,
         cursors: dict[str, str | None] | None = None,
     ) -> Iterator[CogniteEquipmentList]:
-        """Iterate over Cognite equipments
+        """Iterate over Cognite equipment
 
         Args:
-            chunk_size: The number of Cognite equipments to return in each iteration. Defaults to 100.
+            chunk_size: The number of Cognite equipment to return in each iteration. Defaults to 100.
             asset: The asset to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
@@ -951,51 +951,51 @@ class CogniteEquipmentAPI(
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
             retrieve_connections: Whether to retrieve `activities`, `asset`, `equipment_type`, `files`, `source` and
-            `time_series` for the Cognite equipments. Defaults to 'skip'.'skip' will not retrieve any connections,
+            `time_series` for the Cognite equipment. Defaults to 'skip'.'skip' will not retrieve any connections,
             'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full
             connected items.
-            limit: Maximum number of Cognite equipments to return. Defaults to None, which will return all items.
+            limit: Maximum number of Cognite equipment to return. Defaults to None, which will return all items.
             cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
                 specific point. See example below for more details.
 
         Returns:
-            Iteration of Cognite equipments
+            Iteration of Cognite equipment
 
         Examples:
 
-            Iterate Cognite equipments in chunks of 100 up to 2000 items:
+            Iterate Cognite equipment in chunks of 100 up to 2000 items:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_equipments in client.cognite_equipment.iterate(chunk_size=100, limit=2000):
-                ...     for cognite_equipment in cognite_equipments:
+                >>> for cognite_equipment_list in client.cognite_equipment.iterate(chunk_size=100, limit=2000):
+                ...     for cognite_equipment in cognite_equipment_list:
                 ...         print(cognite_equipment.external_id)
 
-            Iterate Cognite equipments in chunks of 100 sorted by external_id in descending order:
+            Iterate Cognite equipment in chunks of 100 sorted by external_id in descending order:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_equipments in client.cognite_equipment.iterate(
+                >>> for cognite_equipment_list in client.cognite_equipment.iterate(
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
                 ... ):
-                ...     for cognite_equipment in cognite_equipments:
+                ...     for cognite_equipment in cognite_equipment_list:
                 ...         print(cognite_equipment.external_id)
 
-            Iterate Cognite equipments in chunks of 100 and use cursors to resume the iteration:
+            Iterate Cognite equipment in chunks of 100 and use cursors to resume the iteration:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
                 >>> for first_iteration in client.cognite_equipment.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_equipments in client.cognite_equipment.iterate(
+                >>> for cognite_equipment_list in client.cognite_equipment.iterate(
                 ...     chunk_size=100,
                 ...     limit=2000,
                 ...     cursors=first_iteration.cursors,
                 ... ):
-                ...     for cognite_equipment in cognite_equipments:
+                ...     for cognite_equipment in cognite_equipment_list:
                 ...         print(cognite_equipment.external_id)
 
         """
@@ -1097,7 +1097,7 @@ class CogniteEquipmentAPI(
         sort: InstanceSort | list[InstanceSort] | None = None,
         retrieve_connections: Literal["skip", "identifier", "full"] = "skip",
     ) -> CogniteEquipmentList:
-        """List/filter Cognite equipments
+        """List/filter Cognite equipment
 
         Args:
             asset: The asset to filter on.
@@ -1126,7 +1126,7 @@ class CogniteEquipmentAPI(
             source_updated_user_prefix: The prefix of the source updated user to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite equipments to return.
+            limit: Maximum number of Cognite equipment to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -1136,20 +1136,20 @@ class CogniteEquipmentAPI(
                 This will override the sort_by and direction. This allowos you to sort by multiple fields and
                 specify the direction for each field as well as how to handle null values.
             retrieve_connections: Whether to retrieve `activities`, `asset`, `equipment_type`, `files`, `source` and
-            `time_series` for the Cognite equipments. Defaults to 'skip'.'skip' will not retrieve any connections,
+            `time_series` for the Cognite equipment. Defaults to 'skip'.'skip' will not retrieve any connections,
             'identifier' will only retrieve the identifier of the connected items, and 'full' will retrieve the full
             connected items.
 
         Returns:
-            List of requested Cognite equipments
+            List of requested Cognite equipment
 
         Examples:
 
-            List Cognite equipments and limit to 5:
+            List Cognite equipment and limit to 5:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_equipments = client.cognite_equipment.list(limit=5)
+                >>> cognite_equipment_list = client.cognite_equipment.list(limit=5)
 
         """
         filter_ = _create_cognite_equipment_filter(

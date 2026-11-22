@@ -61,15 +61,15 @@ _COGNITEASSETCLASS_PROPERTIES_BY_FIELD = {
 
 
 class CogniteAssetClassGraphQL(GraphQLCore):
-    """This represents the reading version of Cognite asset clas, used
+    """This represents the reading version of Cognite asset class, used
     when data is retrieved from CDF using GraphQL.
 
     It is used when retrieving data from CDF using GraphQL.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the Cognite asset clas.
-        data_record: The data record of the Cognite asset clas node.
+        external_id: The external id of the Cognite asset class.
+        data_record: The data record of the Cognite asset class node.
         aliases: Alternative names for the instance.
         code: A unique identifier for the class of asset.
         description: The description of the instance.
@@ -98,23 +98,23 @@ class CogniteAssetClassGraphQL(GraphQLCore):
         return values
 
     def as_read(self) -> CogniteAssetClass:
-        """Convert this GraphQL format of Cognite asset clas to the reading format."""
+        """Convert this GraphQL format of Cognite asset class to the reading format."""
         return CogniteAssetClass.model_validate(as_read_args(self))
 
     def as_write(self) -> CogniteAssetClassWrite:
-        """Convert this GraphQL format of Cognite asset clas to the writing format."""
+        """Convert this GraphQL format of Cognite asset class to the writing format."""
         return CogniteAssetClassWrite.model_validate(as_write_args(self))
 
 
 class CogniteAssetClass(CogniteDescribableNode):
-    """This represents the reading version of Cognite asset clas.
+    """This represents the reading version of Cognite asset class.
 
     It is used to when data is retrieved from CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the Cognite asset clas.
-        data_record: The data record of the Cognite asset clas node.
+        external_id: The external id of the Cognite asset class.
+        data_record: The data record of the Cognite asset class node.
         aliases: Alternative names for the instance.
         code: A unique identifier for the class of asset.
         description: The description of the instance.
@@ -130,19 +130,19 @@ class CogniteAssetClass(CogniteDescribableNode):
     standard: Optional[str] = None
 
     def as_write(self) -> CogniteAssetClassWrite:
-        """Convert this read version of Cognite asset clas to the writing version."""
+        """Convert this read version of Cognite asset class to the writing version."""
         return CogniteAssetClassWrite.model_validate(as_write_args(self))
 
 
 class CogniteAssetClassWrite(CogniteDescribableNodeWrite):
-    """This represents the writing version of Cognite asset clas.
+    """This represents the writing version of Cognite asset class.
 
     It is used to when data is sent to CDF.
 
     Args:
         space: The space where the node is located.
-        external_id: The external id of the Cognite asset clas.
-        data_record: The data record of the Cognite asset clas node.
+        external_id: The external id of the Cognite asset class.
+        data_record: The data record of the Cognite asset class node.
         aliases: Alternative names for the instance.
         code: A unique identifier for the class of asset.
         description: The description of the instance.
@@ -168,22 +168,22 @@ class CogniteAssetClassWrite(CogniteDescribableNodeWrite):
 
 
 class CogniteAssetClassList(DomainModelList[CogniteAssetClass]):
-    """List of Cognite asset class in the read version."""
+    """List of Cognite asset classes in the read version."""
 
     _INSTANCE = CogniteAssetClass
 
     def as_write(self) -> CogniteAssetClassWriteList:
-        """Convert these read versions of Cognite asset clas to the writing versions."""
+        """Convert these read versions of Cognite asset class to the writing versions."""
         return CogniteAssetClassWriteList([node.as_write() for node in self.data])
 
 
 class CogniteAssetClassWriteList(DomainModelWriteList[CogniteAssetClassWrite]):
-    """List of Cognite asset class in the writing version."""
+    """List of Cognite asset classes in the writing version."""
 
     _INSTANCE = CogniteAssetClassWrite
 
 
-def _create_cognite_asset_clas_filter(
+def _create_cognite_asset_class_filter(
     view_id: dm.ViewId,
     code: str | list[str] | None = None,
     code_prefix: str | None = None,
@@ -281,7 +281,7 @@ class _CogniteAssetClassQuery(NodeQueryCore[T_DomainModelList, CogniteAssetClass
             ]
         )
 
-    def list_cognite_asset_clas(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteAssetClassList:
+    def list_cognite_asset_class(self, limit: int = DEFAULT_QUERY_LIMIT) -> CogniteAssetClassList:
         return self._list(limit=limit)
 
 

@@ -133,8 +133,8 @@ class CogniteEquipmentTypeAPI(
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment_class: The equipment clas to filter on.
-            equipment_class_prefix: The prefix of the equipment clas to filter on.
+            equipment_class: The equipment class to filter on.
+            equipment_class_prefix: The prefix of the equipment class to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             standard: The standard to filter on.
@@ -321,8 +321,8 @@ class CogniteEquipmentTypeAPI(
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment_class: The equipment clas to filter on.
-            equipment_class_prefix: The prefix of the equipment clas to filter on.
+            equipment_class: The equipment class to filter on.
+            equipment_class_prefix: The prefix of the equipment class to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             standard: The standard to filter on.
@@ -411,8 +411,8 @@ class CogniteEquipmentTypeAPI(
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment_class: The equipment clas to filter on.
-            equipment_class_prefix: The prefix of the equipment clas to filter on.
+            equipment_class: The equipment class to filter on.
+            equipment_class_prefix: The prefix of the equipment class to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             standard: The standard to filter on.
@@ -511,8 +511,8 @@ class CogniteEquipmentTypeAPI(
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment_class: The equipment clas to filter on.
-            equipment_class_prefix: The prefix of the equipment clas to filter on.
+            equipment_class: The equipment class to filter on.
+            equipment_class_prefix: The prefix of the equipment class to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             standard: The standard to filter on.
@@ -620,8 +620,8 @@ class CogniteEquipmentTypeAPI(
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
-            equipment_class: The equipment clas to filter on.
-            equipment_class_prefix: The prefix of the equipment clas to filter on.
+            equipment_class: The equipment class to filter on.
+            equipment_class_prefix: The prefix of the equipment class to filter on.
             name: The name to filter on.
             name_prefix: The prefix of the name to filter on.
             standard: The standard to filter on.

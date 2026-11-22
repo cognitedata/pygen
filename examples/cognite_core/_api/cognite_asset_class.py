@@ -28,7 +28,7 @@ from cognite_core.data_classes._core import (
 from cognite_core.data_classes._cognite_asset_class import (
     CogniteAssetClassQuery,
     _COGNITEASSETCLASS_PROPERTIES_BY_FIELD,
-    _create_cognite_asset_clas_filter,
+    _create_cognite_asset_class_filter,
 )
 from cognite_core.data_classes import (
     DomainModel,
@@ -75,23 +75,23 @@ class CogniteAssetClassAPI(
         external_id: str | dm.NodeId | tuple[str, str] | SequenceNotStr[str | dm.NodeId | tuple[str, str]],
         space: str = DEFAULT_INSTANCE_SPACE,
     ) -> CogniteAssetClass | CogniteAssetClassList | None:
-        """Retrieve one or more Cognite asset class by id(s).
+        """Retrieve one or more Cognite asset classes by id(s).
 
         Args:
-            external_id: External id or list of external ids of the Cognite asset class.
-            space: The space where all the Cognite asset class are located.
+            external_id: External id or list of external ids of the Cognite asset classes.
+            space: The space where all the Cognite asset classes are located.
 
         Returns:
-            The requested Cognite asset class.
+            The requested Cognite asset classes.
 
         Examples:
 
-            Retrieve cognite_asset_clas by id:
+            Retrieve cognite_asset_class by id:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset_clas = client.cognite_asset_class.retrieve(
-                ...     "my_cognite_asset_clas"
+                >>> cognite_asset_class = client.cognite_asset_class.retrieve(
+                ...     "my_cognite_asset_class"
                 ... )
 
         """
@@ -120,7 +120,7 @@ class CogniteAssetClassAPI(
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> CogniteAssetClassList:
-        """Search Cognite asset class
+        """Search Cognite asset classes
 
         Args:
             query: The search query,
@@ -135,7 +135,7 @@ class CogniteAssetClassAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset class to return. Defaults to 25.
+            limit: Maximum number of Cognite asset classes to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -146,20 +146,20 @@ class CogniteAssetClassAPI(
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
-            Search results Cognite asset class matching the query.
+            Search results Cognite asset classes matching the query.
 
         Examples:
 
-           Search for 'my_cognite_asset_clas' in all text properties:
+           Search for 'my_cognite_asset_class' in all text properties:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset_class = client.cognite_asset_class.search(
-                ...     'my_cognite_asset_clas'
+                >>> cognite_asset_classes = client.cognite_asset_class.search(
+                ...     'my_cognite_asset_class'
                 ... )
 
         """
-        filter_ = _create_cognite_asset_clas_filter(
+        filter_ = _create_cognite_asset_class_filter(
             self._view_id,
             code,
             code_prefix,
@@ -281,7 +281,7 @@ class CogniteAssetClassAPI(
         | list[dm.aggregations.AggregatedNumberedValue]
         | InstanceAggregationResultList
     ):
-        """Aggregate data across Cognite asset class
+        """Aggregate data across Cognite asset classes
 
         Args:
             aggregate: The aggregation to perform.
@@ -299,7 +299,7 @@ class CogniteAssetClassAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset class to return. Defaults to 25.
+            limit: Maximum number of Cognite asset classes to return. Defaults to 25.
                 Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient, you can write
                 your own filtering which will be ANDed with the filter above.
@@ -309,7 +309,7 @@ class CogniteAssetClassAPI(
 
         Examples:
 
-            Count Cognite asset class in space `my_space`:
+            Count Cognite asset classes in space `my_space`:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
@@ -317,7 +317,7 @@ class CogniteAssetClassAPI(
 
         """
 
-        filter_ = _create_cognite_asset_clas_filter(
+        filter_ = _create_cognite_asset_class_filter(
             self._view_id,
             code,
             code_prefix,
@@ -360,7 +360,7 @@ class CogniteAssetClassAPI(
         limit: int = DEFAULT_LIMIT_READ,
         filter: dm.Filter | None = None,
     ) -> dm.aggregations.HistogramValue:
-        """Produces histograms for Cognite asset class
+        """Produces histograms for Cognite asset classes
 
         Args:
             property: The property to use as the value in the histogram.
@@ -377,7 +377,7 @@ class CogniteAssetClassAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset class to return.
+            limit: Maximum number of Cognite asset classes to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -386,7 +386,7 @@ class CogniteAssetClassAPI(
             Bucketed histogram results.
 
         """
-        filter_ = _create_cognite_asset_clas_filter(
+        filter_ = _create_cognite_asset_class_filter(
             self._view_id,
             code,
             code_prefix,
@@ -410,7 +410,7 @@ class CogniteAssetClassAPI(
         )
 
     def select(self) -> CogniteAssetClassQuery:
-        """Start selecting from Cognite asset class."""
+        """Start selecting from Cognite asset classes."""
         return CogniteAssetClassQuery(self._client)
 
     def _build(
@@ -451,10 +451,10 @@ class CogniteAssetClassAPI(
         limit: int | None = None,
         cursors: dict[str, str | None] | None = None,
     ) -> Iterator[CogniteAssetClassList]:
-        """Iterate over Cognite asset class
+        """Iterate over Cognite asset classes
 
         Args:
-            chunk_size: The number of Cognite asset class to return in each iteration. Defaults to 100.
+            chunk_size: The number of Cognite asset classes to return in each iteration. Defaults to 100.
             code: The code to filter on.
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
@@ -467,55 +467,55 @@ class CogniteAssetClassAPI(
             space: The space to filter on.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
-            limit: Maximum number of Cognite asset class to return. Defaults to None, which will return all items.
+            limit: Maximum number of Cognite asset classes to return. Defaults to None, which will return all items.
             cursors: (Advanced) Cursor to use for pagination. This can be used to resume an iteration from a
                 specific point. See example below for more details.
 
         Returns:
-            Iteration of Cognite asset class
+            Iteration of Cognite asset classes
 
         Examples:
 
-            Iterate Cognite asset class in chunks of 100 up to 2000 items:
+            Iterate Cognite asset classes in chunks of 100 up to 2000 items:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_asset_class in client.cognite_asset_class.iterate(chunk_size=100, limit=2000):
-                ...     for cognite_asset_clas in cognite_asset_class:
-                ...         print(cognite_asset_clas.external_id)
+                >>> for cognite_asset_classes in client.cognite_asset_class.iterate(chunk_size=100, limit=2000):
+                ...     for cognite_asset_class in cognite_asset_classes:
+                ...         print(cognite_asset_class.external_id)
 
-            Iterate Cognite asset class in chunks of 100 sorted by external_id in descending order:
+            Iterate Cognite asset classes in chunks of 100 sorted by external_id in descending order:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> for cognite_asset_class in client.cognite_asset_class.iterate(
+                >>> for cognite_asset_classes in client.cognite_asset_class.iterate(
                 ...     chunk_size=100,
                 ...     sort_by="external_id",
                 ...     direction="descending",
                 ... ):
-                ...     for cognite_asset_clas in cognite_asset_class:
-                ...         print(cognite_asset_clas.external_id)
+                ...     for cognite_asset_class in cognite_asset_classes:
+                ...         print(cognite_asset_class.external_id)
 
-            Iterate Cognite asset class in chunks of 100 and use cursors to resume the iteration:
+            Iterate Cognite asset classes in chunks of 100 and use cursors to resume the iteration:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
                 >>> for first_iteration in client.cognite_asset_class.iterate(chunk_size=100, limit=2000):
                 ...     print(first_iteration)
                 ...     break
-                >>> for cognite_asset_class in client.cognite_asset_class.iterate(
+                >>> for cognite_asset_classes in client.cognite_asset_class.iterate(
                 ...     chunk_size=100,
                 ...     limit=2000,
                 ...     cursors=first_iteration.cursors,
                 ... ):
-                ...     for cognite_asset_clas in cognite_asset_class:
-                ...         print(cognite_asset_clas.external_id)
+                ...     for cognite_asset_class in cognite_asset_classes:
+                ...         print(cognite_asset_class.external_id)
 
         """
         warnings.warn(
             "The `iterate` method is in alpha and is subject to breaking changes without prior notice.", stacklevel=2
         )
-        filter_ = _create_cognite_asset_clas_filter(
+        filter_ = _create_cognite_asset_class_filter(
             self._view_id,
             code,
             code_prefix,
@@ -549,7 +549,7 @@ class CogniteAssetClassAPI(
         direction: Literal["ascending", "descending"] = "ascending",
         sort: InstanceSort | list[InstanceSort] | None = None,
     ) -> CogniteAssetClassList:
-        """List/filter Cognite asset class
+        """List/filter Cognite asset classes
 
         Args:
             code: The code to filter on.
@@ -562,7 +562,7 @@ class CogniteAssetClassAPI(
             standard_prefix: The prefix of the standard to filter on.
             external_id_prefix: The prefix of the external ID to filter on.
             space: The space to filter on.
-            limit: Maximum number of Cognite asset class to return.
+            limit: Maximum number of Cognite asset classes to return.
                 Defaults to 25. Set to -1, float("inf") or None to return all items.
             filter: (Advanced) If the filtering available in the above is not sufficient,
                 you can write your own filtering which will be ANDed with the filter above.
@@ -573,18 +573,18 @@ class CogniteAssetClassAPI(
                 specify the direction for each field as well as how to handle null values.
 
         Returns:
-            List of requested Cognite asset class
+            List of requested Cognite asset classes
 
         Examples:
 
-            List Cognite asset class and limit to 5:
+            List Cognite asset classes and limit to 5:
 
                 >>> from cognite_core import CogniteCoreClient
                 >>> client = CogniteCoreClient()
-                >>> cognite_asset_class = client.cognite_asset_class.list(limit=5)
+                >>> cognite_asset_classes = client.cognite_asset_class.list(limit=5)
 
         """
-        filter_ = _create_cognite_asset_clas_filter(
+        filter_ = _create_cognite_asset_class_filter(
             self._view_id,
             code,
             code_prefix,

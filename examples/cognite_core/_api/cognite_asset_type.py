@@ -141,7 +141,7 @@ class CogniteAssetTypeAPI(
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             code: The code to filter on.
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
@@ -339,7 +339,7 @@ class CogniteAssetTypeAPI(
             property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             code: The code to filter on.
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
@@ -427,7 +427,7 @@ class CogniteAssetTypeAPI(
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             code: The code to filter on.
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
@@ -534,7 +534,7 @@ class CogniteAssetTypeAPI(
 
         Args:
             chunk_size: The number of Cognite asset types to return in each iteration. Defaults to 100.
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             code: The code to filter on.
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
@@ -645,7 +645,7 @@ class CogniteAssetTypeAPI(
         """List/filter Cognite asset types
 
         Args:
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             code: The code to filter on.
             code_prefix: The prefix of the code to filter on.
             description: The description to filter on.
