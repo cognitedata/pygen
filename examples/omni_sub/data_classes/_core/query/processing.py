@@ -310,6 +310,10 @@ class QueryUnpacker:
         node_expression: dm.query.NodeResultSetExpression,
         connections: list[tuple[str, dict[dm.NodeId, list[dict[str, Any]]]]],
     ) -> dict[dm.NodeId, list[dict[str, Any]]]:
+        if step.selected_properties is not None and step.selected_properties != ["*"]:
+            step.selected_properties = list(
+                set(step.selected_properties) | {"space", "externalId", "version", "lastUpdatedTime", "createdTime"}
+            )
         step_properties = set(step.selected_properties or []) or None
         direct_property: str | None = None
         if node_expression.through and node_expression.direction == "inwards":
