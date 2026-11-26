@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class Argument(BaseModel):
-    default: Union[str, bool, None] = None
+    default: str | bool | None = None
     help: str
 
 

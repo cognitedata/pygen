@@ -97,8 +97,8 @@ class _CogniteCoreResourceAPI(Protocol[T_CogniteResourceList]):
 
     def delete(
         self,
-        id: Union[int, Sequence[int]] | None = None,
-        external_id: Union[str, SequenceNotStr[str]] | None = None,
+        id: int | Sequence[int] | None = None,
+        external_id: str | SequenceNotStr[str] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> None: ...
 
@@ -125,8 +125,8 @@ class _FileAPIAdapter(_CogniteCoreResourceAPI[FileMetadataList]):
 
     def delete(
         self,
-        id: Union[int, Sequence[int]] | None = None,
-        external_id: Union[str, SequenceNotStr[str]] | None = None,
+        id: int | Sequence[int] | None = None,
+        external_id: str | SequenceNotStr[str] | None = None,
         ignore_unknown_ids: bool = False,
     ) -> None:
         with suppress(CogniteNotFoundError):

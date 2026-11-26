@@ -17,9 +17,9 @@ cd pygen
 
 We use [uv](https://pypi.org/project/uv/) for dependency- and virtual environment management.
 
-When developing `pygen` use Python `3.10`. To specify the python version with `uv` you can use the command
+When developing `pygen` use Python `3.11`. To specify the python version with `uv` you can use the command
 ```bash
-uv venv --python 3.10
+uv venv --python 3.11
 ```
 See [uv docs](https://docs.astral.sh/uv/pip/environments/#creating-a-virtual-environment) for more information on managing environments.
 

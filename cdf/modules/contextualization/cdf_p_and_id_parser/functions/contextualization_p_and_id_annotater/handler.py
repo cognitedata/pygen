@@ -2,7 +2,7 @@ import json
 import time
 import traceback
 from collections.abc import Iterable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from hashlib import sha256
 from typing import Any, Literal, cast
 
@@ -336,7 +336,7 @@ def load_annotation(
         status = "Rejected"
     region = raw_annotation["region"]
     vertices = region["vertices"]
-    now = datetime.now(timezone.utc).replace(microsecond=0)
+    now = datetime.now(UTC).replace(microsecond=0)
     if entity.type == "diagrams.AssetLink":
         start_node = (file_id.space, file_id.external_id)
         end_node = (entity.node_id.space, entity.node_id.external_id)

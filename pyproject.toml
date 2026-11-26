@@ -71,13 +71,13 @@ exclude-newer = "7 days"
 
 [tool.black]
 line-length = 120
-target_version = ['py310']
+target_version = ['py311']
 include = '\.py$'
 
 [tool.ruff]
 # See https://beta.ruff.rs/docs/rules for an overview of ruff rules
 line-length = 120
-target-version = "py310"
+target-version = "py311"
 exclude = ["examples", "scripts"]
 fix = true
 
@@ -85,8 +85,6 @@ fix = true
 select = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
 fixable = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
 ignore = [
-    # This is causing issues for pydantic which does not support use of X | Y for type annotations before 3.10
-    "UP007", # Use X | Y for type annotations
     # Typer do function calls when setting up the CLI.
     "B008", # Do not perform function call {name} in argument defaults
     # This is done when setting the pygen configs, and useful for getting pretty docs.

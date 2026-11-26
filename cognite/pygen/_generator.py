@@ -10,7 +10,7 @@ import tempfile
 import warnings
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any, Literal, Union, cast, overload
+from typing import Any, Literal, cast, overload
 
 from cognite.client import CogniteClient
 from cognite.client import data_modeling as dm
@@ -29,7 +29,7 @@ from cognite.pygen.exceptions import DataModelNotFound
 from cognite.pygen.utils.cdf import _reduce_model
 from cognite.pygen.utils.text import to_pascal, to_snake
 
-DataModel = Union[DataModelIdentifier, dm.DataModel[dm.View]]
+DataModel = DataModelIdentifier | dm.DataModel[dm.View]
 
 _ILLEGAL_CHARACTERS_IN_FOLDER_NAME = '/\\?%*:|"<>!'
 

@@ -1,6 +1,6 @@
-import sys
 from collections.abc import Collection, Iterable, Iterator, MutableSequence
 from typing import (
+    Self,
     SupportsIndex,
     cast,
     overload,
@@ -11,11 +11,6 @@ from cognite.client.data_classes.data_modeling.query import NodeOrEdgeResultSetE
 
 from omni.data_classes._core.query.executor import QueryExecutor
 from omni.data_classes._core.query.step import QueryBuildStep
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 
 class QueryBuilder(list, MutableSequence[QueryBuildStep]):

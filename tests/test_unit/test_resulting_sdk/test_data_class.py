@@ -1,6 +1,6 @@
 import json
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import cast
 
 import pytest
@@ -251,7 +251,7 @@ def test_cognite_file_as_nodes() -> None:
 
 class TestAsWrite:
     def test_as_write_with_extra_arg(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         read_cls = dc.PrimitiveNullable(  # type: ignore[call-arg]
             space="my_space",
             external_id="my_external_id",
@@ -269,7 +269,7 @@ class TestAsWrite:
         }
 
     def test_as_write_with_cdf_external_references(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         read_instance = dc.CDFExternalReferences(
             external_id="my_external_id",
             data_record=dc.DataRecord(
@@ -323,7 +323,7 @@ class TestAsWrite:
         assert isinstance(write.timeseries, TimeSeriesWrite)
 
     def test_as_write_maintain_view_type(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         record = dc.DataRecord(
             version=1,
             last_updated_time=now,
