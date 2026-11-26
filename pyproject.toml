@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Cognite Python SDK Generator"
 authors = [{name="Cognite", email ="support@cognite.com"}]
 readme="README.md"
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.11,<4.0"
 license = "Apache-2.0"
 dependencies = [
     "cognite-sdk>=8.0.1, <9.0.0",
@@ -13,7 +13,7 @@ dependencies = [
     # Thus, we pin it to ensure compatibility with the pyodide build.
     "pydantic>=2.7",
     "Jinja2>=3.1",
-    "inflect>=6.2",
+    "inflect>=7.6",
     "typing-extensions>=4.14.0",
 ]
 
