@@ -8,4 +8,4 @@ mkdocs-gitbook==0.0.1
 mkdocs-glightbox==0.5.3
 pymdown-extensions==13.1
 mkdocstrings[python]==1.0.8
-mistune==3.3.4
+mistune==3.4.0
