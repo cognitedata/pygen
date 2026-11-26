@@ -57,9 +57,9 @@ def _load_pyproject_toml(pyproject_toml_path: Path | None = None) -> dict[str, A
         pyproject_toml_path = Path.cwd() / "pyproject.toml"
     if not pyproject_toml_path.exists():
         return {}
-    import toml
+    import tomllib
 
-    return toml.loads(pyproject_toml_path.read_text())
+    return tomllib.loads(pyproject_toml_path.read_text())
 
 
 def _load_secret_toml(secret_toml_path: Path | None = None) -> dict[str, Any]:
@@ -67,9 +67,9 @@ def _load_secret_toml(secret_toml_path: Path | None = None) -> dict[str, Any]:
         secret_toml_path = Path.cwd() / ".secret.toml"
     if not secret_toml_path.exists():
         return {}
-    import toml
+    import tomllib
 
-    content = toml.loads(secret_toml_path.read_text())
+    content = tomllib.loads(secret_toml_path.read_text())
     if "cognite" not in content:
         raise ValueError(f"Secret file {secret_toml_path} does not contain a cognite section")
     return content["cognite"]

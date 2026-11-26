@@ -626,14 +626,12 @@ dependencies = [
     { name = "inflect" },
     { name = "jinja2" },
     { name = "pydantic" },
-    { name = "typing-extensions" },
 ]
 
 [package.optional-dependencies]
 cli = [
     { name = "build" },
     { name = "packaging" },
-    { name = "toml" },
     { name = "typer" },
 ]
 format = [
@@ -666,11 +664,9 @@ dev = [
     { name = "pytest-rerunfailures" },
     { name = "python-dotenv" },
     { name = "tabulate" },
-    { name = "toml" },
     { name = "twine" },
     { name = "typer" },
     { name = "types-pyyaml" },
-    { name = "types-toml" },
 ]
 
 [package.metadata]
@@ -682,9 +678,7 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1" },
     { name = "packaging", marker = "extra == 'cli'", specifier = ">=21.3" },
     { name = "pydantic", specifier = ">=2.7" },
-    { name = "toml", marker = "extra == 'cli'", specifier = ">=0.10" },
     { name = "typer", marker = "extra == 'cli'", specifier = ">=0.9" },
-    { name = "typing-extensions", specifier = ">=4.14.0" },
 ]
 provides-extras = ["cli", "format"]
 
@@ -713,11 +707,9 @@ dev = [
     { name = "pytest-rerunfailures", specifier = ">=14.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "tabulate", specifier = ">=0.8.9" },
-    { name = "toml", specifier = ">=0.10" },
     { name = "twine", specifier = ">=6.0.0" },
     { name = "typer", specifier = ">=0.12" },
     { name = "types-pyyaml", specifier = ">=6" },
-    { name = "types-toml", specifier = ">=0.10" },
 ]
 
 [[package]]
@@ -4701,15 +4693,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/4d/8b/ba599d956693dbc98e170f32097128bdea0a17f9d42b0b490fa749c12b1a/types_pyyaml-6.0.12.20261113.tar.gz", hash = "sha256:0828be2580fd94151182364f4d0158e4de62fdbeeb8d4296f7f7d2b6c22bb640", size = 19017, upload-time = "2026-11-13T08:51:21.488Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fd/2e/36fc0941a40ef066dbc8abac41bbbefb41389f547c779aef832aea6b873d/types_pyyaml-6.0.12.20261113-py3-none-any.whl", hash = "sha256:3600749e613748afdc4327f0b17c3296cf880cdbc7335f320007abd9dd815f67", size = 21321, upload-time = "2026-11-13T08:51:20.417Z" },
-]
-
-[[package]]
-name = "types-toml"
-version = "0.10.8.20260518"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/4b/11/6ece999e91f2ccb848ab4420f3f4816e78ac0541f739e6864affdaaa5737/types_toml-0.10.8.20260518.tar.gz", hash = "sha256:80e10facd24fdeda9d5c672187d72be3ac284843788d67f5aae59e3e016db6fe", size = 9419, upload-time = "2026-05-18T06:02:16.719Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/91/25/489751806bf5c95e4007f8e17409199c54d31e49ffbea07c5729b1286c8e/types_toml-0.10.8.20260518-py3-none-any.whl", hash = "sha256:0e564ab05f6fde62a315b3b5a9b6624fda569399795d30a37e64705a70459303", size = 9669, upload-time = "2026-05-18T06:02:15.86Z" },
 ]
 
 [[package]]

@@ -14,7 +14,6 @@ dependencies = [
     "pydantic>=2.7",
     "Jinja2>=3.1",
     "inflect>=7.6",
-    "typing-extensions>=4.14.0",
 ]
 
 [project.urls]
@@ -27,7 +26,6 @@ Changelog = "https://github.com/cognitedata/pygen/releases"
 cli = [
     "packaging>=21.3",
     "typer>=0.9",
-    "toml>=0.10",
     "build>=1.1",
 ]
 format = [
@@ -42,7 +40,6 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest-mock>=3.10.0",
     "pytest-rerunfailures>=14.0",
-    "toml>=0.10",
     "pandas>=1.5.3",
     "mypy>=1.5.0",
     "mkdocs>=1.6.0",
@@ -53,7 +50,6 @@ dev = [
     "pandas-stubs>=2",
     "typer>=0.12",
     "types-PyYAML>=6",
-    "types-toml>=0.10",
     "IPython>=8.0.0",
     "matplotlib>=3.5.0",
     "tabulate>=0.8.9",
