@@ -2,7 +2,7 @@
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.
-    rev: 0.12.10
+    rev: 0.13.8
     hooks:
       - id: uv-lock
 
@@ -12,7 +12,7 @@ repos:
         args:
           - --exit-non-zero-on-fix
       - id: ruff-format
-    rev: v0.16.6
+    rev: v0.17.5
 
 # Mypy must be run in the local system environment, not in the pre-commit environment.
   - hooks:

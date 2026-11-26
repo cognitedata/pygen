@@ -363,7 +363,7 @@ class CogniteEquipmentWrite(CogniteDescribableNodeWrite, CogniteSourceableNodeWr
 
 
 class CogniteEquipmentList(DomainModelList[CogniteEquipment]):
-    """List of Cognite equipments in the read version."""
+    """List of Cognite equipment in the read version."""
 
     _INSTANCE = CogniteEquipment
 
@@ -419,7 +419,7 @@ class CogniteEquipmentList(DomainModelList[CogniteEquipment]):
 
 
 class CogniteEquipmentWriteList(DomainModelWriteList[CogniteEquipmentWrite]):
-    """List of Cognite equipments in the writing version."""
+    """List of Cognite equipment in the writing version."""
 
     _INSTANCE = CogniteEquipmentWrite
 

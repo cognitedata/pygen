@@ -206,7 +206,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         Args:
             query: The search query,
             properties: The property to search, if nothing is passed all text fields will be searched.
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
@@ -668,7 +668,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             property: The property to perform aggregation on.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
@@ -846,7 +846,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
             interval: The interval to use for the histogram bins.
             query: The query to search for in the text field.
             search_property: The text field to search in.
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
@@ -1130,7 +1130,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
 
         Args:
             chunk_size: The number of Cognite assets to return in each iteration. Defaults to 100.
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
@@ -1332,7 +1332,7 @@ class CogniteAssetAPI(NodeAPI[CogniteAsset, CogniteAssetWrite, CogniteAssetList,
         """List/filter Cognite assets
 
         Args:
-            asset_class: The asset clas to filter on.
+            asset_class: The asset class to filter on.
             description: The description to filter on.
             description_prefix: The prefix of the description to filter on.
             name: The name to filter on.
