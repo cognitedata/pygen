@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import getpass
 import os
+import tomllib
 from pathlib import Path
 
 import pytest
-import toml
 from cognite.client import ClientConfig, CogniteClient
 from cognite.client import data_modeling as dm
 from cognite.client.credentials import OAuthClientCredentials
@@ -24,7 +24,7 @@ load_dotenv(REPO_ROOT / ".env")
 def client_config() -> dict[str, str]:
     config_file = Path(__file__).parent / "config.toml"
     if config_file.exists():
-        return toml.load(config_file)["cognite"]
+        return tomllib.loads(config_file.read_text(encoding="utf-8"))["cognite"]
     else:
         return {
             "tenant_id": os.environ["IDP_TENANT_ID"],
@@ -39,7 +39,7 @@ def client_config() -> dict[str, str]:
 def client_config_alpha() -> dict[str, str]:
     config_file = Path(__file__).parent.parent.parent / "alpha_config.toml"
     if config_file.exists():
-        return toml.load(config_file)["cognite"]
+        return tomllib.loads(config_file.read_text(encoding="utf-8"))["cognite"]
     pytest.skip("No config_alpha.toml file found")
 
 

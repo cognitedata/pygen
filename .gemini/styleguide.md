@@ -31,7 +31,7 @@
 ## Line Length and Formatting
 
 - **Maximum line length**: 120 characters (configured in ruff)
-- **Target Python version**: 3.10+
+- **Target Python version**: 3.11+
 - **Indentation**: 4 spaces per level
 
 ## Type Hints

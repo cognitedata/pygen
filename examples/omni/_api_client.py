@@ -246,9 +246,9 @@ class OmniClient:
 
     @classmethod
     def from_toml(cls, file_path: Path | str, section: str | None = "cognite") -> OmniClient:
-        import toml
+        import tomllib
 
-        toml_content = toml.load(file_path)
+        toml_content = tomllib.loads(Path(file_path).read_text(encoding="utf-8"))
         if section is not None:
             try:
                 toml_content = toml_content[section]

@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Cognite Python SDK Generator"
 authors = [{name="Cognite", email ="support@cognite.com"}]
 readme="README.md"
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.11,<4.0"
 license = "Apache-2.0"
 dependencies = [
     "cognite-sdk>=8.0.1, <9.0.0",
@@ -13,8 +13,7 @@ dependencies = [
     # Thus, we pin it to ensure compatibility with the pyodide build.
     "pydantic>=2.7",
     "Jinja2>=3.1",
-    "inflect>=6.2",
-    "typing-extensions>=4.14.0",
+    "inflect>=7.6",
 ]
 
 [project.urls]
@@ -27,7 +26,6 @@ Changelog = "https://github.com/cognitedata/pygen/releases"
 cli = [
     "packaging>=21.3",
     "typer>=0.9",
-    "toml>=0.10",
     "build>=1.1",
 ]
 format = [
@@ -42,7 +40,6 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest-mock>=3.10.0",
     "pytest-rerunfailures>=14.0",
-    "toml>=0.10",
     "pandas>=1.5.3",
     "mypy>=1.5.0",
     "mkdocs>=1.6.0",
@@ -53,7 +50,6 @@ dev = [
     "pandas-stubs>=2",
     "typer>=0.12",
     "types-PyYAML>=6",
-    "types-toml>=0.10",
     "IPython>=8.0.0",
     "matplotlib>=3.5.0",
     "tabulate>=0.8.9",
@@ -71,13 +67,13 @@ exclude-newer = "7 days"
 
 [tool.black]
 line-length = 120
-target_version = ['py310']
+target_version = ['py311']
 include = '\.py$'
 
 [tool.ruff]
 # See https://beta.ruff.rs/docs/rules for an overview of ruff rules
 line-length = 120
-target-version = "py310"
+target-version = "py311"
 exclude = ["examples", "scripts"]
 fix = true
 
@@ -85,8 +81,6 @@ fix = true
 select = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
 fixable = ["E","W","F","I","RUF","TID","UP", "B", "FLY", "PTH", "ERA"]
 ignore = [
-    # This is causing issues for pydantic which does not support use of X | Y for type annotations before 3.10
-    "UP007", # Use X | Y for type annotations
     # Typer do function calls when setting up the CLI.
     "B008", # Do not perform function call {name} in argument defaults
     # This is done when setting the pygen configs, and useful for getting pretty docs.

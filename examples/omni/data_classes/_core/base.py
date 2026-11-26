@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import sys
 import warnings
 from abc import ABC, abstractmethod
 from collections import UserList
@@ -52,10 +51,7 @@ from omni.data_classes._core.cdf_external import GraphQLExternal
 from omni.data_classes._core.helpers import as_direct_relation_reference, parse_single_connection
 from omni.config import global_config
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
+from typing import Self
 
 
 @dataclass
